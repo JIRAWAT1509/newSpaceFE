@@ -1,0 +1,9 @@
+/* We use Tailwind for almost everything, but you can add specific overrides here if needed. */
+img {
+    /* This can help if your SVG icons don't inherit color properly */
+    filter: invert(94%) sepia(8%) saturate(121%) hue-rotate(193deg) brightness(100%) contrast(89%); /* Approx gray-text-disabled */
+}
+
+img.text-white-primary {
+    filter: brightness(0) invert(1); /* white */
+}
