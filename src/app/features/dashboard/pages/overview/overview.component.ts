@@ -46,11 +46,11 @@ interface Branch {
 
     ButtonModule
   ],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css',
+  templateUrl: './overview.component.html',
+  styleUrl: './overview.component.css',
 
 })
-export class DashboardComponent implements OnInit {
+export class OverviewComponent implements OnInit {
   // Branch selection
   branches: Branch[] = [
     { id: '1', code: 'ทั้งหมด', name: 'ทั้งหมด', displayName: 'ทั้งหมด' },

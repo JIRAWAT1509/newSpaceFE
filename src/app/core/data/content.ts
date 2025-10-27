@@ -1,377 +1,442 @@
+// content.ts - Navigation content for 3-layer structure
 import { NavigationItem } from '../models/navigation.model';
 
+/**
+ * NAVIGATION STRUCTURE - 3 LAYERS
+ *
+ * Layer 1 (Header): Main Categories
+ * Layer 2 (Sidebar): Sub-modules / Function Groups
+ * Layer 3 (Sidebar Items): Specific Functions / Pages
+ *
+ * NOTE: Items marked with hasDeeper: true contain 4+ levels in the full structure.
+ * These will be implemented in future phases with drill-down functionality.
+ */
+
 export const NAVIGATION_CONTENT: NavigationItem[] = [
+  // ============================================
+  // 1. SALES (New Module - Empty for now)
+  // ============================================
   {
-    primary_content: "area",
+    primary_content: 'sales',
+    secondary_content: []
+  },
+
+  // ============================================
+  // 2. AREA
+  // ============================================
+  {
+    primary_content: 'area',
     secondary_content: [
       {
-        name: "area_management",
-        icon: "assets/icons/briefcase-outline.svg",
-
+        name: 'area_layout_management',
+        icon: 'assets/icons/briefcase-outline.svg',
         sub: [
-          { name: "view_all_areas", route: "/dashboard" },
-          { name: "add_new_area", route: "/dashboard" },
-          { name: "area_statistics", route: "/dashboard" },
-          { name: "area_reports", route: "/dashboard" },
-          { name: "area_settings", route: "/dashboard" }
+          { name: 'master_data', route: '/area/layout/master', hasDeeper: true, deeperNote: 'Contains: Building, Floor, Zone, Layout, Price List, etc.' },
+          { name: 'inquiry', route: '/area/layout/inquiry', hasDeeper: true, deeperNote: 'Contains: Check status, Availability, Inspection' },
+          { name: 'reports', route: '/area/layout/reports', hasDeeper: true, deeperNote: 'Contains: Layout reports, Current area reports' }
         ]
       },
       {
-        name: "area_allocation",
-
-        icon: "assets/icons/business-outline.svg",
+        name: 'area_maintenance_closure',
+        icon: 'assets/icons/clipboard-outline.svg',
         sub: [
-          { name: "allocate_space", route: "/dashboard" },
-          { name: "view_allocations", route: "/dashboard" },
-          { name: "allocation_history", route: "/dashboard" },
-          { name: "allocation_analytics", route: "/dashboard" },
-          { name: "allocation_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/area/maintenance/daily', hasDeeper: true, deeperNote: 'Contains: Closure forms, Approvals' },
+          { name: 'processing', route: '/area/maintenance/processing', hasDeeper: true, deeperNote: 'Contains: Close area, Open area' },
+          { name: 'reports', route: '/area/maintenance/reports' }
         ]
       },
       {
-        name: "area_maintenance",
-
-        icon: "assets/icons/clipboard-outline.svg",
+        name: 'area_measurement',
+        icon: 'assets/icons/cube-outline.svg',
         sub: [
-          { name: "maintenance_schedule", route: "/dashboard" },
-          { name: "maintenance_requests", route: "/dashboard" },
-          { name: "maintenance_history", route: "/dashboard" },
-          { name: "maintenance_reports", route: "/dashboard" },
-          { name: "maintenance_settings", route: "/dashboard" }
-        ]
-      },
-      {
-        name: "area_inspection",
-
-        icon: "assets/icons/cube-outline.svg",
-        sub: [
-          { name: "schedule_inspection", route: "/dashboard" },
-          { name: "inspection_reports", route: "/dashboard" },
-          { name: "inspection_history", route: "/dashboard" },
-          { name: "inspection_checklist", route: "/dashboard" },
-          { name: "inspection_settings", route: "/dashboard" }
-        ]
-      },
-      {
-        name: "area_availability",
-
-        icon: "assets/icons/briefcase-outline.svg",
-        sub: [
-          { name: "check_availability", route: "/dashboard" },
-          { name: "availability_calendar", route: "/dashboard" },
-          { name: "availability_reports", route: "/dashboard" },
-          { name: "availability_alerts", route: "/dashboard" },
-          { name: "availability_settings", route: "/dashboard" }
-        ]
-      },
-      {
-        name: "area_documentation",
-
-        icon: "assets/icons/briefcase-outline.svg",
-        sub: [
-          { name: "view_documents", route: "/dashboard" },
-          { name: "upload_documents", route: "/dashboard" },
-          { name: "document_categories", route: "/dashboard" },
-          { name: "document_search", route: "/dashboard" },
-          { name: "document_archive", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/area/measurement/daily' },
+          { name: 'reports', route: '/area/measurement/reports' }
         ]
       }
     ]
   },
+
+  // ============================================
+  // 3. CONTRACT
+  // ============================================
   {
-    primary_content: "contract",
+    primary_content: 'contract',
     secondary_content: [
       {
-        name: "contract_management",
-
-                icon: "assets/icons/briefcase-outline.svg",
-
+        name: 'quotation_management',
+        icon: 'assets/icons/briefcase-outline.svg',
         sub: [
-          { name: "view_all_contracts", route: "/dashboard" },
-          { name: "create_new_contract", route: "/dashboard" },
-          { name: "contract_templates", route: "/dashboard" },
-          { name: "contract_reports", route: "/dashboard" },
-          { name: "contract_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/contract/quotation/daily', hasDeeper: true, deeperNote: 'Contains: Create, Copy quotations' },
+          { name: 'processing', route: '/contract/quotation/processing' },
+          { name: 'reports', route: '/contract/quotation/reports', hasDeeper: true, deeperNote: 'Contains: Customer data, Quotation details' }
         ]
       },
       {
-        name: "contract_renewal",
-
-        icon: "assets/icons/business-outline.svg",
+        name: 'quotation_to_booking',
+        icon: 'assets/icons/business-outline.svg',
         sub: [
-          { name: "renewal_requests", route: "/dashboard" },
-          { name: "renewal_schedule", route: "/dashboard" },
-          { name: "renewal_history", route: "/dashboard" },
-          { name: "renewal_analytics", route: "/dashboard" },
-          { name: "renewal_settings", route: "/dashboard" }
+          { name: 'processing', route: '/contract/q2b/processing' },
+          { name: 'reports', route: '/contract/q2b/reports' }
         ]
       },
       {
-        name: "contract_termination",
-
-        icon: "assets/icons/briefcase-outline.svg",
+        name: 'booking_contract',
+        icon: 'assets/icons/clipboard-outline.svg',
         sub: [
-          { name: "termination_requests", route: "/dashboard" },
-          { name: "termination_process", route: "/dashboard" },
-          { name: "termination_history", route: "/dashboard" },
-          { name: "termination_reports", route: "/dashboard" },
-          { name: "termination_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/contract/booking/daily' },
+          { name: 'processing', route: '/contract/booking/processing' },
+          { name: 'reports', route: '/contract/booking/reports', hasDeeper: true, deeperNote: 'Contains: Customer data, Booking details, Certificate' }
         ]
       },
       {
-        name: "contract_documents",
-
-        icon: "assets/icons/briefcase-outline.svg",
+        name: 'booking_to_lease',
+        icon: 'assets/icons/briefcase-outline.svg',
         sub: [
-          { name: "view_documents", route: "/dashboard" },
-          { name: "upload_documents", route: "/dashboard" },
-          { name: "document_signing", route: "/dashboard" },
-          { name: "document_archive", route: "/dashboard" },
-          { name: "document_settings", route: "/dashboard" }
+          { name: 'processing', route: '/contract/b2l/processing' },
+          { name: 'reports', route: '/contract/b2l/reports' }
         ]
       },
       {
-        name: "contract_compliance",
-
-        icon: "assets/icons/clipboard-outline.svg",
+        name: 'lease_contract',
+        icon: 'assets/icons/business-outline.svg',
         sub: [
-          { name: "compliance_check", route: "/dashboard" },
-          { name: "compliance_reports", route: "/dashboard" },
-          { name: "compliance_alerts", route: "/dashboard" },
-          { name: "compliance_history", route: "/dashboard" },
-          { name: "compliance_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/contract/lease/daily', hasDeeper: true, deeperNote: 'Contains: Lease, Copy, Addendum, etc.' },
+          { name: 'processing', route: '/contract/lease/processing', hasDeeper: true, deeperNote: 'Contains: Renewal, Discount, Approvals' },
+          { name: 'inquiry', route: '/contract/lease/inquiry' },
+          { name: 'reports', route: '/contract/lease/reports', hasDeeper: true, deeperNote: 'Contains: Details, Age check, Print forms, Data exports' }
         ]
       },
       {
-        name: "contract_analytics",
-
-        icon: "assets/icons/briefcase-outline.svg",
+        name: 'contract_documents',
+        icon: 'assets/icons/clipboard-outline.svg',
         sub: [
-          { name: "contract_metrics", route: "/dashboard" },
-          { name: "performance_analysis", route: "/dashboard" },
-          { name: "contract_trends", route: "/dashboard" },
-          { name: "custom_reports", route: "/dashboard" },
-          { name: "analytics_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/contract/documents/daily' },
+          { name: 'processing', route: '/contract/documents/processing', hasDeeper: true, deeperNote: 'Contains: Approval, Signing' }
+        ]
+      },
+      {
+        name: 'contract_termination',
+        icon: 'assets/icons/briefcase-outline.svg',
+        sub: [
+          { name: 'processing', route: '/contract/termination/processing' },
+          { name: 'reports', route: '/contract/termination/reports' }
+        ]
+      },
+      {
+        name: 'promotion_work_order',
+        icon: 'assets/icons/business-outline.svg',
+        sub: [
+          { name: 'daily_transactions', route: '/contract/promotion/daily', hasDeeper: true, deeperNote: 'Contains: Work order, Promotion job' },
+          { name: 'processing', route: '/contract/promotion/processing' },
+          { name: 'inquiry', route: '/contract/promotion/inquiry' },
+          { name: 'reports', route: '/contract/promotion/reports', hasDeeper: true, deeperNote: 'Contains: Summary, Print forms' }
+        ]
+      },
+      {
+        name: 'fit_out_contract',
+        icon: 'assets/icons/clipboard-outline.svg',
+        sub: [
+          { name: 'daily_transactions', route: '/contract/fitout/daily' }
         ]
       }
     ]
   },
+
+  // ============================================
+  // 4. COLLECTION AND FINANCE
+  // ============================================
   {
-    primary_content: "service",
+    primary_content: 'collection_finance',
     secondary_content: [
+      // --- COLLECTION SECTION ---
       {
-        name: "service_requests",
-
-                icon: "assets/icons/briefcase-outline.svg",
-
+        name: 'collection_sales_recording',
+        icon: 'assets/icons/briefcase-outline.svg',
         sub: [
-          { name: "view_all_requests", route: "/dashboard" },
-          { name: "create_new_request", route: "/dashboard" },
-          { name: "request_status", route: "/dashboard" },
-          { name: "request_history", route: "/dashboard" },
-          { name: "request_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/collection/sales/daily', hasDeeper: true, deeperNote: 'Contains: Sales for finance, Sales for accounting' },
+          { name: 'reports', route: '/collection/sales/reports', hasDeeper: true, deeperNote: 'Contains: Comparison, Daily sales, Monthly sales, Calculation forms' }
         ]
       },
       {
-        name: "service_providers",
-
-        icon: "assets/icons/business-outline.svg",
+        name: 'collection_invoicing',
+        icon: 'assets/icons/business-outline.svg',
         sub: [
-          { name: "view_providers", route: "/dashboard" },
-          { name: "add_new_provider", route: "/dashboard" },
-          { name: "provider_ratings", route: "/dashboard" },
-          { name: "provider_contracts", route: "/dashboard" },
-          { name: "provider_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/collection/invoice/daily', hasDeeper: true, deeperNote: 'Contains: Invoice, Cancel, Guarantee, Date edit, Other income, Monthly billing' },
+          { name: 'processing', route: '/collection/invoice/processing', hasDeeper: true, deeperNote: 'Contains: Auto-create, Tax invoice, Delete, Change VAT, Split, Import' },
+          { name: 'reports', route: '/collection/invoice/reports', hasDeeper: true, deeperNote: 'Contains: 26 different invoice reports' }
         ]
       },
       {
-        name: "service_scheduling",
-
-        icon: "assets/icons/briefcase-outline.svg",
+        name: 'collection_credit_note',
+        icon: 'assets/icons/clipboard-outline.svg',
         sub: [
-          { name: "view_schedule", route: "/dashboard" },
-          { name: "create_schedule", route: "/dashboard" },
-          { name: "schedule_calendar", route: "/dashboard" },
-          { name: "schedule_conflicts", route: "/dashboard" },
-          { name: "schedule_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/collection/credit/daily', hasDeeper: true, deeperNote: 'Contains: Credit note, Guarantee return, Discount list' },
+          { name: 'reports', route: '/collection/credit/reports', hasDeeper: true, deeperNote: 'Contains: Print, Guarantee check, Summaries' }
         ]
       },
       {
-        name: "service_quality",
-
-        icon: "assets/icons/clipboard-outline.svg",
+        name: 'collection_reminders',
+        icon: 'assets/icons/briefcase-outline.svg',
         sub: [
-          { name: "quality_metrics", route: "/dashboard" },
-          { name: "quality_reports", route: "/dashboard" },
-          { name: "quality_feedback", route: "/dashboard" },
-          { name: "quality_improvements", route: "/dashboard" },
-          { name: "quality_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/collection/reminder/daily' },
+          { name: 'processing', route: '/collection/reminder/processing' },
+          { name: 'reports', route: '/collection/reminder/reports', hasDeeper: true, deeperNote: 'Contains: Print, Outstanding summaries, Daily/Monthly reports, Bounced check tracking' }
+        ]
+      },
+
+      // --- FINANCE SECTION ---
+      {
+        name: 'finance_receipts',
+        icon: 'assets/icons/business-outline.svg',
+        sub: [
+          { name: 'daily_transactions', route: '/finance/receipt/daily', hasDeeper: true, deeperNote: 'Contains: Receipt by invoice, by revenue, temporary, bank deposit, bill payments, batch' },
+          { name: 'reports', route: '/finance/receipt/reports', hasDeeper: true, deeperNote: 'Contains: 20 different receipt reports' }
         ]
       },
       {
-        name: "service_billing",
-
-        icon: "assets/icons/briefcase-outline.svg",
+        name: 'finance_credit_note',
+        icon: 'assets/icons/clipboard-outline.svg',
         sub: [
-          { name: "view_invoices", route: "/dashboard" },
-          { name: "create_invoice", route: "/dashboard" },
-          { name: "payment_history", route: "/dashboard" },
-          { name: "billing_reports", route: "/dashboard" },
-          { name: "billing_settings", route: "/dashboard" }
-        ]
-      },
-      {
-        name: "service_analytics",
-
-        icon: "assets/icons/briefcase-outline.svg",
-        sub: [
-          { name: "service_metrics", route: "/dashboard" },
-          { name: "performance_analysis", route: "/dashboard" },
-          { name: "service_trends", route: "/dashboard" },
-          { name: "custom_reports", route: "/dashboard" },
-          { name: "analytics_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/finance/credit/daily', hasDeeper: true, deeperNote: 'Contains: By receipt, By revenue' },
+          { name: 'reports', route: '/finance/credit/reports', hasDeeper: true, deeperNote: 'Contains: Details, Print/Confirm' }
         ]
       }
     ]
   },
+
+  // ============================================
+  // 5. FACILITIES MANAGEMENT
+  // ============================================
   {
-    primary_content: "finance",
+    primary_content: 'facilities',
     secondary_content: [
+      // --- UTILITIES SECTION ---
       {
-        name: "revenue_management",
-
-                icon: "assets/icons/briefcase-outline.svg",
-
+        name: 'utilities_meter_management',
+        icon: 'assets/icons/briefcase-outline.svg',
         sub: [
-          { name: "view_revenue", route: "/dashboard" },
-          { name: "revenue_reports", route: "/dashboard" },
-          { name: "revenue_forecast", route: "/dashboard" },
-          { name: "revenue_analytics", route: "/dashboard" },
-          { name: "revenue_settings", route: "/dashboard" }
+          { name: 'master_data', route: '/facilities/utilities/master', hasDeeper: true, deeperNote: 'Contains: Meter groups, Meters, Phone, Rates' },
+          { name: 'daily_transactions', route: '/facilities/utilities/daily', hasDeeper: true, deeperNote: 'Contains: Latest reading, Charges, Last used, Other income' },
+          { name: 'processing', route: '/facilities/utilities/processing' },
+          { name: 'reports', route: '/facilities/utilities/reports', hasDeeper: true, deeperNote: 'Contains: Usage summaries by customer, Usage tables' }
         ]
       },
       {
-        name: "expense_tracking",
-
-        icon: "assets/icons/business-outline.svg",
+        name: 'utilities_overtime_ac',
+        icon: 'assets/icons/business-outline.svg',
         sub: [
-          { name: "view_expenses", route: "/dashboard" },
-          { name: "add_new_expense", route: "/dashboard" },
-          { name: "expense_reports", route: "/dashboard" },
-          { name: "expense_categories", route: "/dashboard" },
-          { name: "expense_settings", route: "/dashboard" }
+          { name: 'master_data', route: '/facilities/overtime-ac/master', hasDeeper: true, deeperNote: 'Contains: AHU, Holiday rates, Customer rates' },
+          { name: 'daily_transactions', route: '/facilities/overtime-ac/daily' },
+          { name: 'reports', route: '/facilities/overtime-ac/reports' }
         ]
       },
-      {
-        name: "payment_processing",
 
-        icon: "assets/icons/clipboard-outline.svg",
-        sub: [
-          { name: "process_payments", route: "/dashboard" },
-          { name: "payment_history", route: "/dashboard" },
-          { name: "payment_methods", route: "/dashboard" },
-          { name: "payment_reports", route: "/dashboard" },
-          { name: "payment_settings", route: "/dashboard" }
-        ]
-      },
+      // --- WORK ORDER SECTION ---
       {
-        name: "invoicing",
-
-        icon: "assets/icons/briefcase-outline.svg",
+        name: 'work_order_management',
+        icon: 'assets/icons/clipboard-outline.svg',
         sub: [
-          { name: "create_invoice", route: "/dashboard" },
-          { name: "view_invoices", route: "/dashboard" },
-          { name: "invoice_templates", route: "/dashboard" },
-          { name: "invoice_reports", route: "/dashboard" },
-          { name: "invoice_settings", route: "/dashboard" }
-        ]
-      },
-      {
-        name: "financial_reports",
-
-        icon: "assets/icons/briefcase-outline.svg",
-        sub: [
-          { name: "profit_loss", route: "/dashboard" },
-          { name: "balance_sheet", route: "/dashboard" },
-          { name: "cash_flow", route: "/dashboard" },
-          { name: "tax_reports", route: "/dashboard" },
-          { name: "report_settings", route: "/dashboard" }
-        ]
-      },
-      {
-        name: "budget_planning",
-
-        icon: "assets/icons/briefcase-outline.svg",
-        sub: [
-          { name: "create_budget", route: "/dashboard" },
-          { name: "view_budgets", route: "/dashboard" },
-          { name: "budget_analysis", route: "/dashboard" },
-          { name: "budget_alerts", route: "/dashboard" },
-          { name: "budget_settings", route: "/dashboard" }
+          { name: 'daily_transactions', route: '/facilities/workorder/daily', hasDeeper: true, deeperNote: 'Contains: Work order, Lease line, Direct line, Parking, Smart card' },
+          { name: 'reports', route: '/facilities/workorder/reports' }
         ]
       }
     ]
   },
+
+  // ============================================
+  // 6. REPORT AND DASHBOARD
+  // ============================================
   {
-    primary_content: "dashboard",
+    primary_content: 'report_dashboard',
     secondary_content: [
-       {
-      name: "overview",
-      icon: "assets/icons/briefcase-outline.svg",
-      route: "/dashboard/overview"  // Add this route
-    },
+      // --- REPORTS SECTION ---
+      {
+        name: 'budget_reports',
+        icon: 'assets/icons/briefcase-outline.svg',
+        sub: [
+          { name: 'revenue_details_main', route: '/reports/budget/revenue-main' },
+          { name: 'revenue_details_discount', route: '/reports/budget/revenue-discount' },
+          { name: 'revenue_details_other', route: '/reports/budget/revenue-other' },
+          { name: 'salable_area_report', route: '/reports/budget/salable-area' },
+          { name: 'revenue_vs_budget_actual', route: '/reports/budget/vs-budget-actual' },
+          { name: 'revenue_vs_budget_income', route: '/reports/budget/vs-budget-income' }
+        ]
+      },
+      {
+        name: 'interface_reports',
+        icon: 'assets/icons/business-outline.svg',
+        sub: [
+          { name: 'monthly_billing_summary', route: '/reports/interface/monthly-billing' },
+          { name: 'interface_logs', route: '/reports/interface/logs' }
+        ]
+      },
+
+      // --- DASHBOARD SECTION ---
+      {
+        name: 'dashboard_executive',
+        icon: 'assets/icons/clipboard-outline.svg',
+        sub: [
+          { name: 'receive_tracking', route: '/dashboard/executive/receive-tracking' },
+          { name: 'receive_tracking_exhibition', route: '/dashboard/executive/exhibition' },
+          { name: 'guarantee_info', route: '/dashboard/executive/guarantee' },
+          { name: 'expire_list', route: '/dashboard/executive/expire' },
+          { name: 'pending_contracts', route: '/dashboard/executive/pending' }
+        ]
+      },
+      {
+        name: 'dashboard_sales',
+        icon: 'assets/icons/business-outline.svg',
+        sub: [
+          { name: 'sales_and_traffic', route: '/dashboard/sales/traffic' },
+          { name: 'data_projection', route: '/dashboard/sales/projection' }
+        ]
+      },
+      {
+        name: 'dashboard_finance',
+        icon: 'assets/icons/briefcase-outline.svg',
+        sub: [
+          { name: 'receive_tracking_order', route: '/dashboard/finance/receive-order' },
+          { name: 'receive_tracking_group', route: '/dashboard/finance/receive-group' },
+          { name: 'invoice_delivery_summary', route: '/dashboard/finance/invoice-delivery' }
+        ]
+      },
+      {
+        name: 'dashboard_operation',
+        icon: 'assets/icons/clipboard-outline.svg',
+        sub: [
+          { name: 'export_query_to_file', route: '/dashboard/operation/export-query' },
+          { name: 'operational_tools', route: '/dashboard/operation/tools' }
+        ]
+      }
+    ]
+  },
+
+  // ============================================
+  // 7. SETTING
+  // ============================================
+{
+  primary_content: 'setting',
+  secondary_content: [
+    // --- USER SETTING ---
     {
-      name: "analytics",
-      icon: "assets/icons/business-outline.svg",
+      name: 'user_accounts',
+      icon: 'assets/icons/briefcase-outline.svg',
       sub: [
-        { name: "performance_metrics", route: "/dashboard/analytics/performance" },
-        { name: "trend_analysis", route: "/dashboard/analytics/trends" },
-        { name: "comparative_reports", route: "/dashboard/analytics/reports" },
-        { name: "custom_analytics", route: "/dashboard/analytics/custom" },
-        { name: "analytics_settings", route: "/dashboard/analytics/settings" }
+        {
+          name: 'user_data_management',
+          route: '/setting/user-accounts/data',
+          hasDeeper: true,
+          deeperNote: 'Contains: User setup, User groups, Display preferences'
+        },
+        {
+          name: 'roles_permissions',
+          route: '/setting/user-accounts/roles',
+          hasDeeper: true,
+          deeperNote: 'Contains: Permissions, Email recipients, Positions, Access scope, Approval period'
+        }
+      ]
+    },
+
+    // --- COMPANY SETTING ---
+    {
+      name: 'company_info',
+      icon: 'assets/icons/clipboard-outline.svg',
+      sub: [
+        {
+          name: 'company_data',
+          route: '/setting/company/data',
+          hasDeeper: true,
+          deeperNote: 'Contains: Company, Legal entity, Branches, Structure, Partners, New branch'
+        },
+        {
+          name: 'bank_info',
+          route: '/setting/company/bank',
+          hasDeeper: true,
+          deeperNote: 'Contains: Banks, Bank branches, Deposit codes'
+        },
+        {
+          name: 'finance_revenue',
+          route: '/setting/company/finance-revenue',
+          hasDeeper: true,
+          deeperNote: 'Contains: Revenue, Types, Mapping, Groups, Guarantee'
+        },
+        {
+          name: 'customer_info',
+          route: '/setting/company/customer'
+        }
+      ]
+    },
+
+    // --- SYSTEM SETTING ---
+    {
+      name: 'contract_data',
+      icon: 'assets/icons/business-outline.svg',
+      sub: [
+        {
+          name: 'contract_preparation_data',
+          route: '/setting/system/contract',
+          hasDeeper: true,
+          deeperNote: 'Contains: Profit center, Business types, Categories, Sales type, Contract types, Product groups, Signatories, Cost center'
+        }
       ]
     },
     {
-      name: "reports",
-      icon: "assets/icons/clipboard-outline.svg",
-      route: "/dashboard/reports"  // Add this route
+      name: 'finance_system_data',
+      icon: 'assets/icons/clipboard-outline.svg',
+      sub: [
+        {
+          name: 'finance_data_except_revenue',
+          route: '/setting/system/finance',
+          hasDeeper: true,
+          deeperNote: 'Contains: Basic data, Branch data, Document types, Numbering, Payment types, Debt reasons, Credit terms, VAT, WHT, Currency, Period control, Account numbers'
+        }
+      ]
     },
-      {
-        name: "alerts",
+    {
+      name: 'budget_management',
+      icon: 'assets/icons/briefcase-outline.svg',
+      sub: [
+        {
+          name: 'budget_setup',
+          route: '/setting/system/budget',
+          hasDeeper: true,
+          deeperNote: 'Contains: Budget revenue, Budget area, Close period, Collect data, New budget collection'
+        }
+      ]
+    },
+    {
+      name: 'interface_configuration',
+      icon: 'assets/icons/business-outline.svg',
+      sub: [
+        {
+          name: 'interface_settings',
+          route: '/setting/system/interface',
+          hasDeeper: true,
+          deeperNote: 'Contains: 13 interface configuration items (Receipt VAT, Credit receipt, Invoice, Customer, RPA, FTP, etc.)'
+        }
+      ]
+    }
+  ]
+}
+];
 
-        icon: "assets/icons/clipboard-outline.svg",
-        sub: [
-          { name: "view_alerts", route: "/dashboard" },
-          { name: "alert_rules", route: "/dashboard" },
-          { name: "alert_history", route: "/dashboard" },
-          { name: "alert_notifications", route: "/dashboard" },
-          { name: "alert_settings", route: "/dashboard" }
-        ]
-      },
-      {
-        name: "widgets",
-
-        icon: "assets/icons/briefcase-outline.svg",
-        sub: [
-          { name: "available_widgets", route: "/dashboard" },
-          { name: "widget_layout", route: "/dashboard" },
-          { name: "widget_settings", route: "/dashboard" },
-          { name: "custom_widgets", route: "/dashboard" },
-          { name: "widget_library", route: "/dashboard" }
-        ]
-      },
-      {
-        name: "customization",
-
-        icon: "assets/icons/briefcase-outline.svg",
-        sub: [
-          { name: "layout_options", route: "/dashboard" },
-          { name: "theme_settings", route: "/dashboard" },
-          { name: "display_preferences", route: "/dashboard" },
-          { name: "data_sources", route: "/dashboard" },
-          { name: "reset_dashboard", route: "/dashboard" }
-        ]
-      }
-    ]
-  }
+/**
+ * ITEMS WITH DEEPER NESTING (4+ levels)
+ * These items are marked with hasDeeper: true and will need drill-down UI in future phases
+ *
+ * Implementation Strategy:
+ * Phase 1 (Current): 3-layer navigation - clicking navigates to listing/summary page
+ * Phase 2 (Future): Add drill-down/breadcrumb navigation for deeper levels
+ * Phase 3 (Future): Add dynamic sub-routing for 4th and 5th levels
+ */
+export const DEEP_NAVIGATION_NOTES = [
+  { path: 'area.layout.master', levels: 4, items: ['Building', 'Floor', 'Zone', 'Layout', 'Price List', 'Review'] },
+  { path: 'area.layout.inquiry', levels: 4, items: ['Status check', 'Availability', 'Inspection'] },
+  { path: 'area.layout.reports', levels: 4, items: ['Area check', 'Current layout'] },
+  { path: 'collection.invoice.daily', levels: 5, items: ['Invoice', 'Cancel', 'Guarantee', 'Edit date', 'Other income', 'One-time', 'Monthly billing'] },
+  { path: 'collection.invoice.processing', levels: 5, items: ['Auto-create', 'Tax invoice', 'Delete', 'Change VAT', 'Import', 'Split', 'Other income processing'] },
+  { path: 'collection.invoice.reports', levels: 5, items: ['26 different report types'] },
+  { path: 'finance.receipt.daily', levels: 5, items: ['By invoice', 'By revenue', 'Temporary', 'Bank deposit', 'Bill payments', 'Batch'] },
+  { path: 'finance.receipt.reports', levels: 5, items: ['20 different report types'] },
+  // ... more items documented for future phases
 ];

@@ -6,7 +6,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { NavigationService } from '@core/services/navigation.service';
 import { LanguageService } from '@core/services/language.service';
 import { NAVIGATION_CONTENT } from '@core/data/content';
-import { NavigationItem, NavigationSecondary, NavigationSub } from '@core/models/navigation.model';
+import { NavigationItem, NavigationSecondary, NavigationTertiary } from '@core/models/navigation.model';
 import { SIDEBAR_TEXTS } from '@assets/language/sidebar.text';
 
 @Component({
@@ -109,7 +109,7 @@ export class SidebarComponent implements OnInit {
     this.openAccordion = this.openAccordion === itemName ? null : itemName;
   }
 
-onSubItemClick(subItem: NavigationSub): void {
+onSubItemClick(subItem: NavigationTertiary): void {
     this.navigationService.setSidebarExpanded(false); // Always hide on click
   }
 

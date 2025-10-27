@@ -1,20 +1,22 @@
+<!-- header.component.html - UPDATED with clickable logo -->
+
 <header class="fixed top-0 left-0 right-0 z-50">
   <!-- Main Header -->
-  <div
-class="bg-gradient-to-r from-sidebar-main via-header-primary to-accent-primary px-8 py-4 shadow-lg relative"
-  >
+  <div class="bg-gradient-to-r from-sidebar-main via-header-primary to-accent-primary px-8 py-4 shadow-lg relative">
     <div class="flex items-center justify-between">
-      <!-- Logo -->
+      <!-- Logo - NOW CLICKABLE -->
       <div class="flex items-center space-x-8">
         <h1
-          class="text-white-primary text-2xl font-bold tracking-widest drop-shadow-lg"
+          (click)="onLogoClick()"
+          class="text-white-primary text-2xl font-bold tracking-widest drop-shadow-lg cursor-pointer hover:opacity-90 transition-opacity duration-200"
+          title="Go to Home"
         >
           {{ texts.logoText }}
         </h1>
 
         <!-- Navigation Menu -->
         <nav class="flex space-x-6">
-        <a
+          <a
             *ngFor="let item of navigationItems; let i = index"
             [id]="'nav-item-' + i"
             (click)="setActiveMenuItem(item.primary_content)"
@@ -164,7 +166,7 @@ class="bg-gradient-to-r from-sidebar-main via-header-primary to-accent-primary p
       <div class="flex px-8">
         <!-- Spacer matching logo width -->
         <div class="text-2xl font-bold tracking-widest invisible leading-none">
-          S P A C E
+          {{ texts.logoText }}
         </div>
         <!-- Spacer matching space-x-8 -->
         <div class="w-8"></div>

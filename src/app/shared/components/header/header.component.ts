@@ -1,6 +1,8 @@
+// header.component.ts - UPDATED with logo navigation
+
 import { Component, HostListener, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router'; // Add Router import
 import { FormsModule } from '@angular/forms';
 import {
   trigger,
@@ -78,7 +80,6 @@ import { HeaderService } from '@core/services/header.service';
 export class HeaderComponent implements OnInit {
   // Navigation data
   navigationItems: NavigationItem[] = NAVIGATION_CONTENT;
-  // activeMenuItem: string = 'service';
   activeMenuItem: string = '';
 
   // UI state
@@ -107,15 +108,18 @@ export class HeaderComponent implements OnInit {
     private languageService: LanguageService,
     private searchService: SearchService,
     private navigationService: NavigationService,
-    private headerService: HeaderService
+    private headerService: HeaderService,
+    private router: Router // NEW: Inject Router for navigation
   ) {
     this.currentLanguage = this.languageService.getCurrentLanguage();
     this.texts = HEADER_TEXTS[this.currentLanguage.code];
-// This makes the local activeMenuItem property reactive to service changes
+
+    // This makes the local activeMenuItem property reactive to service changes
     effect(() => {
       this.activeMenuItem = this.navigationService.activePrimaryItem();
     });
-        effect(() => {
+
+    effect(() => {
       this.isScrolled = this.headerService.isScrolled();
     });
   }
@@ -131,22 +135,20 @@ export class HeaderComponent implements OnInit {
     this.availableLanguages = this.languageService.getAvailableLanguages();
   }
 
-  // @HostListener('window:scroll', [])
-  // onWindowScroll(): void {
-  //   const scrolled = window.scrollY > 50;
-  //   this.isScrolled = scrolled;
-  //   this.headerService.setScrolledState(scrolled);
-  // }
-
   getUserInitials(name: string): string {
     return name.charAt(0).toUpperCase();
   }
 
-  // setActiveMenuItem(item: string): void {
-  //   this.activeMenuItem = item;
-  //   this.navigationService.setActivePrimaryNavItem(item);
-  // }
-    setActiveMenuItem(item: string): void {
+  /**
+   * NEW: Navigate to home page when logo is clicked
+   */
+  onLogoClick(): void {
+    this.router.navigate(['/dashboard/overview']);
+    // Optionally collapse sidebar and clear active menu
+    this.navigationService.setSidebarExpanded(false);
+  }
+
+  setActiveMenuItem(item: string): void {
     // Get the currently active item from the service
     const currentActive = this.navigationService.activePrimaryItem();
 
@@ -159,7 +161,6 @@ export class HeaderComponent implements OnInit {
       this.navigationService.setSidebarExpanded(true);
     }
   }
-
 
   onSearch(): void {
     this.searchService.setSearchQuery(this.searchQuery);
@@ -195,18 +196,6 @@ export class HeaderComponent implements OnInit {
     console.log('Logout clicked');
   }
 
-  getMenuItemWidth(itemName: string): string {
-    // Approximate widths based on text length - adjust as needed
-    const widths: { [key: string]: string } = {
-      Area: '45px',
-      Contract: '75px',
-      Service: '65px',
-      Finance: '70px',
-      Dashboard: '95px',
-    };
-    return widths[itemName] || '60px';
-  }
-
   // Close dropdowns when clicking outside
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -220,6 +209,3 @@ export class HeaderComponent implements OnInit {
     }
   }
 }
-// function trigger(arg0: string, arg1: any[]): any {
-//   throw new Error('Function not implemented.');
-// }
