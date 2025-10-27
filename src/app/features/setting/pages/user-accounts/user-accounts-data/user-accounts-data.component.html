@@ -1,1 +1,292 @@
-<p>user-accounts-data works!</p>
+<!-- user-accounts-data.component.html -->
+
+<div class="container mx-auto px-4 py-6">
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">User Management</h1>
+
+    <p-button
+      label="New User"
+      icon="pi pi-plus"
+      severity="primary"
+      (onClick)="openCreateDrawer()"
+    ></p-button>
+  </div>
+
+  <!-- Filters Bar -->
+  <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+    <div class="flex flex-col lg:flex-row gap-4 items-end">
+      <!-- Search Input -->
+      <div class="flex-1">
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Search
+        </label>
+        <div class="relative">
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+            placeholder="Search by name, ID, department..."
+            class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+          />
+          <svg
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Role Filter -->
+      <div class="w-full lg:w-48">
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Role
+        </label>
+        <p-select
+          [(ngModel)]="selectedRole"
+          [options]="roleOptions"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onRoleChange()"
+          placeholder="Select role"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+
+      <!-- Status Filter (NEW) -->
+      <div class="w-full lg:w-48">
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Status
+        </label>
+        <p-select
+          [(ngModel)]="selectedStatus"
+          [options]="statusOptions"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onStatusChange()"
+          placeholder="Select status"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+
+      <!-- Items Per Page -->
+      <div class="w-full lg:w-40">
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Show
+        </label>
+        <p-select
+          [(ngModel)]="itemsPerPage"
+          [options]="itemsPerPageOptions"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onItemsPerPageChange()"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+    </div>
+
+    <!-- Bulk Actions (only show when users are selected) -->
+    <div *ngIf="hasSelectedUsers" class="mt-4 pt-4 border-t border-gray-200">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-gray-700">
+          {{ selectedUserCount }} user(s) selected
+        </span>
+        <p-button
+          label="Delete Selected"
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          (onClick)="confirmBulkDelete()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && users.length === 0" class="bg-white rounded-lg shadow-md p-12 text-center">
+    <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+    <h3 class="text-lg font-semibold text-gray-900 mb-2">No users found</h3>
+    <p class="text-gray-600 mb-4">
+      {{ searchQuery || selectedRole !== 'all' || selectedStatus !== 'all'
+         ? 'Try adjusting your filters'
+         : 'Get started by creating your first user' }}
+    </p>
+    <p-button
+      *ngIf="!searchQuery && selectedRole === 'all' && selectedStatus === 'all'"
+      label="Create User"
+      icon="pi pi-plus"
+      severity="primary"
+      (onClick)="openCreateDrawer()"
+    ></p-button>
+  </div>
+
+  <!-- User Cards Grid -->
+  <div *ngIf="!isLoading && users.length > 0">
+    <!-- Select All Checkbox -->
+    <div class="mb-4 flex items-center">
+      <input
+        type="checkbox"
+        [checked]="allUsersSelected"
+        [indeterminate]="someUsersSelected"
+        (change)="toggleSelectAll()"
+        id="selectAll"
+        class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+      />
+      <label for="selectAll" class="ml-2 text-sm font-medium text-gray-700 cursor-pointer">
+        Select All
+      </label>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+      <app-user-card
+        *ngFor="let user of users"
+        [user]="user"
+        (edit)="openEditDrawer($event)"
+        (delete)="confirmDeleteUser($event)"
+        (select)="toggleUserSelection($event)"
+      ></app-user-card>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-between bg-white rounded-lg shadow-md p-4">
+      <div class="text-sm text-gray-700">
+        Showing <span class="font-medium">{{ paginationStart }}</span> to
+        <span class="font-medium">{{ paginationEnd }}</span> of
+        <span class="font-medium">{{ totalUsers }}</span> results
+      </div>
+
+      <div class="flex items-center gap-2">
+        <p-button
+          icon="pi pi-chevron-left"
+          [outlined]="true"
+          severity="secondary"
+          [disabled]="currentPage === 1"
+          (onClick)="previousPage()"
+        ></p-button>
+
+        <span class="px-4 py-2 text-sm font-medium text-gray-700">
+          Page {{ currentPage }} of {{ totalPages }}
+        </span>
+
+        <p-button
+          icon="pi pi-chevron-right"
+          [outlined]="true"
+          severity="secondary"
+          [disabled]="currentPage === totalPages"
+          (onClick)="nextPage()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User Form Drawer -->
+<app-user-form-drawer
+  [isOpen]="isDrawerOpen"
+  [mode]="drawerMode"
+  [user]="selectedUser"
+  (close)="closeDrawer()"
+  (save)="onSaveUser($event)"
+></app-user-form-drawer>
+
+<!-- Delete Confirmation Modal (Single User) -->
+<div
+  *ngIf="showDeleteModal"
+  class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+  (click)="cancelDelete()"
+>
+  <div
+    class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+      <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    </div>
+
+    <h3 class="text-lg font-semibold text-gray-900 text-center mb-2">
+      Delete User
+    </h3>
+
+    <p class="text-sm text-gray-600 text-center mb-6">
+      {{ deleteModalMessage }}
+    </p>
+
+    <div class="flex gap-3 justify-center">
+      <p-button
+        label="Cancel"
+        [outlined]="true"
+        severity="secondary"
+        styleClass="w-32"
+        (onClick)="cancelDelete()"
+      ></p-button>
+
+      <p-button
+        label="Delete"
+        severity="danger"
+        styleClass="w-32"
+        (onClick)="deleteUser()"
+      ></p-button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Delete Confirmation Modal -->
+<div
+  *ngIf="showBulkDeleteModal"
+  class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+  (click)="cancelBulkDelete()"
+>
+  <div
+    class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+      <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    </div>
+
+    <h3 class="text-lg font-semibold text-gray-900 text-center mb-2">
+      Delete Multiple Users
+    </h3>
+
+    <p class="text-sm text-gray-600 text-center mb-6">
+      {{ deleteModalMessage }}
+    </p>
+
+    <div class="flex gap-3 justify-center">
+      <p-button
+        label="Cancel"
+        [outlined]="true"
+        severity="secondary"
+        styleClass="w-32"
+        (onClick)="cancelBulkDelete()"
+      ></p-button>
+
+      <p-button
+        label="Delete All"
+        severity="danger"
+        styleClass="w-32"
+        (onClick)="bulkDeleteUsers()"
+      ></p-button>
+    </div>
+  </div>
+</div>

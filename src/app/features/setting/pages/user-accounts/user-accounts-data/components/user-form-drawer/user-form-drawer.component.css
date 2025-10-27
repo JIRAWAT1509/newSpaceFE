@@ -1,0 +1,66 @@
+/* user-form-drawer.component.css */
+
+/* Custom scrollbar for form content */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* PrimeNG Dropdown custom styling */
+::ng-deep .p-select {
+  width: 100%;
+  border-radius: 0.5rem;
+  border-color: #d1d5db;
+}
+
+::ng-deep .p-select:not(.p-disabled):hover {
+  border-color: #9ca3af;
+}
+
+::ng-deep .p-select:not(.p-disabled).p-focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 2px #3b82f6;
+  border-color: #3b82f6;
+}
+
+::ng-deep .p-select .p-select-label {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+::ng-deep .p-select-panel .p-select-items .p-select-item {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+::ng-deep .p-select-panel .p-select-items .p-select-item:hover {
+  background: #eff6ff;
+}
+
+::ng-deep .p-select-panel .p-select-items .p-select-item.p-highlight {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Error state for dropdown */
+::ng-deep .p-select.border-red-500 {
+  border-color: #ef4444 !important;
+}
+
+::ng-deep .p-select.border-red-500:focus {
+  box-shadow: 0 0 0 2px #ef4444 !important;
+}

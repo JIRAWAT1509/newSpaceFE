@@ -1,0 +1,162 @@
+/* user-accounts-data.component.css */
+
+/* Container adjustments */
+.container {
+  max-width: 1400px;
+}
+
+/* Fix input fields to be white with black text */
+input[type="text"],
+input[type="search"] {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+input[type="text"]::placeholder,
+input[type="search"]::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Fix PrimeNG Select dropdowns to be white */
+::ng-deep .p-select {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+::ng-deep .p-select .p-select-label {
+  color: #1f2937 !important;
+}
+
+::ng-deep .p-select:not(.p-disabled):hover {
+  background-color: white !important;
+}
+
+::ng-deep .p-select:not(.p-disabled).p-focus {
+  background-color: white !important;
+}
+
+/* Smooth transitions for cards */
+.grid > * {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Indeterminate checkbox state */
+input[type="checkbox"]:indeterminate {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3e%3cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3e%3c/svg%3e");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* PrimeNG Button adjustments for consistency */
+::ng-deep .p-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+::ng-deep .p-button-outlined {
+  background-color: transparent;
+}
+
+::ng-deep .p-button-icon-only {
+  padding: 0.5rem;
+  width: auto;
+}
+
+/* PrimeNG Dropdown in filters */
+::ng-deep .p-dropdown {
+  border-radius: 0.5rem;
+  border-color: #d1d5db;
+  background-color: white !important;
+}
+
+::ng-deep .p-select {
+  background-color: white !important;
+  border-color: #d1d5db;
+  border-radius: 0.5rem;
+}
+
+::ng-deep .p-select .p-select-label {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+::ng-deep .p-select .p-select-label.p-placeholder {
+  color: #9ca3af !important;
+}
+
+::ng-deep .p-dropdown:not(.p-disabled):hover,
+::ng-deep .p-select:not(.p-disabled):hover {
+  border-color: #9ca3af;
+  background-color: white !important;
+}
+
+::ng-deep .p-dropdown:not(.p-disabled).p-focus,
+::ng-deep .p-select:not(.p-disabled).p-focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 2px #3b82f6;
+  border-color: #3b82f6;
+  background-color: white !important;
+}
+
+::ng-deep .p-dropdown .p-dropdown-label,
+::ng-deep .p-select .p-select-label {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+::ng-deep .p-select-overlay .p-select-list .p-select-option {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background-color: white;
+  color: #1f2937;
+}
+
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item:hover,
+::ng-deep .p-select-overlay .p-select-list .p-select-option:hover {
+  background: #eff6ff;
+}
+
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+::ng-deep .p-select-overlay .p-select-list .p-select-option.p-selected {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Modal backdrop blur effect */
+.fixed.inset-0.bg-black {
+  backdrop-filter: blur(2px);
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
