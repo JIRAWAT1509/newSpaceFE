@@ -1,0 +1,35 @@
+<div class="bg-white rounded-lg shadow-md p-6 h-full flex flex-col" style="min-height: 265px; max-height: 265px;">
+  <h2 class="text-xl font-bold mb-4 text-gray-900">Top 10 Rental Space Size</h2>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center flex-grow">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-header-primary"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError && !isLoading" class="text-red-500 text-sm text-center flex-grow flex items-center justify-center">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Data List with Fixed Height -->
+  <div *ngIf="!isLoading && !hasError && data.length > 0" class="flex-grow flex flex-col">
+    <!-- Header Row (Sticky) -->
+    <div class="flex justify-between items-center pb-2 mb-3 border-b-2 border-header-primary">
+      <div class="text-sm font-semibold text-gray-800">Customer</div>
+      <div class="text-sm font-semibold text-gray-800">Total Area</div>
+    </div>
+
+    <!-- Scrollable Data Rows -->
+    <div class="overflow-y-auto flex-grow" style="max-height: 150px;">
+      <div *ngFor="let item of data" class="flex justify-between items-center py-2 text-sm text-gray-800 border-b border-gray-200 last:border-b-0">
+        <div>{{ item.CUSTOMER }}</div>
+        <div>{{ utilities.displayNumber(item.TOTAL_AREA) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !hasError && data.length === 0" class="text-gray-500 text-sm text-center flex-grow flex items-center justify-center">
+    <p>No data available</p>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<div class="bg-white rounded-lg shadow-md p-6 h-full flex flex-col" style="min-height: 400px;">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800">Outstanding</h2>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center flex-grow">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-header-primary"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError && !isLoading" class="text-red-500 text-sm text-center flex-grow flex items-center justify-center">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Data Content -->
+  <div *ngIf="!isLoading && !hasError" class="flex-grow">
+    <!-- Data Table -->
+    <div class="overflow-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b-2 border-header-primary">
+            <th class="text-left px-4 py-3 font-semibold text-gray-800">Aging</th>
+            <th class="text-right px-4 py-3 font-semibold text-gray-800">No</th>
+            <th class="text-right px-4 py-3 font-semibold text-gray-800">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of agingData" class="border-b border-gray-200 hover:bg-gray-50">
+            <td class="px-4 py-3 text-left text-gray-800">{{ row.aging }}</td>
+            <td class="px-4 py-3 text-right text-gray-800">{{ utilities.displaySumValue(row.no) }}</td>
+            <td class="px-4 py-3 text-right text-gray-800">{{ utilities.displayNumber(row.amount) }}</td>
+          </tr>
+
+          <!-- Total Row -->
+          <tr class="border-t-2 border-header-primary bg-blue-50 font-semibold">
+            <td class="px-4 py-3 text-left text-gray-800">Total</td>
+            <td class="px-4 py-3 text-right text-gray-800">{{ utilities.displaySumValue(totalNo) }}</td>
+            <td class="px-4 py-3 text-right text-gray-800">{{ utilities.displayNumber(totalAmount) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

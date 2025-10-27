@@ -315,31 +315,27 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   {
     primary_content: "dashboard",
     secondary_content: [
-      {
-        name: "overview",
-
-                icon: "assets/icons/briefcase-outline.svg",
-
-        route: "/dashboard"
-      },
-      {
-        name: "analytics",
-
-        icon: "assets/icons/business-outline.svg",
-        sub: [
-          { name: "performance_metrics", route: "/dashboard" },
-          { name: "trend_analysis", route: "/dashboard" },
-          { name: "comparative_reports", route: "/dashboard" },
-          { name: "custom_analytics", route: "/dashboard" },
-          { name: "analytics_settings", route: "/dashboard" }
-        ]
-      },
-      {
-        name: "reports",
-
-        icon: "assets/icons/clipboard-outline.svg",
-        route: "/dashboard"
-      },
+       {
+      name: "overview",
+      icon: "assets/icons/briefcase-outline.svg",
+      route: "/dashboard/overview"  // Add this route
+    },
+    {
+      name: "analytics",
+      icon: "assets/icons/business-outline.svg",
+      sub: [
+        { name: "performance_metrics", route: "/dashboard/analytics/performance" },
+        { name: "trend_analysis", route: "/dashboard/analytics/trends" },
+        { name: "comparative_reports", route: "/dashboard/analytics/reports" },
+        { name: "custom_analytics", route: "/dashboard/analytics/custom" },
+        { name: "analytics_settings", route: "/dashboard/analytics/settings" }
+      ]
+    },
+    {
+      name: "reports",
+      icon: "assets/icons/clipboard-outline.svg",
+      route: "/dashboard/reports"  // Add this route
+    },
       {
         name: "alerts",
 

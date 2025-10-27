@@ -1,0 +1,48 @@
+<div class="bg-white rounded-lg shadow-md p-6 h-full flex flex-col">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xl font-semibold text-gray-800">Contract</h2>
+    <div class="text-sm">
+      <span class="font-semibold text-gray-800">Notice for expire : </span>
+      <span class="text-gray-800">{{ utilities.displaySumValue(noticeForExpire) }}</span>
+      <span class="text-gray-800"> รายการ</span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center flex-grow">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-header-primary"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError && !isLoading" class="text-red-500 text-sm text-center flex-grow flex items-center justify-center">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Data Content -->
+  <div *ngIf="!isLoading && !hasError" class="flex-grow overflow-hidden">
+    <div class="overflow-y-auto" style="max-height: 200px;">
+      <!-- Header Row -->
+      <div class="grid grid-cols-12 gap-4 pb-2 mb-3 border-b-2 border-[#9CDCFF]">
+        <div class="col-span-3 text-sm font-semibold text-gray-800">Contract No</div>
+        <div class="col-span-4 text-sm font-semibold text-gray-800">Customer - Shop Name</div>
+        <div class="col-span-3 text-sm font-semibold text-gray-800">Unit No</div>
+        <div class="col-span-2 text-sm font-semibold text-gray-800 text-center">จำนวนวัน Expire</div>
+      </div>
+
+      <!-- Data Rows -->
+      <div *ngIf="contractList.length > 0">
+        <div *ngFor="let item of contractList" class="grid grid-cols-12 gap-4 py-2 text-sm text-gray-800">
+          <div class="col-span-3 text-center">{{ item.ContCode }}</div>
+          <div class="col-span-4">{{ item.CustomerName }}</div>
+          <div class="col-span-3">{{ item.UnitNo }}</div>
+          <div class="col-span-2 text-center">{{ utilities.displaySumValue(item.ExpireDay) }}</div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="contractList.length === 0" class="text-gray-500 text-sm text-center py-8">
+        <p>No contracts expiring soon</p>
+      </div>
+    </div>
+  </div>
+</div>

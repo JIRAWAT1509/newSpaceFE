@@ -7,7 +7,7 @@ import { filter } from 'rxjs/operators';
 })
 export class NavigationService {
   // Signal to hold the active primary item name (e.g., 'service')
-  private activePrimaryNavItem = signal<string>('service'); // Default to 'service'
+  private activePrimaryNavItem = signal<string>('dashboard'); // Default to 'service'
 
   // Signal to hold the active sub-route URL
   private activeSubRoute = signal<string>('');

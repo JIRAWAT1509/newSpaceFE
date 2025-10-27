@@ -1,0 +1,169 @@
+<div class="relative">
+  <!-- Input Field -->
+  <input
+    type="text"
+    [value]="displayValue"
+    [placeholder]="placeholder"
+    (click)="toggleCalendar()"
+    readonly
+    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-white"
+  />
+
+  <!-- Calendar Icon -->
+  <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  </div>
+
+  <!-- Calendar Dropdown with Smart Positioning and Fade-in -->
+  <div *ngIf="isOpen"
+    class="fixed z-[9999] bg-white border border-gray-300 rounded-lg shadow-xl p-4 w-80 transition-opacity duration-150"
+    [class.opacity-0]="!isPositioned"
+    [class.opacity-100]="isPositioned"
+    [style.top.px]="dropdownTop"
+    [style.left.px]="dropdownLeft">
+
+    <!-- Day View -->
+    <div *ngIf="viewMode === 'day'">
+      <!-- Month/Year Header -->
+      <div class="flex items-center justify-between mb-4">
+        <button
+          (click)="previousMonth()"
+          class="p-1 hover:bg-gray-100 rounded"
+          [disabled]="minDateTime && currentMonth.minus({ months: 1 }).endOf('month') < minDateTime"
+          [class.opacity-30]="minDateTime && currentMonth.minus({ months: 1 }).endOf('month') < minDateTime"
+          [class.cursor-not-allowed]="minDateTime && currentMonth.minus({ months: 1 }).endOf('month') < minDateTime"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <div class="flex gap-2">
+          <button
+            (click)="switchToMonthView()"
+            class="px-3 py-1 text-sm font-semibold hover:bg-gray-100 rounded"
+          >
+            {{ currentMonth.toFormat('MMMM') }}
+          </button>
+          <button
+            (click)="switchToYearView()"
+            class="px-3 py-1 text-sm font-semibold hover:bg-gray-100 rounded"
+          >
+            {{ currentMonth.toFormat('yyyy') }}
+          </button>
+        </div>
+
+<button
+  (click)="nextMonth()"
+  class="p-1 hover:bg-gray-100 rounded"
+  [disabled]="(maxDateTime && currentMonth.plus({ months: 1 }).startOf('month') > maxDateTime) || currentMonth.plus({ months: 1 }).startOf('month') > today.endOf('month')"
+  [class.opacity-30]="(maxDateTime && currentMonth.plus({ months: 1 }).startOf('month') > maxDateTime) || currentMonth.plus({ months: 1 }).startOf('month') > today.endOf('month')"
+  [class.cursor-not-allowed]="(maxDateTime && currentMonth.plus({ months: 1 }).startOf('month') > maxDateTime) || currentMonth.plus({ months: 1 }).startOf('month') > today.endOf('month')"
+>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Week Days -->
+      <div class="grid grid-cols-7 gap-1 mb-2">
+        <div *ngFor="let day of weekDays" class="text-center text-xs font-semibold text-gray-600 py-2">
+          {{ day }}
+        </div>
+      </div>
+
+      <!-- Calendar Days -->
+      <div class="grid grid-cols-7 gap-1">
+        <ng-container *ngFor="let week of weeks">
+          <button
+            *ngFor="let date of week"
+            (click)="selectDate(date)"
+            [disabled]="isDateDisabled(date)"
+            [class.opacity-30]="!isCurrentMonth(date) || isDateDisabled(date)"
+            [class.cursor-not-allowed]="isDateDisabled(date)"
+            [class.bg-header-primary]="isSelected(date)"
+            [class.text-white]="isSelected(date)"
+            [class.bg-blue-50]="isToday(date) && !isSelected(date) && !isDateDisabled(date)"
+            [class.hover:bg-gray-100]="!isSelected(date) && !isDateDisabled(date)"
+            class="text-sm py-2 rounded transition-colors"
+          >
+            {{ date.day }}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Month View -->
+    <div *ngIf="viewMode === 'month'">
+      <div class="flex items-center justify-between mb-4">
+        <button (click)="viewMode = 'day'" class="p-1 hover:bg-gray-100 rounded">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          (click)="switchToYearView()"
+          class="px-3 py-1 text-sm font-semibold hover:bg-gray-100 rounded"
+        >
+          {{ currentMonth.toFormat('yyyy') }}
+        </button>
+        <div class="w-6"></div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        <button
+          *ngFor="let month of months; let i = index"
+          (click)="selectMonth(i)"
+          [disabled]="isMonthDisabled(i)"
+          [class.bg-header-primary]="currentMonth.month === i + 1 && !isMonthDisabled(i)"
+          [class.text-white]="currentMonth.month === i + 1 && !isMonthDisabled(i)"
+          [class.opacity-30]="isMonthDisabled(i)"
+          [class.cursor-not-allowed]="isMonthDisabled(i)"
+          [class.hover:bg-gray-100]="!isMonthDisabled(i)"
+          class="px-3 py-2 text-sm rounded transition-colors"
+        >
+          {{ month.substring(0, 3) }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Year View -->
+    <div *ngIf="viewMode === 'year'">
+      <div class="flex items-center justify-between mb-4">
+        <button (click)="previousYearRange()" class="p-1 hover:bg-gray-100 rounded">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <span class="text-sm font-semibold">
+          {{ yearRangeStart }} - {{ yearRangeStart + 11 }}
+        </span>
+        <button (click)="nextYearRange()" class="p-1 hover:bg-gray-100 rounded">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        <button
+          *ngFor="let year of years"
+          (click)="selectYear(year)"
+          [disabled]="isYearDisabled(year)"
+          [class.bg-header-primary]="currentMonth.year === year && !isYearDisabled(year)"
+          [class.text-white]="currentMonth.year === year && !isYearDisabled(year)"
+          [class.opacity-30]="isYearDisabled(year)"
+          [class.cursor-not-allowed]="isYearDisabled(year)"
+          [class.hover:bg-gray-100]="!isYearDisabled(year)"
+          class="px-3 py-2 text-sm rounded transition-colors"
+        >
+          {{ year }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

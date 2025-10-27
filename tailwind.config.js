@@ -43,9 +43,15 @@ module.exports = {
         'btn-hover': '#1565C0',
 
         // Graph colors (keep existing)
-        'graph-primary': '#FF6384',
-        'graph-secondary': '#FFCD56',
-        'graph-tertiary': '#4BC0C0',
+        'graph-primary': '#80E08E', // Green
+        'graph-secondary': '#FFD05F', // Yellow
+        'graph-tertiary': '#FF6384', // Red
+
+        // Table specific colors
+        'table-border-primary': '#9CDCFF',
+        'table-border-secondary': '#EBEBEB',
+        'table-hover': '#F8FEFF',
+
       }
     },
   },

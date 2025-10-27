@@ -1,0 +1,173 @@
+<div class="bg-white rounded-lg shadow-md p-6 h-full flex flex-col" style="min-height: 500px; max-height: 600px;">
+  <!-- Header with Title -->
+  <div class="flex justify-between items-start mb-4">
+    <h2 class="text-2xl font-bold text-gray-900">Building</h2>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center flex-grow">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-header-primary"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError && !isLoading" class="text-red-500 text-sm text-center flex-grow flex items-center justify-center">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Data Content -->
+  <div *ngIf="!isLoading && !hasError" class="flex-grow flex flex-col">
+    <!-- Custom Legend (Centered above chart) -->
+    <div class="flex justify-center items-center gap-6 mb-4">
+      <button
+        (click)="toggleDataset('reserve')"
+        class="flex items-center gap-2 text-xs cursor-pointer hover:opacity-75 transition-opacity"
+        [class.opacity-50]="!datasetVisibility.reserve">
+        <div class="w-4 h-4 rounded"
+             [style.background-color]="datasetVisibility.reserve ? '#FF6384' : '#E5E7EB'"
+             [style.text-decoration]="!datasetVisibility.reserve ? 'line-through' : 'none'"></div>
+        <span class="text-gray-700"
+              [style.text-decoration]="!datasetVisibility.reserve ? 'line-through' : 'none'">
+          Unit / พื้นที่จอง (ตร.ม.)
+        </span>
+      </button>
+      <button
+        (click)="toggleDataset('rent')"
+        class="flex items-center gap-2 text-xs cursor-pointer hover:opacity-75 transition-opacity"
+        [class.opacity-50]="!datasetVisibility.rent">
+        <div class="w-4 h-4 rounded"
+             [style.background-color]="datasetVisibility.rent ? '#FFD05F' : '#E5E7EB'"
+             [style.text-decoration]="!datasetVisibility.rent ? 'line-through' : 'none'"></div>
+        <span class="text-gray-700"
+              [style.text-decoration]="!datasetVisibility.rent ? 'line-through' : 'none'">
+          Unit / พื้นที่เช่า (ตร.ม.)
+        </span>
+      </button>
+      <button
+        (click)="toggleDataset('free')"
+        class="flex items-center gap-2 text-xs cursor-pointer hover:opacity-75 transition-opacity"
+        [class.opacity-50]="!datasetVisibility.free">
+        <div class="w-4 h-4 rounded"
+             [style.background-color]="datasetVisibility.free ? '#80E08E' : '#E5E7EB'"
+             [style.text-decoration]="!datasetVisibility.free ? 'line-through' : 'none'"></div>
+        <span class="text-gray-700"
+              [style.text-decoration]="!datasetVisibility.free ? 'line-through' : 'none'">
+          Unit / พื้นที่ว่าง (ตร.ม.)
+        </span>
+      </button>
+    </div>
+
+    <!-- Chart Container (Reduced height) -->
+    <div class="mb-2 flex justify-center" style="height: 180px;">
+      <div style="width: 95%; height: 100%;">
+        <canvas #chartCanvas></canvas>
+      </div>
+    </div>
+
+    <!-- Data Table with Fixed Height and Scroll -->
+<div class="flex flex-col">
+  <div class="overflow-auto " style="height: 180px; min-height: 180px; max-height: 180px;">
+    <table class="w-full text-xs">
+      <thead class="sticky top-0 bg-white z-10">
+        <tr class="border-b-2 border-header-primary">
+          <th class="text-center px-2 py-3 font-semibold text-gray-800" style="width: 12%;">
+            อาคาร
+          </th>
+          <th class="text-center px-2 py-3 font-semibold text-gray-800" style="width: 17%;">
+            Unit /<br/>ในพื้นรวม<br/>(ตร.ม.)
+          </th>
+          <th class="text-center px-2 py-3 font-semibold text-gray-800" style="width: 17%;">
+            Unit /<br/>พื้นที่ว่าง<br/>(ตร.ม.)
+          </th>
+          <th class="text-center px-2 py-3 font-semibold text-gray-800" style="width: 17%;">
+            Unit /<br/>พื้นที่จอง<br/>(ตร.ม.)
+          </th>
+          <th class="text-center px-2 py-3 font-semibold text-gray-800" style="width: 17%;">
+            Unit /<br/>พื้นที่เช่า<br/>(ตร.ม.)
+          </th>
+          <th class="text-center px-2 py-3 font-semibold text-gray-800" style="width: 10%;">
+            OCC
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of paginatedData; let i = index"
+            class="border-b border-gray-200 hover:bg-gray-50">
+          <td class="px-2 py-2 text-left text-gray-800">
+            {{ item.BUILDING_CODE }}
+          </td>
+          <td class="px-2 py-2 text-center text-gray-800">
+            {{ utilities.displaySumValue(getTotalUnits(item)) }}<br/>
+            <span class="text-gray-600">[{{ utilities.displayNumber(getTotalArea(item)) }}]</span>
+          </td>
+          <td class="px-2 py-2 text-center text-gray-800">
+            {{ utilities.displaySumValue(item.FREE) }}<br/>
+            <span class="text-gray-600">[{{ utilities.displayNumber(item.AREA_FREE) }}]</span>
+          </td>
+          <td class="px-2 py-2 text-center text-gray-800">
+            {{ utilities.displaySumValue(item.RESERVE) }}<br/>
+            <span class="text-gray-600">[{{ utilities.displayNumber(item.AREA_RESERVE) }}]</span>
+          </td>
+          <td class="px-2 py-2 text-center text-gray-800">
+            {{ utilities.displaySumValue(item.CONTRACT) }}<br/>
+            <span class="text-gray-600">[{{ utilities.displayNumber(item.AREA_CONTRACT) }}]</span>
+          </td>
+          <td class="px-2 py-2 text-center text-gray-800">
+            {{ calculateOccupancy(item) }}%
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+<!-- Pagination Controls (Always visible) -->
+<div class="flex justify-center items-center gap-2 mt-3 relative">
+  <!-- Previous Button -->
+  <button
+    (click)="previousPage()"
+    [disabled]="currentPage === 1"
+    class="px-2 py-1 text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+    style="min-width: 32px;">
+    &lt;
+  </button>
+
+  <!-- Page Range Dropdown -->
+  <div class="relative">
+    <button
+      (click)="togglePageDropdown($event)"
+      class="px-3 py-1 rounded  text-sm hover:bg-gray-100 transition-colors flex items-center justify-center gap-1"
+      style="min-width: 120px;">
+      <span class="flex-1 text-center">{{ currentPageRange }} of {{ totalItems }}</span>
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div
+      *ngIf="showPageDropdown"
+      (click)="$event.stopPropagation()"
+      class="absolute bottom-full mb-1 left-0 bg-white border border-gray-300 rounded shadow-lg z-20 overflow-auto"
+      style="max-height: 200px; min-width: 120px;">
+      <button
+        *ngFor="let range of cachedPageRanges"
+        (click)="onDropdownItemClick(range.page, $event)"
+        [class.bg-header-primary]="currentPage === range.page"
+        [class.text-white]="currentPage === range.page"
+        class="w-full px-3 py-2 text-center text-sm hover:bg-gray-100 transition-colors">
+        {{ range.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Next Button -->
+  <button
+    (click)="nextPage()"
+    [disabled]="currentPage === totalPages"
+    class="px-2 py-1 text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+    style="min-width: 32px;">
+    &gt;
+  </button>
+</div>
+</div>
+  </div>
+</div>

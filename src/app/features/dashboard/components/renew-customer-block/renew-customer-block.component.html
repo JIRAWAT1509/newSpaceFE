@@ -1,0 +1,37 @@
+<div class="bg-white rounded-lg shadow-md p-6 h-full flex flex-col">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800">Renew Customer</h2>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center flex-grow">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-header-primary"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError && !isLoading" class="text-red-500 text-sm text-center flex-grow flex items-center justify-center">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Data List -->
+  <div *ngIf="!isLoading && !hasError && data.length > 0" class="flex-grow overflow-hidden">
+    <div class="overflow-y-auto" style="max-height: 250px;">
+      <!-- Header Row -->
+      <div class="grid grid-cols-12 gap-4 pb-2 mb-3 border-b-2 border-[#9CDCFF]">
+        <div class="col-span-3 text-sm text-center font-semibold text-gray-800">Contract No</div>
+        <div class="col-span-6 text-sm text-center font-semibold text-gray-800">Customer - Shop Name</div>
+        <div class="col-span-3 text-sm text-center font-semibold text-gray-800">Unit No</div>
+      </div>
+
+      <!-- Data Rows -->
+      <div *ngFor="let item of data" class="grid grid-cols-12 gap-4 py-2 text-sm text-gray-800">
+        <div class="col-span-3 text-center">{{ item.CONT_CODE }}</div>
+        <div class="col-span-6 text-center">{{ item.CUSTOMER }}</div>
+        <div class="col-span-3 text-center">{{ truncateText(item.BLOCK_NAME, 20) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !hasError && data.length === 0" class="text-gray-500 text-sm text-center flex-grow flex items-center justify-center">
+    <p>No customers to renew</p>
+  </div>
+</div>

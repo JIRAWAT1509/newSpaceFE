@@ -1,0 +1,81 @@
+/* Dashboard Table Styles */
+.dashboard-table {
+  width: 100%;
+  font-size: 0.875rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.dashboard-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #FFFFFF;
+}
+
+.dashboard-table th {
+  padding: 0.5rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #000000;
+  border-bottom: 2px solid #9CDCFF;
+  background-color: #FFFFFF;
+  white-space: nowrap;
+}
+
+.dashboard-table th.text-right {
+  text-align: right;
+}
+
+.dashboard-table tbody tr {
+  border-bottom: 1px solid #EBEBEB;
+  transition: background-color 0.15s ease;
+}
+
+.dashboard-table tbody tr:hover {
+  background-color: #F8FEFF;
+}
+
+.dashboard-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.dashboard-table td {
+  padding: 0.5rem 1rem;
+  color: #000000;
+  background-color: transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dashboard-table td.text-right {
+  text-align: right;
+}
+
+/* Scrollable container */
+.table-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid #EBEBEB;
+  border-radius: 0.375rem;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #F3F4F6;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #9CDCFF;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #7BC8F5;
+}

@@ -1,0 +1,132 @@
+<div class="bg-white rounded-lg shadow-md p-6 h-full flex flex-col" style="min-height: 480px; max-height: 480px;">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800">Financial</h2>
+
+  <!-- Loading State with fixed height -->
+  <div *ngIf="isLoading" class="flex items-center justify-center" style="min-height: 400px;">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-header-primary"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError && !isLoading" class="text-red-500 text-sm text-center flex items-center justify-center" style="min-height: 400px;">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Data Content -->
+  <div *ngIf="!isLoading && !hasError" class="flex-grow flex flex-col">
+    <!-- Date Range Filter -->
+    <div class="flex items-center gap-4 mb-4">
+      <label class="text-sm font-semibold text-gray-800">From</label>
+      <app-date-picker
+        #startDatePicker
+        [value]="startDate"
+        [minDate]="startMinDate"
+        [maxDate]="startMaxDate"
+        (valueChange)="onStartDateChange($event)"
+        (pickerOpen)="onStartDatePickerOpen()"
+        placeholder="DD/MM/YYYY"
+      ></app-date-picker>
+
+      <label class="text-sm font-semibold text-gray-800">-</label>
+
+      <app-date-picker
+        #endDatePicker
+        [value]="endDate"
+        [minDate]="endMinDate"
+        [maxDate]="endMaxDate"
+        (valueChange)="onEndDateChange($event)"
+        (pickerOpen)="onEndDatePickerOpen()"
+        placeholder="DD/MM/YYYY"
+      ></app-date-picker>
+    </div>
+
+    <hr class="border-gray-300 mb-4" />
+
+    <!-- Financial Data Grid with fixed height -->
+    <div class="flex-grow overflow-y-auto" style="min-height: 300px;">
+      <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+        <!-- Left Column: Invoice Data -->
+        <div class="space-y-2">
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">No of Invoice</span>
+            <span class="text-gray-800">{{ utilities.displaySumValue(invoiceTypeN) }}</span>
+          </div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">Total Amount</span>
+            <span class="text-gray-800">{{ utilities.displayNumber(totalAmountTypeN) }}</span>
+          </div>
+
+          <div class="h-10"></div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">Printed Invoice</span>
+            <span class="text-gray-800">{{ utilities.displaySumValue(printInvoice) }}</span>
+          </div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">Never Print Invoice</span>
+            <span class="text-gray-800">{{ utilities.displaySumValue(neverPrintInvoice) }}</span>
+          </div>
+
+          <div class="h-10"></div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">No of CN Invoice</span>
+            <span class="text-gray-800">{{ utilities.displaySumValue(invoiceTypeCN) }}</span>
+          </div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">Total Amount</span>
+            <span class="text-gray-800">{{ utilities.displayNumber(totalAmountTypeCN) }}</span>
+          </div>
+        </div>
+
+        <!-- Right Column: Received Data -->
+        <div class="space-y-2">
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">No of Received</span>
+            <span class="text-gray-800">{{ utilities.displaySumValue(receiveTypeN) }}</span>
+          </div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">Total Amount</span>
+            <span class="text-gray-800">{{ utilities.displayNumber(receiveAmountTypeN) }}</span>
+          </div>
+
+          <div class="h-10"></div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">Printed Received</span>
+            <span class="text-gray-800">{{ utilities.displaySumValue(printReceive) }}</span>
+          </div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">Never Print Receive</span>
+            <span class="text-gray-800">{{ utilities.displaySumValue(neverPrintReceive) }}</span>
+          </div>
+
+          <div class="h-10"></div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">No of CN Received</span>
+            <span class="text-gray-800">{{ utilities.displaySumValue(receiveTypeCN) }}</span>
+          </div>
+
+          <div class="flex justify-between py-1">
+            <span class="font-semibold text-gray-800">Total Amount</span>
+            <span class="text-gray-800">{{ utilities.displayNumber(receiveAmountTypeCN) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Warning Modal -->
+<app-warning-modal
+  [isOpen]="showWarningModal"
+  [title]="'Warning'"
+  [message]="warningMessage"
+  [buttonText]="'OK'"
+  (onClose)="closeWarningModal()"
+></app-warning-modal>

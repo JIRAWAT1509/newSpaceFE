@@ -1,0 +1,50 @@
+<div class="container mx-auto px-4 py-6">
+  <!-- Header with Title and Branch Selector -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Dashboard Overview</h1>
+
+    <!-- Branch Dropdown -->
+    <div class="flex items-center gap-3">
+      <label for="branchSelect" class="text-base font-semibold text-gray-700 whitespace-nowrap">สาขา: </label>
+      <select
+        id="branchSelect"
+        [(ngModel)]="selectedBranch"
+        (change)="onBranchChange(selectedBranch)"
+        class="px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-header-gradient-start focus:border-transparent bg-white shadow-sm hover:border-gray-400 transition-colors"
+        style="min-width: 280px;">
+        <option *ngFor="let branch of branches" [value]="branch.id" class="rounded-md">
+          {{ branch.displayName }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- First Row: Area, Building, Top10s -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+    <app-area-block></app-area-block>
+    <app-building-block></app-building-block>
+
+    <!-- Top 10 Combined Container - 1 column always -->
+    <div class="flex flex-col gap-6">
+      <app-top-rental-size-block></app-top-rental-size-block>
+      <app-top-rent-rates-block></app-top-rent-rates-block>
+    </div>
+  </div>
+
+  <!-- Second Row: Middle blocks -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <app-reserve-block></app-reserve-block>
+    <app-renew-customer-block></app-renew-customer-block>
+    <app-contract-block></app-contract-block>
+    <app-new-customer-block></app-new-customer-block>
+  </div>
+
+  <!-- Third Row: Outstanding, Income, Financial -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <app-outstanding-block></app-outstanding-block>
+    <app-income-block></app-income-block>
+    <app-financial-block></app-financial-block>
+  </div>
+
+  <p-button label="Check" />
+</div>

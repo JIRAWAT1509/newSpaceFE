@@ -54,17 +54,19 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "newSpaceFE:build:production"
-            },
-            "development": {
-              "buildTarget": "newSpaceFE:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "configurations": {
+    "development": {
+      "buildTarget": "newSpaceFE:build:development",
+      "proxyConfig": "proxy.conf.json"
+    },
+    "production": {
+      "buildTarget": "newSpaceFE:build:production",
+      "proxyConfig": "proxy.conf.json"
+    }
+  },
+  "defaultConfiguration": "development"
+},
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
         },

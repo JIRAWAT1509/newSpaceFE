@@ -10,7 +10,7 @@
       <li *ngFor="let item of currentSecondaryNav" class="mb-1">
         <div *ngIf="item.sub && item.sub.length > 0; else directLink">
           <div
-            class="group flex items-center p-4 mx-3 rounded-md cursor-pointer hover:bg-sidebar-hover relative"
+            class="group flex items-center p-4 cursor-pointer hover:bg-sidebar-hover relative"
             [class.border-r-4]="
               !isExpanded() && !isHovering && isItemActive(item)
             "
@@ -22,7 +22,7 @@
             <img
               [src]="item.icon"
               alt=""
-              class="w-6 h-6 flex-shrink-0 transition-colors duration-200"
+              class="w-6 h-6 flex-shrink-0 ml-3 transition-colors duration-200"
               [ngClass]="{
                 'brightness-0 invert drop-shadow-md': isItemActive(item),
                 'opacity-60 group-hover:brightness-0 group-hover:invert':
@@ -88,7 +88,7 @@
           <a
             [routerLink]="item.route"
             (click)="handleDirectLinkClick()"
-            class="group flex items-center p-4 mx-3 rounded-md cursor-pointer hover:bg-sidebar-hover relative"
+            class="group flex items-center p-4 cursor-pointer hover:bg-sidebar-hover relative"
             [class.border-r-4]="
               !isExpanded() && !isHovering && isItemActive(item)
             "
@@ -99,7 +99,7 @@
             <img
               [src]="item.icon"
               alt=""
-              class="w-6 h-6 flex-shrink-0 transition-colors duration-200"
+              class="w-6 h-6 ml-3 flex-shrink-0 transition-colors duration-200"
               [ngClass]="{
                 'brightness-0 invert drop-shadow-md': isItemActive(item),
                 'opacity-60 group-hover:brightness-0 group-hover:invert':
