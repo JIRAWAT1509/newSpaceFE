@@ -52,6 +52,12 @@ module.exports = {
         'table-border-secondary': '#EBEBEB',
         'table-hover': '#F8FEFF',
 
+        // Area Status colors - NEW
+        'status-unallocated': '#FF6384', // Red/Pink
+        'status-quotation': '#4CA3FF', // Blue
+        'status-leased': '#FFD05F', // Yellow
+        'status-vacant': '#80E08E', // Green
+
       }
     },
   },

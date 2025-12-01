@@ -1,0 +1,76 @@
+.mode-toggle-container {
+  @apply flex flex-col gap-4 mb-6;
+}
+
+.mode-toggle-buttons {
+  @apply flex gap-2;
+}
+
+.mode-button {
+  @apply flex items-center gap-2 px-6 py-3 rounded-lg border-2 transition-all duration-200;
+  @apply bg-white text-gray-600 border-gray-300;
+  @apply hover:border-blue-400 hover:bg-blue-50;
+  @apply font-medium;
+}
+
+.mode-button.active {
+  @apply bg-blue-500 text-white border-blue-500;
+  @apply hover:bg-blue-600 hover:border-blue-600;
+}
+
+.mode-button i {
+  @apply text-lg;
+}
+
+.date-picker-container {
+  @apply flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200;
+}
+
+.date-label {
+  @apply flex items-center gap-2 text-gray-700 font-medium whitespace-nowrap;
+}
+
+.date-label i {
+  @apply text-blue-500;
+}
+
+:host ::ng-deep {
+  .p-datepicker {
+    @apply w-full;
+  }
+
+  .p-datepicker .p-inputtext {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+
+  .p-datepicker-panel {
+    @apply shadow-lg border border-gray-200 rounded-lg;
+  }
+
+  .p-datepicker-header {
+    @apply bg-blue-500 text-white rounded-t-lg;
+  }
+
+  .p-datepicker-today > span {
+    @apply bg-blue-100 text-blue-600 font-semibold;
+  }
+
+  .p-datepicker .p-highlight {
+    @apply bg-blue-500 text-white;
+  }
+}
+
+@media (max-width: 640px) {
+  .mode-toggle-buttons {
+    @apply flex-col;
+  }
+
+  .mode-button {
+    @apply w-full justify-center;
+  }
+
+  .date-picker-container {
+    @apply flex-col items-start;
+  }
+}

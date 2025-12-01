@@ -1,0 +1,149 @@
+<!-- sales-dashboard.component.html -->
+
+<div class="sales-dashboard-container">
+  <!-- ==================== HEADER SECTION ==================== -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">Sales Dashboard</h1>
+        <p class="page-subtitle">แดชบอร์ดฝ่ายขาย - ภาพรวมการทำงานและกิจกรรม</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-refresh" (click)="loadDashboardData()" [disabled]="isLoading()">
+          <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
+          <span>รีเฟรช</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== NAVIGATION CARDS ==================== -->
+
+
+
+  <div class="navigation-cards-section">
+    <!-- <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-th-large"></i>
+        เลือกหมวดหมู่
+      </h2>
+      <p class="section-subtitle">คลิกที่การ์ดเพื่อไปยังส่วนที่ต้องการ</p>
+    </div> -->
+
+    <div class="navigation-cards-grid">
+      @for (card of navigationCards(); track card.id) {
+        <div
+          class="nav-card"
+          [class]="getCardClasses(card)"
+          [class.active]="isActiveSection(card.id)"
+          (click)="scrollToSection(card.sectionId)"
+        >
+          <!-- Card Header with Icon -->
+          <div class="card-header">
+            <div class="card-icon" [ngClass]="'bg-gradient-to-br ' + card.gradient">
+              <i [class]="card.icon"></i>
+            </div>
+            @if (card.badge) {
+              <span class="card-badge">{{ card.badge }}</span>
+            }
+          </div>
+
+          <!-- Card Content -->
+          <div class="card-body">
+            <h3 class="card-title">{{ card.title }}</h3>
+            <p class="card-title-en">{{ card.titleEn }}</p>
+            <p class="card-description">{{ card.description }}</p>
+          </div>
+
+          <!-- Card Footer with Arrow -->
+          <div class="card-footer">
+            <span class="card-action">ดูรายละเอียด</span>
+            <i class="pi pi-arrow-right card-arrow"></i>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ==================== PERFORMANCE SECTION ==================== -->
+  <div
+    id="performance-section"
+    #performanceSection
+    class="dashboard-section"
+  >
+    <div class="section-title-bar">
+      <div class="title-content">
+        <i class="pi pi-chart-line section-icon" style="color: #3b82f6;"></i>
+        <div>
+          <h2 class="section-main-title">ผลการดำเนินงาน</h2>
+          <p class="section-subtitle-text">Performance Overview</p>
+        </div>
+      </div>
+      <button class="btn-section-action">
+        <i class="pi pi-external-link"></i>
+        <span>ดูแบบเต็ม</span>
+      </button>
+    </div>
+
+    <!-- Performance Component -->
+    <app-performance-section></app-performance-section>
+  </div>
+
+  <!-- ==================== ACTIVITIES SECTION ==================== -->
+  <div
+    id="activities-section"
+    #activitiesSection
+    class="dashboard-section"
+  >
+    <div class="section-title-bar">
+      <div class="title-content">
+        <i class="pi pi-calendar section-icon" style="color: #8b5cf6;"></i>
+        <div>
+          <h2 class="section-main-title">กิจกรรมและตารางงาน</h2>
+          <p class="section-subtitle-text">Activities & Schedule</p>
+        </div>
+      </div>
+      <button class="btn-section-action">
+        <i class="pi pi-external-link"></i>
+        <span>ดูแบบเต็ม</span>
+      </button>
+    </div>
+
+    <!-- Activities Component -->
+    <app-activities-section></app-activities-section>
+  </div>
+
+  <!-- ==================== ANALYSIS SECTION ==================== -->
+  <div
+    id="analysis-section"
+    #analysisSection
+    class="dashboard-section"
+  >
+    <div class="section-title-bar">
+      <div class="title-content">
+        <i class="pi pi-chart-bar section-icon" style="color: #10b981;"></i>
+        <div>
+          <h2 class="section-main-title">การวิเคราะห์ข้อมูล</h2>
+          <p class="section-subtitle-text">Data Analysis</p>
+        </div>
+      </div>
+      <button class="btn-section-action">
+        <i class="pi pi-external-link"></i>
+        <span>ดูแบบเต็ม</span>
+      </button>
+    </div>
+
+    <!-- Analysis Component -->
+    <app-analysis-section></app-analysis-section>
+  </div>
+
+  <!-- ==================== LOADING OVERLAY ==================== -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="loading-spinner">
+        <i class="pi pi-spin pi-spinner"></i>
+        <p>กำลังโหลดข้อมูล...</p>
+      </div>
+    </div>
+  }
+</div>

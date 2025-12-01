@@ -1,0 +1,71 @@
+<!-- permission-tree-row.component.html -->
+
+<div [class]="rowClasses">
+  <!-- Main Row -->
+  <div class="tree-row-content">
+    <!-- Menu Name Column -->
+<div
+  class="tree-cell menu-name-cell"
+  [class.clickable]="hasChildren"
+  (click)="hasChildren ? onToggleExpand() : null"
+  [style.cursor]="hasChildren ? 'pointer' : 'default'"
+>
+      <div class="menu-name-wrapper" [style.padding-left]="indentPadding">
+        <!-- Expand/Collapse Button -->
+        <button
+          *ngIf="hasChildren"
+          class="expand-btn"
+          (click)="onToggleExpand()"
+          type="button"
+        >
+          <i [class]="expandIcon"></i>
+        </button>
+
+        <!-- Spacer for leaf nodes -->
+        <span *ngIf="!hasChildren" class="leaf-spacer"></span>
+
+        <!-- Menu/Feature Name -->
+        <span [class]="nameClasses">
+          {{ permission.MenuName }}
+        </span>
+
+        <!-- Level Badge (optional - for debugging) -->
+        <!-- <span class="level-badge">L{{ permission.Level }}</span> -->
+      </div>
+    </div>
+
+    <!-- Enable Column -->
+    <div class="tree-cell permission-cell enable-cell" (click)="$event.stopPropagation()">
+      <p-checkbox
+        [(ngModel)]="permission.isEnabled"
+        [binary]="true"
+        (onChange)="onEnableToggle($event)"
+        [indeterminate]="isIndeterminate"
+        inputId="enable-{{ permission.MENU_ID }}"
+      ></p-checkbox>
+    </div>
+
+    <!-- View Only Column -->
+    <div class="tree-cell permission-cell viewonly-cell" (click)="$event.stopPropagation()">
+      <p-checkbox
+        [(ngModel)]="permission.isViewOnly"
+        [binary]="true"
+        [disabled]="isViewOnlyDisabled"
+        (onChange)="onViewOnlyToggle($event)"
+        inputId="viewonly-{{ permission.MENU_ID }}"
+      ></p-checkbox>
+    </div>
+  </div>
+
+  <!-- Children Rows (Recursive) -->
+  <div *ngIf="hasChildren && isExpanded" class="tree-children">
+    <app-permission-tree-row
+      *ngFor="let child of permission.children"
+      [permission]="child"
+      [level]="level + 1"
+      (enableChange)="onChildEnableChange($event)"
+      (viewOnlyChange)="onChildViewOnlyChange($event)"
+      (toggleExpand)="onChildToggleExpand($event)"
+    ></app-permission-tree-row>
+  </div>
+</div>

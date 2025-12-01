@@ -1,0 +1,982 @@
+/* role-permission.component.css */
+
+/* ==================== CONTAINER ==================== */
+.role-permission-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* ==================== HEADER SECTION ==================== */
+.header-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.title-section {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Change Indicator */
+.changes-indicator {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #92400e;
+  font-size: 0.875rem;
+}
+
+.changes-indicator i {
+  color: #f59e0b;
+}
+
+/* ==================== MESSAGES ==================== */
+.message-container {
+  margin-bottom: 1rem;
+}
+
+/* ==================== CONTROL SECTION ==================== */
+.control-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.role-selector {
+  flex: 1;
+  min-width: 250px;
+}
+
+.control-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ==================== SUMMARY STATISTICS ==================== */
+.summary-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.summary-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e5e7eb;
+  color: #6b7280;
+  font-size: 1.5rem;
+}
+
+.summary-icon.success {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.summary-icon.primary {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.summary-icon.info {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.summary-content {
+  flex: 1;
+}
+
+.summary-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.summary-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ==================== SEARCH SECTION ==================== */
+.search-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  min-width: 300px;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.clear-search-btn:hover {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.tab-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ==================== LOADING STATE ==================== */
+.loading-container {
+  background: white;
+  border-radius: 12px;
+  padding: 4rem 2rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+  font-size: 3rem;
+  color: #3b82f6;
+  margin-bottom: 1rem;
+}
+
+.loading-container p {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ==================== EMPTY STATE ==================== */
+.empty-state {
+  background: white;
+  border-radius: 12px;
+  padding: 4rem 2rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* ==================== TABS CONTAINER ==================== */
+.tabs-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Simple Tabs Implementation */
+.simple-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-headers {
+  display: flex;
+  border-bottom: 2px solid #e5e7eb;
+  overflow-x: auto;
+  background-color: #f9fafb;
+}
+
+.tab-header {
+  flex: 0 0 auto;
+  padding: 1rem 1.5rem;
+  border: none;
+  background: none;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tab-header:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.tab-header.active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+  background-color: white;
+}
+
+.tab-header i {
+  font-size: 1rem;
+}
+
+.tab-header .badge {
+  background-color: #e5e7eb;
+  color: #6b7280;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tab-header.active .badge {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.tab-content {
+  padding: 1.5rem;
+}
+
+/* ==================== TREE TABLE ==================== */
+.tree-table-container {
+  overflow-x: auto;
+}
+
+.tree-table {
+  width: 100%;
+  min-width: 600px;
+}
+
+/* Table Header */
+.tree-header {
+  display: grid;
+  grid-template-columns: 1fr 150px 150px;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.tree-header-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.menu-name-header {
+  justify-content: flex-start;
+}
+
+.permission-header {
+  justify-content: center;
+}
+
+.info-icon {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  cursor: help;
+}
+
+/* Tree Body */
+.tree-body {
+  padding: 1rem;
+}
+
+/* Temporary Placeholder */
+.temp-placeholder {
+  text-align: center;
+  padding: 3rem 2rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 2px dashed #d1d5db;
+}
+
+.placeholder-message {
+  font-size: 1rem;
+  color: #059669;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.placeholder-hint {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* No Results */
+.no-results {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #9ca3af;
+}
+
+.no-results i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.no-results p {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.no-results-hint {
+  color: #6b7280;
+  font-size: 0.8125rem;
+}
+
+/* ==================== MODAL STYLES ==================== */
+.modal-content {
+  padding: 0.5rem 0;
+}
+
+.modal-description {
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+.modal-field {
+  margin-top: 1rem;
+}
+
+.modal-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+/* Warning Icon in Modal */
+.warning-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem;
+  background-color: #fef3c7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.warning-icon i {
+  font-size: 2rem;
+  color: #f59e0b;
+}
+
+/* Template Grid */
+.template-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.template-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.template-card:hover {
+  border-color: #3b82f6;
+  background-color: #f9fafb;
+}
+
+.template-card.selected {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.template-icon {
+  width: 48px;
+  height: 48px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #6b7280;
+}
+
+.template-card.selected .template-icon {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.template-info {
+  flex: 1;
+}
+
+.template-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.template-info p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.template-radio {
+  width: 20px;
+  height: 20px;
+}
+
+.template-radio input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .control-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quick-actions {
+    width: 100%;
+  }
+
+  .search-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tab-actions {
+    width: 100%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .role-permission-container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .header-actions {
+    flex-direction: column;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+  }
+
+  .summary-section {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-headers {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .tree-header {
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .tree-table {
+    min-width: 500px;
+  }
+}
+
+/* ==================== PRIMENG OVERRIDES ==================== */
+
+/* Button spacing */
+::ng-deep p-button {
+  display: inline-block;
+}
+
+/* Select dropdown */
+::ng-deep .p-select {
+  width: 100%;
+}
+
+/* Dialog */
+::ng-deep .p-dialog {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+::ng-deep .p-dialog-header {
+  background-color: #f9fafb;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+::ng-deep .p-dialog-content {
+  padding: 1.5rem;
+}
+
+::ng-deep .p-dialog-footer {
+  background-color: #f9fafb;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Message */
+::ng-deep .p-message {
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+/* ==================== UTILITIES ==================== */
+
+.w-full {
+  width: 100%;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-gray-600 {
+  color: #6b7280;
+}
+
+/* role-permission.component.css - ENHANCED DIALOG STYLES */
+
+/* ==================== DIALOG/MODAL FIXES ==================== */
+
+/* Dialog wrapper */
+::ng-deep .p-dialog {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Dialog header */
+::ng-deep .p-dialog .p-dialog-header {
+  background-color: #f9fafb !important;
+  padding: 1.25rem 1.5rem !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+::ng-deep .p-dialog .p-dialog-title {
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+}
+
+/* Dialog content */
+::ng-deep .p-dialog .p-dialog-content {
+  background-color: #ffffff !important;
+  padding: 1.5rem !important;
+  color: #1f2937 !important;
+}
+
+/* Dialog footer */
+::ng-deep .p-dialog .p-dialog-footer {
+  background-color: #f9fafb !important;
+  padding: 1rem 1.5rem !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+/* Dialog close button */
+::ng-deep .p-dialog .p-dialog-header-close {
+  color: #6b7280 !important;
+  background-color: transparent !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  border-radius: 6px !important;
+  transition: all 0.2s !important;
+}
+
+::ng-deep .p-dialog .p-dialog-header-close:hover {
+  color: #1f2937 !important;
+  background-color: #e5e7eb !important;
+}
+
+/* ==================== MODAL CONTENT STYLES ==================== */
+
+.modal-content-body {
+  padding: 0;
+}
+
+.modal-description {
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.modal-description.centered {
+  text-align: center;
+}
+
+.modal-description strong {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.modal-field {
+  margin-bottom: 1rem;
+}
+
+.modal-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+/* ==================== DIALOG FOOTER ACTIONS ==================== */
+
+.dialog-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.dialog-footer-actions p-button {
+  flex-shrink: 0;
+}
+
+/* ==================== WARNING ICON ==================== */
+
+.warning-icon-container {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem;
+  background-color: #fef3c7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.warning-icon-container i {
+  font-size: 2rem;
+  color: #f59e0b;
+}
+
+/* ==================== TEMPLATE GRID ==================== */
+
+.template-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.template-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #ffffff;
+}
+
+.template-card:hover {
+  border-color: #3b82f6;
+  background-color: #f9fafb;
+}
+
+.template-card.selected {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.template-icon {
+  width: 48px;
+  height: 48px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.template-card.selected .template-icon {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.template-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.template-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.template-info p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.template-radio {
+  flex-shrink: 0;
+}
+
+.template-radio input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+/* ==================== SELECT IN DIALOG ==================== */
+
+::ng-deep .p-dialog .p-select {
+  width: 100%;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+}
+
+::ng-deep .p-dialog .p-select:hover {
+  border-color: #9ca3af !important;
+}
+
+::ng-deep .p-dialog .p-select.p-focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* ==================== BUTTON SIZING IN DIALOGS ==================== */
+
+::ng-deep .p-dialog .p-button {
+  padding: 0.625rem 1.25rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 6px !important;
+}
+
+::ng-deep .p-dialog .p-button .p-button-label {
+  font-weight: 500 !important;
+}
+
+::ng-deep .p-dialog .p-button .p-button-icon {
+  font-size: 1rem !important;
+}
+
+/* ==================== RESPONSIVE DIALOG ==================== */
+
+@media (max-width: 640px) {
+  ::ng-deep .p-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+  }
+
+  .dialog-footer-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .dialog-footer-actions p-button {
+    width: 100%;
+  }
+
+  ::ng-deep .dialog-footer-actions .p-button {
+    width: 100% !important;
+  }
+
+  .template-grid {
+    gap: 0.75rem;
+  }
+
+  .template-card {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .template-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .template-info h4 {
+    font-size: 0.875rem;
+  }
+
+  .template-info p {
+    font-size: 0.8125rem;
+  }
+}

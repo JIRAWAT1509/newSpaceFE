@@ -1,0 +1,96 @@
+<!-- team-overview-panel.component.html -->
+
+<div class="team-overview-panel">
+
+  <!-- ==================== TEAM SALES CARD ==================== -->
+  <div class="overview-card team-sales-card">
+    <div class="card-header">
+      <h3 class="card-title">Team sales</h3>
+      <span class="card-subtitle">ยอดขายทีม</span>
+    </div>
+
+    <div class="card-content">
+      <!-- This Year -->
+      <div class="sales-metric-primary">
+        <div class="metric-value">{{ formatCurrency(teamTotals.thisYear) }}</div>
+        <div class="metric-label">this year | ปีนี้</div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="72"></div>
+        </div>
+      </div>
+
+      <!-- This Week -->
+      <div class="sales-metric-secondary">
+        <div class="metric-value">{{ formatNumber(teamTotals.thisWeek) }}</div>
+        <div class="metric-label-row">
+          <span>this week | สัปดาห์นี้</span>
+          <span class="metric-change" [class.positive]="teamTotals.weekChange > 0" [class.negative]="teamTotals.weekChange < 0">
+            {{ teamTotals.weekChange > 0 ? '+' : '' }}{{ teamTotals.weekChange }}% vs last week
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LEADERBOARD CARD ==================== -->
+  <div class="overview-card leaderboard-card">
+    <div class="card-header">
+      <h3 class="card-title">Leaderboard this year</h3>
+      <span class="card-subtitle">อันดับยอดขายปีนี้</span>
+    </div>
+
+    <div class="card-content">
+      <div class="leaderboard-list">
+        @for (member of leaderboard.slice(0, 4); track member.id; let i = $index) {
+          <div class="leaderboard-item">
+            <div class="rank-badge" [class]="'rank-' + (i + 1)">{{ i + 1 }}</div>
+            <div class="member-info">
+              <div class="member-name">{{ member.name }}</div>
+              <div class="member-region">{{ member.region }}</div>
+            </div>
+            <div class="member-sales">{{ formatCurrency(member.salesThisYear) }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== WEEKLY SALES CHART CARD ==================== -->
+  <div class="overview-card weekly-sales-card">
+    <div class="card-header">
+      <h3 class="card-title">Weekly sales</h3>
+      <span class="card-subtitle">ยอดขายรายสัปดาห์</span>
+    </div>
+
+    <div class="card-content">
+      <div class="weekly-chart">
+        <div class="chart-area">
+          <!-- Simple SVG line chart -->
+          <svg viewBox="0 0 200 60" class="line-chart">
+            <defs>
+              <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.2" />
+                <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0" />
+              </linearGradient>
+            </defs>
+            <!-- Generate path from weeklySales data -->
+            @if (weeklySales.length > 0) {
+              <polyline
+                [attr.points]="generateChartPoints()"
+                fill="url(#lineGradient)"
+                stroke="#3b82f6"
+                stroke-width="2"
+              />
+            }
+          </svg>
+        </div>
+        <div class="chart-range">
+          <span>{{ formatNumber(0) }}</span>
+          <span>→</span>
+          <span>{{ formatNumber(teamTotals.thisWeek) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

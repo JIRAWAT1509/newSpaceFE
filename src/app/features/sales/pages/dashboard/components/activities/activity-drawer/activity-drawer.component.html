@@ -1,0 +1,399 @@
+<!-- activity-drawer.component.html -->
+
+<div class="drawer-container">
+
+  <!-- ==================== DRAWER HEADER ==================== -->
+  <div class="drawer-header">
+    <div class="header-content">
+      <h2 class="drawer-title">{{ getDrawerTitle() }}</h2>
+      <p class="drawer-subtitle">
+        {{ mode === 'create' ? 'กรอกข้อมูลกิจกรรมใหม่' : 'แก้ไขข้อมูลกิจกรรม' }}
+      </p>
+    </div>
+    <button class="btn-close" (click)="onCancel()">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+
+  <!-- ==================== DRAWER BODY ==================== -->
+  <div class="drawer-body">
+    <form class="activity-form">
+
+      <!-- Type Selection (Create mode only) -->
+      @if (mode === 'create') {
+        <div class="form-section">
+          <label class="form-label">ประเภทกิจกรรม <span class="required">*</span></label>
+          <div class="type-selector">
+            <button
+              type="button"
+              class="type-option"
+              [class.active]="formData().type === 'personal'"
+              (click)="onTypeChange('personal')"
+            >
+              <i class="pi pi-user"></i>
+              <div class="type-info">
+                <span class="type-name">Personal Task</span>
+                <span class="type-desc">งานส่วนตัว</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              class="type-option"
+              [class.active]="formData().type === 'assignment'"
+              (click)="onTypeChange('assignment')"
+            >
+              <i class="pi pi-users"></i>
+              <div class="type-info">
+                <span class="type-name">Assignment</span>
+                <span class="type-desc">งานมอบหมาย</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Title -->
+      <div class="form-section">
+        <label class="form-label" for="title">
+          ชื่อกิจกรรม <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="title"
+          class="form-input"
+          [class.error]="formErrors()['title']"
+          [value]="formData().title"
+          (input)="updateField('title', $any($event.target).value)"
+          placeholder="กรอกชื่อกิจกรรม..."
+          maxlength="200"
+        />
+        @if (formErrors()['title']) {
+          <span class="error-message">{{ formErrors()['title'] }}</span>
+        }
+      </div>
+
+      <!-- Description -->
+      <div class="form-section">
+        <label class="form-label" for="description">
+          รายละเอียด
+        </label>
+        <textarea
+          id="description"
+          class="form-textarea"
+          [value]="formData().description"
+          (input)="updateField('description', $any($event.target).value)"
+          placeholder="กรอกรายละเอียด..."
+          rows="4"
+        ></textarea>
+      </div>
+
+      <!-- Date Range -->
+      <div class="form-section">
+        <label class="form-label">วันและเวลา <span class="required">*</span></label>
+
+        <div class="date-time-grid">
+          <!-- Start Date -->
+          <div class="date-time-group">
+            <label class="sub-label">เริ่มต้น</label>
+            <div class="date-time-inputs">
+              <input
+                type="date"
+                class="form-input date-input"
+                [class.error]="formErrors()['startDate']"
+                [value]="formData().startDate"
+                (change)="onStartDateChange($any($event.target).value)"
+              />
+              <input
+                type="time"
+                class="form-input time-input"
+                [value]="formData().startTime"
+                (change)="onStartTimeChange($any($event.target).value)"
+              />
+            </div>
+          </div>
+
+          <!-- End Date -->
+          <div class="date-time-group">
+            <label class="sub-label">สิ้นสุด</label>
+            <div class="date-time-inputs">
+              <input
+                type="date"
+                class="form-input date-input"
+                [class.error]="formErrors()['endDate']"
+                [value]="formData().endDate"
+                (input)="updateField('endDate', $any($event.target).value)"
+              />
+              <input
+                type="time"
+                class="form-input time-input"
+                [value]="formData().endTime"
+                (input)="updateField('endTime', $any($event.target).value)"
+              />
+            </div>
+          </div>
+        </div>
+
+        @if (formErrors()['startDate'] || formErrors()['endDate']) {
+          <span class="error-message">
+            {{ formErrors()['startDate'] || formErrors()['endDate'] }}
+          </span>
+        }
+      </div>
+
+      <!-- Assignees (Assignment only) -->
+      @if (formData().type === 'assignment') {
+        <div class="form-section">
+          <label class="form-label">
+            ผู้รับผิดชอบ <span class="required">*</span>
+          </label>
+
+          <!-- Selected Items -->
+          <div class="selected-items">
+            <!-- Selected Users -->
+            @for (user of selectedUsers(); track user.id) {
+              <div class="selected-chip user-chip">
+                <div class="chip-avatar">
+                  @if (user.avatar) {
+                    <span class="avatar-emoji">{{ user.avatar }}</span>
+                  } @else {
+                    <span class="avatar-initials">{{ getUserInitials(user) }}</span>
+                  }
+                </div>
+                <span class="chip-name">{{ user.nameTh }}</span>
+                <button
+                  type="button"
+                  class="btn-chip-remove"
+                  (click)="removeAssignee(user.id)"
+                >
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+            }
+
+            <!-- Selected Roles -->
+            @for (role of selectedRoles(); track role.id) {
+              <div class="selected-chip role-chip">
+                <i class="pi pi-users chip-icon"></i>
+                <span class="chip-name">{{ role.nameTh }}</span>
+                <button
+                  type="button"
+                  class="btn-chip-remove"
+                  (click)="removeRole(role.id)"
+                >
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- Add Buttons -->
+          <div class="add-buttons">
+            <button
+              type="button"
+              class="btn-add"
+              (click)="toggleAssigneeSearch()"
+            >
+              <i class="pi pi-user-plus"></i>
+              <span>เพิ่มบุคคล</span>
+            </button>
+
+            <button
+              type="button"
+              class="btn-add"
+              (click)="toggleRoleSearch()"
+            >
+              <i class="pi pi-users"></i>
+              <span>เพิ่มกลุ่ม</span>
+            </button>
+          </div>
+
+          <!-- User Search Dropdown -->
+          @if (showAssigneeSearch()) {
+            <div class="search-dropdown">
+              <div class="search-header">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="ค้นหาบุคคล..."
+                  [value]="assigneeSearchQuery()"
+                  (input)="assigneeSearchQuery.set($any($event.target).value)"
+                  autofocus
+                />
+                <button
+                  type="button"
+                  class="btn-search-close"
+                  (click)="closeSearches()"
+                >
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+
+              <div class="search-results">
+                @for (user of filteredUsers(); track user.id) {
+                  <div
+                    class="search-item"
+                    [class.selected]="isUserSelected(user.id)"
+                    (click)="toggleAssignee(user.id)"
+                  >
+                    <div class="item-avatar">
+                      @if (user.avatar) {
+                        <span class="avatar-emoji">{{ user.avatar }}</span>
+                      } @else {
+                        <span class="avatar-initials">{{ getUserInitials(user) }}</span>
+                      }
+                    </div>
+                    <div class="item-info">
+                      <span class="item-name">{{ user.nameTh }}</span>
+                      <span class="item-detail">{{ user.email }}</span>
+                    </div>
+                    @if (isUserSelected(user.id)) {
+                      <i class="pi pi-check item-check"></i>
+                    }
+                  </div>
+                } @empty {
+                  <div class="search-empty">ไม่พบผลลัพธ์</div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Role Search Dropdown -->
+          @if (showRoleSearch()) {
+            <div class="search-dropdown">
+              <div class="search-header">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="ค้นหากลุ่ม..."
+                  [value]="roleSearchQuery()"
+                  (input)="roleSearchQuery.set($any($event.target).value)"
+                  autofocus
+                />
+                <button
+                  type="button"
+                  class="btn-search-close"
+                  (click)="closeSearches()"
+                >
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+
+              <div class="search-results">
+                @for (role of filteredRoles(); track role.id) {
+                  <div
+                    class="search-item"
+                    [class.selected]="isRoleSelected(role.id)"
+                    (click)="toggleRole(role.id)"
+                  >
+                    <div class="item-icon" [style.background]="getRoleColor(role)">
+                      <i class="pi pi-users"></i>
+                    </div>
+                    <div class="item-info">
+                      <span class="item-name">{{ role.nameTh }}</span>
+                      <span class="item-detail">{{ role.userCount }} คน</span>
+                    </div>
+                    @if (isRoleSelected(role.id)) {
+                      <i class="pi pi-check item-check"></i>
+                    }
+                  </div>
+                } @empty {
+                  <div class="search-empty">ไม่พบผลลัพธ์</div>
+                }
+              </div>
+            </div>
+          }
+
+          @if (formErrors()['assignedTo']) {
+            <span class="error-message">{{ formErrors()['assignedTo'] }}</span>
+          }
+        </div>
+
+        <!-- Finish Requirement -->
+        <div class="form-section">
+          <label class="form-label">ข้อกำหนดการเสร็จสิ้น</label>
+
+          <div class="requirement-options">
+            <label class="requirement-option">
+              <input
+                type="radio"
+                name="finishRequirement"
+                [checked]="formData().finishRequirement.type === 'none'"
+                (change)="updateFinishRequirement('none')"
+              />
+              <span>ไม่กำหนด</span>
+            </label>
+
+            <label class="requirement-option">
+              <input
+                type="radio"
+                name="finishRequirement"
+                [checked]="formData().finishRequirement.type === 'text'"
+                (change)="updateFinishRequirement('text')"
+              />
+              <span>ต้องการข้อความ</span>
+            </label>
+
+            <label class="requirement-option">
+              <input
+                type="radio"
+                name="finishRequirement"
+                [checked]="formData().finishRequirement.type === 'file'"
+                (change)="updateFinishRequirement('file')"
+              />
+              <span>ต้องการไฟล์</span>
+            </label>
+
+            <label class="requirement-option">
+              <input
+                type="radio"
+                name="finishRequirement"
+                [checked]="formData().finishRequirement.type === 'both'"
+                (change)="updateFinishRequirement('both')"
+              />
+              <span>ต้องการทั้งสองอย่าง</span>
+            </label>
+          </div>
+
+          @if (formData().finishRequirement.type !== 'none') {
+            <textarea
+              class="form-textarea requirement-textarea"
+              [class.error]="formErrors()['finishRequirement']"
+              [value]="formData().finishRequirement.description || ''"
+              (input)="updateFinishRequirementDescription($any($event.target).value)"
+              placeholder="คำอธิบายข้อกำหนด (ถ้ามี)..."
+              rows="3"
+            ></textarea>
+
+            @if (formErrors()['finishRequirement']) {
+              <span class="error-message">{{ formErrors()['finishRequirement'] }}</span>
+            }
+          }
+        </div>
+      }
+
+    </form>
+  </div>
+
+  <!-- ==================== DRAWER FOOTER ==================== -->
+  <div class="drawer-footer">
+    <button
+      type="button"
+      class="btn-footer btn-cancel"
+      (click)="onCancel()"
+    >
+      ยกเลิก
+    </button>
+
+    <button
+      type="button"
+      class="btn-footer btn-save"
+      [disabled]="!isFormValid()"
+      (click)="onSubmit()"
+    >
+      <i class="pi pi-check"></i>
+      <span>{{ mode === 'create' ? 'สร้าง' : 'บันทึก' }}</span>
+    </button>
+  </div>
+
+</div>

@@ -1,0 +1,123 @@
+<!-- document-type.component.html -->
+
+<div class="document-type-container">
+  <!-- ==================== HEADER SECTION ==================== -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">ประเภทเอกสาร</h1>
+        <p class="page-subtitle">จัดการข้อมูลประเภทเอกสารในระบบ</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DATA SECTION ==================== -->
+  <div class="data-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-file"></i>
+        รายการประเภทเอกสาร
+      </h2>
+
+      <div class="section-actions">
+        <!-- Search Box -->
+        <div class="search-box">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="ค้นหารหัส หรือชื่อเอกสาร..."
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearch()"
+          />
+        </div>
+
+        <!-- Add Button -->
+        <p-button
+          label="เพิ่มประเภทเอกสาร"
+          icon="pi pi-plus"
+          (onClick)="openCreateDrawer()"
+          severity="primary"
+        ></p-button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="empty-state">
+        <i class="pi pi-spin pi-spinner empty-icon"></i>
+        <p>กำลังโหลดข้อมูล...</p>
+      </div>
+    }
+
+    <!-- Data Table -->
+    @else if (filteredDocumentTypes().length > 0) {
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 15%;">รหัสเอกสาร</th>
+              <th>ชื่อเอกสาร</th>
+              <th style="width: 100px; text-align: center;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (doc of filteredDocumentTypes(); track doc.DOC_CODE) {
+              <tr class="clickable-row">
+                <td (click)="onRowClick(doc)">
+                  <strong>{{ doc.DOC_CODE }}</strong>
+                </td>
+                <td (click)="onRowClick(doc)">
+                  {{ doc.DOC_NAME }}
+                </td>
+                <td class="actions-column">
+                  <div class="flex items-center justify-center gap-2">
+                    <button
+                      class="action-btn action-btn-edit"
+                      (click)="openEditDrawer(doc)"
+                      title="แก้ไข"
+                    >
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button
+                      class="action-btn action-btn-delete"
+                      (click)="deleteDocumentType(doc)"
+                      title="ลบ"
+                    >
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @else {
+      <div class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>ไม่พบข้อมูลประเภทเอกสาร</p>
+        @if (searchQuery()) {
+          <button
+            class="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2"
+            (click)="clearSearch()"
+          >
+            ล้างการค้นหา
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ==================== FORM DRAWER ==================== -->
+<app-document-type-form-drawer
+  [isOpen]="isDrawerOpen()"
+  [mode]="drawerMode()"
+  [documentType]="selectedDocumentType()"
+  (close)="closeDrawer()"
+  (save)="onSave($event)"
+></app-document-type-form-drawer>

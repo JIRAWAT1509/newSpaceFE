@@ -1,28 +1,28 @@
-<!-- header.component.html - UPDATED with clickable logo -->
+<!-- header.component.html - RESPONSIVE FIXED -->
 
 <header class="fixed top-0 left-0 right-0 z-50">
   <!-- Main Header -->
-  <div class="bg-gradient-to-r from-sidebar-main via-header-primary to-accent-primary px-8 py-4 shadow-lg relative">
+  <div class="bg-gradient-to-r from-sidebar-main via-header-primary to-accent-primary px-4 md:px-8 py-3 md:py-4 shadow-lg relative">
     <div class="flex items-center justify-between">
-      <!-- Logo - NOW CLICKABLE -->
-      <div class="flex items-center space-x-8">
+      <!-- Logo -->
+      <div class="flex items-center space-x-2 md:space-x-8">
         <h1
           (click)="onLogoClick()"
-          class="text-white-primary text-2xl font-bold tracking-widest drop-shadow-lg cursor-pointer hover:opacity-90 transition-opacity duration-200"
+          class="text-white-primary text-lg md:text-2xl font-bold tracking-normal md:tracking-widest drop-shadow-lg cursor-pointer hover:opacity-90 transition-opacity duration-200 whitespace-nowrap flex-shrink-0"
           title="Go to Home"
         >
           {{ texts.logoText }}
         </h1>
 
-        <!-- Navigation Menu -->
-        <nav class="flex space-x-6">
+        <!-- Navigation Menu - Hidden on mobile, scrollable on tablet -->
+        <nav class="hidden md:flex md:space-x-3 lg:space-x-6 overflow-x-auto scrollbar-hide">
           <a
             *ngFor="let item of navigationItems; let i = index"
             [id]="'nav-item-' + i"
             (click)="setActiveMenuItem(item.primary_content)"
             [class.text-white-primary]="activeMenuItem === item.primary_content"
             [class.text-text-disabled]="activeMenuItem !== item.primary_content"
-            class="relative text-base font-medium cursor-pointer transition-colors duration-200 hover:text-white-primary drop-shadow-md py-1"
+            class="relative text-sm lg:text-base font-medium cursor-pointer transition-colors duration-200 hover:text-white-primary drop-shadow-md py-1 whitespace-nowrap flex-shrink-0"
           >
             {{ translateNav(item.primary_content) }}
           </a>
@@ -30,15 +30,15 @@
       </div>
 
       <!-- Right Section -->
-      <div class="flex items-center space-x-4">
-        <!-- Container for search bar and greeting with fixed width -->
-        <div class="w-64 relative h-10">
+      <div class="flex items-center space-x-2 md:space-x-4">
+        <!-- Search/Greeting Container - Always visible on tablet+ -->
+        <div class="w-48 md:w-64 relative h-10">
           <div
             *ngIf="!isScrolled"
-            class="absolute top-0 left-0 w-full h-full flex items-center justify-end text-white-primary text-base font-medium drop-shadow-md whitespace-nowrap"
+            class="absolute top-0 left-0 w-full h-full flex items-center justify-end text-white-primary text-sm md:text-base font-medium drop-shadow-md whitespace-nowrap overflow-hidden"
             [@slideDownSmallFaded]
           >
-            {{ texts.greeting }}, {{ username }}!
+            <span class="truncate">{{ texts.greeting }}, {{ username }}!</span>
           </div>
 
           <div
@@ -51,10 +51,10 @@
               [(ngModel)]="searchQuery"
               (keyup.enter)="onSearch()"
               [placeholder]="texts.searchPlaceholder"
-              class="w-full px-4 py-2 pl-10 rounded-lg bg-white-primary text-black-primary placeholder-text-disabled focus:outline-none focus:ring-2 focus:ring-accent-primary"
+              class="w-full px-3 md:px-4 py-2 pl-8 md:pl-10 text-sm rounded-lg bg-white-primary text-black-primary placeholder-text-disabled focus:outline-none focus:ring-2 focus:ring-accent-primary"
             />
             <svg
-              class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-icon-default pointer-events-none"
+              class="absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-icon-default pointer-events-none"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -73,7 +73,7 @@
         <div class="relative language-dropdown">
           <button
             (click)="toggleLanguageDropdown()"
-            class="w-12 h-12 rounded-full bg-white-primary text-sidebar-main font-semibold text-sm flex items-center justify-center hover:bg-gray-100 transition-colors duration-200 shadow-md"
+            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white-primary text-sidebar-main font-semibold text-xs md:text-sm flex items-center justify-center hover:bg-gray-100 transition-colors duration-200 shadow-md flex-shrink-0"
           >
             {{ currentLanguage.abbreviation }}
           </button>
@@ -81,19 +81,19 @@
           <!-- Language Dropdown -->
           <div
             *ngIf="isLanguageDropdownOpen"
-            class="absolute right-0 mt-2 w-48 bg-white-primary rounded-lg shadow-xl py-2 border border-gray-200"
+            class="absolute right-0 mt-2 w-40 md:w-48 bg-white-primary rounded-lg shadow-xl py-2 border border-gray-200 z-50"
           >
             <button
               *ngFor="let lang of availableLanguages"
               (click)="selectLanguage(lang)"
-              class="w-full px-4 py-2 text-left hover:bg-sidebar-active-bg hover:text-sidebar-active-text transition-colors duration-150 flex items-center justify-between"
+              class="w-full px-3 md:px-4 py-2 text-left text-sm hover:bg-sidebar-active-bg hover:text-sidebar-active-text transition-colors duration-150 flex items-center justify-between"
               [ngClass]="{
                 'bg-sidebar-active-bg text-sidebar-active-text':
                   currentLanguage.code === lang.code
               }"
             >
               <span class="font-medium">{{ lang.name }}</span>
-              <span class="text-sm font-semibold">{{ lang.abbreviation }}</span>
+              <span class="text-xs md:text-sm font-semibold">{{ lang.abbreviation }}</span>
             </button>
           </div>
         </div>
@@ -102,7 +102,7 @@
         <div class="relative profile-dropdown">
           <button
             (click)="toggleProfileDropdown()"
-            class="w-12 h-12 rounded-full bg-white-primary flex items-center justify-center hover:bg-gray-100 transition-colors duration-200 shadow-md overflow-hidden"
+            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white-primary flex items-center justify-center hover:bg-gray-100 transition-colors duration-200 shadow-md overflow-hidden flex-shrink-0"
           >
             <img
               *ngIf="hasProfilePicture && profilePictureUrl"
@@ -112,7 +112,7 @@
             />
             <svg
               *ngIf="!hasProfilePicture"
-              class="w-6 h-6 text-icon-default"
+              class="w-5 h-5 md:w-6 md:h-6 text-icon-default"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -129,10 +129,10 @@
           <!-- Profile Dropdown -->
           <div
             *ngIf="isProfileDropdownOpen"
-            class="absolute right-0 mt-2 w-56 bg-white-primary rounded-lg shadow-xl py-2 border border-gray-200"
+            class="absolute right-0 mt-2 w-48 md:w-56 bg-white-primary rounded-lg shadow-xl py-2 border border-gray-200 z-50"
           >
-            <div class="px-4 py-3 border-b border-gray-200">
-              <p class="text-sm font-semibold text-black-primary">
+            <div class="px-3 md:px-4 py-3 border-b border-gray-200">
+              <p class="text-sm font-semibold text-black-primary truncate">
                 {{ username }}
               </p>
               <p class="text-xs text-text-disabled">
@@ -140,19 +140,19 @@
               </p>
             </div>
             <button
-              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors duration-150"
+              class="w-full px-3 md:px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors duration-150"
             >
               {{ texts.viewProfile }}
             </button>
             <button
-              class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors duration-150"
+              class="w-full px-3 md:px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors duration-150"
             >
               {{ texts.settings }}
             </button>
             <hr class="my-2" />
             <button
               (click)="logout()"
-              class="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50 transition-colors duration-150"
+              class="w-full px-3 md:px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50 transition-colors duration-150"
             >
               {{ texts.logout }}
             </button>
@@ -161,20 +161,20 @@
       </div>
     </div>
 
-    <!-- Active indicator positioned at the very bottom edge of header (inside) -->
-    <div class="absolute bottom-0 left-0 right-0 h-1 pointer-events-none">
+    <!-- Active indicator - Only show on desktop -->
+    <div class="hidden md:block absolute bottom-0 left-0 right-0 h-1 pointer-events-none">
       <div class="flex px-8">
-        <!-- Spacer matching logo width -->
-        <div class="text-2xl font-bold tracking-widest invisible leading-none">
+        <!-- Spacer matching logo -->
+        <div class="text-2xl font-bold tracking-widest invisible leading-none whitespace-nowrap">
           {{ texts.logoText }}
         </div>
-        <!-- Spacer matching space-x-8 -->
+        <!-- Spacer -->
         <div class="w-8"></div>
         <!-- Navigation indicators -->
-        <div class="flex space-x-6">
+        <div class="flex space-x-3 lg:space-x-6">
           <div
             *ngFor="let item of navigationItems"
-            class="text-base font-medium relative leading-none"
+            class="text-sm lg:text-base font-medium relative leading-none whitespace-nowrap"
           >
             <span class="invisible">{{
               translateNav(item.primary_content)
@@ -189,23 +189,23 @@
     </div>
   </div>
 
-  <!-- Large Search Bar (visible when not scrolled) -->
+  <!-- Large Search Bar (desktop only) -->
   <div
     *ngIf="!isScrolled"
-    class="bg-gradient-to-r from-header-gradient-start to-header-gradient-end border-t border-accent-highlight border-opacity-20 overflow-hidden"
+    class="hidden md:block bg-gradient-to-r from-header-gradient-start to-header-gradient-end border-t border-accent-highlight border-opacity-20 overflow-hidden"
     [@slideDown]
   >
-    <div class="px-8 py-4">
+    <div class="px-4 md:px-8 py-3 md:py-4">
       <div class="max-w-3xl mx-auto relative">
         <input
           type="text"
           [(ngModel)]="searchQuery"
           (keyup.enter)="onSearch()"
           [placeholder]="texts.searchPlaceholder"
-          class="w-full px-6 py-3 pl-12 rounded-lg bg-white-primary text-black-primary placeholder-text-disabled text-base focus:outline-none focus:ring-2 focus:ring-accent-primary shadow-lg"
+          class="w-full px-4 md:px-6 py-2 md:py-3 pl-10 md:pl-12 rounded-lg bg-white-primary text-black-primary placeholder-text-disabled text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-accent-primary shadow-lg"
         />
         <svg
-          class="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-icon-default"
+          class="absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 md:w-6 md:h-6 text-icon-default"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

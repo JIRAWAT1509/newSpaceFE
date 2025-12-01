@@ -1,0 +1,192 @@
+.floor-plan-wrapper {
+  @apply relative w-full h-full flex flex-col bg-gray-50 rounded-lg overflow-hidden;
+}
+
+/* Top Left: Building Selector */
+.top-left-controls {
+  @apply absolute top-4 left-4 z-20;
+}
+
+:host ::ng-deep .building-dropdown {
+  @apply min-w-[280px];
+}
+
+:host ::ng-deep .building-dropdown .p-select {
+  @apply w-full;
+}
+
+:host ::ng-deep .building-dropdown .p-inputtext {
+  @apply px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-md;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply text-sm;
+}
+
+/* Top Center: Floor Dropdown */
+.top-center-controls {
+  @apply absolute top-4 left-1/2 transform -translate-x-1/2 z-20;
+}
+
+:host ::ng-deep .floor-dropdown {
+  @apply min-w-[140px];
+}
+
+:host ::ng-deep .floor-dropdown .p-inputtext {
+  @apply px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-md;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply text-lg font-semibold;
+}
+
+/* Top Right: Zoom Controls */
+.top-right-controls {
+  @apply absolute top-4 right-4 z-20;
+}
+
+.zoom-controls {
+  @apply flex items-center gap-2 bg-white p-2 rounded-lg shadow-md;
+}
+
+.zoom-button {
+  @apply w-12 h-12 flex items-center justify-center rounded-lg;
+  @apply bg-white text-gray-700 border border-gray-300;
+  @apply hover:bg-blue-500 hover:text-white hover:border-blue-500;
+  @apply transition-colors duration-200;
+  @apply disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-400;
+}
+
+.zoom-button i {
+  @apply text-xl;
+}
+
+/* Middle Left/Right: Floor Navigation Arrows */
+.arrow-button {
+  @apply absolute top-1/2 transform -translate-y-1/2 z-20;
+  @apply w-12 h-12 flex items-center justify-center rounded-full;
+  @apply bg-white text-gray-700 shadow-lg;
+  @apply hover:bg-gray-100;
+  @apply transition-colors duration-200;
+}
+
+.arrow-left {
+  @apply left-4;
+}
+
+.arrow-right {
+  @apply right-4;
+}
+
+.arrow-button i {
+  @apply text-2xl;
+}
+
+/* Floor Plan Container */
+.floor-plan-container {
+  @apply flex-1 relative overflow-hidden bg-gray-100;
+  cursor: grab;
+  /* Use flexbox to center content */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floor-plan-container:active {
+  cursor: grabbing;
+}
+
+.floor-plan-content {
+  @apply relative;
+  transition: transform 0.3s ease-out;
+  will-change: transform;
+  /* Content will be centered by flex parent */
+}
+
+.floor-plan-image {
+  @apply block max-w-none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Bottom Left: Filter Toggle */
+.bottom-left-controls {
+  @apply absolute bottom-4 left-4 z-20;
+}
+
+.filter-toggle-button {
+  @apply w-12 h-12 flex items-center justify-center rounded-lg;
+  @apply bg-white text-gray-700 shadow-md border border-gray-300;
+  @apply hover:bg-blue-500 hover:text-white hover:border-blue-500;
+  @apply transition-colors duration-200;
+}
+
+.filter-toggle-button i {
+  @apply text-xl;
+}
+
+/* Bottom Center: Status Bar */
+.bottom-center-controls {
+  @apply absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20;
+  @apply max-w-[600px] w-full px-4;
+}
+
+/* Bottom Right: Edit Button */
+.bottom-right-controls {
+  @apply absolute bottom-4 right-4 z-20;
+}
+
+.edit-button {
+  @apply flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-lg shadow-md;
+  @apply hover:bg-blue-700 transition-colors duration-200;
+  @apply font-medium;
+}
+
+.edit-button i {
+  @apply text-lg;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .top-left-controls {
+    @apply top-2 left-2;
+  }
+
+  :host ::ng-deep .building-dropdown {
+    @apply min-w-[220px];
+  }
+
+  .top-center-controls {
+    @apply top-16;
+  }
+
+  .top-right-controls {
+    @apply top-2 right-2;
+  }
+
+  .arrow-button {
+    @apply w-10 h-10;
+  }
+
+  .arrow-left {
+    @apply left-2;
+  }
+
+  .arrow-right {
+    @apply right-2;
+  }
+
+  .bottom-center-controls {
+    @apply max-w-[400px];
+  }
+}
+
+@media (max-width: 640px) {
+  .top-left-controls {
+    @apply hidden;
+  }
+
+  .edit-button span {
+    @apply hidden;
+  }
+
+  .edit-button {
+    @apply w-12 h-12 p-0 justify-center;
+  }
+}

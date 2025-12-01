@@ -1,1 +1,681 @@
-<p>company-bank works!</p>
+<div class="company-bank-container">
+
+  <!-- Toast for notifications -->
+  <p-toast></p-toast>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">Bank Management</h1>
+        <p class="page-subtitle">Manage banks, branches, and account information</p>
+      </div>
+
+      <div class="header-actions">
+        <p-button
+          label="Add Bank"
+          icon="pi pi-plus"
+          severity="success"
+          (onClick)="openAddBankModal()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content - Split Layout -->
+  <div class="main-content" [class.split-layout]="selectedBank">
+
+    <!-- Banks Section -->
+    <div class="banks-section" [class.half-width]="selectedBank">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="pi pi-building"></i>
+          Banks
+        </h2>
+        <div class="search-box">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="bankSearchQuery"
+            placeholder="Search banks..."
+            class="search-input"
+          />
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="isLoadingBanks" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading banks...</p>
+      </div>
+
+      <!-- Banks Grid -->
+      <div *ngIf="!isLoadingBanks && filteredBanks.length > 0" class="banks-grid">
+        <div
+          *ngFor="let bank of filteredBanks"
+          class="bank-card"
+          [class.selected]="selectedBank?.BANK_CODE === bank.BANK_CODE"
+          (click)="selectBank(bank)"
+        >
+          <div class="bank-card-header">
+            <div class="bank-icon">
+              <i class="pi pi-building"></i>
+            </div>
+            <div class="bank-code">{{ bank.BANK_CODE }}</div>
+          </div>
+          <div class="bank-card-body">
+            <h3 class="bank-name-en">{{ bank.BANK_NAME_EN }}</h3>
+            <p class="bank-name-th">{{ bank.BANK_NAME_TH }}</p>
+          </div>
+          <div class="bank-card-actions">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              size="small"
+              (onClick)="openEditBankModal(bank); $event.stopPropagation()"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              size="small"
+              (onClick)="deleteBank(bank); $event.stopPropagation()"
+            ></p-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoadingBanks && filteredBanks.length === 0" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No banks found</p>
+      </div>
+    </div>
+
+    <!-- Branches Section (only show when bank is selected) -->
+    <div *ngIf="selectedBank" class="branches-section half-width">
+      <div class="section-header">
+        <div class="selected-bank-info">
+          <h2 class="section-title">
+            <i class="pi pi-map-marker"></i>
+            Branches
+          </h2>
+          <span class="bank-badge">{{ selectedBank.BANK_CODE }}</span>
+        </div>
+        <div class="branch-actions">
+          <div class="search-box">
+            <i class="pi pi-search search-icon"></i>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="branchSearchQuery"
+              placeholder="Search branches..."
+              class="search-input"
+            />
+          </div>
+          <p-button
+            label="Add Branch"
+            icon="pi pi-plus"
+            severity="success"
+            [outlined]="true"
+            (onClick)="openAddBranchModal()"
+          ></p-button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="isLoadingBranches" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading branches...</p>
+      </div>
+
+      <!-- Branches Grid -->
+      <div *ngIf="!isLoadingBranches && filteredBranches.length > 0" class="branches-grid">
+        <div
+          *ngFor="let branch of filteredBranches"
+          class="branch-card"
+          (click)="viewBranchDetails(branch)"
+        >
+          <div class="branch-card-header">
+            <div class="branch-icon">
+              <i class="pi pi-map-marker"></i>
+            </div>
+            <div class="branch-code">{{ branch.BRANCH_CODE }}</div>
+          </div>
+          <div class="branch-card-body">
+            <h4 class="branch-name-en">{{ branch.BRANCH_NAME_EN }}</h4>
+            <p class="branch-name-th">{{ branch.BRANCH_NAME_TH }}</p>
+          </div>
+          <div class="branch-card-footer">
+            <p-button
+              icon="pi pi-eye"
+              label="View Details"
+              [text]="true"
+              size="small"
+              (onClick)="viewBranchDetails(branch); $event.stopPropagation()"
+            ></p-button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoadingBranches && filteredBranches.length === 0" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No branches found for this bank</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL 1: Bank Add/Edit Modal -->
+<!-- ============================================ -->
+<p-dialog
+  [(visible)]="showBankModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px' }"
+  [header]="isEditMode ? 'Edit Bank' : 'Add New Bank'"
+>
+  <div class="modal-content">
+    <div class="form-field" [class.has-error]="bankErrors['BANK_CODE']">
+      <label class="form-label required">Bank Code</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="bankForm.BANK_CODE"
+        [disabled]="isEditMode"
+        placeholder="Enter bank code"
+        class="form-input"
+      />
+      <div *ngIf="bankErrors['BANK_CODE']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ bankErrors['BANK_CODE'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="bankErrors['BANK_NAME_EN']">
+      <label class="form-label required">Bank Name (English)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="bankForm.BANK_NAME_EN"
+        placeholder="Enter bank name in English"
+        class="form-input"
+      />
+      <div *ngIf="bankErrors['BANK_NAME_EN']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ bankErrors['BANK_NAME_EN'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="bankErrors['BANK_NAME_TH']">
+      <label class="form-label required">Bank Name (Thai)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="bankForm.BANK_NAME_TH"
+        placeholder="Enter bank name in Thai"
+        class="form-input"
+      />
+      <div *ngIf="bankErrors['BANK_NAME_TH']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ bankErrors['BANK_NAME_TH'] }}</span>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeBankModal()"
+        [disabled]="isSaving"
+      ></p-button>
+      <p-button
+        [label]="isEditMode ? 'Save Changes' : 'Create Bank'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="saveBankModal()"
+        [loading]="isSaving"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ============================================ -->
+<!-- MODAL 2: Branch Add/Edit Modal (Simple) -->
+<!-- ============================================ -->
+<p-dialog
+  [(visible)]="showBranchModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px' }"
+  [header]="isEditMode ? 'Edit Branch' : 'Add New Branch'"
+>
+  <div class="modal-content">
+    <div class="form-field" [class.has-error]="branchErrors['BRANCH_CODE']">
+      <label class="form-label required">Branch Code</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="branchForm.BRANCH_CODE"
+        [disabled]="isEditMode"
+        placeholder="Enter branch code"
+        class="form-input"
+      />
+      <div *ngIf="branchErrors['BRANCH_CODE']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ branchErrors['BRANCH_CODE'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="branchErrors['BRANCH_NAME_EN']">
+      <label class="form-label required">Branch Name (English)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="branchForm.BRANCH_NAME_EN"
+        placeholder="Enter branch name in English"
+        class="form-input"
+      />
+      <div *ngIf="branchErrors['BRANCH_NAME_EN']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ branchErrors['BRANCH_NAME_EN'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="branchErrors['BRANCH_NAME_TH']">
+      <label class="form-label required">Branch Name (Thai)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="branchForm.BRANCH_NAME_TH"
+        placeholder="Enter branch name in Thai"
+        class="form-input"
+      />
+      <div *ngIf="branchErrors['BRANCH_NAME_TH']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ branchErrors['BRANCH_NAME_TH'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Bank Code</label>
+      <input
+        type="text"
+        pInputText
+        [ngModel]="branchForm.BANK_CODE"
+        [disabled]="true"
+        class="form-input"
+      />
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeBranchModal()"
+        [disabled]="isSaving"
+      ></p-button>
+      <p-button
+        [label]="isEditMode ? 'Save Changes' : 'Create Branch'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="saveBranchModal()"
+        [loading]="isSaving"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ============================================ -->
+<!-- MODAL 3: Branch Details Modal with Accounts Table -->
+<!-- ============================================ -->
+<p-dialog
+  [(visible)]="showDetailsModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '1100px', maxWidth: '95vw' }"
+  header="Branch & Account Details"
+>
+  <div *ngIf="selectedBranch" class="details-content">
+
+    <!-- Branch Header -->
+    <div class="details-header">
+      <div class="details-title-section">
+        <h2 class="details-title">{{ selectedBranch.BRANCH_NAME_EN }}</h2>
+        <p class="details-subtitle">{{ selectedBranch.BRANCH_CODE }}</p>
+      </div>
+    </div>
+
+    <!-- Branch Information (Full Width) -->
+    <div class="branch-info-section">
+      <h3 class="section-title">Branch Information</h3>
+      <div class="branch-info-grid">
+        <div class="info-item">
+          <span class="info-label">Bank Code:</span>
+          <span class="info-value">{{ selectedBranch.BANK_CODE }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Branch Code:</span>
+          <span class="info-value">{{ selectedBranch.BRANCH_CODE }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Name (English):</span>
+          <span class="info-value">{{ selectedBranch.BRANCH_NAME_EN }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Name (Thai):</span>
+          <span class="info-value">{{ selectedBranch.BRANCH_NAME_TH }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accounts Table Section -->
+    <div class="accounts-section">
+      <div class="accounts-header">
+        <h3 class="section-title">
+          <i class="pi pi-wallet"></i>
+          Account Information
+        </h3>
+        <p-button
+          label="Add Account"
+          icon="pi pi-plus"
+          severity="success"
+          size="small"
+          [outlined]="true"
+          (onClick)="openAddAccountModal()"
+        ></p-button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="isLoadingAccounts" class="loading-state small">
+        <i class="pi pi-spin pi-spinner"></i>
+        <p>Loading accounts...</p>
+      </div>
+
+     <!-- Accounts Table -->
+<div *ngIf="!isLoadingAccounts && accounts.length > 0" class="accounts-table">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Payment Code</th>
+        <th>Account Number</th>
+        <th>Account Type</th>
+        <th>GL Account</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let account of accounts"
+        class="clickable-row"
+        (click)="openEditAccountModal(account)"
+      >
+        <td>{{ account.PAID_FOR_CODE }}</td>
+        <td>{{ account.ACC_BANK }}</td>
+        <td>{{ account.ACC_TYPE }}</td>
+        <td>{{ account.ACC_GL }}</td>
+        <td>{{ account.NB_LONG_TEXT || '-' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoadingAccounts && accounts.length === 0" class="empty-state small">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No accounts found for this branch</p>
+        <p-button
+          label="Add First Account"
+          icon="pi pi-plus"
+          severity="primary"
+          size="small"
+          (onClick)="openAddAccountModal()"
+        ></p-button>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button
+        label="Close"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeDetailsModal()"
+      ></p-button>
+      <div class="action-buttons-group">
+        <p-button
+          label="Edit Branch"
+          icon="pi pi-pencil"
+          severity="info"
+          (onClick)="editBranchFromDetails()"
+        ></p-button>
+        <p-button
+          label="Delete Branch"
+          icon="pi pi-trash"
+          severity="danger"
+          (onClick)="deleteBranchFromDetails()"
+        ></p-button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ============================================ -->
+<!-- MODAL 4: Account Add/Edit Modal -->
+<!-- ============================================ -->
+<p-dialog
+  [(visible)]="showAccountModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '700px', maxWidth: '95vw' }"
+  [header]="isAccountEditMode ? 'Edit Account' : 'Add New Account'"
+>
+  <div class="modal-content">
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">Bank Code</label>
+        <input
+          type="text"
+          pInputText
+          [ngModel]="accountForm.BANK_CODE"
+          [disabled]="true"
+          class="form-input"
+        />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Branch Code</label>
+        <input
+          type="text"
+          pInputText
+          [ngModel]="accountForm.BRANCH_CODE"
+          [disabled]="true"
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="accountErrors['ACC_BANK']">
+      <label class="form-label required">Account Number</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="accountForm.ACC_BANK"
+        placeholder="Enter account number"
+        class="form-input"
+      />
+      <div *ngIf="accountErrors['ACC_BANK']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ accountErrors['ACC_BANK'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="accountErrors['ACC_TYPE']">
+      <label class="form-label required">Account Type</label>
+      <p-select
+        [(ngModel)]="accountForm.ACC_TYPE"
+        [options]="accountTypeOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select account type"
+        styleClass="w-full"
+      ></p-select>
+      <div *ngIf="accountErrors['ACC_TYPE']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ accountErrors['ACC_TYPE'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">GL Account</label>
+      <p-select
+        [(ngModel)]="accountForm.ACC_GL"
+        [options]="glAccountOptions"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        filterBy="label"
+        placeholder="Select GL account"
+        [showClear]="true"
+        styleClass="w-full"
+        [loading]="isLoadingGLAccounts"
+      ></p-select>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Payment Code</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="accountForm.PAID_FOR_CODE"
+        [disabled]="isAccountEditMode"
+        placeholder="Auto-generated if empty"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Description</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="accountForm.NB_LONG_TEXT"
+        placeholder="Enter description"
+        class="form-input"
+      />
+    </div>
+
+<!-- Bill Payment Section -->
+    <div class="bill-payment-section">
+      <h4 class="subsection-title">
+        <i class="pi pi-file-edit"></i>
+        Bill Payment Column Mapping
+      </h4>
+      <p class="subsection-hint">
+        Configure which columns to use for Bill Payment processing
+      </p>
+
+      <div class="form-row-three">
+        <div class="form-field">
+          <label class="form-label">Customer (Ref1)</label>
+          <p-select
+            [(ngModel)]="accountForm.BILL_PAYMENT_REF1"
+            [options]="billPaymentColumns"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="-- Select column --"
+            [showClear]="true"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Invoice No (Ref2)</label>
+          <p-select
+            [(ngModel)]="accountForm.BILL_PAYMENT_REF2"
+            [options]="billPaymentColumns"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="-- Select column --"
+            [showClear]="true"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Payment Amount</label>
+          <p-select
+            [(ngModel)]="accountForm.BILL_PAYMENT_REF3"
+            [options]="billPaymentColumns"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="-- Select column --"
+            [showClear]="true"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<ng-template pTemplate="footer">
+  <div class="modal-footer">
+    <div class="left-actions">
+      <p-button
+        *ngIf="isAccountEditMode"
+        label="Delete"
+        icon="pi pi-trash"
+        severity="danger"
+        [outlined]="true"
+        (onClick)="deleteAccountFromModal()"
+      ></p-button>
+    </div>
+    <div class="right-actions">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeAccountModal()"
+        [disabled]="isSaving"
+      ></p-button>
+      <p-button
+        [label]="isAccountEditMode ? 'Save Changes' : 'Create Account'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="saveAccountModal()"
+        [loading]="isSaving"
+      ></p-button>
+    </div>
+  </div>
+</ng-template>
+</p-dialog>

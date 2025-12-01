@@ -1,1 +1,34 @@
-<p>layout-master works!</p>
+<div class="layout-master-container">
+  <!-- Section 1: Area Availability (Per-Building) - Full Width -->
+  <div class="section section-availability">
+    <app-area-availability
+      [mode]="'per-building'"
+      (filterChanged)="onStatusFilterChanged($event)"
+    />
+  </div>
+
+  <!-- Filter Bar - Between Section 1 and 2 -->
+  <div class="section section-filter-bar">
+    <app-area-filter-bar
+      (filterChanged)="onTypeFilterChanged($event)"
+    />
+  </div>
+
+  <!-- Section 2: Area Management (Floor Plan + Area List) -->
+  <div class="section section-area-management">
+    <app-area-management
+      [selectedStatusFilters]="selectedStatusFilters()"
+      [selectedTypeFilters]="selectedTypeFilters()"
+      [searchQuery]="searchQuery()"
+      (areaSelected)="onAreaSelected($event)"
+    />
+  </div>
+
+  <!-- Section 3: Floor/Area Data Display -->
+  <div class="section section-data-display">
+    <app-area-floor-data
+      [selectedAreaId]="selectedAreaId()"
+      (backToGeneral)="onBackToGeneral()"
+    />
+  </div>
+</div>

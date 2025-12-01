@@ -1,0 +1,305 @@
+<!-- revenue-form-drawer.component.html -->
+
+<!-- Backdrop -->
+@if (isOpen) {
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+    (click)="onClose()"
+  ></div>
+}
+
+<!-- Drawer -->
+@if (isOpen) {
+  <div
+    class="fixed z-50 bg-white shadow-2xl transition-all duration-300 ease-in-out overflow-hidden
+           md:top-0 md:right-0 md:h-full md:w-[700px]
+           max-md:top-1/2 max-md:left-1/2 max-md:transform max-md:-translate-x-1/2 max-md:-translate-y-1/2
+           max-md:rounded-lg max-md:w-[95%] max-md:max-w-[600px] max-md:max-h-[90vh]"
+  >
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-white">
+        {{ mode === 'create' ? 'เพิ่มรายได้' : 'แก้ไขรายได้' }}
+      </h2>
+      <button
+        (click)="onClose()"
+        class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1 transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Form Content (Scrollable) -->
+    <div class="overflow-y-auto p-6" style="max-height: calc(100vh - 140px);">
+      <form>
+        <div class="space-y-4">
+
+          <!-- รหัสรายได้ -->
+          <div class="form-field">
+            <label class="form-label required">รหัสรายได้:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.REVENUE_CODE"
+              name="revenueCode"
+              [disabled]="mode === 'edit'"
+              placeholder="กรอกรหัสรายได้"
+              class="form-input"
+              [class.input-error]="!!errors['REVENUE_CODE']"
+            />
+            @if (errors['REVENUE_CODE']) {
+              <p class="error-message">{{ errors['REVENUE_CODE'] }}</p>
+            }
+          </div>
+
+          <!-- ชื่อรายได้ -->
+          <div class="form-field">
+            <label class="form-label required">ชื่อรายได้:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.REVENUE_NAME"
+              name="revenueName"
+              placeholder="กรอกชื่อรายได้"
+              class="form-input"
+              [class.input-error]="!!errors['REVENUE_NAME']"
+            />
+            @if (errors['REVENUE_NAME']) {
+              <p class="error-message">{{ errors['REVENUE_NAME'] }}</p>
+            }
+          </div>
+
+          <!-- VAT (%) -->
+          <div class="form-field">
+  <label class="form-label">VAT (%):</label>
+  <select [(ngModel)]="formData.VAT_PERCENT" name="vatPercent" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+</div>
+
+          <!-- W/H Tax บุคคล -->
+          <div class="form-field">
+  <label class="form-label">W/H Tax บุคคล:</label>
+  <select [(ngModel)]="formData.WH_TAX_NORMAL" name="whTaxNormal" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+</div>
+
+          <!-- W/H Tax นิติบุคคล -->
+          <div class="form-field">
+            <label class="form-label">W/H Tax นิติบุคคล:</label>
+            <select [(ngModel)]="formData.WH_TAX_NO_BOOK" name="whTaxNormal" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+          </div>
+
+          <!-- W/H Tax ช่าราชการ -->
+          <div class="form-field">
+            <label class="form-label">W/H Tax ช่าราชการ:</label>
+            <select [(ngModel)]="formData.WH_TAX_NO_RECEIPT" name="whTaxNormal" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+          </div>
+
+          <!-- W/H Tax บุคคล(ที่เคยะ) -->
+          <div class="form-field">
+            <label class="form-label">W/H Tax บุคคล(ที่เคยะ):</label>
+            <select [(ngModel)]="formData.WH_TAX_NORMAL_NO_BOOK" name="whTaxNormal" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+          </div>
+
+          <!-- W/H Tax นิติบุคคล(ที่เคยะ) -->
+          <div class="form-field">
+            <label class="form-label">W/H Tax นิติบุคคล(ที่เคยะ):</label>
+            <select [(ngModel)]="formData.WH_TAX_NO_BOOK_NO_RECEIPT" name="whTaxNormal" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+          </div>
+
+          <!-- W/H Tax ช่าราชการ(ที่เคยะ) -->
+          <div class="form-field">
+            <label class="form-label">W/H Tax ช่าราชการ(ที่เคยะ):</label>
+            <select [(ngModel)]="formData.WH_TAX_NO_RECEIPT_NO_BOOK" name="whTaxNormal" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+          </div>
+
+          <!-- W/H Tax บุคคล(ต่างประเทศ) -->
+          <div class="form-field">
+            <label class="form-label">W/H Tax บุคคล(ต่างประเทศ):</label>
+            <select [(ngModel)]="formData.WH_TAX_NORMAL_FOREIGN" name="whTaxNormal" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+          </div>
+
+          <!-- W/H Tax นิติบุคคล(ต่างประเทศ) -->
+          <div class="form-field">
+            <label class="form-label">W/H Tax นิติบุคคล(ต่างประเทศ):</label>
+            <select [(ngModel)]="formData.WH_TAX_NO_BOOK_FOREIGN" name="whTaxNormal" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+          </div>
+
+          <!-- Profit Center -->
+          <div class="form-field">
+            <label class="form-label">Profit Center:</label>
+           <select [(ngModel)]="formData.PROFIT_CENTER" name="whTaxNormal" class="form-input">
+    <option value="">เลือก</option>
+    <option *ngFor="let opt of taxOptions" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+          </div>
+
+          <!-- เลขที่บัญชี -->
+          <div class="form-field">
+            <label class="form-label">เลขที่บัญชี:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.ACCOUNT_CODE"
+              name="accountCode"
+              placeholder="กรอกเลขที่บัญชี"
+              class="form-input"
+            />
+          </div>
+
+          <!-- เลขที่บัญชีนิติบุคคลที่เกี่ยวข้องกัน -->
+          <div class="form-field">
+            <label class="form-label">เลขที่บัญชีนิติบุคคลที่เกี่ยวข้องกัน:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.ACCOUNT_CODE_NO_BOOK"
+              name="accountCodeNoBook"
+              placeholder="กรอกเลขที่บัญชี"
+              class="form-input"
+            />
+          </div>
+
+          <!-- การคืนเงิน -->
+          <div class="form-field">
+            <label class="form-label">การคืนเงิน:</label>
+            <div class="flex gap-6">
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  [(ngModel)]="formData.UPDATE_TYPE"
+                  name="updateType"
+                  value="ต้น"
+                  class="radio-input"
+                />
+                <span>ต้น</span>
+              </label>
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  [(ngModel)]="formData.UPDATE_TYPE"
+                  name="updateType"
+                  value="ไม่ต้น"
+                  class="radio-input"
+                />
+                <span>ไม่ต้น</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- ลักษณะการได้: -->
+          <div class="form-field">
+            <label class="form-label">ลักษณะการได้:</label>
+            <div class="flex gap-6">
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  [(ngModel)]="formData.BILLING_TYPE"
+                  name="billingType"
+                  value="Fixed"
+                  class="radio-input"
+                />
+                <span>Fixed</span>
+              </label>
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  [(ngModel)]="formData.BILLING_TYPE"
+                  name="billingType"
+                  value="Non Fixed"
+                  class="radio-input"
+                />
+                <span>Non Fixed</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- CN Flag -->
+          <div class="form-field">
+            <label class="form-label">CN Flag:</label>
+            <div class="flex gap-6">
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  [(ngModel)]="formData.CN_FLAG"
+                  name="cnFlag"
+                  value="Yes"
+                  class="radio-input"
+                />
+                <span>Yes</span>
+              </label>
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  [(ngModel)]="formData.CN_FLAG"
+                  name="cnFlag"
+                  value="No"
+                  class="radio-input"
+                />
+                <span>No</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- ประเภทเงินประกัน -->
+          <div class="form-field">
+            <label class="form-label">ประเภทเงินประกัน:</label>
+            <select
+              [(ngModel)]="formData.COUNTRY_TYPE"
+              name="countryType"
+              class="form-input"
+            >
+              <option value="">เลือก</option>
+              <option value="TYPE1">ประเภท 1</option>
+              <option value="TYPE2">ประเภท 2</option>
+            </select>
+          </div>
+
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="onClose()"
+        [disabled]="isSubmitting"
+      ></p-button>
+
+      <p-button
+        [label]="mode === 'create' ? 'สร้าง' : 'บันทึก'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="onSubmit()"
+        [loading]="isSubmitting"
+      ></p-button>
+    </div>
+  </div>
+}

@@ -1,0 +1,773 @@
+<!-- contract-type-wizard.component.html -->
+
+<!-- Backdrop -->
+@if (isOpen) {
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300"
+    (click)="onBackdropClick()"
+  ></div>
+}
+
+<!-- Wizard Modal -->
+@if (isOpen) {
+  <div
+    class="fixed z-50 bg-white rounded-lg shadow-2xl transition-all duration-300 ease-in-out
+           top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+           w-[95%] max-w-[1200px] max-h-[90vh] overflow-hidden"
+  >
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-white">
+        {{ mode === 'create' ? 'เพิ่มประเภทสัญญา' : 'แก้ไขประเภทสัญญา' }}
+      </h2>
+      <button
+        (click)="onClose()"
+        class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1 transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Progress Stepper -->
+    <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+      <div class="flex items-center justify-between">
+        <!-- Step 1 -->
+        <div class="flex items-center flex-1">
+          <div
+            class="step-circle"
+            [class.step-active]="currentStep === 1"
+            [class.step-completed]="currentStep > 1"
+          >
+            @if (currentStep > 1) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span>1</span>
+            }
+          </div>
+          <div class="ml-2 hidden sm:block">
+            <p class="text-xs font-medium" [class.text-purple-600]="currentStep === 1">
+              ข้อมูลทั่วไป
+            </p>
+          </div>
+        </div>
+
+        <div class="flex-none w-12 h-0.5 bg-gray-300" [class.bg-purple-600]="currentStep > 1"></div>
+
+        <!-- Step 2 -->
+        <div class="flex items-center flex-1">
+          <div
+            class="step-circle"
+            [class.step-active]="currentStep === 2"
+            [class.step-completed]="currentStep > 2"
+          >
+            @if (currentStep > 2) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span>2</span>
+            }
+          </div>
+          <div class="ml-2 hidden sm:block">
+            <p class="text-xs font-medium" [class.text-purple-600]="currentStep === 2">
+              ไฟล์
+            </p>
+          </div>
+        </div>
+
+        <div class="flex-none w-12 h-0.5 bg-gray-300" [class.bg-purple-600]="currentStep > 2"></div>
+
+        <!-- Step 3 -->
+        <div class="flex items-center flex-1">
+          <div
+            class="step-circle"
+            [class.step-active]="currentStep === 3"
+            [class.step-completed]="currentStep > 3"
+          >
+            @if (currentStep > 3) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span>3</span>
+            }
+          </div>
+          <div class="ml-2 hidden sm:block">
+            <p class="text-xs font-medium" [class.text-purple-600]="currentStep === 3">
+              เงื่อนไข
+            </p>
+          </div>
+        </div>
+
+        <div class="flex-none w-12 h-0.5 bg-gray-300" [class.bg-purple-600]="currentStep > 3"></div>
+
+        <!-- Step 4 -->
+        <div class="flex items-center flex-1">
+          <div
+            class="step-circle"
+            [class.step-active]="currentStep === 4"
+            [class.step-completed]="currentStep > 4"
+          >
+            @if (currentStep > 4) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span>4</span>
+            }
+          </div>
+          <div class="ml-2 hidden sm:block">
+            <p class="text-xs font-medium" [class.text-purple-600]="currentStep === 4">
+              สรุป
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Content (Scrollable) -->
+    <div class="overflow-y-auto px-6 py-6" style="max-height: calc(90vh - 220px);">
+
+      <!-- ==================== STEP 1: ข้อมูลทั่วไป ==================== -->
+      @if (currentStep === 1) {
+        <div class="space-y-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">ข้อมูลทั่วไป</h3>
+
+          <!-- รหัสประเภทสัญญา -->
+          <div class="form-field">
+            <label class="form-label required">รหัสประเภทสัญญา</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.TYPE_CODE"
+              name="typeCode"
+              [disabled]="mode === 'edit'"
+              placeholder="กรอกรหัสประเภทสัญญา"
+              class="form-input"
+              [class.input-error]="!!errors['TYPE_CODE']"
+            />
+            @if (errors['TYPE_CODE']) {
+              <p class="error-message">{{ errors['TYPE_CODE'] }}</p>
+            }
+          </div>
+
+          <!-- ชื่อประเภทสัญญา (Thai/English) -->
+          <div class="dual-input-container">
+            <div class="form-field flex-1">
+              <label class="form-label required">ชื่อประเภทสัญญา (ไทย)</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.TYPE_NAME"
+                name="typeName"
+                placeholder="กรอกชื่อประเภทสัญญา (ภาษาไทย)"
+                class="form-input"
+                [class.input-error]="!!errors['TYPE_NAME']"
+              />
+              @if (errors['TYPE_NAME']) {
+                <p class="error-message">{{ errors['TYPE_NAME'] }}</p>
+              }
+            </div>
+
+            <div class="form-field flex-1">
+              <label class="form-label">ชื่อประเภทสัญญา (English)</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.TYPE_NAME_EN"
+                name="typeNameEn"
+                placeholder="Enter contract type name (English)"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <!-- ประเภทสัญญาหลัก (Thai/English) -->
+          <div class="dual-input-container">
+            <div class="form-field flex-1">
+              <label class="form-label">ประเภทสัญญาหลัก (ไทย)</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.MAIN_TYPE"
+                name="mainType"
+                placeholder="กรอกประเภทสัญญาหลัก (ไทย)"
+                class="form-input"
+              />
+            </div>
+
+            <div class="form-field flex-1">
+              <label class="form-label">ประเภทสัญญาหลัก (English)</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.MAIN_TYPE_EN"
+                name="mainTypeEn"
+                placeholder="Enter main type (English)"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <!-- Type (สำหรับทำงบประมาณ) -->
+          <div class="form-field">
+            <label class="form-label required">Type (สำหรับทำงบประมาณ)</label>
+            <div class="flex gap-6 mt-2">
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  [(ngModel)]="formData.TYPE_STATUS"
+                  name="typeStatus"
+                  value="R"
+                  class="radio-input"
+                />
+                <span>Rent</span>
+              </label>
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  [(ngModel)]="formData.TYPE_STATUS"
+                  name="typeStatus"
+                  value="C"
+                  class="radio-input"
+                />
+                <span>Consignment</span>
+              </label>
+            </div>
+            @if (errors['TYPE_STATUS']) {
+              <p class="error-message">{{ errors['TYPE_STATUS'] }}</p>
+            }
+          </div>
+
+          <!-- เงินประกันตกแต่ง -->
+          <div class="form-field">
+            <div class="flex items-center justify-between">
+              <label class="form-label required">เงินประกันตกแต่ง</label>
+              <label class="toggle-switch">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="formData.DECORATION_INS_INC_VAT"
+                  [ngModelOptions]="{standalone: false}"
+                  name="decorationInsIncVat"
+                  [value]="formData.DECORATION_INS_INC_VAT === '1'"
+                  (ngModelChange)="formData.DECORATION_INS_INC_VAT = formData.DECORATION_INS_INC_VAT === '1' ? '0' : '1'"
+                />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">
+              {{ formData.DECORATION_INS_INC_VAT === '1' ? 'รวม VAT' : 'ไม่รวม VAT' }}
+            </p>
+          </div>
+        </div>
+      }
+
+      <!-- ==================== STEP 2: ไฟล์เอกสาร ==================== -->
+      @if (currentStep === 2) {
+        <div class="space-y-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">ไฟล์เอกสาร</h3>
+          <p class="text-sm text-gray-600 mb-4">อัปโหลดไฟล์เอกสารทั้งภาษาไทยและภาษาอังกฤษ</p>
+
+          <!-- Bill of Sale / ใบเสร็จรับเงิน -->
+          <div class="file-group">
+            <h4 class="file-group-title">ใบเสร็จรับเงิน / Bill of Sale</h4>
+            <div class="dual-input-container">
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (ไทย)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_BILL_SALE = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_BILL_SALE) {
+                  <p class="file-name">{{ formData.DOC_BILL_SALE }}</p>
+                }
+              </div>
+
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (English)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_BILL_SALE_EN = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_BILL_SALE_EN) {
+                  <p class="file-name">{{ formData.DOC_BILL_SALE_EN }}</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Contract / สัญญา -->
+          <div class="file-group">
+            <h4 class="file-group-title">สัญญา / Contract</h4>
+            <div class="dual-input-container">
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (ไทย)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_CONTRACT = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_CONTRACT) {
+                  <p class="file-name">{{ formData.DOC_CONTRACT }}</p>
+                }
+              </div>
+
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (English)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_CONTRACT_EN = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_CONTRACT_EN) {
+                  <p class="file-name">{{ formData.DOC_CONTRACT_EN }}</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Invoice Renew Contact / ใบแจ้งหนี้ต่ออายุสัญญา -->
+          <div class="file-group">
+            <h4 class="file-group-title">ใบแจ้งหนี้ต่ออายุสัญญา / Invoice Renew Contact</h4>
+            <div class="dual-input-container">
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (ไทย)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_INV_RENEW_CONTACT = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_INV_RENEW_CONTACT) {
+                  <p class="file-name">{{ formData.DOC_INV_RENEW_CONTACT }}</p>
+                }
+              </div>
+
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (English)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_INV_RENEW_CONTACT_EN = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_INV_RENEW_CONTACT_EN) {
+                  <p class="file-name">{{ formData.DOC_INV_RENEW_CONTACT_EN }}</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Contract / สัญญาเพิ่มเติม -->
+          <div class="file-group">
+            <h4 class="file-group-title">สัญญาเพิ่มเติม / Additional Contract</h4>
+            <div class="dual-input-container">
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (ไทย)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_ADD_CONTRACT = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_ADD_CONTRACT) {
+                  <p class="file-name">{{ formData.DOC_ADD_CONTRACT }}</p>
+                }
+              </div>
+
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (English)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_ADD_CONTRACT_EN = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_ADD_CONTRACT_EN) {
+                  <p class="file-name">{{ formData.DOC_ADD_CONTRACT_EN }}</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Terminate / บอกเลิกสัญญา -->
+          <div class="file-group">
+            <h4 class="file-group-title">บอกเลิกสัญญา / Terminate</h4>
+            <div class="dual-input-container">
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (ไทย)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_TERMINATE = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_TERMINATE) {
+                  <p class="file-name">{{ formData.DOC_TERMINATE }}</p>
+                }
+              </div>
+
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (English)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_TERMINATE_EN = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_TERMINATE_EN) {
+                  <p class="file-name">{{ formData.DOC_TERMINATE_EN }}</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Warranty / หนังสือค้ำประกัน -->
+          <div class="file-group">
+            <h4 class="file-group-title">หนังสือค้ำประกัน / Warranty</h4>
+            <div class="dual-input-container">
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (ไทย)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_WARRANTY = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_WARRANTY) {
+                  <p class="file-name">{{ formData.DOC_WARRANTY }}</p>
+                }
+              </div>
+
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (English)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_WARRANTY_EN = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_WARRANTY_EN) {
+                  <p class="file-name">{{ formData.DOC_WARRANTY_EN }}</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Transfer / โอนสัญญา -->
+          <div class="file-group">
+            <h4 class="file-group-title">โอนสัญญา / Transfer</h4>
+            <div class="dual-input-container">
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (ไทย)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_TRANSFER = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_TRANSFER) {
+                  <p class="file-name">{{ formData.DOC_TRANSFER }}</p>
+                }
+              </div>
+
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (English)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_TRANSFER_EN = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_TRANSFER_EN) {
+                  <p class="file-name">{{ formData.DOC_TRANSFER_EN }}</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Receipt / ใบเสร็จรับเงิน -->
+          <div class="file-group">
+            <h4 class="file-group-title">ใบเสร็จรับเงิน / Receipt</h4>
+            <div class="dual-input-container">
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (ไทย)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_RECEIPT = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_RECEIPT) {
+                  <p class="file-name">{{ formData.DOC_RECEIPT }}</p>
+                }
+              </div>
+
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (English)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_RECEIPT_EN = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_RECEIPT_EN) {
+                  <p class="file-name">{{ formData.DOC_RECEIPT_EN }}</p>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Certificate / หนังสือรับรอง -->
+          <div class="file-group">
+            <h4 class="file-group-title">หนังสือรับรอง / Certificate</h4>
+            <div class="dual-input-container">
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (ไทย)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_CERTIFICATE = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_CERTIFICATE) {
+                  <p class="file-name">{{ formData.DOC_CERTIFICATE }}</p>
+                }
+              </div>
+
+              <div class="form-field flex-1">
+                <label class="form-label">ไฟล์ (English)</label>
+                <input
+                  type="file"
+                  (change)="formData.DOC_CERTIFICATE_EN = $any($event.target).files[0]?.name || ''"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                />
+                @if (formData.DOC_CERTIFICATE_EN) {
+                  <p class="file-name">{{ formData.DOC_CERTIFICATE_EN }}</p>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ==================== STEP 3: เงื่อนไขตามสัญญาเพิ่มเติม ==================== -->
+      @if (currentStep === 3) {
+        <div class="space-y-4">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">เงื่อนไขตามสัญญาเพิ่มเติม</h3>
+            <p-button
+              label="เพิ่มเงื่อนไข"
+              icon="pi pi-plus"
+              severity="secondary"
+              [outlined]="true"
+              size="small"
+              (onClick)="addCondition()"
+            ></p-button>
+          </div>
+
+          @if (formData.conditions.length === 0) {
+            <div class="empty-state-small">
+              <i class="pi pi-inbox text-3xl text-gray-400"></i>
+              <p class="text-gray-500 mt-2">ยังไม่มีเงื่อนไข คลิก "เพิ่มเงื่อนไข" เพื่อเริ่มต้น</p>
+            </div>
+          } @else {
+            <div class="conditions-table-wrapper">
+              <table class="conditions-table">
+                <thead>
+                  <tr>
+                    <th style="width: 60px;">ข้อที่</th>
+                    <th>หัวข้อ</th>
+                    <th>เนื้อหา</th>
+                    <th style="width: 80px;">การดำเนินการ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (condition of formData.conditions; track condition.seq) {
+                    <tr>
+                      <td class="text-center">{{ condition.seq }}</td>
+                      <td>{{ condition.title }}</td>
+                      <td class="truncate max-w-xs">{{ condition.content }}</td>
+                      <td class="text-center">
+                        <p-button
+                          icon="pi pi-pencil"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="info"
+                          size="small"
+                          (onClick)="editCondition(condition)"
+                        ></p-button>
+                        <p-button
+                          icon="pi pi-trash"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="danger"
+                          size="small"
+                          (onClick)="deleteCondition(condition.seq)"
+                        ></p-button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- ==================== STEP 4: สรุป ==================== -->
+      @if (currentStep === 4) {
+        <div class="space-y-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">สรุปข้อมูล</h3>
+
+          <!-- ข้อมูลทั่วไป -->
+          <div class="summary-section">
+            <h4 class="summary-title">ข้อมูลทั่วไป</h4>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <span class="summary-label">รหัสประเภทสัญญา:</span>
+                <span class="summary-value">{{ formData.TYPE_CODE }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">ชื่อประเภทสัญญา (ไทย):</span>
+                <span class="summary-value">{{ formData.TYPE_NAME }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">ชื่อประเภทสัญญา (EN):</span>
+                <span class="summary-value">{{ formData.TYPE_NAME_EN || '-' }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">ประเภทสัญญาหลัก (ไทย):</span>
+                <span class="summary-value">{{ formData.MAIN_TYPE || '-' }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">ประเภทสัญญาหลัก (EN):</span>
+                <span class="summary-value">{{ formData.MAIN_TYPE_EN || '-' }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Type:</span>
+                <span class="summary-value">{{ formData.TYPE_STATUS === 'R' ? 'Rent' : 'Consignment' }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">เงินประกันตกแต่ง:</span>
+                <span class="summary-value">{{ formData.DECORATION_INS_INC_VAT === '1' ? 'รวม VAT' : 'ไม่รวม VAT' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ไฟล์เอกสาร -->
+          <div class="summary-section">
+            <h4 class="summary-title">ไฟล์เอกสาร</h4>
+            <div class="summary-files">
+              @if (hasAnyFilePath()) {
+                <p class="text-sm text-gray-600">มีการระบุไฟล์เอกสาร {{ getFileCount() }} รายการ</p>
+              } @else {
+                <p class="text-sm text-gray-500">ไม่มีการระบุไฟล์เอกสาร</p>
+              }
+            </div>
+          </div>
+
+          <!-- เงื่อนไขตามสัญญา -->
+          <div class="summary-section">
+            <h4 class="summary-title">เงื่อนไขตามสัญญา</h4>
+            @if (formData.conditions.length > 0) {
+              <p class="text-sm text-gray-600">มีเงื่อนไขทั้งหมด {{ formData.conditions.length }} ข้อ</p>
+            } @else {
+              <p class="text-sm text-gray-500">ไม่มีเงื่อนไข</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-between">
+      <div>
+        @if (currentStep > 1) {
+          <p-button
+            label="ก่อนหน้า"
+            icon="pi pi-chevron-left"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="previousStep()"
+            [disabled]="isSubmitting"
+          ></p-button>
+        }
+      </div>
+
+      <div class="flex gap-3">
+        <p-button
+          label="ยกเลิก"
+          icon="pi pi-times"
+          [outlined]="true"
+          severity="secondary"
+          (onClick)="onClose()"
+          [disabled]="isSubmitting"
+        ></p-button>
+
+        @if (currentStep < 4) {
+          <p-button
+            label="ถัดไป"
+            icon="pi pi-chevron-right"
+            iconPos="right"
+            severity="primary"
+            (onClick)="nextStep()"
+          ></p-button>
+        } @else {
+          <p-button
+            [label]="mode === 'create' ? 'สร้าง' : 'บันทึก'"
+            icon="pi pi-check"
+            severity="primary"
+            (onClick)="onSubmit()"
+            [loading]="isSubmitting"
+          ></p-button>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Condition Form Modal -->
+@if (showConditionModal) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center" (click)="closeConditionModal()">
+    <div class="bg-white rounded-lg shadow-xl w-[90%] max-w-[600px] p-6" (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-semibold mb-4">{{ conditionEditMode ? 'แก้ไขเงื่อนไข' : 'เพิ่มเงื่อนไข' }}</h3>
+
+      <div class="space-y-4">
+        <div class="form-field">
+          <label class="form-label required">หัวข้อ</label>
+          <input
+            type="text"
+            [(ngModel)]="conditionForm.title"
+            name="conditionTitle"
+            placeholder="กรอกหัวข้อ"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="form-label required">เนื้อหา</label>
+          <textarea
+            [(ngModel)]="conditionForm.content"
+            name="conditionContent"
+            placeholder="กรอกเนื้อหา"
+            rows="4"
+            class="form-input"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <p-button
+          label="ยกเลิก"
+          [outlined]="true"
+          severity="secondary"
+          (onClick)="closeConditionModal()"
+        ></p-button>
+        <p-button
+          label="บันทึก"
+          severity="primary"
+          (onClick)="saveCondition()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+}

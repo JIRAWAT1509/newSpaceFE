@@ -1,1 +1,719 @@
-<p>company-customer works!</p>
+<div class="company-customer-container">
+  <!-- Toast for notifications -->
+  <p-toast></p-toast>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">Company & Customer Management</h1>
+        <p class="page-subtitle">Manage customer data and information</p>
+      </div>
+
+      <div class="header-actions">
+        <p-button
+          label="Add Customer"
+          icon="pi pi-plus"
+          severity="success"
+          (onClick)="openAddDialog()"
+        ></p-button>
+
+        <p-button
+          label="Delete Selected"
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          [disabled]="selectedCustomers.length === 0"
+          (onClick)="deleteSelected()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-header">
+      <h3 class="section-title">
+        <i class="pi pi-filter"></i>
+        Filters
+      </h3>
+      <p-button
+        label="Clear All"
+        icon="pi pi-times"
+        severity="secondary"
+        [text]="true"
+        size="small"
+        (onClick)="clearFilters()"
+        [disabled]="!hasActiveFilters()"
+      ></p-button>
+    </div>
+
+    <div class="filters-content">
+      <!-- Row 1: Code Range and Name -->
+      <div class="filter-row">
+        <div class="filter-field code-range-field">
+          <label class="filter-label">Customer Code</label>
+          <div class="code-range-inputs">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="filters.codeFrom"
+              (ngModelChange)="onFilterChange()"
+              placeholder="From"
+              class="filter-input"
+            />
+            <span class="range-separator">—</span>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="filters.codeTo"
+              (ngModelChange)="onFilterChange()"
+              placeholder="To"
+              class="filter-input"
+            />
+          </div>
+        </div>
+
+        <div class="filter-field name-field">
+          <label class="filter-label">Customer Name</label>
+          <span class="p-input-icon-left full-width">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="filters.name"
+              (ngModelChange)="onFilterChange()"
+              placeholder="Search by name..."
+              class="filter-input"
+            />
+          </span>
+        </div>
+      </div>
+
+      <!-- Row 2: Customer Type and Nationality -->
+      <div class="filter-row">
+        <div class="filter-field">
+          <label class="filter-label">Customer Type</label>
+          <div class="checkbox-list">
+            <div *ngFor="let type of customerTypeOptions" class="checkbox-item">
+              <p-checkbox
+                [value]="type.value"
+                [(ngModel)]="filters.customerType"
+                (ngModelChange)="onFilterChange()"
+                [inputId]="'type-' + type.value"
+              ></p-checkbox>
+              <label [for]="'type-' + type.value" class="checkbox-label">
+                {{ type.label }}
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-field">
+          <label class="filter-label">Nationality</label>
+          <div class="checkbox-list">
+            <div *ngFor="let nat of nationalityOptions" class="checkbox-item">
+              <p-checkbox
+                [value]="nat.value"
+                [(ngModel)]="filters.nationality"
+                (ngModelChange)="onFilterChange()"
+                [inputId]="'nat-' + nat.value"
+              ></p-checkbox>
+              <label [for]="'nat-' + nat.value" class="checkbox-label">
+                {{ nat.label }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Details Modal -->
+  <p-dialog
+    [(visible)]="showDetailsModal"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '90vw', maxWidth: '1000px' }"
+    header="Customer Details"
+  >
+    <div *ngIf="selectedCustomerDetails" class="details-content">
+      <!-- Customer Header -->
+<div class="details-header">
+  <div class="details-title-section">
+    <h2 class="details-title">{{ selectedCustomerDetails.CUSTOMER_NAME }}</h2>
+    <p class="details-subtitle">{{ selectedCustomerDetails.CUSTOMER_CODE }}</p>
+  </div>
+  <div class="details-status">
+    <label class="custom-switch">
+      <input
+        type="checkbox"
+        [(ngModel)]="selectedCustomerDetails.statusActive"
+        (change)="onStatusChange(selectedCustomerDetails)"
+      />
+      <span class="switch-slider"></span>
+    </label>
+    <span class="status-label" [class.active]="selectedCustomerDetails.statusActive">
+      {{ selectedCustomerDetails.statusActive ? 'Active' : 'Inactive' }}
+    </span>
+  </div>
+</div>
+
+      <!-- Details Grid -->
+      <div class="details-grid">
+        <div class="detail-section">
+          <h3 class="section-title">Basic Information</h3>
+          <div class="detail-item">
+            <span class="detail-label">Customer Code:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.CUSTOMER_CODE
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">SAP Code:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.SAP_CUSTOMER_CODE
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Customer Name:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.CUSTOMER_NAME
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Shop Name:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.SHOP_NAME
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Customer Type:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.CUSTOMER_TYPE || "-"
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Nationality:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.NATIONALITY || "-"
+            }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3 class="section-title">Contact Information</h3>
+          <div class="detail-item">
+            <span class="detail-label">Address:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.ADDRESS
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Phone:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.PHONE || "-"
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.EMAIL || "-"
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Tax ID:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.TAX_ID || "-"
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<ng-template pTemplate="footer">
+  <div class="dialog-footer">
+    <p-button
+      label="Close"
+      icon="pi pi-times"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="closeDetailsModal()"
+    ></p-button>
+    <div class="action-buttons-group">
+      <p-button
+        label="Edit"
+        icon="pi pi-pencil"
+        severity="info"
+        (onClick)="editFromDetails()"
+      ></p-button>
+      <p-button
+        label="Delete"
+        icon="pi pi-trash"
+        severity="danger"
+        (onClick)="deleteFromDetails()"
+      ></p-button>
+    </div>
+  </div>
+</ng-template>
+  </p-dialog>
+
+  <!-- Table Section -->
+  <div class="table-section">
+    <p-table
+      [value]="customers"
+      [paginator]="true"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      [loading]="isLoading"
+      [(selection)]="selectedCustomers"
+      dataKey="CUSTOMER_CODE"
+      [lazy]="true"
+      (onLazyLoad)="loadCustomers($event)"
+      [(first)]="first"
+      styleClass="p-datatable-sm"
+      [rowHover]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem">
+            <p-checkbox
+              [ngModel]="allSelected"
+              (onChange)="toggleSelectAll($event)"
+              [binary]="true"
+            ></p-checkbox>
+          </th>
+          <th pSortableColumn="CUSTOMER_CODE">
+            Customer Code <p-sortIcon field="CUSTOMER_CODE"></p-sortIcon>
+          </th>
+          <th pSortableColumn="SAP_CUSTOMER_CODE">
+            SAP Code <p-sortIcon field="SAP_CUSTOMER_CODE"></p-sortIcon>
+          </th>
+          <th pSortableColumn="CUSTOMER_NAME">
+            Name <p-sortIcon field="CUSTOMER_NAME"></p-sortIcon>
+          </th>
+          <th pSortableColumn="REC_STATUS">
+            Status <p-sortIcon field="REC_STATUS"></p-sortIcon>
+          </th>
+          <th pSortableColumn="SHOP_NAME">
+            Shop Name <p-sortIcon field="SHOP_NAME"></p-sortIcon>
+          </th>
+          <th>Address</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-customer>
+        <tr (click)="viewCustomerDetails(customer)" class="clickable-row">
+          <td (click)="$event.stopPropagation()">
+            <p-checkbox
+              [(ngModel)]="customer.selected"
+              (onChange)="onRowSelect()"
+              [binary]="true"
+            ></p-checkbox>
+          </td>
+          <td>{{ customer.CUSTOMER_CODE }}</td>
+          <td>{{ customer.SAP_CUSTOMER_CODE }}</td>
+          <td class="font-medium">{{ customer.CUSTOMER_NAME }}</td>
+          <!-- <td (click)="$event.stopPropagation()"> -->
+          <!-- <p-toggleButton
+    [(ngModel)]="customer.statusActive"
+    (onChange)="onStatusChange(customer)"
+    onLabel="Active"
+    offLabel="Inactive"
+    offIcon="pi pi-times"
+    [style]="{'width': '120px'}"
+    styleClass="status-toggle"
+  >
+    onIcon="pi pi-check"
+</td>
+</p-toggleButton> -->
+          <td (click)="$event.stopPropagation()">
+            <label class="custom-switch">
+              <input
+                type="checkbox"
+                [(ngModel)]="customer.statusActive"
+                (change)="onStatusChange(customer)"
+              />
+              <span class="switch-slider"></span>
+            </label>
+          </td>
+
+          <td>{{ customer.SHOP_NAME }}</td>
+          <td class="address-cell">{{ customer.ADDRESS }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="empty-message">
+            <i class="pi pi-inbox empty-icon"></i>
+            <p>No customers found</p>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Multi-Step Form Dialog -->
+<p-dialog
+  [(visible)]="showFormDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '90vw', maxWidth: '1200px' }"
+  [header]="isEditMode ? 'Edit Customer' : 'Add New Customer'"
+>
+  <div class="form-dialog-content">
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-steps">
+        <div
+          *ngFor="let step of steps; let i = index"
+          class="progress-step"
+          [class.active]="step.id === currentStep"
+          [class.completed]="step.completed"
+          [class.accessible]="isStepAccessible(step.id)"
+          (click)="goToStep(step.id)"
+        >
+          <div class="step-circle">
+            <i [class]="step.completed ? 'pi pi-check' : step.icon"></i>
+          </div>
+          <span class="step-label">{{ step.label }}</span>
+          <div *ngIf="i < steps.length - 1" class="step-connector"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Draft indicator -->
+    <div *ngIf="lastSavedTime" class="draft-indicator">
+      <i class="pi pi-save"></i>
+      <span>Last saved: {{ lastSavedTime | date : "short" }}</span>
+    </div>
+
+    <!-- Form Steps -->
+    <div class="form-steps-content">
+      <!-- Step 1: Basic Information -->
+      <div *ngIf="currentStep === 1" class="form-step">
+        <h3 class="step-title">Basic Information</h3>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label required">Customer Code</label>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="formData.CUSTOMER_CODE"
+              [disabled]="isEditMode"
+              placeholder="Auto-generated if empty"
+            />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">SAP Code</label>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="formData.SAP_CUSTOMER_CODE"
+              placeholder="SAP customer code"
+            />
+          </div>
+
+          <div class="form-field full-width">
+            <label class="form-label required">Customer Name</label>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="formData.CUSTOMER_NAME"
+              placeholder="Enter customer name"
+            />
+          </div>
+
+          <div class="form-field full-width">
+            <label class="form-label">Shop Name</label>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="formData.SHOP_NAME"
+              placeholder="Enter shop name"
+            />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Customer Type</label>
+            <p-select
+              [(ngModel)]="formData.CUSTOMER_TYPE"
+              [options]="customerTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select type"
+            ></p-select>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Nationality</label>
+            <p-select
+              [(ngModel)]="formData.NATIONALITY"
+              [options]="nationalityOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select nationality"
+            ></p-select>
+          </div>
+
+<!-- Status Switch -->
+<div class="form-field full-width">
+  <label class="form-label required">Status</label>
+  <div class="status-switch-wrapper">
+    <label class="custom-switch">
+      <input
+        type="checkbox"
+        [(ngModel)]="formData.statusActive"
+      />
+      <span class="switch-slider"></span>
+    </label>
+    <span class="status-label" [class.active]="formData.statusActive">
+      {{ formData.statusActive ? 'Active' : 'Inactive' }}
+    </span>
+  </div>
+</div>
+        </div>
+      </div>
+
+      <!-- Step 2: Contact & Address -->
+      <div *ngIf="currentStep === 2" class="form-step">
+        <h3 class="step-title">Contact & Address</h3>
+
+        <div class="form-grid">
+          <div class="form-field full-width">
+            <label class="form-label">Address</label>
+            <textarea
+              pInputTextarea
+              [(ngModel)]="formData.ADDRESS"
+              [rows]="3"
+              placeholder="Enter full address"
+            ></textarea>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Phone</label>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="formData.PHONE"
+              placeholder="Phone number"
+            />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Email</label>
+            <input
+              type="email"
+              pInputText
+              [(ngModel)]="formData.EMAIL"
+              placeholder="Email address"
+            />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Tax ID</label>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="formData.TAX_ID"
+              placeholder="Tax identification number"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Business Details -->
+      <div *ngIf="currentStep === 3" class="form-step">
+        <h3 class="step-title">Business Details</h3>
+
+        <div class="form-grid">
+          <!-- Add more business-related fields here -->
+          <div class="form-field full-width">
+            <p class="info-text">
+              Additional business details will be added here
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Additional Data -->
+      <div *ngIf="currentStep === 4" class="form-step">
+        <h3 class="step-title">Additional Data</h3>
+
+        <div class="form-grid">
+          <!-- Add documents, contacts table here -->
+          <div class="form-field full-width">
+            <p class="info-text">
+              Documents and contacts management will be added here
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Summary -->
+      <div *ngIf="currentStep === 5" class="form-step">
+        <h3 class="step-title">Summary & Confirmation</h3>
+
+        <div class="summary-section">
+          <div *ngIf="isEditMode && hasChanges()" class="changes-notice">
+            <i class="pi pi-exclamation-circle"></i>
+            <span>The following fields have been modified:</span>
+          </div>
+
+          <div class="summary-grid">
+            <!-- Basic Info -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">Basic Information</h4>
+
+              <div class="summary-item">
+                <span class="summary-label">Customer Code:</span>
+                <span class="summary-value">{{
+                  formData.CUSTOMER_CODE || "Auto-generated"
+                }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">SAP Code:</span>
+                <span class="summary-value">{{
+                  formData.SAP_CUSTOMER_CODE || "-"
+                }}</span>
+              </div>
+
+              <div
+                class="summary-item"
+                [class.changed]="getChangedFields().includes('CUSTOMER_NAME')"
+              >
+                <span class="summary-label">Customer Name:</span>
+                <div class="summary-value-container">
+                  <span class="summary-value">{{
+                    formData.CUSTOMER_NAME
+                  }}</span>
+                  <span
+                    *ngIf="
+                      originalData &&
+                      originalData.CUSTOMER_NAME !== formData.CUSTOMER_NAME
+                    "
+                    class="previous-value"
+                  >
+                    Previous: {{ originalData.CUSTOMER_NAME }}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                class="summary-item"
+                [class.changed]="getChangedFields().includes('SHOP_NAME')"
+              >
+                <span class="summary-label">Shop Name:</span>
+                <div class="summary-value-container">
+                  <span class="summary-value">{{
+                    formData.SHOP_NAME || "-"
+                  }}</span>
+                  <span
+                    *ngIf="
+                      originalData &&
+                      originalData.SHOP_NAME !== formData.SHOP_NAME
+                    "
+                    class="previous-value"
+                  >
+                    Previous: {{ originalData.SHOP_NAME }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Status:</span>
+                <span [class]="'status-badge status-' + formData.REC_STATUS">
+                  {{ getStatusLabel(formData.REC_STATUS) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">Contact & Address</h4>
+
+              <div
+                class="summary-item"
+                [class.changed]="getChangedFields().includes('ADDRESS')"
+              >
+                <span class="summary-label">Address:</span>
+                <div class="summary-value-container">
+                  <span class="summary-value">{{
+                    formData.ADDRESS || "-"
+                  }}</span>
+                  <span
+                    *ngIf="
+                      originalData && originalData.ADDRESS !== formData.ADDRESS
+                    "
+                    class="previous-value"
+                  >
+                    Previous: {{ originalData.ADDRESS }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Phone:</span>
+                <span class="summary-value">{{ formData.PHONE || "-" }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Email:</span>
+                <span class="summary-value">{{ formData.EMAIL || "-" }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Tax ID:</span>
+                <span class="summary-value">{{ formData.TAX_ID || "-" }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Navigation Buttons -->
+<div class="form-navigation">
+  <p-button
+    *ngIf="currentStep > 1"
+    label="Previous"
+    icon="pi pi-arrow-left"
+    severity="secondary"
+    [outlined]="true"
+    (onClick)="previousStep()"
+  ></p-button>
+
+  <div class="nav-spacer"></div>
+
+  <p-button
+    *ngIf="currentStep < steps.length"
+    label="Next"
+    icon="pi pi-arrow-right"
+    iconPos="right"
+    (onClick)="nextStep()"
+  ></p-button>
+
+  <p-button
+    *ngIf="currentStep === steps.length"
+    label="Save Customer"
+    icon="pi pi-check"
+    severity="success"
+    [loading]="isSaving"
+    (onClick)="saveCustomer()"
+  ></p-button>
+</div>
+  </div>
+</p-dialog>

@@ -1,0 +1,430 @@
+<!-- role-permission.component.html -->
+
+<div class="role-permission-container">
+
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">Role & Permission Management</h1>
+        <p class="page-subtitle">Manage access permissions for user roles</p>
+      </div>
+
+      <div class="header-actions">
+        <p-button
+          label="Cancel"
+          icon="pi pi-times"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="!hasChanges || isSaving"
+          (onClick)="cancelChanges()"
+        ></p-button>
+
+        <p-button
+          label="Save Changes"
+          icon="pi pi-check"
+          severity="success"
+          [disabled]="!hasChanges || isSaving"
+          [loading]="isSaving"
+          (onClick)="savePermissions()"
+        ></p-button>
+      </div>
+    </div>
+
+    <!-- Change Indicator -->
+    <div *ngIf="hasChanges" class="changes-indicator">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>You have unsaved changes</span>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="message-container">
+    <p-message severity="success" [text]="successMessage"></p-message>
+  </div>
+
+  <div *ngIf="errorMessage" class="message-container">
+    <p-message severity="error" [text]="errorMessage"></p-message>
+  </div>
+
+  <!-- Role Selection & Quick Actions -->
+  <div class="control-section">
+    <!-- Role Selector -->
+    <div class="role-selector">
+      <label class="control-label">Select Role</label>
+      <p-select
+        [(ngModel)]="selectedRole"
+        [options]="roleOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Choose a role..."
+        (onChange)="onRoleChange()"
+        [disabled]="isLoading"
+        styleClass="w-full"
+      ></p-select>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <p-button
+        label="Copy from Role"
+        icon="pi pi-copy"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="!selectedRole || isLoading"
+        (onClick)="openCopyModal()"
+      ></p-button>
+
+      <p-button
+        label="Apply Template"
+        icon="pi pi-bolt"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="!selectedRole || isLoading"
+        (onClick)="openTemplateModal()"
+      ></p-button>
+
+      <p-button
+        label="Expand All"
+        icon="pi pi-angle-double-down"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="!hasPermissions || isLoading"
+        (onClick)="expandAll()"
+      ></p-button>
+
+      <p-button
+        label="Collapse All"
+        icon="pi pi-angle-double-up"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="!hasPermissions || isLoading"
+        (onClick)="collapseAll()"
+      ></p-button>
+    </div>
+  </div>
+
+  <!-- Summary Statistics -->
+  <div *ngIf="hasPermissions && !isLoading" class="summary-section">
+    <div class="summary-card">
+      <div class="summary-icon">
+        <i class="pi pi-list"></i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-value">{{ summary.totalFeatures }}</div>
+        <div class="summary-label">Total Features</div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon success">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-value">{{ summary.enabledFeatures }}</div>
+        <div class="summary-label">Enabled</div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon primary">
+        <i class="pi pi-unlock"></i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-value">{{ summary.fullAccessFeatures }}</div>
+        <div class="summary-label">Full Access</div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon info">
+        <i class="pi pi-eye"></i>
+      </div>
+      <div class="summary-content">
+        <div class="summary-value">{{ summary.viewOnlyFeatures }}</div>
+        <div class="summary-label">View Only</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div *ngIf="hasPermissions && !isLoading" class="search-section">
+    <div class="search-input-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search menus and features..."
+        class="search-input"
+      />
+      <button
+        *ngIf="isSearchActive"
+        class="clear-search-btn"
+        (click)="clearSearch()"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Tab Actions -->
+    <div class="tab-actions">
+      <p-button
+        label="Enable All"
+        icon="pi pi-check"
+        severity="success"
+        [outlined]="true"
+        size="small"
+        (onClick)="enableAllInTab()"
+      ></p-button>
+
+      <p-button
+        label="View Only"
+        icon="pi pi-eye"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="setViewOnlyInTab()"
+      ></p-button>
+
+      <p-button
+        label="Disable All"
+        icon="pi pi-times"
+        severity="danger"
+        [outlined]="true"
+        size="small"
+        (onClick)="disableAllInTab()"
+      ></p-button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <i class="pi pi-spin pi-spinner loading-spinner"></i>
+    <p>Loading permissions...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !hasPermissions" class="empty-state">
+    <i class="pi pi-inbox empty-icon"></i>
+    <h3>No Role Selected</h3>
+    <p>Please select a role to manage permissions</p>
+  </div>
+
+  <!-- Tabs with Tree Content -->
+  <div *ngIf="hasPermissions && !isLoading" class="tabs-container">
+    <!-- Simple Placeholder - Will add proper tabs component later -->
+    <div class="simple-tabs">
+      <div class="tab-headers">
+        <button
+          *ngFor="let tab of tabs; let i = index"
+          class="tab-header"
+          [class.active]="activeTabIndex === i"
+          (click)="activeTabIndex = i"
+        >
+          <i [class]="tab.icon"></i>
+          <span>{{ tab.label }}</span>
+          <span class="badge">({{ tab.items.length }})</span>
+        </button>
+      </div>
+
+      <div class="tab-content">
+        <div *ngFor="let tab of tabs; let i = index" [hidden]="activeTabIndex !== i">
+          <!-- Tree Table -->
+          <div class="tree-table-container">
+            <div class="tree-table">
+              <!-- Table Header -->
+              <div class="tree-header">
+                <div class="tree-header-cell menu-name-header">
+                  <span>Menu / Feature Name</span>
+                </div>
+                <div class="tree-header-cell permission-header">
+                  <span>Enable</span>
+                  <i class="pi pi-info-circle info-icon"
+                     title="Allow access with full permissions (Create, Edit, Delete)"></i>
+                </div>
+                <div class="tree-header-cell permission-header">
+                  <span>View Only</span>
+                  <i class="pi pi-info-circle info-icon"
+                     title="Allow read-only access (no modifications)"></i>
+                </div>
+              </div>
+
+              <!-- Tree Rows - Recursive Component -->
+              <div class="tree-body">
+                <ng-container *ngIf="tab.items.length > 0">
+                  <app-permission-tree-row
+                    *ngFor="let item of tab.items"
+                    [permission]="item"
+                    [level]="1"
+                    (enableChange)="onEnableChange($event.permission, $event.event)"
+                    (viewOnlyChange)="onViewOnlyChange($event.permission, $event.event)"
+                    (toggleExpand)="toggleExpand($event)"
+                  ></app-permission-tree-row>
+                </ng-container>
+
+                <!-- No Results in Tab -->
+                <div *ngIf="tab.items.length === 0" class="no-results">
+                  <i class="pi pi-inbox"></i>
+                  <p>No items found in this category</p>
+                  <p *ngIf="isSearchActive" class="no-results-hint">
+                    Try adjusting your search or clearing the filter
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Copy from Role Modal -->
+<p-dialog
+  [(visible)]="showCopyModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px' }"
+  header="Copy Permissions from Another Role"
+>
+  <div class="modal-content-body">
+    <p class="modal-description">
+      This will copy all permissions from the selected role to
+      <strong *ngIf="selectedRole">{{ getRoleLabel(selectedRole) }}</strong>.
+      Your current permissions will be replaced.
+    </p>
+
+    <div class="modal-field">
+      <label class="modal-label">Select Source Role</label>
+      <p-select
+        [(ngModel)]="copyFromRole"
+        [options]="copyRoleOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Choose a role to copy from..."
+        styleClass="w-full"
+      ></p-select>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="showCopyModal = false"
+      ></p-button>
+      <p-button
+        label="Copy Permissions"
+        icon="pi pi-copy"
+        severity="primary"
+        [disabled]="!copyFromRole"
+        (onClick)="copyFromOtherRole()"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Apply Template Modal -->
+<p-dialog
+  [(visible)]="showTemplateModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '600px' }"
+  header="Apply Permission Template"
+>
+  <div class="modal-content-body">
+    <p class="modal-description">
+      Choose a pre-configured template to quickly set up permissions.
+    </p>
+
+    <div class="template-grid">
+      <div
+        *ngFor="let template of templates"
+        class="template-card"
+        [class.selected]="selectedTemplate === template.id"
+        (click)="selectedTemplate = template.id"
+      >
+        <div class="template-icon">
+          <i [class]="template.icon"></i>
+        </div>
+        <div class="template-info">
+          <h4>{{ template.name }}</h4>
+          <p>{{ template.description }}</p>
+        </div>
+        <div class="template-radio">
+          <input
+            type="radio"
+            name="template"
+            [value]="template.id"
+            [checked]="selectedTemplate === template.id"
+            (change)="selectedTemplate = template.id"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="showTemplateModal = false"
+      ></p-button>
+      <p-button
+        label="Apply Template"
+        icon="pi pi-bolt"
+        severity="primary"
+        [disabled]="!selectedTemplate"
+        (onClick)="applyTemplate()"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Discard Changes Confirmation Modal -->
+<p-dialog
+  [(visible)]="showDiscardModal"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '450px' }"
+  header="Unsaved Changes"
+>
+  <div class="modal-content-body">
+    <div class="warning-icon-container">
+      <i class="pi pi-exclamation-triangle"></i>
+    </div>
+    <p class="modal-description centered">
+      You have unsaved changes. Do you want to discard them and switch roles?
+    </p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer-actions">
+      <p-button
+        label="Keep Editing"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cancelDiscardChanges()"
+      ></p-button>
+      <p-button
+        label="Discard Changes"
+        icon="pi pi-trash"
+        severity="danger"
+        (onClick)="confirmDiscardChanges()"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>

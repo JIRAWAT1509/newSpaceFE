@@ -1,0 +1,115 @@
+<div class="area-list-container">
+  <!-- Header with Title and Count -->
+  <div class="area-list-header">
+    <h3 class="list-title">Floor Areas</h3>
+    <span class="list-count">{{ totalItems() }} areas</span>
+  </div>
+
+  <!-- Sort Bar -->
+  <div class="sort-bar">
+    <label class="sort-label">Sort by:</label>
+    <p-select
+      [options]="sortOptions"
+      [ngModel]="selectedSort()"
+      (ngModelChange)="selectedSort.set($event); onSortChange()"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Room Number"
+      [styleClass]="'sort-dropdown'"
+    />
+  </div>
+
+  <!-- Area List Content -->
+  <div class="area-list-content">
+    @if (paginatedAreas().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox text-4xl text-gray-300 mb-2"></i>
+        <p class="text-gray-500">No areas found</p>
+      </div>
+    } @else {
+      @for (area of paginatedAreas(); track area.id) {
+        <div
+          class="area-item"
+          [class.selected]="isSelected(area.id)"
+          (click)="onAreaClick(area.id)"
+        >
+          <!-- Status Indicator -->
+          <div class="status-dot" [style.backgroundColor]="getStatusColor(area.status)"></div>
+
+          <!-- Area Info -->
+          <div class="area-info">
+            <div class="room-number">Room: {{ area.roomNumber }}</div>
+            <div class="tenant-info">
+              @if (area.currentTenant) {
+                <span class="tenant-name">{{ area.currentTenant.name }}</span>
+              } @else {
+                <span class="no-tenant">{{ getStatusLabel(area.status) }}</span>
+              }
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <div class="area-action">
+            <!-- <button
+              type="button"
+              class="action-button"
+              (click)="onActionClick($event, area.id)"
+            >
+              {{ getActionLabel(area.status) }}
+            </button> -->
+            <i class="pi pi-chevron-right"></i>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Pagination Controls (Mimic building-block style) -->
+  <div class="pagination-controls">
+    <!-- Previous Button -->
+    <button
+      (click)="previousPage()"
+      [disabled]="currentPage() === 1"
+      class="pagination-button"
+    >
+      &lt;
+    </button>
+
+    <!-- Page Range Dropdown -->
+    <div class="page-dropdown-wrapper">
+      <button
+        (click)="togglePageDropdown($event)"
+        class="page-dropdown-button"
+      >
+        <span>{{ currentPageRange() }} of {{ totalItems() }}</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      @if (showPageDropdown) {
+        <div class="page-dropdown-menu" (click)="$event.stopPropagation()">
+          @for (range of pageRanges(); track range.page) {
+            <button
+              (click)="goToPage(range.page, $event)"
+              [class.active]="currentPage() === range.page"
+              class="page-dropdown-item"
+            >
+              {{ range.label }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Next Button -->
+    <button
+      (click)="nextPage()"
+      [disabled]="currentPage() === totalPages()"
+      class="pagination-button"
+    >
+      &gt;
+    </button>
+  </div>
+</div>

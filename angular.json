@@ -14,6 +14,7 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/new-space-fe",
+            "baseHref": "/SPACE_NEW_DESIGN/",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -21,13 +22,15 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-  "src/favicon.ico",
-  "src/assets"
-],
-            "styles": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+"styles": [
+  "src/styles/styles.css",
   "node_modules/primeicons/primeicons.css",
-  "src/styles/styles.css"
+  "src/styles/primeng-overrides.css"
 ],
+
             "scripts": []
           },
           "configurations": {
@@ -35,13 +38,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "1MB",
+                  "maximumError": "1MB"
                 }
               ],
               "outputHashing": "all"
@@ -55,19 +58,19 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-  "builder": "@angular-devkit/build-angular:dev-server",
-  "configurations": {
-    "development": {
-      "buildTarget": "newSpaceFE:build:development",
-      "proxyConfig": "proxy.conf.json"
-    },
-    "production": {
-      "buildTarget": "newSpaceFE:build:production",
-      "proxyConfig": "proxy.conf.json"
-    }
-  },
-  "defaultConfiguration": "development"
-},
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "development": {
+              "buildTarget": "newSpaceFE:build:development",
+              "proxyConfig": "proxy.conf.json"
+            },
+            "production": {
+              "buildTarget": "newSpaceFE:build:production",
+              "proxyConfig": "proxy.conf.json"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
         },

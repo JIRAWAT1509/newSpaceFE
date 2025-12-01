@@ -1,0 +1,14 @@
+<button
+  type="button"
+  class="inactive-toggle-button"
+  [class.active]="showInactive()"
+  (click)="onToggle()"
+>
+  <i class="pi" [class.pi-eye]="showInactive()" [class.pi-eye-slash]="!showInactive()"></i>
+  <span class="toggle-text">
+    {{ showInactive() ? 'Hide' : 'Show' }} Inactive
+  </span>
+  @if (inactiveCount() > 0) {
+    <span class="inactive-badge">{{ inactiveCount() }}</span>
+  }
+</button>

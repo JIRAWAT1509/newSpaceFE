@@ -1,0 +1,223 @@
+<!-- source-attribution-chart.component.html -->
+
+<div class="source-attribution-container">
+
+  <!-- ==================== HEADER ==================== -->
+  <div class="chart-header">
+    <div class="header-content">
+      <h3 class="chart-title">
+        <i class="pi pi-chart-pie"></i>
+        Source Attribution (60d)
+      </h3>
+      <p class="chart-subtitle">แหล่งที่มาของดีล</p>
+    </div>
+
+    <!-- Total Summary -->
+    <div class="total-summary">
+      <div class="total-item">
+        <span class="total-label">Total Deals</span>
+        <span class="total-value">{{ totalCount() }}</span>
+      </div>
+      <div class="total-item">
+        <span class="total-label">Total Value</span>
+        <span class="total-value">{{ formatCurrency(totalValue()) }}</span>
+      </div>
+      <div class="total-item">
+        <span class="total-label">Avg Deal</span>
+        <span class="total-value">{{ formatCurrency(avgDealValue()) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CHART SECTION ==================== -->
+  <div class="chart-section">
+
+    <!-- Donut Chart -->
+    <div class="donut-chart-wrapper">
+      <svg
+        viewBox="0 0 180 180"
+        class="donut-chart"
+      >
+        <!-- Background circle (optional subtle effect) -->
+        <circle
+          cx="90"
+          cy="90"
+          r="70"
+          fill="none"
+          stroke="#f3f4f6"
+          stroke-width="2"
+        />
+
+        <!-- Donut segments -->
+        @for (segment of donutSegments(); track segment.source) {
+          <path
+            [attr.d]="segment.path"
+            [attr.fill]="segment.color"
+            class="donut-segment"
+            [class.hovered]="isHovered(segment.source)"
+            [class.selected]="isSelected(segment.source)"
+            (mouseenter)="setHovered(segment.source)"
+            (mouseleave)="setHovered(null)"
+            (click)="onSegmentClick(segment.source)"
+          />
+        }
+
+        <!-- Center circle with total -->
+        <circle
+          cx="90"
+          cy="90"
+          r="45"
+          fill="#ffffff"
+          stroke="#e5e7eb"
+          stroke-width="2"
+        />
+
+        <!-- Center text - Dynamic based on selection -->
+        @if (selectedSource()) {
+          <text
+            x="90"
+            y="80"
+            text-anchor="middle"
+            class="center-label"
+          >
+            {{ selectedSource() }}
+          </text>
+          <text
+            x="90"
+            y="95"
+            text-anchor="middle"
+            class="center-value"
+          >
+            {{ getSourceData(selectedSource()!)?.count || 0 }}
+          </text>
+          <text
+            x="90"
+            y="108"
+            text-anchor="middle"
+            class="center-sublabel"
+          >
+            deals
+          </text>
+        } @else {
+          <text
+            x="90"
+            y="85"
+            text-anchor="middle"
+            class="center-label"
+          >
+            Total Deals
+          </text>
+          <text
+            x="90"
+            y="100"
+            text-anchor="middle"
+            class="center-value"
+          >
+            {{ totalCount() }}
+          </text>
+        }
+      </svg>
+
+      <!-- Click hint -->
+      <div class="chart-hint">
+        <i class="pi pi-info-circle"></i>
+        <span>Click segments to filter</span>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="chart-legend">
+      @for (item of attributionData(); track item.source) {
+        <div
+          class="legend-item"
+          [class.hovered]="isHovered(item.source)"
+          [class.selected]="isSelected(item.source)"
+          (mouseenter)="setHovered(item.source)"
+          (mouseleave)="setHovered(null)"
+          (click)="onLegendClick(item.source)"
+        >
+          <!-- Icon and Source -->
+          <div class="legend-header">
+            <div
+              class="legend-color-badge"
+              [style.background]="getSourceColor(item.source)"
+            >
+              <i class="pi" [class]="getSourceIcon(item.source)"></i>
+            </div>
+            <div class="legend-source-info">
+              <span class="legend-source-name">{{ item.source }}</span>
+              <span class="legend-source-name-th">{{ item.sourceTh }}</span>
+            </div>
+
+            <!-- Selection indicator -->
+            @if (isSelected(item.source)) {
+              <div class="selection-indicator">
+                <i class="pi pi-check-circle"></i>
+              </div>
+            }
+          </div>
+
+          <!-- Metrics -->
+          <div class="legend-metrics">
+            <!-- Percentage -->
+            <div class="metric-box percentage-box">
+              <span class="metric-value">{{ formatPercentage(item.percentage) }}</span>
+              <span class="metric-label">of total</span>
+            </div>
+
+            <!-- Count -->
+            <div class="metric-box">
+              <span class="metric-value">{{ item.count }}</span>
+              <span class="metric-label">deals</span>
+            </div>
+
+            <!-- Value -->
+            <div class="metric-box">
+              <span class="metric-value">{{ formatCurrency(item.value) }}</span>
+              <span class="metric-label">value</span>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="legend-progress">
+            <div
+              class="legend-progress-bar"
+              [style.width.%]="item.percentage"
+              [style.background]="getSourceColor(item.source)"
+            ></div>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- ==================== FOOTER INSIGHTS ==================== -->
+  <div class="chart-footer">
+    <div class="insight-item">
+      <i class="pi pi-info-circle"></i>
+      <span>Data from last 60 days of closed deals</span>
+    </div>
+
+    @if (topSource()) {
+      <div class="insight-item">
+        <i class="pi pi-trophy"></i>
+        <span>
+          Top source:
+          <strong>{{ topSource()!.source }}</strong> ({{ formatPercentage(topSource()!.percentage) }})
+        </span>
+      </div>
+    }
+
+    <!-- Export button (for demo) -->
+    <button
+      class="export-btn"
+      (click)="exportData()"
+      title="Export data as JSON"
+    >
+      <i class="pi pi-download"></i>
+      <span>Export</span>
+    </button>
+  </div>
+
+</div>

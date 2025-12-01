@@ -1,0 +1,156 @@
+/* business-form-drawer.component.css */
+
+/* Custom scrollbar for form content */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Form Field Spacing */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+/* Form Field */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-label.required::after {
+  content: ' *';
+  color: #ef4444;
+}
+
+/* Form Input */
+.form-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background-color: #ffffff;
+  transition: all 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.form-input.input-error {
+  border-color: #ef4444;
+}
+
+.form-input.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Error Message */
+.error-message {
+  color: #ef4444;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: -0.25rem;
+}
+
+/* PrimeNG Dropdown custom styling */
+::ng-deep .p-select {
+  width: 100%;
+  border-radius: 0.5rem;
+  border-color: #d1d5db;
+  background-color: white;
+}
+
+::ng-deep .p-select:not(.p-disabled):hover {
+  border-color: #9ca3af;
+}
+
+::ng-deep .p-select:not(.p-disabled).p-focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+}
+
+::ng-deep .p-select .p-select-label {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  background-color: white;
+  color: #1f2937;
+}
+
+::ng-deep .p-select .p-select-label.p-placeholder {
+  color: #9ca3af;
+}
+
+::ng-deep .p-select-overlay .p-select-list .p-select-option {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+::ng-deep .p-select-overlay .p-select-list .p-select-option:hover {
+  background: #eff6ff;
+}
+
+::ng-deep .p-select-overlay .p-select-list .p-select-option.p-selected {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Error state for dropdown */
+::ng-deep .p-select.input-error {
+  border-color: #ef4444 !important;
+}
+
+::ng-deep .p-select.input-error:focus,
+::ng-deep .p-select.input-error.p-focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* PrimeNG Button Styling */
+::ng-deep .p-button {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+::ng-deep .p-button-outlined {
+  background-color: transparent;
+}
+
+::ng-deep .p-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

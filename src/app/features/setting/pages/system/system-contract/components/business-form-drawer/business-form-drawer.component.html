@@ -1,0 +1,216 @@
+<!-- business-form-drawer.component.html -->
+
+<!-- Backdrop -->
+@if (isOpen) {
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+    (click)="onClose()"
+  ></div>
+}
+
+<!-- Drawer (Desktop: Right side, Mobile: Centered) -->
+@if (isOpen) {
+  <div
+    class="fixed z-50 bg-white shadow-2xl transition-all duration-300 ease-in-out overflow-hidden
+           md:top-0 md:right-0 md:h-full md:w-[600px]
+           max-md:top-1/2 max-md:left-1/2 max-md:transform max-md:-translate-x-1/2 max-md:-translate-y-1/2
+           max-md:rounded-lg max-md:w-[95%] max-md:max-w-[500px] max-md:max-h-[90vh]"
+  >
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-white">
+        {{ getHeaderTitle() }}
+      </h2>
+      <button
+        (click)="onClose()"
+        class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1 transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Form Content (Scrollable) -->
+    <div class="overflow-y-auto p-6" style="max-height: calc(100vh - 140px);">
+      <form>
+        <!-- ==================== PROFIT CENTER FORM ==================== -->
+        @if (formType === 'profit') {
+          <div class="space-y-4">
+            <!-- รหัส Profit Center -->
+            <div class="form-field">
+              <label class="form-label required">รหัส Profit Center</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.COST_CENTER_CODE"
+                name="profitCode"
+                [disabled]="mode === 'edit'"
+                placeholder="กรอกรหัส Profit Center"
+                class="form-input"
+                [class.input-error]="!!errors['COST_CENTER_CODE']"
+              />
+              @if (errors['COST_CENTER_CODE']) {
+                <p class="error-message">{{ errors['COST_CENTER_CODE'] }}</p>
+              }
+            </div>
+
+            <!-- ชื่อ Profit Center -->
+            <div class="form-field">
+              <label class="form-label required">ชื่อ Profit Center</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.COST_CENTER_NAME"
+                name="profitName"
+                placeholder="กรอกชื่อ Profit Center"
+                class="form-input"
+                [class.input-error]="!!errors['COST_CENTER_NAME']"
+              />
+              @if (errors['COST_CENTER_NAME']) {
+                <p class="error-message">{{ errors['COST_CENTER_NAME'] }}</p>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ==================== MAIN BUSINESS TYPE FORM ==================== -->
+        @if (formType === 'main-business') {
+          <div class="space-y-4">
+            <!-- รหัสประเภทธุรกิจ -->
+            <div class="form-field">
+              <label class="form-label required">รหัสประเภทธุรกิจ</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.BUS_TYPE_CODE"
+                name="businessCode"
+                [disabled]="mode === 'edit'"
+                placeholder="กรอกรหัสประเภทธุรกิจ"
+                class="form-input"
+                [class.input-error]="!!errors['BUS_TYPE_CODE']"
+              />
+              @if (errors['BUS_TYPE_CODE']) {
+                <p class="error-message">{{ errors['BUS_TYPE_CODE'] }}</p>
+              }
+            </div>
+
+            <!-- ชื่อประเภทธุรกิจ -->
+            <div class="form-field">
+              <label class="form-label required">ชื่อประเภทธุรกิจ</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.BUS_TYPE_NAME"
+                name="businessName"
+                placeholder="กรอกชื่อประเภทธุรกิจ"
+                class="form-input"
+                [class.input-error]="!!errors['BUS_TYPE_NAME']"
+              />
+              @if (errors['BUS_TYPE_NAME']) {
+                <p class="error-message">{{ errors['BUS_TYPE_NAME'] }}</p>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- ==================== SUB BUSINESS TYPE FORM ==================== -->
+        @if (formType === 'sub-business') {
+          <div class="space-y-4">
+            <!-- รหัสประเภทธุรกิจย่อย -->
+            <div class="form-field">
+              <label class="form-label required">รหัสประเภทธุรกิจย่อย</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.BUS_SUBTYPE_CODE"
+                name="subBusinessCode"
+                [disabled]="mode === 'edit'"
+                placeholder="กรอกรหัสประเภทธุรกิจย่อย"
+                class="form-input"
+                [class.input-error]="!!errors['BUS_SUBTYPE_CODE']"
+              />
+              @if (errors['BUS_SUBTYPE_CODE']) {
+                <p class="error-message">{{ errors['BUS_SUBTYPE_CODE'] }}</p>
+              }
+            </div>
+
+            <!-- ชื่อประเภทธุรกิจย่อย -->
+            <div class="form-field">
+              <label class="form-label required">ชื่อประเภทธุรกิจย่อย</label>
+              <input
+                type="text"
+                [(ngModel)]="formData.BUS_SUBTYPE_NAME"
+                name="subBusinessName"
+                placeholder="กรอกชื่อประเภทธุรกิจย่อย"
+                class="form-input"
+                [class.input-error]="!!errors['BUS_SUBTYPE_NAME']"
+              />
+              @if (errors['BUS_SUBTYPE_NAME']) {
+                <p class="error-message">{{ errors['BUS_SUBTYPE_NAME'] }}</p>
+              }
+            </div>
+
+            <!-- ประเภทธุรกิจหลัก (Dropdown) -->
+            <div class="form-field">
+              <label class="form-label required">ประเภทธุรกิจหลัก</label>
+              <p-select
+                [(ngModel)]="formData.BUS_TYPE_CODE"
+                name="mainBusiness"
+                [options]="mainBusinessTypes"
+                optionLabel="BUS_TYPE_NAME"
+                optionValue="BUS_TYPE_CODE"
+                placeholder="เลือกประเภทธุรกิจหลัก"
+                [filter]="true"
+                filterBy="BUS_TYPE_NAME"
+                [showClear]="true"
+                styleClass="w-full"
+                [class.input-error]="!!errors['BUS_TYPE_CODE']"
+              ></p-select>
+              @if (errors['BUS_TYPE_CODE']) {
+                <p class="error-message">{{ errors['BUS_TYPE_CODE'] }}</p>
+              }
+            </div>
+
+            <!-- Profit Center (Dropdown) -->
+            <div class="form-field">
+              <label class="form-label required">Profit Center</label>
+              <p-select
+                [(ngModel)]="formData.COST_CENTER_CODE"
+                name="profitCenter"
+                [options]="profitCenters"
+                optionLabel="COST_CENTER_NAME"
+                optionValue="COST_CENTER_CODE"
+                placeholder="เลือก Profit Center"
+                [filter]="true"
+                filterBy="COST_CENTER_NAME"
+                [showClear]="true"
+                styleClass="w-full"
+                [class.input-error]="!!errors['COST_CENTER_CODE']"
+              ></p-select>
+              @if (errors['COST_CENTER_CODE']) {
+                <p class="error-message">{{ errors['COST_CENTER_CODE'] }}</p>
+              }
+            </div>
+          </div>
+        }
+
+      </form>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="onClose()"
+        [disabled]="isSubmitting"
+      ></p-button>
+
+      <p-button
+        [label]="mode === 'create' ? 'สร้าง' : 'บันทึก'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="onSubmit()"
+        [loading]="isSubmitting"
+      ></p-button>
+    </div>
+  </div>
+}

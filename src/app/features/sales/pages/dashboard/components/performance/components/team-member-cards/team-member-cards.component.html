@@ -1,0 +1,114 @@
+<!-- team-member-cards.component.html -->
+
+<div class="team-cards-container">
+
+  @for (member of members; track member.id) {
+    <div
+      class="member-card"
+      [class.selected]="isSelected(member.id)"
+      (click)="onCardClick(member.id)"
+    >
+
+      <!-- Card Header: Avatar + Info -->
+      <div class="card-header">
+        <div class="avatar-section">
+          <div class="avatar">{{ member.avatar }}</div>
+          <div class="member-basic-info">
+            <h3 class="member-name">{{ member.name }}</h3>
+            <p class="member-region">{{ member.region }}</p>
+          </div>
+        </div>
+
+        <!-- Selection Indicator -->
+        @if (isSelected(member.id)) {
+          <div class="selection-indicator">
+            <i class="pi pi-check-circle"></i>
+          </div>
+        }
+      </div>
+
+      <!-- Sales Metrics -->
+      <div class="sales-metrics">
+
+        <!-- This Year -->
+        <div class="metric-row primary-metric">
+          <div class="metric-info">
+            <span class="metric-value">{{ formatCurrency(member.salesThisYear) }}</span>
+            <span class="metric-label">this year | ปีนี้</span>
+          </div>
+        </div>
+
+        <!-- This Week with Change -->
+        <div class="metric-row secondary-metric">
+          <div class="metric-info">
+            <span class="metric-value">{{ formatNumber(member.salesThisWeek) }}</span>
+            <span class="metric-label">this week | สัปดาห์นี้</span>
+          </div>
+
+          <!-- Week Change Badge -->
+          @if (calculateWeekChange(member).value !== 0) {
+            <div
+              class="change-badge"
+              [class.positive]="calculateWeekChange(member).isPositive"
+              [class.negative]="!calculateWeekChange(member).isPositive"
+            >
+              <i
+                class="pi"
+                [class.pi-arrow-up]="calculateWeekChange(member).isPositive"
+                [class.pi-arrow-down]="!calculateWeekChange(member).isPositive"
+              ></i>
+              <span>{{ Math.abs(calculateWeekChange(member).value) }}%</span>
+            </div>
+          }
+        </div>
+
+      </div>
+
+      <!-- Sparkline Chart -->
+      <div class="sparkline-section">
+        <div class="sparkline-chart">
+          <svg viewBox="0 0 120 40" class="sparkline-svg">
+            <defs>
+              <linearGradient
+                [id]="getGradientId(member.id)"
+                x1="0%"
+                y1="0%"
+                x2="0%"
+                y2="100%"
+              >
+                @for (stop of getGradientStops(member); track stop.offset) {
+                  <stop
+                    [attr.offset]="stop.offset"
+                    [attr.style]="'stop-color:' + stop.color + ';stop-opacity:' + stop.opacity"
+                  />
+                }
+              </linearGradient>
+            </defs>
+
+            <!-- Area fill -->
+            <polyline
+              [attr.points]="generateSparklinePoints(member)"
+              [attr.fill]="'url(#' + getGradientId(member.id) + ')'"
+              [attr.stroke]="getSparklineColor(member)"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+
+        <div class="sparkline-label">
+          <span>Last 8 weeks | 8 สัปดาห์ล่าสุด</span>
+        </div>
+      </div>
+
+      <!-- Click indicator -->
+      <div class="click-hint">
+        <i class="pi pi-chevron-down"></i>
+        <span>{{ isSelected(member.id) ? 'Hide Details' : 'View Details' }}</span>
+      </div>
+
+    </div>
+  }
+
+</div>

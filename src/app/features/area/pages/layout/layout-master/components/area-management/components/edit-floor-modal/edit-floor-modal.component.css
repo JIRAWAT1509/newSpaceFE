@@ -1,0 +1,131 @@
+/* Override PrimeNG Dialog Styles */
+:host ::ng-deep .edit-floor-modal {
+  .p-dialog {
+    @apply rounded-lg shadow-2xl;
+  }
+
+  .p-dialog-header {
+    @apply bg-gradient-to-r from-blue-600 to-blue-500 text-white;
+    @apply px-6 py-4 rounded-t-lg;
+  }
+
+  .p-dialog-content {
+    @apply p-0 overflow-hidden;
+  }
+
+  .p-dialog-footer {
+    @apply px-6 py-4 bg-gray-50 border-t border-gray-200;
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  @apply flex items-center justify-between w-full;
+}
+
+.modal-title {
+  @apply text-xl font-bold flex items-center gap-3;
+}
+
+.modal-title i {
+  @apply text-lg;
+}
+
+.header-actions {
+  @apply flex items-center gap-3;
+}
+
+.draft-indicator {
+  @apply flex items-center gap-2 px-3 py-1 rounded-full;
+  @apply bg-blue-100 bg-opacity-30 text-white text-sm;
+}
+
+.draft-indicator i {
+  @apply text-xs;
+}
+
+/* Modal Content */
+.modal-content {
+  @apply flex h-full;
+  min-height: 70vh;
+}
+
+.floor-plan-section {
+  @apply flex-1 bg-gray-50 border-r border-gray-200;
+  flex: 3;
+}
+
+.marker-list-section {
+  @apply bg-white;
+  flex: 1;
+  min-width: 300px;
+  max-width: 400px;
+}
+
+/* Modal Footer */
+.modal-footer {
+  @apply flex items-center justify-end gap-3;
+}
+
+.btn-cancel,
+.btn-close,
+.btn-save,
+.btn-secondary,
+.btn-danger {
+  @apply flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium;
+  @apply transition-all duration-200;
+}
+
+.btn-cancel {
+  @apply bg-white text-gray-700 border-2 border-gray-300;
+  @apply hover:bg-gray-50 hover:border-gray-400;
+}
+
+.btn-close {
+  @apply bg-blue-600 text-white;
+  @apply hover:bg-blue-700;
+}
+
+.btn-save {
+  @apply bg-green-600 text-white;
+  @apply hover:bg-green-700;
+  @apply disabled:bg-gray-300 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-white text-gray-700 border-2 border-gray-300;
+  @apply hover:bg-gray-50;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white;
+  @apply hover:bg-red-700;
+}
+
+/* Warning Dialog */
+.warning-message {
+  @apply text-gray-700 mb-4;
+}
+
+/* Responsive */
+@media (max-width: 1280px) {
+  .marker-list-section {
+    min-width: 250px;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    @apply flex-col;
+  }
+
+  .floor-plan-section,
+  .marker-list-section {
+    @apply w-full border-r-0 border-b;
+  }
+
+  .marker-list-section {
+    max-width: 100%;
+  }
+}

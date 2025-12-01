@@ -1,0 +1,112 @@
+<div class="editable-floor-plan-wrapper">
+  <!-- Top Center: Floor Info -->
+  <div class="top-center-info">
+    <div class="floor-info-badge">
+      <i class="pi pi-building"></i>
+      <span>{{ floor()?.floorName || 'Floor' }}</span>
+    </div>
+  </div>
+
+  <!-- Top Right: Zoom Controls -->
+  <div class="top-right-controls">
+    <div class="zoom-controls">
+      <button
+        type="button"
+        class="zoom-button"
+        (click)="onZoomIn()"
+        [disabled]="zoomLevel() >= 3.0"
+      >
+        <i class="pi pi-plus"></i>
+      </button>
+      <button
+        type="button"
+        class="zoom-button"
+        (click)="onZoomOut()"
+        [disabled]="zoomLevel() <= 0.5"
+      >
+        <i class="pi pi-minus"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Floor Plan Container -->
+  <div
+    #floorPlanContainer
+    class="floor-plan-container"
+    [class.drag-over]="isDragOver()"
+    (wheel)="onWheel($event)"
+    (mousedown)="onMouseDown($event)"
+    (mousemove)="onMouseMove($event)"
+    (mouseup)="onMouseUp($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div
+      class="floor-plan-content"
+      [style.transform]="'translate(' + panOffset().x + 'px, ' + panOffset().y + 'px) scale(' + zoomLevel() + ')'"
+    >
+      <!-- Floor Plan Image -->
+      @if (currentFloorImage()) {
+        <img
+          [src]="currentFloorImage()"
+          alt="Floor Plan"
+          class="floor-plan-image"
+          #floorImage
+        />
+      } @else {
+        <div class="no-image-placeholder">
+          <i class="pi pi-image"></i>
+          <p>No floor plan image</p>
+        </div>
+      }
+
+      <!-- Area Markers (Draggable) - Only show active areas -->
+      @for (area of activeAreas(); track area.id) {
+        <app-area-marker
+          [area]="area"
+          [zoomLevel]="zoomLevel()"
+          [isSelected]="selectedAreaId() === area.id"
+          [isDraggable]="true"
+          [shouldPulse]="selectedAreaId() === area.id"
+          (markerDragged)="onMarkerDragged($event)"
+          (markerClicked)="onMarkerClicked($event)"
+          (markerDragStart)="onMarkerDragStart($event)"
+          (markerDragEnd)="onMarkerDragEnd()"
+          (markerDraggedOutside)="onMarkerDraggedOutside($event)"
+        />
+      }
+
+      <!-- Ghost Marker (shown while dragging from list) -->
+      @if (ghostMarkerPosition() && getDraggedArea()) {
+        <div class="ghost-marker" [style]="getGhostMarkerStyle()">
+          <div class="marker-circle" [style.backgroundColor]="getStatusColor(getDraggedArea().status)">
+          </div>
+          <div class="room-label">
+            {{ getDraggedArea().roomNumber }}
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Bottom Right: Upload Button -->
+  <div class="bottom-right-controls">
+    <label class="upload-button">
+      <input
+        type="file"
+        accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+        (change)="onFileSelected($event)"
+        #fileInput
+      />
+      <i class="pi pi-upload"></i>
+      <span>Upload Floor Plan</span>
+    </label>
+  </div>
+
+  <!-- Edit Instructions -->
+  <div class="edit-instructions">
+    <i class="pi pi-info-circle"></i>
+    Drag markers to reposition • Click to select • Upload new floor plan to update layout
+  </div>
+</div>

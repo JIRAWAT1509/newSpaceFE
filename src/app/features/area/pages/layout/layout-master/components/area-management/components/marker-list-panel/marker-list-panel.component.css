@@ -1,0 +1,248 @@
+.marker-list-panel {
+  @apply h-full flex flex-col bg-white;
+}
+
+/* Panel Header */
+.panel-header {
+  @apply px-4 py-3 border-b border-gray-200 bg-gray-50;
+}
+
+.panel-title {
+  @apply text-lg font-bold text-gray-800 flex items-center gap-2;
+}
+
+.panel-title i {
+  @apply text-blue-600;
+}
+
+/* List Section */
+.list-section {
+  @apply flex-1 overflow-y-auto;
+}
+
+.section-header {
+  @apply flex items-center justify-between px-4 py-3 bg-gray-100;
+  @apply sticky top-0 z-10;
+}
+
+.section-title {
+  @apply text-sm font-semibold text-gray-700 flex items-center gap-2;
+}
+
+.section-title i {
+  @apply text-xs;
+}
+
+.count-badge {
+  @apply px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold;
+}
+
+/* Area List */
+.area-list {
+  @apply px-2 py-2;
+  min-height: 100px;
+  transition: all 0.2s ease;
+}
+
+.area-list.drop-zone-active {
+  @apply bg-blue-50 ring-2 ring-blue-400 ring-inset;
+  @apply relative;
+}
+
+.area-list.drop-zone-active::before {
+  content: 'Drop here';
+  @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
+  @apply text-blue-600 font-bold text-sm pointer-events-none;
+  @apply bg-white px-3 py-1 rounded shadow-md;
+}
+
+.area-item-wrapper {
+  @apply mb-2;
+}
+
+.area-item {
+  @apply flex items-center gap-3 p-3 rounded-lg;
+  @apply bg-white border-2 border-gray-200;
+  @apply cursor-pointer transition-all duration-200;
+  @apply hover:border-blue-300 hover:bg-blue-50;
+}
+
+.area-item.selected {
+  @apply border-blue-500 bg-blue-50 shadow-md;
+}
+
+.area-item.inactive {
+  @apply bg-gray-50 border-gray-300;
+}
+
+.area-item.expanded {
+  @apply rounded-b-none border-b-0;
+}
+
+.drag-handle {
+  @apply text-gray-400 cursor-move;
+}
+
+.drag-handle i {
+  @apply text-sm;
+}
+
+.status-dot {
+  @apply w-3 h-3 rounded-full flex-shrink-0;
+}
+
+.status-dot.inactive {
+  @apply opacity-50;
+}
+
+.area-info {
+  @apply flex-1 flex flex-col gap-1;
+}
+
+.room-number {
+  @apply text-sm font-semibold text-gray-800;
+}
+
+.area-type {
+  @apply text-xs text-gray-500;
+}
+
+.area-actions {
+  @apply flex items-center gap-1;
+}
+
+.action-button {
+  @apply w-8 h-8 flex items-center justify-center rounded;
+  @apply text-gray-500 hover:text-red-600 hover:bg-red-50;
+  @apply transition-colors duration-200;
+}
+
+.expand-icon {
+  @apply text-gray-400;
+}
+
+.expand-icon i {
+  @apply text-xs;
+}
+
+/* Area Details (Expanded) */
+.area-details {
+  @apply p-4 bg-white border-2 border-t-0 border-gray-200 rounded-b-lg;
+  @apply space-y-3;
+}
+
+.detail-row {
+  @apply flex items-center justify-between gap-2;
+}
+
+.detail-label {
+  @apply text-xs text-gray-500 font-medium;
+}
+
+.detail-value {
+  @apply text-sm text-gray-800;
+}
+
+.status-badge {
+  @apply px-2 py-1 rounded text-xs text-white font-medium;
+}
+
+.detail-actions {
+  @apply flex gap-2 pt-2 border-t border-gray-200;
+}
+
+.btn-see-more,
+.btn-activate {
+  @apply flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg;
+  @apply text-sm font-medium transition-colors duration-200;
+}
+
+.btn-see-more {
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+}
+
+.btn-activate {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.btn-deactivate {
+  @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.btn-see-more i,
+.btn-activate i,
+.btn-deactivate i {
+  @apply text-xs;
+}
+
+/* Empty State */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-8 text-gray-400;
+}
+
+.empty-state i {
+  @apply text-4xl mb-2;
+}
+
+.empty-state p {
+  @apply text-sm;
+}
+
+/* Panel Footer */
+.panel-footer {
+  @apply px-4 py-3 border-t border-gray-200 bg-gray-50;
+}
+
+.btn-add-area {
+  @apply w-full flex items-center justify-center gap-2 px-4 py-3;
+  @apply bg-blue-600 text-white rounded-lg font-medium;
+  @apply hover:bg-blue-700 transition-colors duration-200;
+}
+
+.btn-add-area i {
+  @apply text-lg;
+}
+
+/* Drop Zone Overlay (shown during drag from map) */
+.drop-zone-overlay {
+  @apply absolute inset-0 bg-red-50 bg-opacity-90 z-50;
+  @apply flex items-center justify-center;
+  @apply border-4 border-dashed border-red-400;
+  @apply animate-pulse;
+}
+
+.drop-zone-indicator {
+  @apply flex flex-col items-center gap-3 px-6 py-8;
+  @apply bg-white rounded-lg shadow-xl;
+  @apply border-2 border-red-500;
+}
+
+.drop-zone-indicator i {
+  @apply text-4xl text-red-600;
+}
+
+.drop-zone-indicator p {
+  @apply text-lg font-bold text-red-700;
+}
+
+/* Drag States */
+.area-item[draggable="true"]:active {
+  @apply opacity-50 cursor-grabbing;
+}
+
+/* Scrollbar */
+.list-section::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.list-section::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+.list-section::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+.list-section::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}

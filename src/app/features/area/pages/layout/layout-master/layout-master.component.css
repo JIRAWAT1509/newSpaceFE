@@ -1,0 +1,54 @@
+.layout-master-container {
+  @apply min-h-screen bg-gray-50 p-6 flex flex-col gap-6;
+}
+
+.section {
+  @apply bg-white rounded-lg shadow-sm;
+}
+
+/* Section 1: Area Availability - Full Width at Top */
+.section-availability {
+  @apply w-full;
+}
+
+/* Filter Bar - Between Sections */
+.section-filter-bar {
+  @apply w-full;
+}
+
+/* Section 2: Area Management (Floor Plan + Area List) - Full Width */
+.section-area-management {
+  @apply w-full;
+  @apply min-h-[700px];
+}
+
+/* Section 3: Floor/Area Data Display - Full Width */
+.section-data-display {
+  @apply w-full;
+  @apply min-h-[400px];
+}
+
+/* Responsive Design */
+@media (max-width: 1280px) {
+  .section-area-management {
+    @apply min-h-[600px];
+  }
+
+  .section-data-display {
+    @apply min-h-[350px];
+  }
+}
+
+@media (max-width: 768px) {
+  .layout-master-container {
+    @apply p-4 gap-4;
+  }
+
+  .section-area-management {
+    @apply min-h-[500px];
+  }
+
+  .section-data-display {
+    @apply min-h-[300px];
+  }
+}

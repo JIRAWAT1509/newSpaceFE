@@ -1,0 +1,638 @@
+/* primeng-overrides.css - ENHANCED with Better Hover States */
+/* Version with visible checkmarks on hover */
+
+/* ==================== CHECKBOX FIXES - WITH VISIBLE HOVER ==================== */
+
+/* Target ALL checkbox-related elements */
+input[type="checkbox"],
+input[type="checkbox"]:not(.p-checkbox-input),
+.p-checkbox,
+.p-component.p-checkbox,
+.p-checkbox-box,
+.p-checkbox .p-checkbox-box,
+span.p-checkbox,
+span.p-checkbox .p-checkbox-box {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  background-color: #ffffff !important;
+  border: 2px solid #d1d5db !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+/* Checkbox hover - UNCHECKED state (light gray background) */
+input[type="checkbox"]:not(:checked):hover,
+.p-checkbox:not(.p-disabled):hover .p-checkbox-box:not(.p-highlight):not(.p-checked),
+.p-checkbox-box:not(.p-highlight):not(.p-checked):hover {
+  border-color: #3b82f6 !important;
+  background-color: #f3f4f6 !important; /* Light gray on hover */
+}
+
+/* Checkbox hover - CHECKED state (darker blue, keep checkmark visible) */
+input[type="checkbox"]:checked:hover,
+.p-checkbox:not(.p-disabled):hover .p-checkbox-box.p-highlight,
+.p-checkbox:not(.p-disabled):hover .p-checkbox-box.p-checked,
+.p-checkbox-box.p-highlight:hover,
+.p-checkbox-box.p-checked:hover {
+  border-color: #2563eb !important;
+  background-color: #2563eb !important; /* Darker blue on hover when checked */
+}
+
+/* Checkbox checked state - ALL VARIATIONS */
+input[type="checkbox"]:checked,
+.p-checkbox .p-checkbox-box.p-highlight,
+.p-checkbox .p-checkbox-box.p-checked,
+.p-checkbox-box.p-highlight,
+.p-checkbox-box.p-checked,
+.p-checkbox.p-highlight .p-checkbox-box,
+.p-checkbox.p-checked .p-checkbox-box,
+input[type="checkbox"]:checked + .p-checkbox-box,
+.p-checkbox input:checked ~ .p-checkbox-box {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Checkbox icon (checkmark) - ALWAYS VISIBLE when checked */
+input[type="checkbox"]:checked::after,
+input[type="checkbox"]:checked::before,
+.p-checkbox .p-checkbox-box .p-checkbox-icon,
+.p-checkbox .p-checkbox-box .p-icon,
+.p-checkbox-icon,
+.p-checkbox-box .p-icon,
+.p-checkbox .p-icon,
+.p-highlight .p-icon,
+span.p-checkbox-icon {
+  color: #ffffff !important;
+  font-size: 14px !important;
+  opacity: 1 !important; /* Ensure checkmark is always visible */
+  visibility: visible !important;
+}
+
+/* Add checkmark to native checkbox when checked */
+input[type="checkbox"]:checked::after {
+  content: '✓' !important;
+  display: block !important;
+  text-align: center !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  line-height: 16px !important;
+  font-weight: bold !important;
+}
+
+/* Ensure checkmark is visible on hover when checked */
+input[type="checkbox"]:checked:hover::after {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+/* Checkbox disabled */
+input[type="checkbox"]:disabled,
+.p-checkbox.p-disabled,
+.p-checkbox.p-disabled .p-checkbox-box,
+.p-checkbox-box.p-disabled {
+  background-color: #f3f4f6 !important;
+  border-color: #e5e7eb !important;
+  opacity: 0.6 !important;
+}
+
+/* Checkbox indeterminate state */
+.p-checkbox .p-checkbox-box.p-indeterminate,
+.p-checkbox-box.p-indeterminate {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+/* ==================== RADIO BUTTON FIXES - WITH VISIBLE HOVER ==================== */
+
+/* Target ALL radio-related elements */
+input[type="radio"],
+input[type="radio"]:not(.p-radiobutton-input),
+.p-radiobutton,
+.p-component.p-radiobutton,
+.p-radiobutton-box,
+.p-radiobutton .p-radiobutton-box,
+span.p-radiobutton,
+span.p-radiobutton .p-radiobutton-box {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  background-color: #ffffff !important;
+  border: 2px solid #d1d5db !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+/* Radio hover - UNCHECKED state (light gray background) */
+input[type="radio"]:not(:checked):hover,
+.p-radiobutton:not(.p-disabled):hover .p-radiobutton-box:not(.p-highlight):not(.p-checked),
+.p-radiobutton-box:not(.p-highlight):not(.p-checked):hover {
+  border-color: #3b82f6 !important;
+  background-color: #f3f4f6 !important; /* Light gray on hover */
+}
+
+/* Radio hover - CHECKED state (keep dot visible) */
+input[type="radio"]:checked:hover,
+.p-radiobutton:not(.p-disabled):hover .p-radiobutton-box.p-highlight,
+.p-radiobutton:not(.p-disabled):hover .p-radiobutton-box.p-checked,
+.p-radiobutton-box.p-highlight:hover,
+.p-radiobutton-box.p-checked:hover {
+  border-color: #2563eb !important;
+  background-color: #ffffff !important; /* Stay white when checked+hover */
+}
+
+/* Radio checked - ALL VARIATIONS */
+input[type="radio"]:checked,
+.p-radiobutton .p-radiobutton-box.p-highlight,
+.p-radiobutton .p-radiobutton-box.p-checked,
+.p-radiobutton-box.p-highlight,
+.p-radiobutton-box.p-checked,
+.p-radiobutton.p-highlight .p-radiobutton-box,
+input[type="radio"]:checked + .p-radiobutton-box,
+.p-radiobutton input:checked ~ .p-radiobutton-box {
+  background-color: #ffffff !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Radio inner circle - ALWAYS VISIBLE when checked */
+input[type="radio"]:checked::after,
+input[type="radio"]:checked::before,
+.p-radiobutton .p-radiobutton-box .p-radiobutton-icon,
+.p-radiobutton .p-radiobutton-box .p-icon,
+.p-radiobutton-icon,
+.p-radiobutton-box .p-icon,
+span.p-radiobutton-icon {
+  width: 10px !important;
+  height: 10px !important;
+  background-color: #3b82f6 !important;
+  border-radius: 50% !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Add dot to native radio when checked */
+input[type="radio"]:checked::after {
+  content: '' !important;
+  display: block !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background-color: #3b82f6 !important;
+  position: relative !important;
+  top: 3px !important;
+  left: 3px !important;
+}
+
+/* Ensure dot is visible on hover when checked */
+input[type="radio"]:checked:hover::after {
+  background-color: #2563eb !important; /* Darker blue on hover */
+  opacity: 1 !important;
+}
+
+/* Radio disabled */
+input[type="radio"]:disabled,
+.p-radiobutton.p-disabled,
+.p-radiobutton.p-disabled .p-radiobutton-box,
+.p-radiobutton-box.p-disabled {
+  background-color: #f3f4f6 !important;
+  border-color: #e5e7eb !important;
+  opacity: 0.6 !important;
+}
+
+/* ==================== INPUT FIELD FIXES (ALL TYPES) ==================== */
+
+/* All input fields - White background */
+input:not([type="checkbox"]):not([type="radio"]),
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+textarea {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #1f2937 !important;
+  border-radius: 6px;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  outline: none !important;
+}
+
+/* PrimeNG Input Text - White background */
+.p-inputtext,
+.p-component.p-inputtext,
+input.p-inputtext {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #1f2937 !important;
+  padding: 0.625rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.p-inputtext:enabled:hover,
+input.p-inputtext:enabled:hover {
+  border-color: #9ca3af !important;
+}
+
+.p-inputtext:enabled:focus,
+input.p-inputtext:enabled:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  outline: none !important;
+}
+
+.p-inputtext::placeholder,
+input.p-inputtext::placeholder {
+  color: #9ca3af !important;
+}
+
+.p-inputtext:disabled,
+input.p-inputtext:disabled {
+  background-color: #f3f4f6 !important;
+  color: #9ca3af !important;
+  opacity: 0.6;
+}
+
+/* ==================== TEXTAREA FIXES ==================== */
+
+.p-inputtextarea,
+textarea.p-inputtextarea {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #1f2937 !important;
+  border-radius: 6px;
+  padding: 0.625rem 0.75rem;
+}
+
+.p-inputtextarea:enabled:hover,
+textarea.p-inputtextarea:enabled:hover {
+  border-color: #9ca3af !important;
+}
+
+.p-inputtextarea:enabled:focus,
+textarea.p-inputtextarea:enabled:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* ==================== DROPDOWN/SELECT FIXES ==================== */
+
+.p-select,
+.p-dropdown,
+.p-component.p-select,
+.p-component.p-dropdown {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px;
+}
+
+.p-select:not(.p-disabled):hover,
+.p-dropdown:not(.p-disabled):hover {
+  border-color: #9ca3af !important;
+}
+
+.p-select:not(.p-disabled).p-focus,
+.p-dropdown:not(.p-disabled).p-focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.p-select .p-select-label,
+.p-dropdown .p-dropdown-label {
+  background-color: transparent !important;
+  color: #1f2937 !important;
+  padding: 0.625rem 0.75rem;
+}
+
+.p-select .p-select-label.p-placeholder,
+.p-dropdown .p-dropdown-label.p-placeholder {
+  color: #9ca3af !important;
+}
+
+.p-select .p-select-dropdown,
+.p-select .p-select-trigger,
+.p-dropdown .p-dropdown-trigger {
+  color: #6b7280 !important;
+}
+
+.p-select-overlay,
+.p-select-panel,
+.p-dropdown-panel {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.p-select-option,
+.p-select-item,
+.p-dropdown-item {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  padding: 0.625rem 0.75rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.p-select-option:hover,
+.p-select-item:hover,
+.p-dropdown-item:hover {
+  background-color: #f3f4f6 !important;
+  color: #1f2937 !important;
+}
+
+.p-select-option.p-selected,
+.p-select-option.p-highlight,
+.p-select-item.p-highlight,
+.p-dropdown-item.p-highlight {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+}
+
+/* ==================== BUTTON FIXES ==================== */
+
+.p-button.p-button-primary,
+.p-button-primary,
+button.p-button-primary {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+.p-button.p-button-primary:enabled:hover,
+.p-button-primary:enabled:hover {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+.p-button.p-button-success,
+.p-button-success {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+}
+
+.p-button.p-button-success:enabled:hover,
+.p-button-success:enabled:hover {
+  background-color: #059669 !important;
+  border-color: #059669 !important;
+}
+
+.p-button.p-button-danger,
+.p-button-danger {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+.p-button.p-button-danger:enabled:hover,
+.p-button-danger:enabled:hover {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+}
+
+.p-button.p-button-secondary.p-button-outlined,
+.p-button-secondary.p-button-outlined {
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+}
+
+.p-button.p-button-secondary.p-button-outlined:enabled:hover,
+.p-button-secondary.p-button-outlined:enabled:hover {
+  background-color: #f9fafb !important;
+  border-color: #9ca3af !important;
+}
+
+/* ==================== DIALOG/MODAL FIXES ==================== */
+
+.p-dialog {
+  background-color: #ffffff !important;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.p-dialog .p-dialog-header {
+  background-color: #f9fafb !important;
+  color: #1f2937 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px 12px 0 0;
+}
+
+.p-dialog .p-dialog-content {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  padding: 1.5rem;
+}
+
+.p-dialog .p-dialog-footer {
+  background-color: #f9fafb !important;
+  border-top: 1px solid #e5e7eb !important;
+  padding: 1rem 1.5rem;
+  border-radius: 0 0 12px 12px;
+}
+
+/* ==================== FOCUS RING CONSISTENCY ==================== */
+
+.p-inputtext:focus,
+.p-select:focus,
+.p-dropdown:focus,
+input:not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+input[type="checkbox"]:focus,
+input[type="radio"]:focus {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
+
+/* ====== layout / surface fixes for finance basic page ====== */
+
+/* make prime containers white */
+.p-component,
+.p-card,
+.p-panel,
+.p-fieldset,
+.p-tabview,
+.p-tabs {
+  background: #ffffff !important;
+  color: #0f172a !important; /* slate-900-ish */
+}
+
+/* tabs strip (the black bar you saw) */
+.p-tabs,
+.p-tabview-nav {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+/* tab item */
+.p-tab,
+.p-tabview-nav li .p-tabview-nav-link {
+  background: transparent !important;
+  color: #334155 !important;
+}
+
+/* active tab */
+.p-tab.p-tab-active,
+.p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  color: #0284c7 !important;
+  border-color: transparent transparent #0284c7 transparent !important;
+  background: #ffffff !important;
+}
+
+/* our inner "fieldset" boxes */
+.finance-basic-card,
+.fieldset,
+.finance-section {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.75rem;
+}
+
+/* dropdown panel white */
+.p-dropdown-panel,
+.p-select-panel {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* buttons keep tailwind-ish look */
+.p-button {
+  background: #0284c7 !important;
+  border: none !important;
+  color: #fff !important;
+}
+.p-button:hover {
+  background: #0369a1 !important;
+}
+
+/* 1) base surfacing – force light bg + dark text */
+:root {
+  --surface-ground: #f1f5f9;
+  --surface-card: #ffffff;
+  --surface-section: #ffffff;
+  --text-color: #0f172a;
+  --text-color-secondary: #475569;
+  --surface-border: #e2e8f0;
+  --content-border-radius: 0.75rem;
+}
+
+/* make sure the page background is light */
+body {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* 2) common panels/cards PrimeNG uses */
+.p-component,
+.p-card,
+.p-panel,
+.p-panel-content,
+.p-datatable,
+.p-datatable .p-datatable-thead > tr > th,
+.p-datatable .p-datatable-tbody > tr > td {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* 3) inputs & dropdowns */
+.p-inputtext,
+.p-inputnumber,
+.p-dropdown,
+.p-multiselect,
+.p-calendar,
+.p-select,
+.p-password {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.5rem !important;
+}
+
+.p-dropdown .p-dropdown-label {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* hover / focus */
+.p-inputtext:enabled:hover,
+.p-dropdown:not(.p-disabled):hover {
+  border-color: #3b82f6 !important;
+}
+.p-inputtext:enabled:focus,
+.p-dropdown.p-focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* 4) Tabs (your p-tabs / p-tablist) */
+.p-tabs,
+.p-tablist {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.p-tablist .p-tab {
+  background: transparent !important;
+  color: #475569 !important;
+}
+
+.p-tablist .p-tab.p-tab-active {
+  color: #0f172a !important;
+  border-bottom: 2px solid #2563eb !important;
+}
+
+/* 5) radios & toast dialog */
+.p-radiobutton .p-radiobutton-box {
+  border-color: #cbd5e1 !important;
+  background: #ffffff !important;
+}
+.p-radiobutton .p-radiobutton-box.p-highlight {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+}
+
+.p-toast,
+.p-confirm-dialog {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* 6) just your finance basic wrapper too, in case */
+.finance-basic-container,
+.finance-basic-container .data-section,
+.finance-basic-container .fieldset {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}

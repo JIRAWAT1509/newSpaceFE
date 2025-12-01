@@ -1,1 +1,1099 @@
-<p>system-contract works!</p>
+<!-- system-contract.component.html -->
+
+<div class="system-contract-container">
+  <!-- ==================== HEADER SECTION ==================== -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">ข้อมูลเพื่อการจัดทำสัญญา</h1>
+        <p class="page-subtitle">จัดการข้อมูลหลักสำหรับการสร้างสัญญา</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN CATEGORY CARDS (4 CARDS) ==================== -->
+  <div class="main-category-cards">
+    <!-- Card 1: Business Data -->
+    <div
+      class="category-card"
+      [class.active]="activeMainCategory === 'business'"
+      (click)="selectMainCategory('business')"
+    >
+      <div class="card-icon business-icon">
+        <i class="pi pi-building"></i>
+      </div>
+      <div class="card-content">
+        <h3 class="card-title">ข้อมูล Profit & Business Type</h3>
+        <p class="card-description">จัดการ Profit Center และประเภทธุรกิจ</p>
+        <div class="card-stats">
+          <span class="stat-badge">3 sections</span>
+          <span class="stat-count">{{ profitCenterCount + mainBusinessCount + subBusinessCount }} รายการ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Contract Types -->
+    <div
+      class="category-card"
+      [class.active]="activeMainCategory === 'contract'"
+      (click)="selectMainCategory('contract')"
+    >
+      <div class="card-icon contract-icon">
+        <i class="pi pi-file-edit"></i>
+      </div>
+      <div class="card-content">
+        <h3 class="card-title">ประเภทสัญญา</h3>
+        <p class="card-description">จัดการประเภทสัญญาและเงื่อนไข</p>
+        <div class="card-stats">
+          <span class="stat-count">{{ contractTypeCount }} รายการ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Signers -->
+    <div
+      class="category-card"
+      [class.active]="activeMainCategory === 'signers'"
+      (click)="selectMainCategory('signers')"
+    >
+      <div class="card-icon signer-icon">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="card-content">
+        <h3 class="card-title">รายชื่อผู้ลงนามในสัญญา</h3>
+        <p class="card-description">จัดการรายชื่อผู้ลงนามและตำแหน่ง</p>
+        <div class="card-stats">
+          <span class="stat-count">{{ signerCount }} รายการ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Cost Center -->
+    <div
+      class="category-card"
+      [class.active]="activeMainCategory === 'cost'"
+      (click)="selectMainCategory('cost')"
+    >
+      <div class="card-icon cost-icon">
+        <i class="pi pi-dollar"></i>
+      </div>
+      <div class="card-content">
+        <h3 class="card-title">Cost Center ค่าธรรมเนียม</h3>
+        <p class="card-description">จัดการ Cost Center และ IO</p>
+        <div class="card-stats">
+          <span class="stat-count">{{ costCenterCount }} รายการ</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CONTENT SECTION ==================== -->
+  <div class="content-section">
+    <!-- ==================== BUSINESS DATA SECTION ==================== -->
+    <div *ngIf="activeMainCategory === 'business'">
+      <!-- Sub-category Cards -->
+      <div class="sub-category-cards">
+        <!-- Profit Center -->
+        <div
+          class="sub-card"
+          [class.active]="activeSubCategory === 'profit'"
+          (click)="selectSubCategory('profit')"
+        >
+          <div class="sub-card-icon">
+            <i class="pi pi-briefcase"></i>
+          </div>
+          <div class="sub-card-content">
+            <h4 class="sub-card-title">Profit Center</h4>
+            <p class="sub-card-count">{{ profitCenterCount }} รายการ</p>
+          </div>
+        </div>
+
+        <!-- Main Business Type -->
+        <div
+          class="sub-card"
+          [class.active]="activeSubCategory === 'main-business'"
+          (click)="selectSubCategory('main-business')"
+        >
+          <div class="sub-card-icon">
+            <i class="pi pi-th-large"></i>
+          </div>
+          <div class="sub-card-content">
+            <h4 class="sub-card-title">ประเภทธุรกิจหลัก</h4>
+            <p class="sub-card-count">{{ mainBusinessCount }} รายการ</p>
+          </div>
+        </div>
+
+        <!-- Sub Business Type -->
+        <div
+          class="sub-card"
+          [class.active]="activeSubCategory === 'sub-business'"
+          (click)="selectSubCategory('sub-business')"
+        >
+          <div class="sub-card-icon">
+            <i class="pi pi-sitemap"></i>
+          </div>
+          <div class="sub-card-content">
+            <h4 class="sub-card-title">ประเภทธุรกิจย่อย</h4>
+            <p class="sub-card-count">{{ subBusinessCount }} รายการ</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Section for Business Data -->
+      <div class="data-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="pi" [ngClass]="{
+              'pi-briefcase': activeSubCategory === 'profit',
+              'pi-th-large': activeSubCategory === 'main-business',
+              'pi-sitemap': activeSubCategory === 'sub-business'
+            }"></i>
+            {{ getActiveSubCategoryTitle() }}
+          </h2>
+
+          <div class="section-actions">
+            <div class="search-box">
+              <i class="pi pi-search search-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="searchQuery"
+                [placeholder]="'ค้นหา...'"
+                class="search-input"
+              />
+            </div>
+            <p-button
+              label="เพิ่ม"
+              icon="pi pi-plus"
+              (onClick)="openAddDrawer()"
+              styleClass="p-button-primary"
+            ></p-button>
+          </div>
+        </div>
+
+        <!-- Profit Center Table -->
+        <div *ngIf="activeSubCategory === 'profit'" class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" />
+                </th>
+                <th>รหัส Profit Center</th>
+                <th>ชื่อ Profit Center</th>
+                <th>อัปเดตโดย</th>
+                <th>วันที่อัปเดต</th>
+                <th class="actions-column">การดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let item of getFilteredData()"
+                class="clickable-row"
+              >
+                <td (click)="$event.stopPropagation()">
+                  <input type="checkbox" />
+                </td>
+                <td (click)="openEditDrawer(item)">{{ item.COST_CENTER_CODE }}</td>
+                <td (click)="openEditDrawer(item)">{{ item.COST_CENTER_NAME }}</td>
+                <td (click)="openEditDrawer(item)">{{ item.UPD_BY }}</td>
+                <td (click)="openEditDrawer(item)">{{ formatDate(item.UPD_DATE) }}</td>
+                <td class="actions-column">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="info"
+                    (onClick)="openEditDrawer(item)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="danger"
+                    (onClick)="deleteItem(item)"
+                  ></p-button>
+                </td>
+              </tr>
+              <tr *ngIf="getFilteredData().length === 0">
+                <td colspan="6" class="empty-state">
+                  <i class="pi pi-inbox empty-icon"></i>
+                  <p>ไม่พบข้อมูล</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Main Business Type Table -->
+        <div *ngIf="activeSubCategory === 'main-business'" class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" />
+                </th>
+                <th>รหัสประเภทธุรกิจ</th>
+                <th>ชื่อประเภทธุรกิจ</th>
+                <th>อัปเดตโดย</th>
+                <th>วันที่อัปเดต</th>
+                <th class="actions-column">การดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let item of getFilteredData()"
+                class="clickable-row"
+              >
+                <td (click)="$event.stopPropagation()">
+                  <input type="checkbox" />
+                </td>
+                <td (click)="openEditDrawer(item)">{{ item.BUS_TYPE_CODE }}</td>
+                <td (click)="openEditDrawer(item)">{{ item.BUS_TYPE_NAME }}</td>
+                <td (click)="openEditDrawer(item)">{{ item.UPD_BY }}</td>
+                <td (click)="openEditDrawer(item)">{{ formatDate(item.UPD_DATE) }}</td>
+                <td class="actions-column">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="info"
+                    (onClick)="openEditDrawer(item)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="danger"
+                    (onClick)="deleteItem(item)"
+                  ></p-button>
+                </td>
+              </tr>
+              <tr *ngIf="getFilteredData().length === 0">
+                <td colspan="6" class="empty-state">
+                  <i class="pi pi-inbox empty-icon"></i>
+                  <p>ไม่พบข้อมูล</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Sub Business Type Table -->
+        <div *ngIf="activeSubCategory === 'sub-business'" class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" />
+                </th>
+                <th>รหัสประเภทธุรกิจย่อย</th>
+                <th>ชื่อประเภทธุรกิจย่อย</th>
+                <th>ประเภทธุรกิจหลัก</th>
+                <th>Profit Center</th>
+                <th>อัปเดตโดย</th>
+                <th>วันที่อัปเดต</th>
+                <th class="actions-column">การดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let item of getFilteredData()"
+                class="clickable-row"
+              >
+                <td (click)="$event.stopPropagation()">
+                  <input type="checkbox" />
+                </td>
+                <td (click)="openEditDrawer(item)">{{ item.BUS_SUBTYPE_CODE }}</td>
+                <td (click)="openEditDrawer(item)">{{ item.BUS_SUBTYPE_NAME }}</td>
+                <td (click)="openEditDrawer(item)">{{ item.BUS_TYPE_CODE }}</td>
+                <td (click)="openEditDrawer(item)">{{ item.COST_CENTER_NAME }}</td>
+                <td (click)="openEditDrawer(item)">{{ item.UPD_BY }}</td>
+                <td (click)="openEditDrawer(item)">{{ formatDate(item.UPD_DATE) }}</td>
+                <td class="actions-column">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="info"
+                    (onClick)="openEditDrawer(item)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="danger"
+                    (onClick)="deleteItem(item)"
+                  ></p-button>
+                </td>
+              </tr>
+              <tr *ngIf="getFilteredData().length === 0">
+                <td colspan="8" class="empty-state">
+                  <i class="pi pi-inbox empty-icon"></i>
+                  <p>ไม่พบข้อมูล</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CONTRACT TYPES SECTION ==================== -->
+    <div *ngIf="activeMainCategory === 'contract'">
+      <div class="data-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="pi pi-file-edit"></i>
+            ประเภทสัญญา
+          </h2>
+
+          <div class="section-actions">
+            <div class="search-box">
+              <i class="pi pi-search search-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="searchQuery"
+                [placeholder]="'ค้นหา...'"
+                class="search-input"
+              />
+            </div>
+            <p-button
+              label="เพิ่ม"
+              icon="pi pi-plus"
+              (onClick)="openAddContractModal()"
+              styleClass="p-button-primary"
+            ></p-button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" />
+                </th>
+                <th>รหัสประเภทสัญญา</th>
+                <th>ชื่อประเภทสัญญา</th>
+                <th>ประเภทสัญญาหลัก</th>
+                <th>Type</th>
+                <th>เงินประกันตกแต่ง</th>
+                <th>อัปเดตโดย</th>
+                <th>วันที่อัปเดต</th>
+                <th class="actions-column">การดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let item of getFilteredContractTypes()"
+                class="clickable-row"
+              >
+                <td (click)="$event.stopPropagation()">
+                  <input type="checkbox" />
+                </td>
+                <td (click)="openEditContractModal(item)">{{ item.TYPE_CODE }}</td>
+                <td (click)="openEditContractModal(item)">{{ item.TYPE_NAME }}</td>
+                <td (click)="openEditContractModal(item)">{{ item.MAIN_TYPE_DESC || '-' }}</td>
+                <td (click)="openEditContractModal(item)">
+                  <span class="badge" [ngClass]="{
+                    'badge-primary': item.TYPE_STATUS === 'R',
+                    'badge-warning': item.TYPE_STATUS === 'C'
+                  }">
+                    {{ item.TYPE_STATUS === 'R' ? 'Rent' : 'Consignment' }}
+                  </span>
+                </td>
+                <td (click)="openEditContractModal(item)">
+                  <span class="badge" [ngClass]="{
+                    'badge-success': item.DECORATION_INS_INC_VAT === '1',
+                    'badge-secondary': item.DECORATION_INS_INC_VAT === '0'
+                  }">
+                    {{ item.DECORATION_INS_INC_VAT === '1' ? 'Include VAT' : 'Exclude VAT' }}
+                  </span>
+                </td>
+                <td (click)="openEditContractModal(item)">{{ item.UPD_BY }}</td>
+                <td (click)="openEditContractModal(item)">{{ formatDate(item.UPD_DATE) }}</td>
+                <td class="actions-column">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="info"
+                    (onClick)="openEditContractModal(item)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="danger"
+                    (onClick)="deleteContractType(item)"
+                  ></p-button>
+                </td>
+              </tr>
+              <tr *ngIf="getFilteredContractTypes().length === 0">
+                <td colspan="9" class="empty-state">
+                  <i class="pi pi-inbox empty-icon"></i>
+                  <p>ไม่พบข้อมูล</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== SIGNERS SECTION ==================== -->
+    <div *ngIf="activeMainCategory === 'signers'">
+      <div class="data-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="pi pi-users"></i>
+            รายชื่อผู้ลงนามในสัญญา
+          </h2>
+
+          <div class="section-actions">
+            <div class="search-box">
+              <i class="pi pi-search search-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="searchQuery"
+                [placeholder]="'ค้นหา...'"
+                class="search-input"
+              />
+            </div>
+            <p-button
+              label="เพิ่ม"
+              icon="pi pi-plus"
+              (onClick)="openAddSignerDrawer()"
+              styleClass="p-button-primary"
+            ></p-button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" />
+                </th>
+                <th>ลำดับ</th>
+                <th>รายชื่อผู้ลงนาม</th>
+                <th>ตำแหน่งผู้ลงนาม</th>
+                <th>ประเภทการลงนาม</th>
+                <th>สถานะ</th>
+                <th>อัปเดตโดย</th>
+                <th>วันที่อัปเดต</th>
+                <th class="actions-column">การดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let item of getFilteredSigners()"
+                class="clickable-row"
+              >
+                <td (click)="$event.stopPropagation()">
+                  <input type="checkbox" />
+                </td>
+                <td (click)="openEditSignerDrawer(item)">{{ item.SEQ }}</td>
+                <td (click)="openEditSignerDrawer(item)">{{ item.REPRESENT }}</td>
+                <td (click)="openEditSignerDrawer(item)">{{ item.POSITION_NAME }}</td>
+                <td (click)="openEditSignerDrawer(item)">{{ item.REP_TYPE_NAME }}</td>
+                <td (click)="openEditSignerDrawer(item)">
+                  <span class="badge" [ngClass]="{
+                    'badge-success': item.STATUS === 'Y',
+                    'badge-secondary': item.STATUS === 'N'
+                  }">
+                    {{ item.STATUS_NAME }}
+                  </span>
+                </td>
+                <td (click)="openEditSignerDrawer(item)">{{ item.UPD_BY }}</td>
+                <td (click)="openEditSignerDrawer(item)">{{ formatDate(item.UPD_DATE) }}</td>
+                <td class="actions-column">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="info"
+                    (onClick)="openEditSignerDrawer(item)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="danger"
+                    (onClick)="deleteSigner(item)"
+                  ></p-button>
+                </td>
+              </tr>
+              <tr *ngIf="getFilteredSigners().length === 0">
+                <td colspan="9" class="empty-state">
+                  <i class="pi pi-inbox empty-icon"></i>
+                  <p>ไม่พบข้อมูล</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== COST CENTER SECTION ==================== -->
+    <div *ngIf="activeMainCategory === 'cost'">
+      <div class="data-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="pi pi-dollar"></i>
+            Cost Center ค่าธรรมเนียม
+          </h2>
+
+          <div class="section-actions">
+            <div class="search-box">
+              <i class="pi pi-search search-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="searchQuery"
+                [placeholder]="'ค้นหา...'"
+                class="search-input"
+              />
+            </div>
+            <p-button
+              label="เพิ่ม"
+              icon="pi pi-plus"
+              (onClick)="openAddCostCenterDrawer()"
+              styleClass="p-button-primary"
+            ></p-button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" />
+                </th>
+                <th>Cost Center</th>
+                <th>IO</th>
+                <th>รายละเอียด</th>
+                <th>เลขที่บัญชี</th>
+                <th>เลขที่บัญชีบริษัทที่เกี่ยวข้องกัน</th>
+                <th>อัปเดตโดย</th>
+                <th>วันที่อัปเดต</th>
+                <th class="actions-column">การดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let item of getFilteredCostCenters()"
+                class="clickable-row"
+              >
+                <td (click)="$event.stopPropagation()">
+                  <input type="checkbox" />
+                </td>
+                <td (click)="openEditCostCenterDrawer(item)">{{ item.COST_CENTER_CODE }}</td>
+                <td (click)="openEditCostCenterDrawer(item)">{{ item.IO }}</td>
+                <td (click)="openEditCostCenterDrawer(item)">{{ item.DESCRIPTION }}</td>
+                <td (click)="openEditCostCenterDrawer(item)">{{ item.ACC_NO }}</td>
+                <td (click)="openEditCostCenterDrawer(item)">{{ item.INTER_ACC_NO }}</td>
+                <td (click)="openEditCostCenterDrawer(item)">{{ item.UPD_BY }}</td>
+                <td (click)="openEditCostCenterDrawer(item)">{{ formatDate(item.UPD_DATE) }}</td>
+                <td class="actions-column">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="info"
+                    (onClick)="openEditCostCenterDrawer(item)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="danger"
+                    (onClick)="deleteCostCenter(item)"
+                  ></p-button>
+                </td>
+              </tr>
+              <tr *ngIf="getFilteredCostCenters().length === 0">
+                <td colspan="9" class="empty-state">
+                  <i class="pi pi-inbox empty-icon"></i>
+                  <p>ไม่พบข้อมูล</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Profit Center Modal -->
+<!-- <p-dialog
+  [(visible)]="profitCenterModalVisible"
+  [header]="isEditMode ? 'แก้ไข Profit Center' : 'เพิ่ม Profit Center'"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div class="modal-content">
+    <div class="form-field">
+      <label class="form-label required">รหัส Profit Center</label>
+      <input
+        type="text"
+        [(ngModel)]="profitCenterForm.COST_CENTER_CODE"
+        [disabled]="isEditMode"
+        class="form-input"
+        placeholder="กรอกรหัส Profit Center"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label required">ชื่อ Profit Center</label>
+      <input
+        type="text"
+        [(ngModel)]="profitCenterForm.COST_CENTER_NAME"
+        class="form-input"
+        placeholder="กรอกชื่อ Profit Center"
+      />
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        (onClick)="profitCenterModalVisible = false"
+        styleClass="p-button-text"
+      ></p-button>
+      <p-button
+        label="บันทึก"
+        icon="pi pi-check"
+        (onClick)="saveProfitCenter()"
+        styleClass="p-button-primary"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog> -->
+
+<!-- Main Business Type Modal -->
+<!-- <p-dialog
+  [(visible)]="mainBusinessModalVisible"
+  [header]="isEditMode ? 'แก้ไขประเภทธุรกิจหลัก' : 'เพิ่มประเภทธุรกิจหลัก'"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div class="modal-content">
+    <div class="form-field">
+      <label class="form-label required">รหัสประเภทธุรกิจ</label>
+      <input
+        type="text"
+        [(ngModel)]="mainBusinessForm.BUS_TYPE_CODE"
+        [disabled]="isEditMode"
+        class="form-input"
+        placeholder="กรอกรหัสประเภทธุรกิจ"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label required">ชื่อประเภทธุรกิจ</label>
+      <input
+        type="text"
+        [(ngModel)]="mainBusinessForm.BUS_TYPE_NAME"
+        class="form-input"
+        placeholder="กรอกชื่อประเภทธุรกิจ"
+      />
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        (onClick)="mainBusinessModalVisible = false"
+        styleClass="p-button-text"
+      ></p-button>
+      <p-button
+        label="บันทึก"
+        icon="pi pi-check"
+        (onClick)="saveMainBusiness()"
+        styleClass="p-button-primary"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog> -->
+
+<!-- Sub Business Type Modal -->
+<!-- <p-dialog
+  [(visible)]="subBusinessModalVisible"
+  [header]="isEditMode ? 'แก้ไขประเภทธุรกิจย่อย' : 'เพิ่มประเภทธุรกิจย่อย'"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div class="modal-content">
+    <div class="form-field">
+      <label class="form-label required">รหัสประเภทธุรกิจย่อย</label>
+      <input
+        type="text"
+        [(ngModel)]="subBusinessForm.BUS_SUBTYPE_CODE"
+        [disabled]="isEditMode"
+        class="form-input"
+        placeholder="กรอกรหัสประเภทธุรกิจย่อย"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label required">ชื่อประเภทธุรกิจย่อย</label>
+      <input
+        type="text"
+        [(ngModel)]="subBusinessForm.BUS_SUBTYPE_NAME"
+        class="form-input"
+        placeholder="กรอกชื่อประเภทธุรกิจย่อย"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label required">ประเภทธุรกิจหลัก</label>
+      <p-select
+        [(ngModel)]="subBusinessForm.BUS_TYPE_CODE"
+        [options]="mainBusinessTypes"
+        optionLabel="BUS_TYPE_NAME"
+        optionValue="BUS_TYPE_CODE"
+        placeholder="เลือกประเภทธุรกิจหลัก"
+        [style]="{ width: '100%' }"
+      ></p-select>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label required">Profit Center</label>
+      <p-select
+        [(ngModel)]="subBusinessForm.COST_CENTER_CODE"
+        [options]="profitCenters"
+        optionLabel="COST_CENTER_NAME"
+        optionValue="COST_CENTER_CODE"
+        placeholder="เลือก Profit Center"
+        [style]="{ width: '100%' }"
+      ></p-select>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        (onClick)="subBusinessModalVisible = false"
+        styleClass="p-button-text"
+      ></p-button>
+      <p-button
+        label="บันทึก"
+        icon="pi pi-check"
+        (onClick)="saveSubBusiness()"
+        styleClass="p-button-primary"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog> -->
+
+<app-business-form-drawer
+  [isOpen]="businessDrawerOpen"
+  [mode]="drawerMode"
+  [formType]="activeSubCategory"
+  [item]="selectedItem"
+  [profitCenters]="profitCenters"
+  [mainBusinessTypes]="mainBusinessTypes"
+  (close)="closeBusinessDrawer()"
+  (save)="onSaveBusinessItem($event)"
+></app-business-form-drawer>
+
+
+<!-- Contract Type Modal (Simplified - Full version would be much larger) -->
+<!-- <p-dialog
+  [(visible)]="contractTypeModalVisible"
+  [header]="isEditMode ? 'แก้ไขประเภทสัญญา' : 'เพิ่มประเภทสัญญา'"
+  [modal]="true"
+  [style]="{ width: '800px', maxHeight: '90vh' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div class="modal-content" style="max-height: 70vh; overflow-y: auto;">
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label required">รหัสประเภทสัญญา</label>
+        <input
+          type="text"
+          [(ngModel)]="contractTypeForm.TYPE_CODE"
+          [disabled]="isEditMode"
+          class="form-input"
+          placeholder="กรอกรหัสประเภทสัญญา"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label required">ชื่อประเภทสัญญา</label>
+        <input
+          type="text"
+          [(ngModel)]="contractTypeForm.TYPE_NAME"
+          class="form-input"
+          placeholder="กรอกชื่อประเภทสัญญา"
+        />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">ประเภทสัญญาหลัก</label>
+      <input
+        type="text"
+        [(ngModel)]="contractTypeForm.MAIN_TYPE"
+        class="form-input"
+        placeholder="กรอกประเภทสัญญาหลัก"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label required">Type (สำหรับทำงบประมาณ)</label>
+      <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+          <input
+            type="radio"
+            [(ngModel)]="contractTypeForm.TYPE_STATUS"
+            value="R"
+            name="typeStatus"
+          />
+          <span>Rent</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+          <input
+            type="radio"
+            [(ngModel)]="contractTypeForm.TYPE_STATUS"
+            value="C"
+            name="typeStatus"
+          />
+          <span>Consignment</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-field-switch">
+      <label class="form-label required">เงินประกันตกแต่ง</label>
+      <label class="toggle-switch">
+        <input
+          type="checkbox"
+          [checked]="contractTypeForm.DECORATION_INS_INC_VAT === '1'"
+          (change)="contractTypeForm.DECORATION_INS_INC_VAT = contractTypeForm.DECORATION_INS_INC_VAT === '1' ? '0' : '1'"
+        />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <p style="color: #6b7280; font-size: 0.875rem; margin: 1rem 0;">
+      หมายเหตุ: ฟอร์มเอกสารและเงื่อนไขตามสัญญาจะถูกเพิ่มในเวอร์ชันถัดไป
+    </p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        (onClick)="contractTypeModalVisible = false"
+        styleClass="p-button-text"
+      ></p-button>
+      <p-button
+        label="บันทึก"
+        icon="pi pi-check"
+        (onClick)="saveContractType()"
+        styleClass="p-button-primary"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog> -->
+<app-contract-type-wizard
+  [isOpen]="contractTypeWizardOpen"
+  [mode]="contractTypeWizardMode"
+  [contractType]="selectedContractType"
+  (close)="onContractTypeWizardClose()"
+  (save)="onContractTypeWizardSave($event)"
+></app-contract-type-wizard>
+<!-- Signer Modal -->
+<!-- <p-dialog
+  [(visible)]="signerModalVisible"
+  [header]="isEditMode ? 'แก้ไขรายชื่อผู้ลงนาม' : 'เพิ่มรายชื่อผู้ลงนาม'"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div class="modal-content">
+    <div class="form-field">
+      <label class="form-label required">รายชื่อผู้ลงนาม (ชื่อ - สกุล)</label>
+      <input
+        type="text"
+        [(ngModel)]="signerForm.REPRESENT"
+        class="form-input"
+        placeholder="กรอกรายชื่อผู้ลงนาม"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label required">ตำแหน่งผู้ลงนาม</label>
+      <input
+        type="text"
+        [(ngModel)]="signerForm.POSITION_NAME"
+        class="form-input"
+        placeholder="กรอกตำแหน่งผู้ลงนาม"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label required">ประเภทการลงนาม</label>
+      <p-select
+        [(ngModel)]="signerForm.REP_TYPE"
+        [options]="repTypes"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="เลือกประเภทการลงนาม"
+        [style]="{ width: '100%' }"
+      ></p-select>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label required">สถานะ</label>
+      <p-select
+        [(ngModel)]="signerForm.STATUS"
+        [options]="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="เลือกสถานะ"
+        [style]="{ width: '100%' }"
+      ></p-select>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        (onClick)="signerModalVisible = false"
+        styleClass="p-button-text"
+      ></p-button>
+      <p-button
+        label="บันทึก"
+        icon="pi pi-check"
+        (onClick)="saveSigner()"
+        styleClass="p-button-primary"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog> -->
+
+<app-signer-form-drawer
+  [isOpen]="signerDrawerOpen"
+  [mode]="drawerMode"
+  [signer]="selectedSigner"
+  (close)="closeSignerDrawer()"
+  (save)="onSaveSigner($event)"
+></app-signer-form-drawer>
+
+<!-- Cost Center Modal -->
+<!-- <p-dialog
+  [(visible)]="costCenterModalVisible"
+  [header]="isEditMode ? 'แก้ไข Cost Center' : 'เพิ่ม Cost Center'"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div class="modal-content">
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label required">Cost Center</label>
+        <input
+          type="text"
+          [(ngModel)]="costCenterForm.COST_CENTER_CODE"
+          [disabled]="isEditMode"
+          class="form-input"
+          placeholder="กรอก Cost Center"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label required">IO</label>
+        <input
+          type="text"
+          [(ngModel)]="costCenterForm.IO"
+          class="form-input"
+          placeholder="กรอก IO"
+        />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">รายละเอียด</label>
+      <input
+        type="text"
+        [(ngModel)]="costCenterForm.DESCRIPTION"
+        class="form-input"
+        placeholder="กรอกรายละเอียด"
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">เลขที่บัญชี</label>
+        <input
+          type="text"
+          [(ngModel)]="costCenterForm.ACC_NO"
+          class="form-input"
+          placeholder="กรอกเลขที่บัญชี"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">เลขที่บัญชีบริษัทที่เกี่ยวข้องกัน</label>
+        <input
+          type="text"
+          [(ngModel)]="costCenterForm.INTER_ACC_NO"
+          class="form-input"
+          placeholder="กรอกเลขที่บัญชี"
+        />
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        (onClick)="costCenterModalVisible = false"
+        styleClass="p-button-text"
+      ></p-button>
+      <p-button
+        label="บันทึก"
+        icon="pi pi-check"
+        (onClick)="saveCostCenter()"
+        styleClass="p-button-primary"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog> -->
+
+<app-cost-center-form-drawer
+  [isOpen]="costCenterDrawerOpen"
+  [mode]="drawerMode"
+  [costCenter]="selectedCostCenter"
+  (close)="closeCostCenterDrawer()"
+  (save)="onSaveCostCenter($event)"
+></app-cost-center-form-drawer>
+

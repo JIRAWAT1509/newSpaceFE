@@ -18,7 +18,22 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   // ============================================
   {
     primary_content: 'sales',
-    secondary_content: []
+    secondary_content: [
+{
+        name: 'sales_dashboard',
+        icon: 'assets/icons/business-outline.svg',
+        route: '/sales/dashboard',
+        // sub: [
+        //   {
+        //     name: 'contract_preparation_data',
+        //     route: '/setting/system/contract',
+        //     hasDeeper: true,
+        //     deeperNote: 'Contains: Profit center, Business types, Categories, Sales type, Contract types, Product groups, Signatories, Cost center'
+        //   }
+        // ]
+      },
+
+    ]
   },
 
   // ============================================
@@ -311,113 +326,118 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     ]
   },
 
-  // ============================================
+// ============================================
   // 7. SETTING
   // ============================================
-{
-  primary_content: 'setting',
-  secondary_content: [
-    // --- USER SETTING ---
-    {
-      name: 'user_accounts',
-      icon: 'assets/icons/briefcase-outline.svg',
-      sub: [
-        {
-          name: 'user_data_management',
-          route: '/setting/user-accounts/data',
-          hasDeeper: true,
-          deeperNote: 'Contains: User setup, User groups, Display preferences'
-        },
-        {
-          name: 'roles_permissions',
-          route: '/setting/user-accounts/roles',
-          hasDeeper: true,
-          deeperNote: 'Contains: Permissions, Email recipients, Positions, Access scope, Approval period'
-        }
-      ]
-    },
+  {
+    primary_content: 'setting',
+    secondary_content: [
+      // --- USER SETTING ---
+      {
+        name: 'user_accounts',
+        icon: 'assets/icons/briefcase-outline.svg',
+        sub: [
+          {
+            name: 'user_data_management',
+            route: '/setting/user-accounts/data',
+            hasDeeper: true,
+            deeperNote: 'Contains: User setup, User groups, Display preferences'
+          },
+          {
+            name: 'roles_permissions',
+            route: '/setting/user-accounts/roles',
+            hasDeeper: true,
+            deeperNote: 'Contains: Permissions, Email recipients, Positions, Access scope, Approval period'
+          }
+        ]
+      },
 
-    // --- COMPANY SETTING ---
-    {
-      name: 'company_info',
-      icon: 'assets/icons/clipboard-outline.svg',
-      sub: [
-        {
-          name: 'company_data',
-          route: '/setting/company/data',
-          hasDeeper: true,
-          deeperNote: 'Contains: Company, Legal entity, Branches, Structure, Partners, New branch'
-        },
-        {
-          name: 'bank_info',
-          route: '/setting/company/bank',
-          hasDeeper: true,
-          deeperNote: 'Contains: Banks, Bank branches, Deposit codes'
-        },
-        {
-          name: 'finance_revenue',
-          route: '/setting/company/finance-revenue',
-          hasDeeper: true,
-          deeperNote: 'Contains: Revenue, Types, Mapping, Groups, Guarantee'
-        },
-        {
-          name: 'customer_info',
-          route: '/setting/company/customer'
-        }
-      ]
-    },
+      // --- COMPANY SETTING ---
+      {
+        name: 'company_info',
+        icon: 'assets/icons/clipboard-outline.svg',
+        sub: [
+          {
+            name: 'company_data',
+            route: '/setting/company/data',
+            hasDeeper: true,
+            deeperNote: 'Contains: Company, Legal entity, Branches, Structure, Partners, New branch'
+          },
+          {
+            name: 'bank_info',
+            route: '/setting/company/bank',
+            hasDeeper: true,
+            deeperNote: 'Contains: Banks, Bank branches, Deposit codes'
+          },
+          // ⛔ finance_revenue ถูกลบตามที่ขอ
+          {
+            name: 'customer_info',
+            route: '/setting/company/customer'
+          }
+        ]
+      },
 
-    // --- SYSTEM SETTING ---
+      // --- SYSTEM SETTING ---
+      {
+        name: 'contract_data',
+        icon: 'assets/icons/business-outline.svg',
+        // ✅ ให้คลิกที่ชั้นนี้ได้เลย
+        route: '/setting/system/contract',
+        sub: [
+          {
+            name: 'contract_preparation_data',
+            route: '/setting/system/contract',
+            hasDeeper: true,
+            deeperNote: 'Contains: Profit center, Business types, Categories, Sales type, Contract types, Product groups, Signatories, Cost center'
+          }
+        ]
+      },
+      {
+  name: 'finance_system_data',
+  icon: 'assets/icons/clipboard-outline.svg',
+
+  sub: [
     {
-      name: 'contract_data',
-      icon: 'assets/icons/business-outline.svg',
-      sub: [
-        {
-          name: 'contract_preparation_data',
-          route: '/setting/system/contract',
-          hasDeeper: true,
-          deeperNote: 'Contains: Profit center, Business types, Categories, Sales type, Contract types, Product groups, Signatories, Cost center'
-        }
-      ]
+      name: 'finance_basic_data',           // ข้อมูลพื้นฐาน
+      route: '/setting/system/finance/basic',
+      hasDeeper: true,
+      deeperNote: 'ข้อมูลพื้นฐานทางการเงิน เช่น รหัสสาขา, เลขที่เอกสารพื้นฐาน, ค่า default ต่าง ๆ'
     },
     {
-      name: 'finance_system_data',
-      icon: 'assets/icons/clipboard-outline.svg',
-      sub: [
-        {
-          name: 'finance_data_except_revenue',
-          route: '/setting/system/finance',
-          hasDeeper: true,
-          deeperNote: 'Contains: Basic data, Branch data, Document types, Numbering, Payment types, Debt reasons, Credit terms, VAT, WHT, Currency, Period control, Account numbers'
-        }
-      ]
+      name: 'finance_revenue_data',        // รายได้
+      route: '/setting/system/finance/revenue',
+      hasDeeper: true,
+      deeperNote: 'โครงสร้างรายได้, กลุ่มรายได้, mapping รายได้'
     },
     {
-      name: 'budget_management',
-      icon: 'assets/icons/briefcase-outline.svg',
-      sub: [
-        {
-          name: 'budget_setup',
-          route: '/setting/system/budget',
-          hasDeeper: true,
-          deeperNote: 'Contains: Budget revenue, Budget area, Close period, Collect data, New budget collection'
-        }
-      ]
+      name: 'finance_tax_data',            // ภาษี
+      route: '/setting/system/finance/tax',
+      hasDeeper: true,
+      deeperNote: 'ตั้งค่า VAT, WHT, ประเภทภาษี, อัตราภาษี'
     },
     {
-      name: 'interface_configuration',
-      icon: 'assets/icons/business-outline.svg',
-      sub: [
-        {
-          name: 'interface_settings',
-          route: '/setting/system/interface',
-          hasDeeper: true,
-          deeperNote: 'Contains: 13 interface configuration items (Receipt VAT, Credit receipt, Invoice, Customer, RPA, FTP, etc.)'
-        }
-      ]
+      name: 'finance_document_type',       // ประเภทเอกสาร
+      route: '/setting/system/finance/document-type',
+      hasDeeper: true,
+      deeperNote: 'ประเภทเอกสารทางการเงิน เช่น ใบแจ้งหนี้, ใบเสร็จ, ใบลดหนี้'
     }
   ]
-}
+},
+
+      {
+        name: 'interface_configuration',
+        icon: 'assets/icons/business-outline.svg',
+        sub: [
+          {
+            name: 'interface_settings',
+            route: '/setting/system/interface',
+            hasDeeper: true,
+            deeperNote: 'Contains: 13 interface configuration items (Receipt VAT, Credit receipt, Invoice, Customer, RPA, FTP, etc.)'
+          }
+        ]
+      }
+    ]
+  }
 ];
 
 /**

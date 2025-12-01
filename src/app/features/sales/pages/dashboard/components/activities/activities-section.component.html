@@ -1,0 +1,201 @@
+<!-- activities-section.component.html - CORRECTED VERSION -->
+
+<div class="activities-section-container">
+
+  <!-- ==================== LEFT SIDE: CALENDAR & TEAM FEED (60%) ==================== -->
+  <div class="left-panel">
+
+    <!-- CALENDAR SECTION -->
+    <div class="calendar-section">
+      <div class="calendar-header">
+        <div class="calendar-title-group">
+          <h3 class="calendar-title">
+            {{ calendarView() === 'month' ? 'ปฏิทินรายเดือน' : 'ปฏิทินรายสัปดาห์' }}
+          </h3>
+          <p class="calendar-subtitle">
+            {{ calendarView() === 'month' ? 'Monthly Calendar' : 'Weekly Calendar' }}
+          </p>
+        </div>
+
+        <div class="calendar-controls">
+          <!-- View Toggle -->
+          <button
+            class="btn-calendar-toggle"
+            (click)="toggleCalendarView()"
+            title="สลับมุมมอง"
+          >
+            <i [class]="calendarView() === 'month' ? 'pi pi-calendar' : 'pi pi-list'"></i>
+            <span>{{ calendarView() === 'month' ? 'Week' : 'Month' }}</span>
+          </button>
+
+          <!-- Navigation -->
+          <div class="calendar-nav">
+            <button
+              class="btn-calendar-nav"
+              (click)="navigateCalendar('prev')"
+              title="ก่อนหน้า"
+            >
+              <i class="pi pi-chevron-left"></i>
+            </button>
+
+            <button
+              class="btn-today"
+              (click)="goToToday()"
+            >
+              วันนี้
+            </button>
+
+            <button
+              class="btn-calendar-nav"
+              (click)="navigateCalendar('next')"
+              title="ถัดไป"
+            >
+              <i class="pi pi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendar Component -->
+      <div class="calendar-content">
+        <app-activity-calendar
+          [activities]="calendarActivities()"
+          [view]="calendarView()"
+          [currentDate]="currentDate()"
+          [selectedDate]="selectedDate()"
+          (activityClick)="selectActivity($event)"
+          (dayClick)="onDayClick($event)"
+        ></app-activity-calendar>
+      </div>
+    </div>
+
+    <!-- TEAM ACTIVITY FEED SECTION -->
+    <div class="team-feed-section">
+      <div class="team-feed-header">
+        <div class="team-feed-title-group">
+          <h3 class="team-feed-title">
+            <i class="pi pi-users"></i>
+            กิจกรรมทีม
+          </h3>
+          <p class="team-feed-subtitle">Team Activity</p>
+        </div>
+
+        <div class="team-feed-info">
+          <span class="feed-count">{{ teamActivityFeed().length }} รายการล่าสุด</span>
+          <i class="pi pi-sync feed-refresh-icon"></i>
+        </div>
+      </div>
+
+      <!-- Team Feed Component -->
+      <div class="team-feed-content">
+        <app-team-activity-feed
+          [feedItems]="teamActivityFeed()"
+          (activityClick)="selectActivity($event)"
+        ></app-team-activity-feed>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== RIGHT SIDE: ACTIVITY LIST (40%) ==================== -->
+  <div class="right-panel">
+
+    <!-- HEADER WITH SELECTED DATE BADGE & ADD BUTTON -->
+    <div class="list-header">
+      <div class="header-left">
+        <h3 class="list-title">รายการกิจกรรม</h3>
+
+        <!-- Selected Date Badge -->
+        @if (selectedDate()) {
+          <div class="selected-date-badge">
+            <i class="pi pi-calendar"></i>
+            <span>{{ selectedDateText() }}</span>
+            <button class="btn-clear-date" (click)="clearDateFilter()">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Add Button -->
+      <button
+        class="btn-add-activity"
+        (click)="openCreateDrawer()"
+        title="เพิ่มกิจกรรม"
+      >
+        <i class="pi pi-plus"></i>
+        <span>เพิ่ม</span>
+      </button>
+    </div>
+
+    <!-- FILTERS SECTION (REPLACES OLD TABS) -->
+    <div class="filters-section">
+      <app-activity-filters
+        [activities]="activities()"
+        [currentUser]="currentUser()"
+        (filtersChange)="onFiltersChange($event)"
+      ></app-activity-filters>
+    </div>
+
+    <!-- ACTIVITY LIST SECTION -->
+    <div class="activity-list-section">
+      @if (isLoading()) {
+        <div class="loading-state">
+          <i class="pi pi-spin pi-spinner"></i>
+          <p>กำลังโหลดข้อมูล...</p>
+        </div>
+      } @else if (!activityCounts().hasActivities) {
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="pi pi-calendar-times"></i>
+          </div>
+          <h3 class="empty-title">ไม่มีกิจกรรม</h3>
+          <p class="empty-text">
+            @if (selectedDate()) {
+              ไม่มีกิจกรรมในวันที่เลือก
+            } @else if (activeFilters().types.length > 0 || activeFilters().statuses.length > 0) {
+              ไม่พบกิจกรรมที่ตรงกับตัวกรอง
+            } @else {
+              ไม่มีกิจกรรมในขณะนี้
+            }
+          </p>
+          @if (!selectedDate() && activeFilters().types.length === 0 && activeFilters().statuses.length === 0) {
+            <button class="btn-create-empty" (click)="openCreateDrawer()">
+              <i class="pi pi-plus"></i>
+              <span>สร้างกิจกรรมใหม่</span>
+            </button>
+          }
+        </div>
+      } @else {
+        <app-activity-list
+          [activities]="filteredActivities()"
+          [selectedId]="selectedActivityId()"
+          [currentUser]="currentUser()"
+          (activitySelect)="selectActivity($event)"
+          (activityEdit)="openEditDrawer($event)"
+          (activityDelete)="deleteActivity($event)"
+          (statusUpdate)="updateActivityStatus($event.id, $event.status, $event.reason, $event.finishNote)"
+        ></app-activity-list>
+      }
+    </div>
+  </div>
+
+  <!-- ==================== DRAWER: CREATE/EDIT FORM ==================== -->
+  @if (isDrawerOpen()) {
+    <div class="drawer-overlay" (click)="closeDrawer()"></div>
+
+    <div class="drawer-container" [class.open]="isDrawerOpen()">
+      <div class="drawer-content">
+        <app-activity-drawer
+          [mode]="drawerMode()"
+          [activity]="selectedActivity()"
+          [users]="users()"
+          [roles]="roles()"
+          [currentUser]="currentUser()"
+          (save)="drawerMode() === 'create' ? createActivity($event) : updateActivity(selectedActivityId()!, $event)"
+          (cancel)="closeDrawer()"
+        ></app-activity-drawer>
+      </div>
+    </div>
+  }
+
+</div>

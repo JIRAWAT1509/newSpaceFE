@@ -1,0 +1,16 @@
+<div class="floor-status-bar-container">
+  <div class="status-bar">
+    @for (status of visibleStatuses(); track status.id) {
+      <div
+        class="status-segment"
+        [style.width.%]="getBarWidth(status)"
+        [style.backgroundColor]="status.color"
+        [title]="status.labelTh + ': ' + status.count + ' (' + formatPercentage(status.percentage) + ')'"
+      >
+        @if (status.percentage >= 10) {
+          <span class="segment-text">{{ formatPercentage(status.percentage) }}</span>
+        }
+      </div>
+    }
+  </div>
+</div>

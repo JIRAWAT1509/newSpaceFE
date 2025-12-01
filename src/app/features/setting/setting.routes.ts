@@ -23,7 +23,7 @@ export const SETTING_ROUTES: Routes = [
   // NOTE: This page should show listing/cards for: Permissions, Email recipients, Positions, Access scope, Approval period
   {
     path: 'user-accounts/roles',
-    loadComponent: () => import('./pages/user-accounts/user-accounts-roles/user-accounts-roles.component').then(m => m.UserAccountsRolesComponent)
+    loadComponent: () => import('./pages/user-accounts/user-accounts-roles/role-permission.component').then(m => m.RolePermissionComponent)
   },
 
   // ============================================
@@ -77,14 +77,34 @@ export const SETTING_ROUTES: Routes = [
     path: 'system/finance',
     loadComponent: () => import('./pages/system/system-finance/system-finance.component').then(m => m.SystemFinanceComponent)
   },
+{
+  path: 'system/finance/basic',
+  loadComponent: () => import('./pages/finance/basic/basic.component')
+    .then(m => m.BasicComponent)
+},
+{
+  path: 'system/finance/revenue',
+  loadComponent: () => import('./pages/finance/revenue/revenue.component')
+    .then(m => m.RevenueComponent)
+},
+{
+  path: 'system/finance/tax',
+  loadComponent: () => import('./pages/finance/tax/tax.component')
+    .then(m => m.TaxComponent)
+},
+{
+  path: 'system/finance/document-type',
+  loadComponent: () => import('./pages/finance/document-type/document-type.component')
+    .then(m => m.DocumentTypeComponent)
+},
 
   // Budget Management
   // NOTE: This page should show listing/cards for: Budget revenue, Budget area, Close period,
   // Collect data, New budget collection (5 items)
-  {
-    path: 'system/budget',
-    loadComponent: () => import('./pages/system/system-budget/system-budget.component').then(m => m.SystemBudgetComponent)
-  },
+  // {
+  //   path: 'system/budget',
+  //   loadComponent: () => import('./pages/system/system-budget/system-budget.component').then(m => m.SystemBudgetComponent)
+  // },
 
   // Interface Configuration
   // NOTE: This page should show listing/cards for: Receipt VAT, Credit receipt, Invoice,

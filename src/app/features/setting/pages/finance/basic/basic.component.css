@@ -1,0 +1,232 @@
+.finance-basic-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* header */
+.header-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 .25rem 0;
+  color: #1f2937;
+}
+.page-subtitle {
+  margin: 0;
+  color: #6b7280;
+  font-size: .875rem;
+}
+
+/* cards */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.summary-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.summary-card:hover {
+  transform: translateY(-2px);
+}
+.summary-card.active {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+  box-shadow: 0 4px 12px rgba(59,130,246,.15);
+}
+.card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 1.25rem;
+}
+.card-icon.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.card-icon.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.card-icon.green { background: linear-gradient(135deg, #10b981, #059669); }
+.card-icon.orange { background: linear-gradient(135deg, #f97316, #ea580c); }
+.card-icon.teal { background: linear-gradient(135deg, #14b8a6, #0f766e); }
+
+.card-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: .15rem;
+}
+.card-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+.card-sublabel {
+  font-size: .7rem;
+  text-transform: uppercase;
+  color: #9ca3af;
+  letter-spacing: .05em;
+}
+
+/* data section */
+.data-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem 1.5rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+.section-title {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.section-title i {
+  color: #3b82f6;
+}
+.section-actions {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+}
+.search-box {
+  position: relative;
+}
+.search-input {
+  padding-left: 2rem;
+}
+.search-icon {
+  position: absolute;
+  left: .6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+/* table wrapper */
+.data-table-wrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* empty / loading */
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  color: #6b7280;
+}
+.loading-icon,
+.empty-icon {
+  font-size: 2.5rem;
+  color: #3b82f6;
+}
+.empty-icon { color: #d1d5db; }
+
+.actions-column {
+  text-align: center;
+}
+
+.badge {
+  display: inline-block;
+  padding: .2rem .6rem;
+  border-radius: 9999px;
+  font-size: .7rem;
+  font-weight: 600;
+}
+.badge-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+.badge-secondary {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+@media (max-width: 1024px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .section-actions {
+    width: 100%;
+  }
+}
+.basic-form-wrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  background: #fff;
+}
+
+.basic-form-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.basic-form-header h3 {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+
+.form-field label {
+  font-size: .75rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.fieldset {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.2rem 1.1rem;
+  background: #fff;
+}
+
+.fieldset-title {
+  font-weight: 600;
+  margin-bottom: .75rem;
+  color: #111827;
+}

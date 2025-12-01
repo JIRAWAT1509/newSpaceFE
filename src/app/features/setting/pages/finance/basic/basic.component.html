@@ -1,0 +1,679 @@
+<div class="finance-basic-container">
+  <!-- Toast + Confirm -->
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">Finance Basic Management</h1>
+        <p class="page-subtitle">
+          จัดการข้อมูลพื้นฐานทางการเงิน และข้อมูลอ้างอิง
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature cards -->
+  <div class="summary-cards">
+    <div
+      class="summary-card"
+      [class.active]="selectedFeature === 'master'"
+      (click)="selectFeature('master')"
+    >
+      <div class="card-icon blue">
+        <i class="pi pi-database"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">ข้อมูลพื้นฐาน</div>
+        <div class="card-value">{{ baseMaster.length }}</div>
+        <div class="card-sublabel">BASE MASTER</div>
+      </div>
+    </div>
+
+    <div
+      class="summary-card"
+      [class.active]="selectedFeature === 'branch-master'"
+      (click)="selectFeature('branch-master')"
+    >
+      <div class="card-icon purple">
+        <i class="pi pi-sitemap"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">ข้อมูลพื้นฐานระดับสาขา</div>
+        <div class="card-value">{{ branchMaster.length }}</div>
+        <div class="card-sublabel">BRANCH LEVEL</div>
+      </div>
+    </div>
+
+    <div
+      class="summary-card"
+      [class.active]="selectedFeature === 'currency'"
+      (click)="selectFeature('currency')"
+    >
+      <div class="card-icon green">
+        <i class="pi pi-money-bill"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">สกุลเงิน</div>
+        <div class="card-value">{{ currencies.length }}</div>
+        <div class="card-sublabel">CURRENCIES</div>
+      </div>
+    </div>
+
+    <div
+      class="summary-card"
+      [class.active]="selectedFeature === 'credit-note-reason'"
+      (click)="selectFeature('credit-note-reason')"
+    >
+      <div class="card-icon orange">
+        <i class="pi pi-book"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">สาเหตุการลดหนี้</div>
+        <div class="card-value">{{ creditNoteReasons.length }}</div>
+        <div class="card-sublabel">CREDIT NOTE REASONS</div>
+      </div>
+    </div>
+
+    <div
+      class="summary-card"
+      [class.active]="selectedFeature === 'credit-term'"
+      (click)="selectFeature('credit-term')"
+    >
+      <div class="card-icon teal">
+        <i class="pi pi-calendar"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">Credit Term</div>
+        <div class="card-value">{{ creditTerms.length }}</div>
+        <div class="card-sublabel">PAYMENT TERMS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data section -->
+  <div class="data-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="pi pi-list"></i>
+        <ng-container [ngSwitch]="selectedFeature">
+          <span *ngSwitchCase="'master'">ข้อมูลพื้นฐาน</span>
+          <span *ngSwitchCase="'branch-master'">ข้อมูลพื้นฐานระดับสาขา</span>
+          <span *ngSwitchCase="'currency'">สกุลเงิน</span>
+          <span *ngSwitchCase="'credit-note-reason'">สาเหตุการลดหนี้</span>
+          <span *ngSwitchCase="'credit-term'">Credit Term</span>
+        </ng-container>
+      </h2>
+
+      <div class="section-actions">
+        <div class="search-box">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="searchQuery"
+            placeholder="Search..."
+            class="search-input"
+          />
+        </div>
+        <p-button
+          label="Add"
+          icon="pi pi-plus"
+          (onClick)="openCreate()"
+        ></p-button>
+      </div>
+    </div>
+
+    <!-- 1) Base master -->
+<div *ngIf="selectedFeature === 'master'" class="basic-form-wrapper">
+  <div class="basic-form-header">
+    <h3>ข้อมูลพื้นฐาน</h3>
+    <div class="actions">
+      <p-button label="Save" icon="pi pi-save" (onClick)="saveBaseForm()"></p-button>
+    </div>
+  </div>
+
+    <p-tabs [(value)]="activeTab" class="w-full">
+    <p-tablist>
+      <p-tab value="company">Company</p-tab>
+      <p-tab value="misc1">เบ็ดเตล็ด 1</p-tab>
+      <p-tab value="misc2">เบ็ดเตล็ด 2</p-tab>
+      <p-tab value="misc3">เบ็ดเตล็ด 3</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- TAB 1: Company -->
+      <p-tabpanel value="company">
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="form-field md:col-span-2">
+            <label class="form-label">* เลขประจำตัวผู้เสียภาษี</label>
+            <input pInputText [(ngModel)]="baseForm.taxId" maxlength="13" class="w-full" />
+          </div>
+
+          <div class="form-field md:col-span-2">
+            <label class="form-label">* ชื่อ (ไทย)</label>
+            <input pInputText [(ngModel)]="baseForm.compThai" maxlength="50" class="w-full" />
+          </div>
+
+          <div class="form-field md:col-span-2">
+            <label class="form-label">ชื่อ (อังกฤษ)</label>
+            <input pInputText [(ngModel)]="baseForm.compEng" maxlength="50" class="w-full" />
+          </div>
+
+          <div class="form-field md:col-span-2">
+            <label class="form-label">* ที่อยู่ (ไทย)</label>
+            <input pInputText [(ngModel)]="baseForm.addrThai1" maxlength="100" class="w-full" />
+          </div>
+
+          <div class="form-field md:col-span-2">
+            <input pInputText [(ngModel)]="baseForm.addrThai2" maxlength="100" class="w-full" placeholder="ที่อยู่บรรทัดที่ 2 (ถ้ามี)" />
+          </div>
+
+          <div class="form-field md:col-span-2">
+            <label class="form-label">ที่อยู่ (อังกฤษ)</label>
+            <input pInputText [(ngModel)]="baseForm.addrEng1" maxlength="100" class="w-full" />
+          </div>
+
+          <div class="form-field md:col-span-2">
+            <input pInputText [(ngModel)]="baseForm.addrEng2" maxlength="100" class="w-full" placeholder="ที่อยู่บรรทัดที่ 2 (ถ้ามี)" />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">* รหัสไปรษณีย์</label>
+            <input pInputText [(ngModel)]="baseForm.postCode" maxlength="5" class="w-full" />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">* เบอร์โทรศัพท์</label>
+            <input pInputText [(ngModel)]="baseForm.tel" maxlength="20" class="w-full" />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Fax</label>
+            <input pInputText [(ngModel)]="baseForm.fax" maxlength="20" class="w-full" />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">เบอร์โทรติดต่อบัญชี/การเงิน</label>
+            <input pInputText [(ngModel)]="baseForm.telAcc" maxlength="20" class="w-full" />
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- TAB 2: เบ็ดเตล็ด 1 -->
+<p-tabpanel value="misc1">
+  <div class="space-y-6">
+
+    <!-- ภาษี -->
+    <div class="fieldset">
+      <div class="fieldset-title">ภาษี</div>
+
+      <!-- แถว: ภาษีมูลค่าเพิ่ม -->
+      <div class="flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">* ภาษีมูลค่าเพิ่ม:</label>
+        <div class="flex-1">
+          <p-select
+            [options]="vatOptions"
+            optionLabel="desc"
+            optionValue="code"
+            [(ngModel)]="baseForm.vatCode"
+            placeholder="เลือกภาษีมูลค่าเพิ่ม"
+            class="w-full">
+          </p-select>
+        </div>
+      </div>
+
+      <!-- แถว: รหัสภาษีโรงเรือน + อัตรา -->
+      <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">* รหัสภาษีโรงเรือน:</label>
+        <div class="flex-1 flex gap-3 items-center">
+          <div class="flex-1">
+            <p-select
+              [options]="houseTaxOptions"
+              optionLabel="code"
+              optionValue="code"
+              [(ngModel)]="baseForm.houseTaxCode"
+              placeholder="เลือกรหัสภาษีโรงเรือน"
+              class="w-full">
+            </p-select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="form-label whitespace-nowrap">* อัตรา:</label>
+            <input
+              pInputText
+              type="number"
+              [(ngModel)]="baseForm.houseTaxRate"
+              class="w-24 text-right" />
+            <span class="text-xs text-slate-500 whitespace-nowrap">บาท/ตร ม</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- แถว: รหัสภาษีอากรแสตมป์ -->
+      <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">* รหัสภาษีอากรแสตมป์:</label>
+        <div class="flex-1">
+          <p-select
+            [options]="stampOptions"
+            optionLabel="code"
+            optionValue="code"
+            [(ngModel)]="baseForm.stampCode"
+            placeholder="เลือกรหัสภาษีอากรแสตมป์"
+            class="w-full">
+          </p-select>
+        </div>
+      </div>
+
+      <!-- แถว: ยินยอมให้แก้ไข VAT -->
+      <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">ยินยอมให้แก้ไข VAT:</label>
+        <div class="flex gap-6">
+          <div class="flex items-center gap-2">
+            <p-radioButton name="editVat" value="Y" [(ngModel)]="baseForm.canEditVat"></p-radioButton>
+            <label>Yes</label>
+          </div>
+          <div class="flex items-center gap-2">
+            <p-radioButton name="editVat" value="N" [(ngModel)]="baseForm.canEditVat"></p-radioButton>
+            <label>No</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ค่าอื่นๆ -->
+    <div class="fieldset">
+      <div class="fieldset-title">ค่าอื่นๆ</div>
+
+      <!-- สกุลเงิน -->
+      <div class="flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">* สกุลเงิน:</label>
+        <div class="flex-1 flex gap-3 items-center">
+          <div class="flex-1">
+            <p-select
+              [options]="currencyOptions"
+              optionLabel="name"
+              optionValue="code"
+              [(ngModel)]="baseForm.currencyCode"
+              placeholder="เลือกสกุลเงิน"
+              class="w-full">
+            </p-select>
+          </div>
+        </div>
+      </div>
+
+      <!-- short term -->
+      <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">* สัญญาเป็น short term เมื่ออายุน้อยกว่า:</label>
+        <div class="flex items-center gap-2">
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="baseForm.shortTermMonth"
+            class="w-28 text-right" />
+          <span class="text-sm text-slate-500">เดือน</span>
+        </div>
+      </div>
+
+      <!-- credit term -->
+      <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">* Credit Term:</label>
+        <div class="flex-1">
+          <p-select
+            [options]="creditTermOptions"
+            optionLabel="name"
+            optionValue="code"
+            [(ngModel)]="baseForm.creditTermCode"
+            placeholder="เลือก Credit Term"
+            class="w-full">
+          </p-select>
+        </div>
+      </div>
+
+      <!-- insurance -->
+      <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">* รหัสอัตราเบี้ยประกัน:</label>
+        <div class="flex-1 flex gap-3 items-center">
+          <div class="flex-1">
+            <p-select
+              [options]="insuranceOptions"
+              optionLabel="code"
+              optionValue="code"
+              [(ngModel)]="baseForm.insuranceCode"
+              placeholder="เลือกรหัสอัตราเบี้ยประกัน"
+              class="w-full">
+            </p-select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="form-label whitespace-nowrap">* อัตรา:</label>
+            <input
+              pInputText
+              type="number"
+              [(ngModel)]="baseForm.insuranceRate"
+              class="w-24 text-right" />
+            <span class="text-xs text-slate-500 whitespace-nowrap">บาท/ตร ม</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- split invoice -->
+      <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">แยกรายการใบแจ้งหนี้:</label>
+        <div class="flex flex-wrap gap-6">
+          <div class="flex items-center gap-2">
+            <p-radioButton name="splitInv" value="D" [(ngModel)]="baseForm.splitInvoiceType"></p-radioButton>
+            <label>ตามยูนิตตามรายได้</label>
+          </div>
+          <div class="flex items-center gap-2">
+            <p-radioButton name="splitInv" value="S" [(ngModel)]="baseForm.splitInvoiceType"></p-radioButton>
+            <label>ตามรายได้</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ระยะเวลายื่น Notice -->
+    <div class="fieldset">
+      <div class="fieldset-title">ระยะเวลายื่น Notice</div>
+
+      <div class="flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">* รหัสนำหน้าลูกค้า:</label>
+        <div class="flex gap-3 items-center">
+          <input
+            pInputText
+            maxlength="1"
+            [(ngModel)]="baseForm.prefixCust"
+            class="w-20" />
+          <label class="form-label w-32">* ผลต่างราคา:</label>
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="baseForm.priceDiff"
+            class="w-24 text-right" />
+          <span class="text-xs text-slate-500">บาท</span>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-col gap-2 md:flex-row md:items-center">
+        <label class="form-label w-60 min-w-60">* สัญญาอายุตั้งแต่:</label>
+        <div class="flex gap-2 items-center">
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="baseForm.termCreNotice"
+            class="w-24 text-right" />
+          <span class="text-sm text-slate-500">เดือน จะทำใบแจ้งเตือนชำระ</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</p-tabpanel>
+
+
+      <p-tabpanel value="misc3">
+  <div class="fieldset">
+    <div class="fieldset-title">เอกสารต่าง ๆ</div>
+    <div class="space-y-4">
+      <!-- ใบเสร็จรับเงิน -->
+      <div class="grid grid-cols-1 md:grid-cols-[220px,1fr] gap-3 items-center">
+        <label class="form-label md:text-right">* ใบเสร็จรับเงิน:</label>
+        <p-select
+          [options]="receiptDocOptions"
+          optionLabel="name"
+          optionValue="code"
+          [(ngModel)]="baseForm.receiptDocCode"
+          placeholder="เลือกเอกสารใบเสร็จรับเงิน"
+          class="w-full">
+        </p-select>
+      </div>
+
+      <!-- ใบเสร็จรับเงิน/ใบกำกับภาษี -->
+      <div class="grid grid-cols-1 md:grid-cols-[220px,1fr] gap-3 items-center">
+        <label class="form-label md:text-right">* ใบเสร็จรับเงิน/ใบกำกับภาษี:</label>
+        <p-select
+          [options]="receiptTaxDocOptions"
+          optionLabel="name"
+          optionValue="code"
+          [(ngModel)]="baseForm.receiptTaxDocCode"
+          placeholder="เลือกเอกสารใบเสร็จรับเงิน/ใบกำกับภาษี"
+          class="w-full">
+        </p-select>
+      </div>
+
+      <!-- ใบรับเงินชั่วคราว -->
+      <div class="grid grid-cols-1 md:grid-cols-[220px,1fr] gap-3 items-center">
+        <label class="form-label md:text-right">* ใบรับเงินชั่วคราว:</label>
+        <p-select
+          [options]="tempReceiptDocOptions"
+          optionLabel="name"
+          optionValue="code"
+          [(ngModel)]="baseForm.tempReceiptDocCode"
+          placeholder="เลือกเอกสารใบรับเงินชั่วคราว"
+          class="w-full">
+        </p-select>
+      </div>
+
+      <!-- ใบลดหนี้ (ใบเสร็จรับเงิน) -->
+      <div class="grid grid-cols-1 md:grid-cols-[220px,1fr] gap-3 items-center">
+        <label class="form-label md:text-right">* ใบลดหนี้ (ใบเสร็จรับเงิน):</label>
+        <p-select
+          [options]="creditNoteReceiptDocOptions"
+          optionLabel="name"
+          optionValue="code"
+          [(ngModel)]="baseForm.creditNoteReceiptDocCode"
+          placeholder="เลือกเอกสารใบลดหนี้ (ใบเสร็จรับเงิน)"
+          class="w-full">
+        </p-select>
+      </div>
+
+      <!-- ใบลดหนี้/ใบกำกับภาษี -->
+      <div class="grid grid-cols-1 md:grid-cols-[220px,1fr] gap-3 items-center">
+        <label class="form-label md:text-right">* ใบลดหนี้/ใบกำกับภาษี:</label>
+        <p-select
+          [options]="creditNoteTaxDocOptions"
+          optionLabel="name"
+          optionValue="code"
+          [(ngModel)]="baseForm.creditNoteTaxDocCode"
+          placeholder="เลือกเอกสารใบลดหนี้/ใบกำกับภาษี"
+          class="w-full">
+        </p-select>
+      </div>
+    </div>
+  </div>
+</p-tabpanel>
+
+
+      <!-- TAB 4: เบ็ดเตล็ด 3 -->
+      <p-tabpanel value="misc3">
+        <div class="text-slate-400 text-sm">ยังไม่ได้กำหนดฟิลด์เพิ่มเติมในแท็บนี้</div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+
+</div>
+
+
+    <!-- 2) Branch master -->
+    <!-- <div *ngIf="selectedFeature === 'branch-master'" class="data-table-wrapper">
+      <div *ngIf="isLoadingBranch" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading branch level master...</p>
+      </div>
+
+      <p-table
+        *ngIf="!isLoadingBranch && filterData(branchMaster).length"
+        [value]="filterData(branchMaster)"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Branch</th>
+            <th>Name</th>
+            <th>Tax Profile</th>
+            <th style="width: 4rem">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.branch }}</td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.taxProfile }}</td>
+            <td class="actions-column">
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="confirmDelete(row)"
+              ></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div *ngIf="!isLoadingBranch && !filterData(branchMaster).length" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No data</p>
+      </div>
+    </div> -->
+    <app-branch-master
+  *ngIf="selectedFeature === 'branch-master'"
+  [isLoadingBranch]="isLoadingBranch"
+  [branchMaster]="branchMaster">
+</app-branch-master>
+
+    <!-- 3) Currency -->
+    <div *ngIf="selectedFeature === 'currency'" class="data-table-wrapper">
+      <div *ngIf="isLoadingCurrency" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading currencies...</p>
+      </div>
+
+      <p-table
+        *ngIf="!isLoadingCurrency && filterData(currencies).length"
+        [value]="filterData(currencies)"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Rate</th>
+            <th>Active</th>
+            <th style="width: 4rem">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.code }}</td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.rate }}</td>
+            <td>
+              <span class="badge" [class.badge-success]="row.active" [class.badge-secondary]="!row.active">
+                {{ row.active ? 'Yes' : 'No' }}
+              </span>
+            </td>
+            <td class="actions-column">
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="confirmDelete(row)"
+              ></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div *ngIf="!isLoadingCurrency && !filterData(currencies).length" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No currencies</p>
+      </div>
+    </div>
+
+    <!-- 4) Credit note reasons -->
+    <div *ngIf="selectedFeature === 'credit-note-reason'" class="data-table-wrapper">
+      <div *ngIf="isLoadingCreditReason" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading credit note reasons...</p>
+      </div>
+
+      <p-table
+        *ngIf="!isLoadingCreditReason && filterData(creditNoteReasons).length"
+        [value]="filterData(creditNoteReasons)"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Code</th>
+            <th>Description</th>
+            <th style="width: 4rem">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.code }}</td>
+            <td>{{ row.description }}</td>
+            <td class="actions-column">
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="confirmDelete(row)"
+              ></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div *ngIf="!isLoadingCreditReason && !filterData(creditNoteReasons).length" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No credit note reasons</p>
+      </div>
+    </div>
+
+    <!-- 5) Credit terms -->
+    <div *ngIf="selectedFeature === 'credit-term'" class="data-table-wrapper">
+      <div *ngIf="isLoadingCreditTerm" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading credit terms...</p>
+      </div>
+
+      <p-table
+        *ngIf="!isLoadingCreditTerm && filterData(creditTerms).length"
+        [value]="filterData(creditTerms)"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Code</th>
+            <th>Description</th>
+            <th>Days</th>
+            <th style="width: 4rem">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.code }}</td>
+            <td>{{ row.description }}</td>
+            <td>{{ row.days }}</td>
+            <td class="actions-column">
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="confirmDelete(row)"
+              ></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div *ngIf="!isLoadingCreditTerm && !filterData(creditTerms).length" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No credit terms</p>
+      </div>
+    </div>
+  </div>
+</div>

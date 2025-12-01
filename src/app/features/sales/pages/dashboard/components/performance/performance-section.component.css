@@ -1,0 +1,244 @@
+/* performance-section.component.css - LIGHT BLUE THEME */
+
+/* ==================== CONTAINER ==================== */
+.performance-section-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 2rem;
+}
+
+/* ==================== LOADING STATE ==================== */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+}
+
+.loading-state i {
+  font-size: 3rem;
+  color: #3b82f6;
+}
+
+.loading-state p {
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+/* ==================== DASHBOARD LAYOUT ==================== */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ==================== LEFT SIDEBAR ==================== */
+.left-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ==================== RIGHT CONTENT ==================== */
+.right-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ==================== TEAM CARDS SECTION ==================== */
+.team-cards-section {
+  /* Child component will handle layout */
+}
+
+/* ==================== MEMBER DETAILS SECTION ==================== */
+.member-details-section {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== ANALYTICS GRID ==================== */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.analytics-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.analytics-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Specific card sizing */
+.stage-conversion-card {
+  /* Full width - 1 column */
+}
+
+.source-attribution-card {
+  /* Full width - 1 column */
+}
+
+.monte-carlo-card {
+  /* Full width - 1 column */
+}
+
+/* ==================== REPORTS SECTION ==================== */
+.reports-section {
+  margin-top: 1.5rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1536px) {
+  .dashboard-layout {
+    grid-template-columns: 320px 1fr;
+    gap: 1.25rem;
+  }
+
+  .analytics-grid {
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 1280px) {
+  .performance-section-container {
+    padding: 1.5rem;
+  }
+
+  .dashboard-layout {
+    grid-template-columns: 300px 1fr;
+    gap: 1rem;
+  }
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .performance-section-container {
+    padding: 1.25rem;
+  }
+
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .left-sidebar {
+    gap: 1rem;
+  }
+
+  .right-content {
+    gap: 1rem;
+  }
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .analytics-card {
+    grid-column: 1 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .performance-section-container {
+    padding: 1rem;
+  }
+
+  .dashboard-layout {
+    gap: 0.875rem;
+  }
+
+  .analytics-grid {
+    gap: 0.875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .performance-section-container {
+    padding: 0.75rem;
+  }
+
+  .dashboard-layout {
+    gap: 0.75rem;
+  }
+
+  .left-sidebar {
+    gap: 0.75rem;
+  }
+
+  .right-content {
+    gap: 0.75rem;
+  }
+
+  .analytics-grid {
+    gap: 0.75rem;
+  }
+
+  .reports-section {
+    margin-top: 1rem;
+  }
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+  .performance-section-container {
+    background: white;
+    padding: 0;
+  }
+
+  .dashboard-layout {
+    display: block;
+  }
+
+  .left-sidebar,
+  .right-content {
+    page-break-inside: avoid;
+  }
+
+  .analytics-card {
+    page-break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+}

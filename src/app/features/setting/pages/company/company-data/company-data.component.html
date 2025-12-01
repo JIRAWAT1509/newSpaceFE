@@ -1,1 +1,788 @@
-<p>company-data works!</p>
+<div class="company-data-container">
+
+  <!-- Toast for notifications -->
+  <p-toast></p-toast>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">Company Data Management</h1>
+        <p class="page-subtitle">Manage companies, legal entities, and branches</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div
+      class="summary-card"
+      [class.active]="selectedCategory === 'company'"
+      (click)="selectCategory('company')"
+    >
+      <div class="card-icon company-icon">
+        <i class="pi pi-building"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">บริษัท</div>
+        <div class="card-value">{{ companies.length }}</div>
+        <div class="card-sublabel">Companies</div>
+      </div>
+    </div>
+
+    <div
+      class="summary-card"
+      [class.active]="selectedCategory === 'legal'"
+      (click)="selectCategory('legal')"
+    >
+      <div class="card-icon legal-icon">
+        <i class="pi pi-briefcase"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">นิติบุคคล</div>
+        <div class="card-value">{{ legalEntities.length }}</div>
+        <div class="card-sublabel">Legal Entities</div>
+      </div>
+    </div>
+
+    <div
+      class="summary-card"
+      [class.active]="selectedCategory === 'branch'"
+      (click)="selectCategory('branch')"
+    >
+      <div class="card-icon branch-icon">
+        <i class="pi pi-sitemap"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">สาขา</div>
+        <div class="card-value">{{ branches.length }}</div>
+        <div class="card-sublabel">Branches</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Section -->
+  <div class="data-section">
+
+    <!-- Section Header -->
+    <div class="section-header">
+      <h2 class="section-title" *ngIf="selectedCategory === 'company'">
+        <i class="pi pi-building"></i>
+        Company List
+      </h2>
+      <h2 class="section-title" *ngIf="selectedCategory === 'legal'">
+        <i class="pi pi-briefcase"></i>
+        Legal Entity List
+      </h2>
+      <h2 class="section-title" *ngIf="selectedCategory === 'branch'">
+        <i class="pi pi-sitemap"></i>
+        Branch List
+      </h2>
+
+      <div class="section-actions">
+        <div class="search-box">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="searchQuery"
+            placeholder="Search..."
+            class="search-input"
+          />
+        </div>
+        <p-button
+          *ngIf="selectedCategory === 'company'"
+          label="Add Company"
+          icon="pi pi-plus"
+          severity="success"
+          (onClick)="openAddCompanyModal()"
+        ></p-button>
+        <p-button
+          *ngIf="selectedCategory === 'legal'"
+          label="Add Legal Entity"
+          icon="pi pi-plus"
+          severity="success"
+          (onClick)="openAddLegalModal()"
+        ></p-button>
+        <p-button
+          *ngIf="selectedCategory === 'branch'"
+          label="Add Branch"
+          icon="pi pi-plus"
+          severity="success"
+          (onClick)="openAddBranchModal()"
+        ></p-button>
+      </div>
+    </div>
+
+    <!-- Company Table -->
+    <div *ngIf="selectedCategory === 'company'" class="data-table-wrapper">
+      <div *ngIf="isLoadingCompanies" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading companies...</p>
+      </div>
+
+      <table *ngIf="!isLoadingCompanies && filteredCompanies.length > 0" class="data-table">
+        <thead>
+          <tr>
+            <th>Organization Code</th>
+            <th>Company Code</th>
+            <th>Company Name</th>
+            <th class="actions-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let company of filteredCompanies"
+            class="clickable-row"
+          >
+            <td (click)="openEditCompanyModal(company)">{{ company.OU_CODE }}</td>
+            <td (click)="openEditCompanyModal(company)">{{ company.COMP_CODE }}</td>
+            <td (click)="openEditCompanyModal(company)">{{ company.OU_NAME }}</td>
+            <td class="actions-column">
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="deleteCompany(company)"
+              ></p-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="!isLoadingCompanies && filteredCompanies.length === 0" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No companies found</p>
+      </div>
+    </div>
+
+    <!-- Legal Entity Table -->
+    <div *ngIf="selectedCategory === 'legal'" class="data-table-wrapper">
+      <div *ngIf="isLoadingLegal" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading legal entities...</p>
+      </div>
+
+      <table *ngIf="!isLoadingLegal && filteredLegalEntities.length > 0" class="data-table">
+        <thead>
+          <tr>
+            <th>Legal Entity Code</th>
+            <th>Short Name</th>
+            <th>Thai Name</th>
+            <th>Tax ID</th>
+            <th>Calculate WHT</th>
+            <th class="actions-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let legal of filteredLegalEntities"
+            class="clickable-row"
+          >
+            <td (click)="openEditLegalModal(legal)">{{ legal.COMPANY_CODE }}</td>
+            <td (click)="openEditLegalModal(legal)">{{ legal.SHORT_NAME }}</td>
+            <td (click)="openEditLegalModal(legal)">{{ legal.COMPANY_TNAME }}</td>
+            <td (click)="openEditLegalModal(legal)">{{ legal.TAX_ID }}</td>
+            <td (click)="openEditLegalModal(legal)">
+              <span class="badge" [class.badge-success]="legal.CAL_WHT === 'Y'" [class.badge-secondary]="legal.CAL_WHT === 'N'">
+                {{ legal.CAL_WHT === 'Y' ? 'Yes' : 'No' }}
+              </span>
+            </td>
+            <td class="actions-column">
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="deleteLegal(legal)"
+              ></p-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="!isLoadingLegal && filteredLegalEntities.length === 0" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No legal entities found</p>
+      </div>
+    </div>
+
+    <!-- Branch Table -->
+    <div *ngIf="selectedCategory === 'branch'" class="data-table-wrapper">
+      <div *ngIf="isLoadingBranches" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading branches...</p>
+      </div>
+
+      <table *ngIf="!isLoadingBranches && filteredBranches.length > 0" class="data-table">
+        <thead>
+          <tr>
+            <th>Store Code</th>
+            <th>Short Name</th>
+            <th>Thai Name</th>
+            <th>Legal Entity</th>
+            <th>Use Price List</th>
+            <th class="actions-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let branch of filteredBranches"
+            class="clickable-row"
+          >
+            <td (click)="openEditBranchModal(branch)">{{ branch.STORE_CODE }}</td>
+            <td (click)="openEditBranchModal(branch)">{{ branch.SHORT_NAME }}</td>
+            <td (click)="openEditBranchModal(branch)">{{ branch.STORE_NAME_T }}</td>
+            <td (click)="openEditBranchModal(branch)">{{ branch.COMPANY_CODE }}</td>
+            <td (click)="openEditBranchModal(branch)">
+              <span class="badge" [class.badge-success]="branch.USE_PRICE_LIST === 'Y'" [class.badge-secondary]="branch.USE_PRICE_LIST === 'N'">
+                {{ branch.USE_PRICE_LIST === 'Y' ? 'Yes' : 'No' }}
+              </span>
+            </td>
+            <td class="actions-column">
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="deleteBranch(branch)"
+              ></p-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="!isLoadingBranches && filteredBranches.length === 0" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>No branches found</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL 1: Company Add/Edit Modal -->
+<!-- ============================================ -->
+<p-dialog
+  [(visible)]="showCompanyModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px' }"
+  [header]="isEditMode ? 'Edit Company' : 'Add New Company'"
+>
+  <div class="modal-content">
+    <div class="form-field" [class.has-error]="companyErrors['OU_CODE']">
+      <label class="form-label required">Organization Code</label>
+      <p-select
+        [(ngModel)]="companyForm.OU_CODE"
+        [options]="orgCodeOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select organization code"
+        [disabled]="isEditMode"
+        styleClass="w-full"
+        [loading]="isLoadingOrgCodes"
+      ></p-select>
+      <div *ngIf="companyErrors['OU_CODE']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ companyErrors['OU_CODE'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="companyErrors['COMP_CODE']">
+      <label class="form-label required">Company Code</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="companyForm.COMP_CODE"
+        placeholder="Enter company code"
+        class="form-input"
+      />
+      <div *ngIf="companyErrors['COMP_CODE']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ companyErrors['COMP_CODE'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="companyErrors['OU_NAME']">
+      <label class="form-label required">Company Name</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="companyForm.OU_NAME"
+        placeholder="Enter company name"
+        class="form-input"
+      />
+      <div *ngIf="companyErrors['OU_NAME']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ companyErrors['OU_NAME'] }}</span>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeCompanyModal()"
+        [disabled]="isSaving"
+      ></p-button>
+      <p-button
+        [label]="isEditMode ? 'Save Changes' : 'Create Company'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="saveCompanyModal()"
+        [loading]="isSaving"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ============================================ -->
+<!-- MODAL 2: Legal Entity Add/Edit Modal -->
+<!-- ============================================ -->
+<p-dialog
+  [(visible)]="showLegalModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '700px', maxWidth: '95vw' }"
+  [header]="isEditMode ? 'Edit Legal Entity' : 'Add New Legal Entity'"
+>
+  <div class="modal-content">
+    <div class="form-row">
+      <div class="form-field" [class.has-error]="legalErrors['COMPANY_CODE']">
+        <label class="form-label required">รหัสนิติบุคคล</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="legalForm.COMPANY_CODE"
+          [disabled]="isEditMode"
+          placeholder="Enter code"
+          class="form-input"
+        />
+        <div *ngIf="legalErrors['COMPANY_CODE']" class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ legalErrors['COMPANY_CODE'] }}</span>
+        </div>
+      </div>
+
+      <div class="form-field" [class.has-error]="legalErrors['SHORT_NAME']">
+        <label class="form-label required">ชื่อย่อ</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="legalForm.SHORT_NAME"
+          placeholder="Enter short name"
+          class="form-input"
+        />
+        <div *ngIf="legalErrors['SHORT_NAME']" class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ legalErrors['SHORT_NAME'] }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field" [class.has-error]="legalErrors['COMPANY_TNAME']">
+        <label class="form-label required">ชื่อ-ไทย</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="legalForm.COMPANY_TNAME"
+          placeholder="Enter Thai name"
+          class="form-input"
+        />
+        <div *ngIf="legalErrors['COMPANY_TNAME']" class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ legalErrors['COMPANY_TNAME'] }}</span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">ชื่อ-อังกฤษ</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="legalForm.COMPANY_ENAME"
+          placeholder="Enter English name"
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="legalErrors['ADDR_T1']">
+      <label class="form-label required">ที่อยู่ 1 (ไทย)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="legalForm.ADDR_T1"
+        placeholder="Enter Thai address line 1"
+        class="form-input"
+      />
+      <div *ngIf="legalErrors['ADDR_T1']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ legalErrors['ADDR_T1'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">ที่อยู่ 2 (ไทย)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="legalForm.ADDR_T2"
+        placeholder="Enter Thai address line 2"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">ที่อยู่ 1 (อังกฤษ)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="legalForm.ADDR_E1"
+        placeholder="Enter English address line 1"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">ที่อยู่ 2 (อังกฤษ)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="legalForm.ADDR_E2"
+        placeholder="Enter English address line 2"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">หมายเลขโทรศัพท์</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="legalForm.TEL"
+          placeholder="Enter phone number"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-field" [class.has-error]="legalErrors['TAX_ID']">
+        <label class="form-label required">หมายเลขประจําตัวผู้เสียภาษี</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="legalForm.TAX_ID"
+          placeholder="Enter tax ID"
+          class="form-input"
+        />
+        <div *ngIf="legalErrors['TAX_ID']" class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ legalErrors['TAX_ID'] }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-field-switch">
+      <label class="form-label">คํานวณภาษีหัก ณ ที่จ่าย</label>
+      <label class="toggle-switch">
+  <input
+    type="checkbox"
+    [checked]="legalForm.CAL_WHT === 'Y'"
+    (change)="legalForm.CAL_WHT = legalForm.CAL_WHT === 'Y' ? 'N' : 'Y'"
+  />
+  <span class="toggle-slider"></span>
+</label>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeLegalModal()"
+        [disabled]="isSaving"
+      ></p-button>
+      <p-button
+        [label]="isEditMode ? 'Save Changes' : 'Create Legal Entity'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="saveLegalModal()"
+        [loading]="isSaving"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ============================================ -->
+<!-- MODAL 3: Branch Add/Edit Modal -->
+<!-- ============================================ -->
+<p-dialog
+  [(visible)]="showBranchModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '700px', maxWidth: '95vw' }"
+  [header]="isEditMode ? 'Edit Branch' : 'Add New Branch'"
+>
+  <div class="modal-content">
+    <div class="form-row-three">
+      <div class="form-field" [class.has-error]="branchErrors['SHORT_NAME']">
+        <label class="form-label required">ชื่อย่อ</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.SHORT_NAME"
+          placeholder="Short name"
+          class="form-input"
+        />
+        <div *ngIf="branchErrors['SHORT_NAME']" class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ branchErrors['SHORT_NAME'] }}</span>
+        </div>
+      </div>
+
+      <div class="form-field" [class.has-error]="branchErrors['STORE_CODE']">
+        <label class="form-label required">Store Code</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.STORE_CODE"
+          [disabled]="isEditMode"
+          placeholder="Store code"
+          class="form-input"
+        />
+        <div *ngIf="branchErrors['STORE_CODE']" class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ branchErrors['STORE_CODE'] }}</span>
+        </div>
+      </div>
+
+      <div class="form-field" [class.has-error]="branchErrors['STORE_ID']">
+        <label class="form-label required">Store ID</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.STORE_ID"
+          placeholder="Store ID"
+          class="form-input"
+        />
+        <div *ngIf="branchErrors['STORE_ID']" class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ branchErrors['STORE_ID'] }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="branchErrors['COMPANY_CODE']">
+      <label class="form-label required">นิติบุคคล</label>
+      <p-select
+        [(ngModel)]="branchForm.COMPANY_CODE"
+        [options]="legalEntityOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select legal entity"
+        styleClass="w-full"
+        [filter]="true"
+      ></p-select>
+      <div *ngIf="branchErrors['COMPANY_CODE']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ branchErrors['COMPANY_CODE'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field" [class.has-error]="branchErrors['STORE_NAME_T']">
+        <label class="form-label required">ชื่อ-ไทย</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.STORE_NAME_T"
+          placeholder="Thai name"
+          class="form-input"
+        />
+        <div *ngIf="branchErrors['STORE_NAME_T']" class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ branchErrors['STORE_NAME_T'] }}</span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">ชื่อ-อังกฤษ</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.STORE_NAME_E"
+          placeholder="English name"
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <div class="form-field" [class.has-error]="branchErrors['ADDRESS_T1']">
+      <label class="form-label required">ที่อยู่1 (ไทย)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="branchForm.ADDRESS_T1"
+        placeholder="Thai address line 1"
+        class="form-input"
+      />
+      <div *ngIf="branchErrors['ADDRESS_T1']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ branchErrors['ADDRESS_T1'] }}</span>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">ที่อยู่2 (ไทย)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="branchForm.ADDRESS_T2"
+        placeholder="Thai address line 2"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">ที่อยู่1 (อังกฤษ)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="branchForm.ADDRESS_E1"
+        placeholder="English address line 1"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">ที่อยู่2 (อังกฤษ)</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="branchForm.ADDRESS_E2"
+        placeholder="English address line 2"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-row-three">
+      <div class="form-field">
+        <label class="form-label">หมายเลขโทรศัพท์</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.TEL"
+          placeholder="Phone"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">หมายเลขประจําตัวผู้เสียภาษี</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.TAX_ID"
+          placeholder="Tax ID"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-field" [class.has-error]="branchErrors['FILE_PASSWORD']">
+        <label class="form-label required">Password</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.FILE_PASSWORD"
+          placeholder="Password"
+          class="form-input"
+        />
+        <div *ngIf="branchErrors['FILE_PASSWORD']" class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ branchErrors['FILE_PASSWORD'] }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">ผู้จัดการ</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.MANAGER"
+          placeholder="Manager"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Plaza Manager</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="branchForm.PLAZA_MANAGER"
+          placeholder="Plaza manager"
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <div class="form-field-switch">
+      <label class="form-label">Used Price List</label>
+      <label class="toggle-switch">
+  <input
+    type="checkbox"
+    [checked]="branchForm.USE_PRICE_LIST === 'Y'"
+    (change)="branchForm.USE_PRICE_LIST = branchForm.USE_PRICE_LIST === 'Y' ? 'N' : 'Y'"
+  />
+  <span class="toggle-slider"></span>
+</label>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeBranchModal()"
+        [disabled]="isSaving"
+      ></p-button>
+      <p-button
+        [label]="isEditMode ? 'Save Changes' : 'Create Branch'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="saveBranchModal()"
+        [loading]="isSaving"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>

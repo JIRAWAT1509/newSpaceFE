@@ -1,0 +1,365 @@
+<!-- revenue.component.html -->
+
+<div class="revenue-container">
+  <!-- ==================== HEADER SECTION ==================== -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">จัดการรายได้</h1>
+        <p class="page-subtitle">จัดการข้อมูลรายได้ ประเภทรายได้ และการเชื่อมโยงกับประเภทธุรกิจ</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SUMMARY CARDS (3 CARDS) ==================== -->
+  <div class="summary-cards">
+    <!-- Card 1: รายได้ -->
+    <div
+      class="summary-card"
+      [class.active]="activeCategory === 'revenue'"
+      (click)="selectCategory('revenue')"
+    >
+      <div class="card-icon revenue-icon">
+        <i class="pi pi-dollar"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">รายได้</div>
+        <div class="card-value">{{ revenueCount }}</div>
+        <div class="card-sublabel">รายการ</div>
+      </div>
+    </div>
+
+    <!-- Card 2: ประเภทรายได้และกลุ่มรายได้ -->
+    <div
+      class="summary-card"
+      [class.active]="activeCategory === 'revenue-type'"
+      (click)="selectCategory('revenue-type')"
+    >
+      <div class="card-icon revenue-type-icon">
+        <i class="pi pi-tags"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">ประเภทรายได้และกลุ่มรายได้</div>
+        <div class="card-value">{{ revenueTypeCount }}</div>
+        <div class="card-sublabel">ประเภท</div>
+      </div>
+    </div>
+
+    <!-- Card 3: ประเภทธุรกิจและรายได้ -->
+    <div
+      class="summary-card"
+      [class.active]="activeCategory === 'business-revenue'"
+      (click)="selectCategory('business-revenue')"
+    >
+      <div class="card-icon business-revenue-icon">
+        <i class="pi pi-sitemap"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">ประเภทธุรกิจและรายได้</div>
+        <div class="card-value">{{ businessRevenueCount }}</div>
+        <div class="card-sublabel">การเชื่อมโยง</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CONTENT SECTION ==================== -->
+  <div class="content-section">
+
+    <!-- ==================== รายได้ SECTION ==================== -->
+    @if (activeCategory === 'revenue') {
+      <div class="data-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="pi pi-dollar"></i>
+            รายได้
+          </h2>
+
+          <div class="section-actions">
+            <div class="search-box">
+              <i class="pi pi-search search-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="searchQuery"
+                placeholder="ค้นหา..."
+                class="search-input"
+              />
+            </div>
+            <p-button
+              label="เพิ่ม"
+              icon="pi pi-plus"
+              (onClick)="openAddModal()"
+              styleClass="p-button-primary"
+            ></p-button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" />
+                </th>
+                <th>รหัสรายได้</th>
+                <th>ชื่อรายได้</th>
+                <th>ประเภทรายได้</th>
+                <th>สถานะ</th>
+                <th>อัปเดตโดย</th>
+                <th>วันที่อัปเดต</th>
+                <th class="actions-column">การดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of getFilteredRevenues(); track item.REVENUE_CODE) {
+                <tr class="clickable-row">
+                  <td (click)="$event.stopPropagation()">
+                    <input type="checkbox" />
+                  </td>
+                  <td (click)="editItem(item)">{{ item.REVENUE_CODE }}</td>
+                  <td (click)="editItem(item)">{{ item.REVENUE_NAME }}</td>
+                  <td (click)="editItem(item)">{{ item.REVENUE_TYPE }}</td>
+                  <td (click)="editItem(item)">
+                    <span class="badge" [ngClass]="{
+                      'badge-success': item.STATUS === 'A',
+                      'badge-secondary': item.STATUS !== 'A'
+                    }">
+                      {{ getStatusLabel(item.STATUS) }}
+                    </span>
+                  </td>
+                  <td (click)="editItem(item)">{{ item.UPD_BY }}</td>
+                  <td (click)="editItem(item)">{{ formatDate(item.UPD_DATE) }}</td>
+                  <td class="actions-column">
+                    <p-button
+                      icon="pi pi-pencil"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="info"
+                      (onClick)="editItem(item)"
+                    ></p-button>
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="danger"
+                      (onClick)="deleteItem(item)"
+                    ></p-button>
+                  </td>
+                </tr>
+              }
+              @if (getFilteredRevenues().length === 0) {
+                <tr>
+                  <td colspan="8" class="empty-state">
+                    <i class="pi pi-inbox empty-icon"></i>
+                    <p>ไม่พบข้อมูล</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== ประเภทรายได้และกลุ่มรายได้ SECTION ==================== -->
+    @if (activeCategory === 'revenue-type') {
+      <div class="data-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="pi pi-tags"></i>
+            ประเภทรายได้และกลุ่มรายได้
+          </h2>
+
+          <div class="section-actions">
+            <div class="search-box">
+              <i class="pi pi-search search-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="searchQuery"
+                placeholder="ค้นหา..."
+                class="search-input"
+              />
+            </div>
+            <p-button
+              label="เพิ่ม"
+              icon="pi pi-plus"
+              (onClick)="openAddModal()"
+              styleClass="p-button-primary"
+            ></p-button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" />
+                </th>
+                <th>รหัสประเภท</th>
+                <th>ชื่อประเภทรายได้</th>
+                <th>กลุ่มรายได้</th>
+                <th>สถานะ</th>
+                <th>อัปเดตโดย</th>
+                <th>วันที่อัปเดต</th>
+                <th class="actions-column">การดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of getFilteredRevenueTypes(); track item.TYPE_CODE) {
+                <tr class="clickable-row">
+                  <td (click)="$event.stopPropagation()">
+                    <input type="checkbox" />
+                  </td>
+                  <td (click)="editItem(item)">{{ item.TYPE_CODE }}</td>
+                  <td (click)="editItem(item)">{{ item.TYPE_NAME }}</td>
+                  <td (click)="editItem(item)">{{ item.GROUP_NAME }}</td>
+                  <td (click)="editItem(item)">
+                    <span class="badge" [ngClass]="{
+                      'badge-success': item.STATUS === 'A',
+                      'badge-secondary': item.STATUS !== 'A'
+                    }">
+                      {{ getStatusLabel(item.STATUS) }}
+                    </span>
+                  </td>
+                  <td (click)="editItem(item)">{{ item.UPD_BY }}</td>
+                  <td (click)="editItem(item)">{{ formatDate(item.UPD_DATE) }}</td>
+                  <td class="actions-column">
+                    <p-button
+                      icon="pi pi-pencil"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="info"
+                      (onClick)="editItem(item)"
+                    ></p-button>
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="danger"
+                      (onClick)="deleteItem(item)"
+                    ></p-button>
+                  </td>
+                </tr>
+              }
+              @if (getFilteredRevenueTypes().length === 0) {
+                <tr>
+                  <td colspan="8" class="empty-state">
+                    <i class="pi pi-inbox empty-icon"></i>
+                    <p>ไม่พบข้อมูล</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== ประเภทธุรกิจและรายได้ SECTION ==================== -->
+    @if (activeCategory === 'business-revenue') {
+      <div class="data-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="pi pi-sitemap"></i>
+            ประเภทธุรกิจและรายได้
+          </h2>
+
+          <div class="section-actions">
+            <div class="search-box">
+              <i class="pi pi-search search-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="searchQuery"
+                placeholder="ค้นหา..."
+                class="search-input"
+              />
+            </div>
+            <p-button
+              label="เพิ่ม"
+              icon="pi pi-plus"
+              (onClick)="openAddModal()"
+              styleClass="p-button-primary"
+            ></p-button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" />
+                </th>
+                <th>ประเภทธุรกิจ</th>
+                <th>ชื่อธุรกิจ</th>
+                <th>รหัสรายได้</th>
+                <th>ชื่อรายได้</th>
+                <th>สถานะ</th>
+                <th>อัปเดตโดย</th>
+                <th>วันที่อัปเดต</th>
+                <th class="actions-column">การดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of getFilteredBusinessRevenues(); track item.BUSINESS_TYPE + item.REVENUE_CODE) {
+                <tr class="clickable-row">
+                  <td (click)="$event.stopPropagation()">
+                    <input type="checkbox" />
+                  </td>
+                  <td (click)="editItem(item)">{{ item.BUSINESS_TYPE }}</td>
+                  <td (click)="editItem(item)">{{ item.BUSINESS_NAME }}</td>
+                  <td (click)="editItem(item)">{{ item.REVENUE_CODE }}</td>
+                  <td (click)="editItem(item)">{{ item.REVENUE_NAME }}</td>
+                  <td (click)="editItem(item)">
+                    <span class="badge" [ngClass]="{
+                      'badge-success': item.STATUS === 'A',
+                      'badge-secondary': item.STATUS !== 'A'
+                    }">
+                      {{ getStatusLabel(item.STATUS) }}
+                    </span>
+                  </td>
+                  <td (click)="editItem(item)">{{ item.UPD_BY }}</td>
+                  <td (click)="editItem(item)">{{ formatDate(item.UPD_DATE) }}</td>
+                  <td class="actions-column">
+                    <p-button
+                      icon="pi pi-pencil"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="info"
+                      (onClick)="editItem(item)"
+                    ></p-button>
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="danger"
+                      (onClick)="deleteItem(item)"
+                    ></p-button>
+                  </td>
+                </tr>
+              }
+              @if (getFilteredBusinessRevenues().length === 0) {
+                <tr>
+                  <td colspan="9" class="empty-state">
+                    <i class="pi pi-inbox empty-icon"></i>
+                    <p>ไม่พบข้อมูล</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- Revenue Form Drawer -->
+<app-revenue-form-drawer
+  [isOpen]="revenueDrawerOpen"
+  [mode]="revenueDrawerMode"
+  [revenue]="selectedRevenue"
+  (close)="onRevenueDrawerClose()"
+  (save)="onRevenueDrawerSave($event)"
+></app-revenue-form-drawer>

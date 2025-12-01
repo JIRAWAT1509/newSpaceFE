@@ -1,0 +1,42 @@
+<div class="mode-toggle-container">
+  <div class="mode-toggle-buttons">
+    <button
+      type="button"
+      class="mode-button"
+      [class.active]="isActive('normal')"
+      (click)="setMode('normal')"
+    >
+      <i class="pi pi-home"></i>
+      <span>Normal Mode</span>
+    </button>
+
+    <button
+      type="button"
+      class="mode-button"
+      [class.active]="isActive('pre-rent')"
+      (click)="setMode('pre-rent')"
+    >
+      <i class="pi pi-calendar"></i>
+      <span>Pre-Rent Mode</span>
+    </button>
+  </div>
+
+  @if (currentMode === 'pre-rent') {
+    <div class="date-picker-container">
+      <label for="targetDate" class="date-label">
+        <i class="pi pi-calendar-plus"></i>
+        <span>Target Date:</span>
+      </label>
+      <p-datepicker
+        [(ngModel)]="targetDate"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        inputId="targetDate"
+        placeholder="Select date"
+        (onSelect)="onDateChange()"
+        (ngModelChange)="onDateChange()"
+        [styleClass]="'w-full'"
+      />
+    </div>
+  }
+</div>

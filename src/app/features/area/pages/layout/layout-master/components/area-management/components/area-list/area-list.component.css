@@ -1,0 +1,172 @@
+.area-list-container {
+  @apply h-full flex flex-col p-4 bg-white;
+}
+
+.area-list-header {
+  @apply flex items-center justify-between mb-3 pb-3 border-b border-gray-200;
+}
+
+.list-title {
+  @apply text-lg font-bold text-gray-800;
+}
+
+.list-count {
+  @apply text-sm text-gray-500 font-medium;
+}
+
+/* Sort Bar */
+.sort-bar {
+  @apply flex items-center gap-2 mb-3 pb-3 border-b border-gray-200;
+}
+
+.sort-label {
+  @apply text-sm font-semibold text-gray-700 whitespace-nowrap;
+}
+
+:host ::ng-deep .sort-dropdown {
+  @apply flex-1;
+}
+
+:host ::ng-deep .sort-dropdown .p-select {
+  @apply w-full;
+}
+
+:host ::ng-deep .sort-dropdown .p-inputtext {
+  @apply w-full px-3 py-2 text-sm border border-gray-300 rounded-lg;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+/* Area List Content */
+.area-list-content {
+  @apply flex-1 overflow-y-auto space-y-2 mb-3;
+  min-height: 400px;
+}
+
+/* Custom Scrollbar */
+.area-list-content::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.area-list-content::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-full;
+}
+
+.area-list-content::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+  @apply hover:bg-gray-400;
+}
+
+/* Empty State */
+.empty-state {
+  @apply flex flex-col items-center justify-center h-full text-center;
+}
+
+/* Area Item */
+.area-item {
+  @apply flex items-center gap-3 p-3 rounded-lg border border-gray-200;
+  @apply hover:bg-gray-50 hover:border-blue-300 cursor-pointer;
+  @apply transition-all duration-200;
+}
+
+.area-item.selected {
+  @apply bg-blue-50 border-blue-400 shadow-sm;
+}
+
+.status-dot {
+  @apply w-3 h-3 rounded-full flex-shrink-0;
+  @apply shadow-sm;
+}
+
+.area-info {
+  @apply flex-1 min-w-0;
+}
+
+.room-number {
+  @apply text-sm font-semibold text-gray-800 mb-1;
+}
+
+.tenant-info {
+  @apply text-xs text-gray-600;
+}
+
+.tenant-name {
+  @apply font-medium;
+}
+
+.no-tenant {
+  @apply text-gray-500 italic;
+}
+
+.area-action {
+  @apply flex items-center gap-2 flex-shrink-0;
+}
+
+.action-button {
+  @apply px-3 py-1 text-xs font-medium rounded-md;
+  @apply bg-gray-100 text-gray-700 border border-gray-300;
+  @apply hover:bg-blue-500 hover:text-white hover:border-blue-500;
+  @apply transition-colors duration-200;
+}
+
+.area-item.selected .action-button {
+  @apply bg-blue-100 border-blue-300 text-blue-700;
+}
+
+.area-action i {
+  @apply text-gray-400 text-xs;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  @apply flex justify-center items-center gap-2 pt-3 border-t border-gray-200;
+}
+
+.pagination-button {
+  @apply px-2 py-1 text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply transition-colors flex items-center justify-center;
+  min-width: 32px;
+}
+
+.page-dropdown-wrapper {
+  @apply relative;
+}
+
+.page-dropdown-button {
+  @apply px-3 py-1 rounded text-sm hover:bg-gray-100 transition-colors;
+  @apply flex items-center justify-center gap-1;
+  min-width: 120px;
+}
+
+.page-dropdown-button span {
+  @apply flex-1 text-center;
+}
+
+.page-dropdown-button svg {
+  @apply flex-shrink-0;
+}
+
+.page-dropdown-menu {
+  @apply absolute bottom-full mb-1 left-0 bg-white border border-gray-300 rounded shadow-lg z-20;
+  @apply overflow-auto;
+  max-height: 200px;
+  min-width: 120px;
+}
+
+.page-dropdown-item {
+  @apply w-full px-3 py-2 text-center text-sm hover:bg-gray-100 transition-colors;
+}
+
+.page-dropdown-item.active {
+  @apply bg-blue-500 text-white;
+}
+
+/* Responsive */
+@media (max-width: 1280px) {
+  .area-list-container {
+    @apply p-3;
+  }
+
+  .area-item {
+    @apply p-2;
+  }
+}

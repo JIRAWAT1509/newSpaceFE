@@ -1,0 +1,274 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [style]="{ width: '600px' }"
+  styleClass="add-area-wizard-modal"
+  (onHide)="onModalHide()"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="wizard-header">
+      <h2 class="wizard-title">
+        <i class="pi pi-plus-circle"></i>
+        Add New Area
+      </h2>
+      <div class="wizard-steps">
+        @for (step of steps; track step.number) {
+          <div
+            class="step-indicator"
+            [class.active]="currentStep() === step.number"
+            [class.completed]="currentStep() > step.number"
+          >
+            <span class="step-number">{{ step.number }}</span>
+            <span class="step-label">{{ step.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Content -->
+  <div class="wizard-content">
+    <!-- Step 1: Basic Info -->
+    @if (currentStep() === 1) {
+      <div class="wizard-step">
+        <h3 class="step-title">Basic Information</h3>
+
+        <div class="form-group">
+          <label class="form-label">Room Number <span class="required">*</span></label>
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="formData.roomNumber"
+            placeholder="e.g., 2MD001, KK-05"
+          />
+          @if (errors.roomNumber) {
+            <span class="error-message">{{ errors.roomNumber }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Area Type <span class="required">*</span></label>
+          <div class="type-buttons">
+            <button
+              type="button"
+              class="type-button"
+              [class.active]="formData.type === 'log'"
+              (click)="formData.type = 'log'"
+            >
+              <i class="pi pi-building"></i>
+              Log
+            </button>
+            <button
+              type="button"
+              class="type-button"
+              [class.active]="formData.type === 'kiosk'"
+              (click)="formData.type = 'kiosk'"
+            >
+              <i class="pi pi-shop"></i>
+              Kiosk
+            </button>
+            <button
+              type="button"
+              class="type-button"
+              [class.active]="formData.type === 'open-plan'"
+              (click)="formData.type = 'open-plan'"
+            >
+              <i class="pi pi-th-large"></i>
+              Open Plan
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Step 2: Size & Rent -->
+    @if (currentStep() === 2) {
+      <div class="wizard-step">
+        <h3 class="step-title">Size & Rental Information</h3>
+
+        <div class="form-group">
+          <label class="form-label">Size (sqm) <span class="required">*</span></label>
+          <input
+            type="number"
+            class="form-input"
+            [(ngModel)]="formData.size"
+            placeholder="e.g., 25.5"
+            min="1"
+            step="0.1"
+          />
+          @if (errors.size) {
+            <span class="error-message">{{ errors.size }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Monthly Rent (฿)</label>
+          <input
+            type="number"
+            class="form-input"
+            [(ngModel)]="formData.monthlyRent"
+            placeholder="e.g., 15000"
+            min="0"
+          />
+          <span class="form-hint">Optional - Leave empty if not yet determined</span>
+        </div>
+      </div>
+    }
+
+    <!-- Step 3: Room Pictures -->
+    @if (currentStep() === 3) {
+      <div class="wizard-step">
+        <h3 class="step-title">Room Pictures (Optional)</h3>
+        <p class="step-description">Upload 3-5 pictures of the room for reference</p>
+
+        <div class="upload-area">
+          <label class="upload-label">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              (change)="onPicturesSelected($event)"
+              #pictureInput
+            />
+            <div class="upload-placeholder">
+              <i class="pi pi-cloud-upload"></i>
+              <p>Click to upload pictures</p>
+              <span class="upload-hint">PNG, JPG up to 5MB each (3-5 pictures)</span>
+            </div>
+          </label>
+
+          @if (formData.pictures.length > 0) {
+            <div class="picture-preview-grid">
+              @for (picture of formData.pictures; track $index) {
+                <div class="picture-preview">
+                  <img [src]="picture.preview" alt="Room picture" />
+                  <button
+                    type="button"
+                    class="remove-picture"
+                    (click)="removePicture($index)"
+                  >
+                    <i class="pi pi-times"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Step 4: Confirmation -->
+    @if (currentStep() === 4) {
+      <div class="wizard-step">
+        <h3 class="step-title">Review & Confirm</h3>
+
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="summary-label">Room Number:</span>
+            <span class="summary-value">{{ formData.roomNumber }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Type:</span>
+            <span class="summary-value">{{ getTypeLabel(formData.type) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Size:</span>
+            <span class="summary-value">{{ formData.size }} sqm</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Monthly Rent:</span>
+            <span class="summary-value">
+              {{ formData.monthlyRent ? '฿' + formData.monthlyRent.toLocaleString() : 'Not set' }}
+            </span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Pictures:</span>
+            <span class="summary-value">{{ formData.pictures.length }} uploaded</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Initial Status:</span>
+            <span class="summary-value">
+              <span class="status-badge inactive">Inactive</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <i class="pi pi-info-circle"></i>
+          <p>The area will be created as <strong>inactive</strong> and added to the inactive list. You can drag it to the map to activate it later.</p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="wizard-footer">
+      <button
+        type="button"
+        class="btn-cancel"
+        (click)="onCancel()"
+      >
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+
+      @if (currentStep() > 1) {
+        <button
+          type="button"
+          class="btn-back"
+          (click)="previousStep()"
+        >
+          <i class="pi pi-arrow-left"></i>
+          Back
+        </button>
+      }
+
+      @if (currentStep() < 4) {
+        <button
+          type="button"
+          class="btn-next"
+          (click)="nextStep()"
+        >
+          Next
+          <i class="pi pi-arrow-right"></i>
+        </button>
+      }
+
+      @if (currentStep() === 4) {
+        <button
+          type="button"
+          class="btn-save"
+          (click)="onSave()"
+        >
+          <i class="pi pi-check"></i>
+          Create Area
+        </button>
+      }
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Close Warning -->
+<p-dialog
+  [(visible)]="showCloseWarning"
+  [modal]="true"
+  [closable]="false"
+  [style]="{ width: '400px' }"
+  header="Discard Changes?"
+>
+  <p class="warning-message">
+    Are you sure you want to cancel? All entered information will be lost.
+  </p>
+  <ng-template pTemplate="footer">
+    <button type="button" class="btn-secondary" (click)="showCloseWarning = false">
+      Continue Editing
+    </button>
+    <button type="button" class="btn-danger" (click)="confirmCancel()">
+      Yes, Discard
+    </button>
+  </ng-template>
+</p-dialog>

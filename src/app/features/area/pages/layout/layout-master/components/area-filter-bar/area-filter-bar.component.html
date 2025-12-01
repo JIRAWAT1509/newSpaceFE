@@ -1,0 +1,74 @@
+<div class="filter-bar-container">
+  <div class="filter-bar-content">
+    <!-- Type Filter - Multi-select -->
+    <div class="filter-group">
+      <label class="filter-label">Type:</label>
+      <div class="filter-buttons">
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="isTypeSelected('Log')"
+          (click)="onTypeToggle('Log')"
+        >
+          <i class="pi pi-check" *ngIf="isTypeSelected('Log')"></i>
+          Log
+        </button>
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="isTypeSelected('Kiosk')"
+          (click)="onTypeToggle('Kiosk')"
+        >
+          <i class="pi pi-check" *ngIf="isTypeSelected('Kiosk')"></i>
+          Kiosk
+        </button>
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="isTypeSelected('OP')"
+          (click)="onTypeToggle('OP')"
+        >
+          <i class="pi pi-check" *ngIf="isTypeSelected('OP')"></i>
+          OP
+        </button>
+      </div>
+    </div>
+
+    <!-- Clear Filter Button -->
+    @if (selectedTypes().length > 0) {
+      <button
+        type="button"
+        class="clear-filter-button"
+        (click)="clearTypeFilters()"
+        title="Clear type filters"
+      >
+        <i class="pi pi-times"></i>
+        Clear
+      </button>
+    }
+
+    <!-- Search Bar -->
+    <div class="filter-group search-group">
+      <label class="filter-label">Search:</label>
+      <div class="search-input-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Room ID, Tenant, Brand, Shop..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange()"
+        />
+        @if (searchQuery) {
+          <button
+            type="button"
+            class="clear-button"
+            (click)="clearSearch()"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>

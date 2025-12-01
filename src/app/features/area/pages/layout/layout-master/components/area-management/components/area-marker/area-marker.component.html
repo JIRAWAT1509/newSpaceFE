@@ -1,0 +1,28 @@
+<div
+  #markerElement
+  class="area-marker"
+  [class.selected]="isSelected()"
+  [class.pulse]="shouldPulse()"
+  [class.draggable]="isDraggable()"
+  [style]="getMarkerStyle()"
+  [attr.draggable]="isDraggable()"
+  (mousedown)="onMouseDown($event)"
+  (click)="onMarkerClick($event)"
+  (dragstart)="onDragStartNative($event)"
+  (dragend)="onDragEndNative($event)"
+>
+  <!-- Circle Shape with Status Color -->
+  <div class="marker-circle" [style.background-color]="getStatusColor()">
+    <!-- Warning Icon at Center (only when has warning) -->
+    @if (hasWarning()) {
+      <div class="warning-icon">
+        <i class="pi pi-exclamation-circle"></i>
+      </div>
+    }
+  </div>
+
+  <!-- Room Number Label (below circle) -->
+  <div class="room-label">
+    {{ area().roomNumber }}
+  </div>
+</div>

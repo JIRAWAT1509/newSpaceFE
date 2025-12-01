@@ -1,0 +1,30 @@
+<div class="zoom-controls-container">
+  <button
+    type="button"
+    class="zoom-button"
+    (click)="onZoomOut()"
+    [disabled]="currentZoom() <= 0.5"
+    title="Zoom Out"
+  >
+    <i class="pi pi-minus"></i>
+  </button>
+
+  <button
+    type="button"
+    class="zoom-reset"
+    (click)="onResetZoom()"
+    title="Reset Zoom"
+  >
+    {{ getZoomPercentage() }}
+  </button>
+
+  <button
+    type="button"
+    class="zoom-button"
+    (click)="onZoomIn()"
+    [disabled]="currentZoom() >= 3.0"
+    title="Zoom In"
+  >
+    <i class="pi pi-plus"></i>
+  </button>
+</div>

@@ -1,0 +1,219 @@
+<div class="branch-master-wrapper">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-3">
+    <div class="text-base font-semibold text-slate-700">
+      ข้อมูลพื้นฐานระดับสาขา
+    </div>
+
+    <div class="flex gap-2">
+      <input
+        type="text"
+        pInputText
+        placeholder="ค้นหาสาขา..."
+        [(ngModel)]="searchKeyword"
+        class="w-56"
+      />
+      <button pButton icon="pi pi-plus" label="เพิ่ม" (onClick)="openAddPanel()"></button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoadingBranch" class="loading-state">
+    <i class="pi pi-spin pi-spinner text-slate-500 text-2xl"></i>
+    <p>Loading branch level master...</p>
+  </div>
+
+  <!-- Table -->
+  <p-table
+    *ngIf="!isLoadingBranch && filteredBranchList.length"
+    [value]="filteredBranchList"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 140px">Branch</th>
+        <th>ชื่อสาขา</th>
+        <th style="width: 140px">Tax Profile</th>
+        <th style="width: 4rem; text-align: center;">Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row>
+      <tr>
+        <td>{{ row.branch }}</td>
+        <td>{{ row.name }}</td>
+        <td>{{ row.taxProfile }}</td>
+        <td class="text-center">
+          <p-button
+            icon="pi pi-pencil"
+            [text]="true"
+            size="small"
+            (onClick)="openEditPanel(row)"
+          ></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- Empty -->
+  <div *ngIf="!isLoadingBranch && !filteredBranchList.length" class="empty-state">
+    <i class="pi pi-inbox empty-icon"></i>
+    <p>No data</p>
+  </div>
+</div>
+
+<!-- Side panel -->
+<!-- Drawer for add/edit -->
+<p-drawer
+  [(visible)]="sideVisible"
+  position="right"
+  [modal]="true"
+  [dismissible]="false"
+  [showCloseIcon]="false"
+  [style]="{ width: '420px' }"
+>
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-semibold">
+      {{ isEdit ? 'แก้ไขข้อมูลสาขา' : 'เพิ่มข้อมูลสาขา' }}  <!-- was isEditBranch -->
+    </h3>
+    <button type="button" class="p-button p-button-text p-button-danger" (click)="cancelPanel()">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-3">
+
+    <!-- สาขา -->
+    <div>
+      <label class="block text-sm font-medium mb-1">* สาขา</label>
+      <p-select
+        [options]="branchOptions"
+        [(ngModel)]="branchForm.branchCode"
+        placeholder="เลือกสาขา"
+        optionLabel="name"
+        optionValue="code"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- ภาษีมูลค่าเพิ่ม -->
+    <div>
+      <label class="block text-sm font-medium mb-1">* ภาษีมูลค่าเพิ่ม</label>
+      <p-select
+        [options]="vatOptions"
+        [(ngModel)]="branchForm.vatCode"
+        placeholder="เลือกภาษีมูลค่าเพิ่ม"
+        optionLabel="name"
+        optionValue="code"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- ภาษีโรงเรือน + อัตรา -->
+    <div class="flex gap-2">
+      <div class="flex-1">
+        <label class="block text-sm font-medium mb-1">* ภาษีโรงเรือน</label>
+        <p-select
+          [options]="houseTaxOptions"
+          [(ngModel)]="branchForm.houseTaxCode"
+          placeholder="เลือกภาษีโรงเรือน"
+          optionLabel="name"
+          optionValue="code"
+          class="w-full"
+        ></p-select>
+      </div>
+      <div class="w-28">
+        <label class="block text-sm font-medium mb-1">อัตรา</label>
+        <input pInputText type="number" [(ngModel)]="branchForm.houseTaxRate" class="w-full text-right" />
+      </div>
+    </div>
+
+    <!-- รหัสอากรแสตมป์ -->
+    <div>
+      <label class="block text-sm font-medium mb-1">* รหัสอากรแสตมป์</label>
+      <p-select
+        [options]="stampOptions"
+        [(ngModel)]="branchForm.stampCode"
+        placeholder="เลือกรหัสแสตมป์"
+        optionLabel="name"
+        optionValue="code"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- รหัสสกุลเงิน -->
+    <div>
+      <label class="block text-sm font-medium mb-1">* รหัสสกุลเงิน</label>
+      <p-select
+        [options]="currencyOptions"
+        [(ngModel)]="branchForm.currencyCode"
+        placeholder="เลือกสกุลเงิน"
+        optionLabel="name"
+        optionValue="code"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- short term -->
+    <div>
+      <label class="block text-sm font-medium mb-1">สัญญาเป็น short term เมื่ออายุน้อยกว่า (เดือน)</label>
+      <input pInputText type="number" [(ngModel)]="branchForm.shortTermMonth" class="w-full" />
+      <p class="text-xs text-slate-400 mt-1">เดือน (Auto transfer to Contract)</p>
+    </div>
+
+    <!-- credit term -->
+    <div>
+      <label class="block text-sm font-medium mb-1">* Credit Term</label>
+      <p-select
+        [options]="creditTermOptions"
+        [(ngModel)]="branchForm.creditTerm"
+        placeholder="เลือก Credit Term"
+        optionLabel="name"
+        optionValue="code"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- insurance -->
+    <div class="flex gap-2">
+      <div class="flex-1">
+        <label class="block text-sm font-medium mb-1">* รหัสอัตราเบี้ยประกันภัย</label>
+        <p-select
+          [options]="insuranceOptions"
+          [(ngModel)]="branchForm.insuranceCode"
+          placeholder="เลือกอัตราเบี้ยประกันภัย"
+          optionLabel="name"
+          optionValue="code"
+          class="w-full"
+        ></p-select>
+      </div>
+      <div class="w-28">
+        <label class="block text-sm font-medium mb-1">อัตรา</label>
+        <input pInputText type="number" [(ngModel)]="branchForm.insuranceRate" class="w-full text-right" />
+      </div>
+    </div>
+
+    <!-- contract from -->
+    <div>
+      <label class="block text-sm font-medium mb-1">สัญญาอายุตั้งแต่ (เดือน)</label>
+      <input pInputText type="number" [(ngModel)]="branchForm.contractMonthFrom" class="w-full" />
+    </div>
+
+    <!-- cost center -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Cost Center ค่าธรรมเนียม:</label>
+      <p-select
+        [options]="costCenterOptions"
+        [(ngModel)]="branchForm.costCenter"
+        optionLabel="name"
+        optionValue="code"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- actions -->
+ <div class="flex justify-end gap-2 mt-4">
+      <p-button label="ยกเลิก" severity="secondary" (onClick)="cancelPanel()"></p-button> <!-- was cancelBranchForm() -->
+      <p-button label="บันทึก" icon="pi pi-save" (onClick)="saveBranch()" severity="success"></p-button> <!-- was saveBranchForm() -->
+    </div>
+  </div>
+</p-drawer>

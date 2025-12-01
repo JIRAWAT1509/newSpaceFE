@@ -1,0 +1,52 @@
+<div class="area-availability-container">
+  <div class="section-header">
+    <h2 class="section-title">Area Availability</h2>
+  </div>
+
+  <!-- Status Cards Grid (4 main statuses) -->
+  <div class="status-cards-grid">
+    @for (status of mainStatusDistribution(); track status.id) {
+      <div
+        [class]="getStatusCardClasses(status.id)"
+        (click)="toggleFilter(status.id)"
+      >
+        <!-- Icon Circle -->
+        <div class="icon-circle" [style.backgroundColor]="status.color">
+          <i class="pi pi-building"></i>
+        </div>
+
+        <!-- Content -->
+        <div class="card-content">
+          <div class="card-header">
+            <span class="card-label-th">{{ status.labelTh }}</span>
+            <span class="card-count">{{ status.count }}</span>
+          </div>
+          <span class="card-label-en">{{ status.label }}</span>
+        </div>
+
+        <!-- Selection Indicator -->
+        @if (isSelected(status.id)) {
+          <div class="selection-check">
+            <i class="pi pi-check"></i>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Percentage Bar -->
+  <div class="percentage-bar">
+    @for (status of mainStatusDistribution(); track status.id) {
+      @if (status.count > 0) {
+        <div
+          class="bar-segment"
+          [style.width.%]="getBarWidth(status)"
+          [style.backgroundColor]="status.color"
+          [title]="status.label + ': ' + formatPercentage(status.percentage)"
+        >
+          <span class="bar-text">{{ formatPercentage(status.percentage) }}</span>
+        </div>
+      }
+    }
+  </div>
+</div>

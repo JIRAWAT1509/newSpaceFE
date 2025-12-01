@@ -1,0 +1,1317 @@
+/* company-customer.component.css */
+
+/* ==================== CONTAINER ==================== */
+.company-customer-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* ==================== HEADER ==================== */
+.header-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.title-section {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.page-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ==================== FILTERS SECTION ==================== */
+.filters-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title i {
+  color: #3b82f6;
+}
+
+.filters-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-field.code-range-field {
+  min-width: 0;
+}
+
+.filter-field.name-field {
+  min-width: 0;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background-color: #ffffff;
+  transition: all 0.2s;
+}
+
+.filter-input:hover {
+  border-color: #9ca3af;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.code-range-inputs {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.range-separator {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  user-select: none;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-label {
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+
+.checkbox-label:hover {
+  color: #1f2937;
+}
+
+/* Search icon inside input */
+::ng-deep .p-input-icon-left {
+  position: relative;
+  display: block;
+}
+
+::ng-deep .p-input-icon-left.full-width {
+  width: 100%;
+}
+
+::ng-deep .p-input-icon-left > i {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  z-index: 1;
+}
+
+::ng-deep .p-input-icon-left > input {
+  padding-left: 2.5rem;
+}
+
+/* ==================== RESPONSIVE FILTERS ==================== */
+
+@media (max-width: 1024px) {
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .filters-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .code-range-inputs {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .range-separator {
+    display: none;
+  }
+
+  .checkbox-list {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+/* ==================== TABLE SECTION ==================== */
+.table-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.address-cell {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-badge.status-A {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.status-badge.status-I {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #9ca3af;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.empty-message p {
+  margin: 0;
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+/* ==================== FORM DIALOG ==================== */
+.form-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+/* ==================== PROGRESS BAR ==================== */
+.progress-bar-container {
+  padding: 1rem 0;
+}
+
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  padding: 0 2rem;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.progress-step:not(.accessible) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.step-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 2;
+  border: 3px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-step.active .step-circle {
+  background-color: #3b82f6;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.progress-step.completed .step-circle {
+  background-color: #10b981;
+  color: white;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-align: center;
+  max-width: 100px;
+}
+
+.progress-step.active .step-label {
+  color: #3b82f6;
+}
+
+.progress-step.completed .step-label {
+  color: #10b981;
+}
+
+.step-connector {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  width: 100%;
+  height: 3px;
+  background-color: #e5e7eb;
+  z-index: 1;
+  transition: background-color 0.3s;
+}
+
+.progress-step.completed .step-connector {
+  background-color: #10b981;
+}
+
+/* ==================== DRAFT INDICATOR ==================== */
+.draft-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #92400e;
+}
+
+.draft-indicator i {
+  color: #f59e0b;
+}
+
+/* ==================== FORM STEPS ==================== */
+.form-steps-content {
+  min-height: 400px;
+  padding: 1rem;
+}
+
+.form-step {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-label.required::after {
+  content: ' *';
+  color: #dc2626;
+}
+
+.form-grid input,
+.form-grid textarea,
+.form-grid ::ng-deep .p-select {
+  width: 100%;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.info-text {
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 2rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 2px dashed #d1d5db;
+}
+
+/* ==================== SUMMARY SECTION ==================== */
+.summary-section {
+  padding: 1rem;
+}
+
+.changes-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  color: #92400e;
+  font-size: 0.875rem;
+}
+
+.changes-notice i {
+  color: #f59e0b;
+  font-size: 1.25rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.summary-group {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.summary-group-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-item.changed {
+  background-color: #fef3c7;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin: 0.25rem 0;
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-value-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summary-value {
+  font-size: 0.875rem;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.previous-value {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  font-style: italic;
+  padding: 0.25rem 0.5rem;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  border-left: 3px solid #9ca3af;
+}
+
+/* ==================== FORM NAVIGATION ==================== */
+.form-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1rem 1rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.nav-spacer {
+  flex: 1;
+}
+
+/* ==================== PRIMENG OVERRIDES ==================== */
+
+/* Table */
+::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background-color: #f9fafb;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  color: #1f2937;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #f9fafb;
+}
+
+::ng-deep .p-datatable .p-paginator {
+  background-color: #f9fafb;
+  border-top: 2px solid #e5e7eb;
+  padding: 1rem;
+}
+
+/* Checkbox in table */
+::ng-deep .p-datatable .p-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::ng-deep .p-datatable .p-checkbox-box {
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff !important;
+  border: 2px solid #d1d5db !important;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+::ng-deep .p-datatable .p-checkbox:not(.p-checkbox-checked):hover .p-checkbox-box {
+  border-color: #3b82f6 !important;
+  background-color: #f3f4f6 !important;
+}
+
+::ng-deep .p-datatable .p-checkbox-checked .p-checkbox-box {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+::ng-deep .p-datatable .p-checkbox-checked:hover .p-checkbox-box {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+::ng-deep .p-datatable .p-checkbox-icon {
+  color: #ffffff !important;
+}
+
+/* Dialog */
+::ng-deep .p-dialog {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .p-dialog .p-dialog-header {
+  background-color: #f9fafb !important;
+  padding: 1.25rem 1.5rem !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+::ng-deep .p-dialog .p-dialog-content {
+  padding: 1.5rem !important;
+}
+
+/* Form inputs */
+::ng-deep .form-grid input[type="text"],
+::ng-deep .form-grid input[type="email"],
+::ng-deep .form-grid textarea {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #1f2937 !important;
+  border-radius: 6px;
+  padding: 0.625rem 0.75rem;
+  transition: all 0.2s;
+}
+
+::ng-deep .form-grid input:focus,
+::ng-deep .form-grid textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  outline: none !important;
+}
+
+::ng-deep .form-grid .p-select {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+}
+
+::ng-deep .form-grid .p-select:hover {
+  border-color: #9ca3af !important;
+}
+
+::ng-deep .form-grid .p-select.p-focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Radio buttons */
+::ng-deep .radio-group .p-radiobutton-box {
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff !important;
+  border: 2px solid #d1d5db !important;
+  transition: all 0.2s;
+}
+
+::ng-deep .radio-group .p-radiobutton:hover .p-radiobutton-box {
+  border-color: #3b82f6 !important;
+}
+
+::ng-deep .radio-group .p-radiobutton-checked .p-radiobutton-box {
+  border-color: #3b82f6 !important;
+}
+
+::ng-deep .radio-group .p-radiobutton-icon {
+  background-color: #3b82f6 !important;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1024px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-steps {
+    overflow-x: auto;
+    padding: 0 1rem;
+  }
+
+  .progress-step {
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 640px) {
+  .company-customer-container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .code-range {
+    flex-direction: column;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .step-label {
+    font-size: 0.625rem;
+    max-width: 60px;
+  }
+
+  .step-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+}
+
+/* ==================== TABLE FIXES ==================== */
+
+/* Clickable rows */
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.clickable-row:hover {
+  background-color: #f9fafb !important;
+}
+
+/* Status switch styling */
+::ng-deep .p-inputswitch {
+  width: 3rem;
+  height: 1.75rem;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+::ng-deep .p-inputswitch .p-inputswitch-slider {
+  background-color: #ef4444;
+  transition: background-color 0.2s;
+}
+
+::ng-deep .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+  background-color: #10b981;
+}
+
+.status-label {
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ef4444;
+  transition: color 0.2s;
+}
+
+.status-label.active {
+  color: #10b981;
+}
+
+/* ==================== DETAILS MODAL ==================== */
+
+.details-content {
+  padding: 1rem 0;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.details-title-section {
+  flex: 1;
+}
+
+.details-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.details-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.details-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.detail-section {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.detail-item {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.detail-value {
+  font-size: 0.875rem;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+/* ==================== FIX TABLE BACKGROUND ==================== */
+
+::ng-deep .p-datatable .p-datatable-tbody > tr {
+  background-color: #ffffff !important;
+}
+
+::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #f9fafb !important;
+}
+
+::ng-deep .p-datatable .p-datatable-tbody > tr.clickable-row:hover {
+  background-color: #f3f4f6 !important;
+}
+
+@media (max-width: 768px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-item {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}
+
+/* ==================== STATUS TOGGLE STYLING ==================== */
+
+::ng-deep .p-togglebutton.p-button {
+  width: 120px !important;
+  transition: all 0.2s;
+}
+
+::ng-deep .p-togglebutton.p-button.p-highlight {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+  color: white !important;
+}
+
+::ng-deep .p-togglebutton.p-button:not(.p-highlight) {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: white !important;
+}
+
+::ng-deep .p-togglebutton.p-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+::ng-deep .status-toggle .p-button-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* ==================== CUSTOM SWITCH (IF INPUTSWITCH DOESN'T WORK) ==================== */
+
+.custom-switch {
+  position: relative;
+  display: inline-block;
+  width: 3rem;
+  height: 1.75rem;
+}
+
+.custom-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #9ca3af;
+  transition: 0.3s;
+  border-radius: 1.75rem;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 1.25rem;
+  width: 1.25rem;
+  left: 0.25rem;
+  bottom: 0.25rem;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.custom-switch input:checked + .switch-slider {
+  background-color: #10b981;
+}
+
+.custom-switch input:checked + .switch-slider:before {
+  transform: translateX(1.25rem);
+}
+
+.custom-switch:hover .switch-slider {
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* ==================== SEARCH INPUT WITH ICON FIX ==================== */
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 0.875rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.filter-input.with-icon {
+  padding-left: 2.5rem !important;
+}
+
+/* Remove old icon styles if they exist */
+::ng-deep .p-input-icon-left {
+  position: relative;
+  display: block;
+}
+
+::ng-deep .p-input-icon-left.full-width {
+  width: 100%;
+}
+
+::ng-deep .p-input-icon-left > i {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  z-index: 1;
+  pointer-events: none;
+}
+
+::ng-deep .p-input-icon-left > input {
+  padding-left: 2.5rem !important;
+}
+
+/* ==================== DETAILS MODAL ==================== */
+
+.details-content {
+  padding: 1rem 0;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.details-title-section {
+  flex: 1;
+}
+
+.details-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.details-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.details-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.detail-section {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.detail-item {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.detail-value {
+  font-size: 0.875rem;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+/* Dialog Footer */
+.dialog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.action-buttons-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ==================== CUSTOM SWITCH ==================== */
+
+.custom-switch {
+  position: relative;
+  display: inline-block;
+  width: 3rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+}
+
+.custom-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #9ca3af;
+  transition: all 0.3s ease;
+  border-radius: 1.75rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 1.25rem;
+  width: 1.25rem;
+  left: 0.25rem;
+  bottom: 0.25rem;
+  background-color: white;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-switch input:checked + .switch-slider {
+  background-color: #10b981;
+}
+
+.custom-switch input:checked + .switch-slider:before {
+  transform: translateX(1.25rem);
+}
+
+.custom-switch:hover .switch-slider {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1),
+              0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+.custom-switch input:focus + .switch-slider {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1),
+              0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.status-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.status-label.active {
+  color: #10b981;
+}
+
+/* ==================== PRIMENG DIALOG OVERRIDES ==================== */
+
+::ng-deep .p-dialog .p-dialog-footer {
+  padding: 1.25rem 1.5rem;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+::ng-deep .p-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .details-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .details-status {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-item {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .dialog-footer {
+    flex-direction: column;
+  }
+
+  .action-buttons-group {
+    width: 100%;
+  }
+
+  .action-buttons-group ::ng-deep .p-button {
+    flex: 1;
+  }
+}
+
+/* ==================== STATUS SWITCH IN FORM ==================== */
+
+.status-switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+/* ==================== FORM VALIDATION ERRORS ==================== */
+
+.form-field.has-error input,
+.form-field.has-error textarea,
+.form-field.has-error ::ng-deep .p-select {
+  border-color: #ef4444 !important;
+}
+
+.form-field.has-error input:focus,
+.form-field.has-error textarea:focus,
+.form-field.has-error ::ng-deep .p-select.p-focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.error-message i {
+  font-size: 0.875rem;
+}
+
+/* Required field indicator */
+.form-label.required::after {
+  content: ' *';
+  color: #ef4444;
+  font-weight: 600;
+}

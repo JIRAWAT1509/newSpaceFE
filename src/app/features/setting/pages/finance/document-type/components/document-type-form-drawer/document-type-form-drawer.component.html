@@ -1,0 +1,121 @@
+<!-- document-type-form-drawer.component.html -->
+
+<!-- Backdrop -->
+@if (isOpen) {
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+    (click)="onClose()"
+  ></div>
+}
+
+<!-- Drawer (Desktop: Right side, Mobile: Centered) -->
+@if (isOpen) {
+  <div
+    class="fixed z-50 bg-white shadow-2xl transition-all duration-300 ease-in-out overflow-hidden
+           md:top-0 md:right-0 md:h-full md:w-[600px]
+           max-md:top-1/2 max-md:left-1/2 max-md:transform max-md:-translate-x-1/2 max-md:-translate-y-1/2
+           max-md:rounded-lg max-md:w-[95%] max-md:max-w-[500px] max-md:max-h-[90vh]"
+  >
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-white">
+        {{ mode === 'create' ? 'เพิ่มประเภทเอกสาร' : 'แก้ไขประเภทเอกสาร' }}
+      </h2>
+      <button
+        (click)="onClose()"
+        class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1 transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Form Content (Scrollable) -->
+    <div class="overflow-y-auto p-6" style="max-height: calc(100vh - 140px);">
+      <form>
+        <div class="space-y-4">
+          <!-- รหัสเอกสาร -->
+          <div class="form-field">
+            <label class="form-label required">รหัสเอกสาร</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.DOC_CODE"
+              name="docCode"
+              [disabled]="mode === 'edit'"
+              placeholder="กรอกรหัสเอกสาร (เช่น BR, CA, IV)"
+              maxlength="10"
+              class="form-input"
+              [class.input-error]="!!errors['DOC_CODE']"
+            />
+            @if (errors['DOC_CODE']) {
+              <p class="error-message">
+                <i class="pi pi-exclamation-circle"></i>
+                {{ errors['DOC_CODE'] }}
+              </p>
+            }
+            @if (mode === 'edit') {
+              <p class="text-xs text-gray-500 mt-1">
+                <i class="pi pi-info-circle"></i>
+                ไม่สามารถแก้ไขรหัสเอกสารได้
+              </p>
+            }
+          </div>
+
+          <!-- ชื่อเอกสาร -->
+          <div class="form-field">
+            <label class="form-label required">ชื่อเอกสาร</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.DOC_NAME"
+              name="docName"
+              placeholder="กรอกชื่อเอกสาร"
+              maxlength="100"
+              class="form-input"
+              [class.input-error]="!!errors['DOC_NAME']"
+            />
+            @if (errors['DOC_NAME']) {
+              <p class="error-message">
+                <i class="pi pi-exclamation-circle"></i>
+                {{ errors['DOC_NAME'] }}
+              </p>
+            }
+          </div>
+
+          <!-- Info Box -->
+          <div class="info-box">
+            <i class="pi pi-info-circle text-blue-600"></i>
+            <div class="text-sm text-gray-700">
+              <p class="font-semibold mb-1">หมายเหตุ:</p>
+              <ul class="list-disc list-inside space-y-1 text-xs">
+                <li>รหัสเอกสารต้องไม่ซ้ำกันในระบบ</li>
+                <li>รหัสเอกสารสามารถใช้ได้ทั้งตัวอักษรและตัวเลข</li>
+                <li>ชื่อเอกสารควรสื่อความหมายชัดเจน</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="onClose()"
+        [disabled]="isSubmitting"
+      ></p-button>
+
+      <p-button
+        [label]="mode === 'create' ? 'สร้าง' : 'บันทึก'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="onSubmit()"
+        [loading]="isSubmitting"
+      ></p-button>
+    </div>
+  </div>
+}

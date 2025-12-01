@@ -1,0 +1,22 @@
+<div class="area-management-container">
+  <!-- Left: Floor Plan Viewer -->
+  <div class="floor-plan-section">
+    <app-floor-plan
+      [selectedFilters]="selectedStatusFilters()"
+      [selectedTypeFilters]="selectedTypeFilters()"
+      [selectedAreaId]="selectedAreaId()"
+      (areaSelected)="onAreaSelected($event)"
+    />
+  </div>
+
+  <!-- Right: Area List -->
+  <div class="area-list-section">
+    <app-area-list
+      [selectedAreaId]="selectedAreaId()"
+      [statusFilters]="selectedStatusFilters()"
+      [typeFilters]="selectedTypeFilters()"
+      [searchQuery]="searchQuery()"
+      (areaSelected)="onAreaSelected($event)"
+    />
+  </div>
+</div>

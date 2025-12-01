@@ -1,0 +1,130 @@
+<!-- stage-conversion-table.component.html -->
+
+<div class="stage-conversion-container">
+
+  <!-- ==================== HEADER ==================== -->
+  <div class="table-header">
+    <div class="header-content">
+      <h3 class="table-title">
+        <i class="pi pi-chart-line"></i>
+        Stage Conversion (90d)
+      </h3>
+      <p class="table-subtitle">การแปลงขั้นตอนการขาย</p>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="summary-stats">
+      <div class="summary-item">
+        <span class="summary-label">Total Deals</span>
+        <span class="summary-value">{{ getTotalDeals() }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Avg Conversion</span>
+        <span class="summary-value">{{ formatPercentage(getAverageConversion()) }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Avg Days</span>
+        <span class="summary-value">{{ formatDays(getAverageMedianDays()) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TABLE ==================== -->
+  <div class="conversion-table">
+
+    <!-- Table Header -->
+    <div class="table-row table-header-row">
+      <div class="table-cell header-cell stage-col">
+        <span>Stage</span>
+        <span class="header-subtitle">ขั้นตอน</span>
+      </div>
+      <div class="table-cell header-cell conv-col">
+        <span>Conv. Rate</span>
+        <span class="header-subtitle">อัตราแปลง</span>
+      </div>
+      <div class="table-cell header-cell days-col">
+        <span>Median Days</span>
+        <span class="header-subtitle">จำนวนวัน</span>
+      </div>
+      <div class="table-cell header-cell deals-col">
+        <span>Deals</span>
+        <span class="header-subtitle">ดีล</span>
+      </div>
+    </div>
+
+    <!-- Table Body -->
+    @for (stage of stages; track stage.stage; let i = $index) {
+      <div class="table-row data-row">
+
+        <!-- Stage Column -->
+        <div class="table-cell stage-cell">
+          <div class="stage-content">
+            <div class="stage-icon-wrapper" [class]="'icon-' + getStageColor(i)">
+              <i class="pi" [class]="getStageIcon(i)"></i>
+            </div>
+            <div class="stage-info">
+              <span class="stage-name">{{ stage.stage }}</span>
+              <span class="stage-name-th">{{ stage.stageTh }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversion Rate Column -->
+        <div class="table-cell conv-cell">
+          <div class="conv-content">
+            <div
+              class="conv-badge"
+              [class]="getConversionColorClass(stage.conversionRate)"
+            >
+              <i class="pi" [class]="getConversionIcon(stage.conversionRate)"></i>
+              <span class="conv-value">{{ formatPercentage(stage.conversionRate) }}</span>
+            </div>
+            <div class="conv-progress">
+              <div
+                class="conv-progress-bar"
+                [class]="getConversionColorClass(stage.conversionRate)"
+                [style.width.%]="stage.conversionRate"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Median Days Column -->
+        <div class="table-cell days-cell">
+          <div class="days-content">
+            <i class="pi pi-clock"></i>
+            <span class="days-value">{{ formatDays(stage.medianDays) }}</span>
+            <span class="days-unit">days</span>
+          </div>
+        </div>
+
+        <!-- Deals Column -->
+        <div class="table-cell deals-cell">
+          <div class="deals-badge">
+            <span class="deals-count">{{ stage.count }}</span>
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+
+  <!-- ==================== FOOTER INSIGHTS ==================== -->
+  <div class="table-footer">
+    <div class="insight-item">
+      <i class="pi pi-info-circle"></i>
+      <span>Pipeline health based on last 90 days</span>
+    </div>
+    <div class="insight-item">
+      <i class="pi pi-bolt"></i>
+      <span>
+        Best stage:
+        @if (stages.length > 0) {
+          <strong>{{ stages[0].stage }}</strong> ({{ formatPercentage(stages[0].conversionRate) }})
+        }
+      </span>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,230 @@
+<div class="marker-list-panel">
+  <!-- Header -->
+  <div class="panel-header">
+    <h3 class="panel-title">
+      <i class="pi pi-map-marker"></i>
+      Markers
+    </h3>
+  </div>
+
+  <!-- Active Areas Section -->
+  <div class="list-section">
+    <div class="section-header">
+      <span class="section-title">
+        <i class="pi pi-check-circle"></i>
+        Active Areas
+      </span>
+      <span class="count-badge">{{ activeAreas().length }}</span>
+    </div>
+
+    <div
+      class="area-list"
+      #activeListZone
+      [class.drop-zone-active]="isActiveZoneHovered()"
+      (dragover)="onActiveZoneDragOver($event)"
+      (dragleave)="onActiveZoneDragLeave($event)"
+      (drop)="onActiveZoneDrop($event)"
+    >
+      @for (area of activeAreas(); track area.id) {
+        <div class="area-item-wrapper">
+          <div
+            class="area-item"
+            [class.selected]="selectedAreaId() === area.id"
+            [class.expanded]="expandedAreaId() === area.id"
+            (click)="onActiveAreaClick(area.id)"
+            draggable="true"
+            (dragstart)="onDragStart($event, area.id, 'active')"
+            (dragend)="onDragEnd($event)"
+          >
+            <div class="drag-handle">
+              <i class="pi pi-bars"></i>
+            </div>
+
+            <div class="status-dot" [style.backgroundColor]="getStatusColor(area.status)"></div>
+
+            <div class="area-info">
+              <span class="room-number">{{ area.roomNumber }}</span>
+              <span class="area-type">{{ getTypeLabel(area.type) }}</span>
+            </div>
+
+            <div class="expand-icon">
+              <i [class]="expandedAreaId() === area.id ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+            </div>
+          </div>
+
+          <!-- Expanded Details for Active Area -->
+          @if (expandedAreaId() === area.id) {
+            <div class="area-details">
+              @if (area.currentTenant) {
+                <div class="detail-row">
+                  <span class="detail-label">Tenant:</span>
+                  <span class="detail-value">{{ area.currentTenant.name }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Phone:</span>
+                  <span class="detail-value">{{ area.currentTenant.contactPhone || 'N/A' }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Status:</span>
+                  <span class="status-badge" [style.backgroundColor]="getStatusColor(area.status)">
+                    {{ getStatusLabel(area.status) }}
+                  </span>
+                </div>
+              } @else {
+                <div class="detail-row">
+                  <span class="detail-label">Status:</span>
+                  <span class="status-badge" [style.backgroundColor]="getStatusColor(area.status)">
+                    {{ getStatusLabel(area.status) }}
+                  </span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-value text-gray-500">No tenant assigned</span>
+                </div>
+              }
+
+              <div class="detail-actions">
+                <button type="button" class="btn-see-more" (click)="onSeeMore($event, area.id)">
+                  <i class="pi pi-external-link"></i>
+                  See More
+                </button>
+                <button
+                  type="button"
+                  class="btn-deactivate"
+                  (click)="onMoveToInactive($event, area.id)"
+                >
+                  <i class="pi pi-eye-slash"></i>
+                  Deactivate
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (activeAreas().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <p>No active areas</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Inactive Areas Section -->
+  <div class="list-section">
+    <div class="section-header">
+      <span class="section-title">
+        <i class="pi pi-eye-slash"></i>
+        Inactive Areas
+      </span>
+      <span class="count-badge">{{ inactiveAreas().length }}</span>
+    </div>
+
+    <div
+      class="area-list"
+      #inactiveListZone
+      [class.drop-zone-active]="isInactiveZoneHovered()"
+      (dragover)="onInactiveZoneDragOver($event)"
+      (dragleave)="onInactiveZoneDragLeave($event)"
+      (drop)="onInactiveZoneDrop($event)"
+    >
+      @for (area of inactiveAreas(); track area.id) {
+        <div class="area-item-wrapper">
+          <div
+            class="area-item inactive"
+            [class.expanded]="expandedAreaId() === area.id"
+            (click)="onInactiveAreaClick(area.id)"
+            draggable="true"
+            (dragstart)="onDragStart($event, area.id, 'inactive')"
+            (dragend)="onDragEnd($event)"
+          >
+            <div class="drag-handle">
+              <i class="pi pi-bars"></i>
+            </div>
+
+            <div class="status-dot inactive" [style.backgroundColor]="getStatusColor(area.status)"></div>
+
+            <div class="area-info">
+              <span class="room-number">{{ area.roomNumber }}</span>
+              <span class="area-type">{{ getTypeLabel(area.type) }}</span>
+            </div>
+
+            <div class="expand-icon">
+              <i [class]="expandedAreaId() === area.id ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+            </div>
+          </div>
+
+          <!-- Expanded Details -->
+          @if (expandedAreaId() === area.id) {
+            <div class="area-details">
+              @if (area.currentTenant) {
+                <div class="detail-row">
+                  <span class="detail-label">Tenant:</span>
+                  <span class="detail-value">{{ area.currentTenant.name }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Phone:</span>
+                  <span class="detail-value">{{ area.currentTenant.contactPhone || 'N/A' }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Status:</span>
+                  <span class="status-badge" [style.backgroundColor]="getStatusColor(area.status)">
+                    {{ getStatusLabel(area.status) }}
+                  </span>
+                </div>
+              } @else {
+                <div class="detail-row">
+                  <span class="detail-value text-gray-500">No tenant assigned</span>
+                </div>
+              }
+
+              <div class="detail-actions">
+                <button type="button" class="btn-see-more" (click)="onSeeMore($event, area.id)">
+                  <i class="pi pi-external-link"></i>
+                  See More
+                </button>
+                <button
+                  type="button"
+                  class="btn-activate"
+                  (click)="onMoveToActive($event, area.id)"
+                >
+                  <i class="pi pi-eye"></i>
+                  Activate
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (inactiveAreas().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <p>No inactive areas</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Panel Footer -->
+  <div class="panel-footer">
+    <button
+      type="button"
+      class="btn-add-area"
+      (click)="onAddAreaClick()"
+    >
+      <i class="pi pi-plus"></i>
+      Add New Area
+    </button>
+  </div>
+
+  <!-- Drop Zone Overlay (shown during drag from map) -->
+  @if (isDraggingFromMap()) {
+    <div class="drop-zone-overlay">
+      <div class="drop-zone-indicator">
+        <i class="pi pi-arrow-down"></i>
+        <p>Drop here to deactivate</p>
+      </div>
+    </div>
+  }
+</div>

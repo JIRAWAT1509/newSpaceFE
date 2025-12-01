@@ -1,0 +1,216 @@
+<!-- member-details.component.html -->
+
+<div class="member-details-container">
+
+  @if (member) {
+
+    <!-- ==================== HEADER ==================== -->
+    <div class="details-header">
+
+      <div class="header-left">
+        <div class="member-avatar-large">{{ member.avatar }}</div>
+        <div class="member-info">
+          <h2 class="member-name-large">{{ member.name }}</h2>
+          <p class="member-subtitle">
+            <span class="region-badge">
+              <i class="pi pi-map-marker"></i>
+              {{ member.region }}
+            </span>
+            <span class="role-badge">
+              <i class="pi pi-briefcase"></i>
+              {{ member.role }}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button class="btn-close-details" (click)="onClose()" title="Close">
+          <i class="pi pi-times"></i>
+          <span>Close</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ==================== STATISTICS GRID ==================== -->
+    <div class="statistics-section">
+      <h3 class="section-title">
+        <i class="pi pi-chart-bar"></i>
+        Performance Metrics | เมตริกประสิทธิภาพ
+      </h3>
+
+      <div class="stats-grid">
+        @for (stat of getStatCards(); track stat.label) {
+          <div class="stat-card" [class]="'stat-' + stat.color">
+            <div class="stat-icon-wrapper">
+              <i class="pi" [class]="stat.icon"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-label">
+                <span class="label-en">{{ stat.label }}</span>
+                <span class="label-th">{{ stat.labelTh }}</span>
+              </div>
+              @if (stat.subValue) {
+                <div class="stat-subvalue">{{ stat.subValue }}</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ==================== SALES BREAKDOWN ==================== -->
+    <div class="sales-breakdown-section">
+      <h3 class="section-title">
+        <i class="pi pi-dollar"></i>
+        Sales Breakdown | รายละเอียดยอดขาย
+      </h3>
+
+      <div class="breakdown-grid">
+        <!-- This Year -->
+        <div class="breakdown-card primary">
+          <div class="breakdown-header">
+            <span class="breakdown-label">This Year | ปีนี้</span>
+          </div>
+          <div class="breakdown-value">{{ formatCurrency(member.salesThisYear) }}</div>
+          <div class="breakdown-progress">
+            <div class="progress-bar-breakdown">
+              <div class="progress-fill-breakdown" [style.width.%]="72"></div>
+            </div>
+            <span class="progress-text">72% of target</span>
+          </div>
+        </div>
+
+        <!-- This Week -->
+        <div class="breakdown-card">
+          <div class="breakdown-header">
+            <span class="breakdown-label">This Week | สัปดาห์นี้</span>
+          </div>
+          <div class="breakdown-value">{{ formatCurrency(member.salesThisWeek) }}</div>
+          <div class="breakdown-comparison">
+            <span class="comparison-label">vs last week:</span>
+            <span class="comparison-value">{{ formatCurrency(member.salesLastWeek) }}</span>
+          </div>
+        </div>
+
+        <!-- Weekly Average -->
+        <div class="breakdown-card">
+          <div class="breakdown-header">
+            <span class="breakdown-label">Weekly Average | เฉลี่ยต่อสัปดาห์</span>
+          </div>
+          <div class="breakdown-value">
+            @if (member.weeklySalesHistory && member.weeklySalesHistory.length > 0) {
+<div class="breakdown-value">
+  {{ formatCurrency(getWeeklyAverage(member)) }}
+</div>            } @else {
+              {{ formatCurrency(0) }}
+            }
+          </div>
+          <div class="breakdown-comparison">
+            <span class="comparison-label">Last 8 weeks</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== ACTIVITY CALENDAR ==================== -->
+    <div class="calendar-section">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h3 class="section-title">
+            <i class="pi pi-calendar"></i>
+            Activity Calendar | ปฏิทินกิจกรรม
+          </h3>
+          <p class="section-subtitle">Assignments only - Personal tasks hidden</p>
+        </div>
+
+        <div class="calendar-controls">
+          <!-- View Toggle -->
+          <button
+            class="btn-calendar-toggle"
+            (click)="toggleCalendarView()"
+            title="Toggle View"
+          >
+            <i [class]="calendarView() === 'month' ? 'pi pi-calendar' : 'pi pi-list'"></i>
+            <span>{{ calendarView() === 'month' ? 'Week' : 'Month' }}</span>
+          </button>
+
+          <!-- Navigation -->
+          <div class="calendar-nav">
+            <button
+              class="btn-calendar-nav"
+              (click)="navigateCalendar('prev')"
+              title="Previous"
+            >
+              <i class="pi pi-chevron-left"></i>
+            </button>
+
+            <button
+              class="btn-today"
+              (click)="goToToday()"
+            >
+              Today
+            </button>
+
+            <button
+              class="btn-calendar-nav"
+              (click)="navigateCalendar('next')"
+              title="Next"
+            >
+              <i class="pi pi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendar Component Placeholder -->
+      <!-- Uncomment and use actual activity-calendar component -->
+      <div class="calendar-content">
+
+        <app-activity-calendar
+          [activities]="$any(convertActivitiesForCalendar())"
+          [view]="calendarView()"
+          [currentDate]="currentDate()"
+          [selectedDate]="null"
+          (activityClick)="onActivityClick($event)"
+          (dayClick)="onDayClick($event)"
+        ></app-activity-calendar>
+
+
+        <!-- Temporary placeholder until you integrate actual calendar -->
+        <!-- <div class="calendar-placeholder">
+          <div class="placeholder-icon">
+            <i class="pi pi-calendar"></i>
+          </div>
+          <h4>Activity Calendar</h4>
+          <p>{{ getCurrentMonthDisplay() }}</p>
+          <p class="placeholder-note">
+            <strong>{{ activities.length }}</strong> activities scheduled
+          </p>
+          <div class="placeholder-activities">
+            @for (activity of activities.slice(0, 5); track activity.id) {
+              <div class="placeholder-activity-item">
+                <i class="pi pi-circle-fill" [style.color]="activity.color"></i>
+                <span>{{ activity.title }}</span>
+                <span class="activity-date">{{ DateTime.fromISO(activity.startDate).toFormat('MMM dd') }}</span>
+              </div>
+            }
+            @if (activities.length > 5) {
+              <div class="placeholder-more">
+                +{{ activities.length - 5 }} more activities
+              </div>
+            }
+          </div>
+          <p class="integration-note">
+            💡 <strong>Integration Note:</strong> Uncomment the <code>&lt;app-activity-calendar&gt;</code>
+            component in the HTML and import it in TypeScript to show the full calendar.
+          </p>
+        </div> -->
+      </div>
+    </div>
+
+  }
+
+</div>

@@ -1,0 +1,33 @@
+<div class="area-floor-data-container">
+  @if (selectedAreaId()) {
+    <!-- Specific Area View -->
+    <div class="specific-view">
+      <div class="data-header">
+        <button
+          type="button"
+          class="back-button"
+          (click)="onBackToGeneral()"
+        >
+          <i class="pi pi-arrow-left"></i>
+          <span>Back to Floor Overview</span>
+        </button>
+      </div>
+
+      <div class="data-content">
+        <h3 class="data-title">Area Details</h3>
+        <p class="placeholder-text">area data : {{ selectedAreaId() }}</p>
+      </div>
+    </div>
+  } @else {
+    <!-- General Floor View -->
+    <div class="general-view">
+      <div class="data-header">
+        <h3 class="data-title">Floor Overview</h3>
+      </div>
+
+      <div class="data-content">
+        <p class="placeholder-text">General floor info</p>
+      </div>
+    </div>
+  }
+</div>

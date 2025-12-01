@@ -1,0 +1,129 @@
+.area-availability-container {
+  @apply p-6 bg-white rounded-lg shadow-sm border border-gray-200;
+}
+
+.section-header {
+  @apply mb-6;
+}
+
+.section-title {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+/* Status Cards Grid - 4 columns */
+.status-cards-grid {
+  @apply grid grid-cols-4 gap-4 mb-6;
+}
+
+.status-card {
+  @apply relative flex items-center gap-4 p-4 rounded-xl;
+  @apply bg-white border-2 border-gray-200;
+  @apply cursor-pointer transition-all duration-200;
+  @apply hover:shadow-md hover:border-gray-300;
+}
+
+.status-card.active {
+  @apply border-blue-500 bg-blue-50 shadow-lg;
+}
+
+.status-card.dimmed {
+  @apply opacity-40;
+}
+
+/* Icon Circle */
+.icon-circle {
+  @apply w-14 h-14 rounded-xl flex items-center justify-center;
+  @apply flex-shrink-0;
+  @apply shadow-sm;
+}
+
+.icon-circle i {
+  @apply text-white text-2xl;
+}
+
+/* Card Content */
+.card-content {
+  @apply flex-1 flex flex-col gap-1;
+}
+
+.card-header {
+  @apply flex items-baseline justify-between gap-2;
+}
+
+.card-label-th {
+  @apply text-sm font-semibold text-gray-800;
+}
+
+.card-count {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+.card-label-en {
+  @apply text-xs text-gray-500 uppercase tracking-wide;
+}
+
+/* Selection Check */
+.selection-check {
+  @apply absolute -top-2 -right-2;
+  @apply w-6 h-6 rounded-full bg-blue-500 text-white;
+  @apply flex items-center justify-center;
+  @apply shadow-md;
+}
+
+.selection-check i {
+  @apply text-xs;
+}
+
+/* Percentage Bar */
+.percentage-bar {
+  @apply flex h-10 rounded-lg overflow-hidden shadow-inner;
+  @apply bg-gray-100;
+}
+
+.bar-segment {
+  @apply transition-all duration-300 flex items-center justify-center;
+  @apply hover:opacity-90;
+}
+
+.bar-text {
+  @apply text-sm font-bold text-white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1280px) {
+  .status-cards-grid {
+    @apply grid-cols-2 gap-3;
+  }
+
+  .icon-circle {
+    @apply w-12 h-12;
+  }
+
+  .icon-circle i {
+    @apply text-xl;
+  }
+
+  .card-count {
+    @apply text-xl;
+  }
+}
+
+@media (max-width: 640px) {
+  .status-cards-grid {
+    @apply grid-cols-1;
+  }
+
+  .area-availability-container {
+    @apply p-4;
+  }
+}
+
+/* Hover Effects */
+.status-card:not(.dimmed):hover {
+  @apply transform -translate-y-1;
+}
+
+.status-card.active:hover {
+  @apply border-blue-600 shadow-xl;
+}

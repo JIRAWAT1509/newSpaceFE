@@ -1,0 +1,539 @@
+/* stage-conversion-table.component.css - LIGHT BLUE THEME */
+
+/* ==================== CONTAINER ==================== */
+.stage-conversion-container {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================== HEADER ==================== */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.table-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.table-title i {
+  color: #3b82f6;
+  font-size: 1.375rem;
+}
+
+.table-subtitle {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 0;
+  padding-left: 2.125rem; /* Align with title text */
+}
+
+/* Summary Stats */
+.summary-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+/* ==================== TABLE ==================== */
+.conversion-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Table Row */
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 0.8fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.table-header-row {
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.data-row {
+  padding: 1rem;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.data-row:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  transform: translateX(4px);
+}
+
+/* Table Cells */
+.table-cell {
+  display: flex;
+  align-items: center;
+}
+
+.header-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.header-subtitle {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* ==================== STAGE CELL ==================== */
+.stage-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stage-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.stage-icon-wrapper.icon-blue {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #3b82f6;
+}
+
+.stage-icon-wrapper.icon-green {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #10b981;
+}
+
+.stage-icon-wrapper.icon-purple {
+  background: linear-gradient(135deg, #e9d5ff, #d8b4fe);
+  color: #8b5cf6;
+}
+
+.stage-icon-wrapper.icon-orange {
+  background: linear-gradient(135deg, #fed7aa, #fbbf24);
+  color: #f59e0b;
+}
+
+.stage-icon-wrapper i {
+  font-size: 1.125rem;
+}
+
+.stage-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.stage-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.stage-name-th {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* ==================== CONVERSION CELL ==================== */
+.conv-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.conv-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  align-self: flex-start;
+}
+
+.conv-badge.excellent {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.conv-badge.good {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.conv-badge.fair {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.conv-badge.poor {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.conv-badge i {
+  font-size: 0.875rem;
+}
+
+.conv-value {
+  font-size: 0.9375rem;
+}
+
+/* Progress Bar */
+.conv-progress {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.conv-progress-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease-out;
+}
+
+.conv-progress-bar.excellent {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.conv-progress-bar.good {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.conv-progress-bar.fair {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.conv-progress-bar.poor {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+/* ==================== DAYS CELL ==================== */
+.days-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.days-content i {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.days-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.days-unit {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* ==================== DEALS CELL ==================== */
+.deals-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 36px;
+  padding: 0 0.875rem;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.deals-count {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ==================== FOOTER ==================== */
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e5e7eb;
+  gap: 1rem;
+}
+
+.insight-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.insight-item i {
+  color: #3b82f6;
+  font-size: 1rem;
+}
+
+.insight-item strong {
+  color: #1f2937;
+  font-weight: 700;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1280px) {
+  .stage-conversion-container {
+    padding: 1.25rem;
+  }
+
+  .table-row {
+    gap: 0.75rem;
+  }
+
+  .summary-stats {
+    gap: 1rem;
+  }
+
+  .summary-value {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .table-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .summary-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .table-row {
+    grid-template-columns: 2fr 1.5fr 1fr 0.8fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .stage-conversion-container {
+    padding: 1rem;
+  }
+
+  .table-title {
+    font-size: 1.125rem;
+  }
+
+  /* Stack table rows */
+  .table-header-row {
+    display: none; /* Hide header on mobile */
+  }
+
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .data-row {
+    padding: 0.875rem;
+  }
+
+  /* Mobile-friendly cell layout */
+  .stage-cell {
+    grid-column: 1;
+  }
+
+  .conv-cell,
+  .days-cell,
+  .deals-cell {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .conv-cell::before,
+  .days-cell::before,
+  .deals-cell::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #6b7280;
+    font-size: 0.8125rem;
+  }
+
+  .conv-cell::before {
+    content: 'Conv. Rate:';
+  }
+
+  .days-cell::before {
+    content: 'Median Days:';
+  }
+
+  .deals-cell::before {
+    content: 'Deals:';
+  }
+
+  .stage-icon-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+
+  .stage-icon-wrapper i {
+    font-size: 1rem;
+  }
+
+  .stage-name {
+    font-size: 0.875rem;
+  }
+
+  .summary-stats {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .summary-item {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 6px;
+  }
+
+  .table-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .stage-conversion-container {
+    padding: 0.875rem;
+  }
+
+  .table-title {
+    font-size: 1rem;
+  }
+
+  .data-row:hover {
+    transform: none;
+  }
+
+  .stage-content {
+    gap: 0.5rem;
+  }
+
+  .conv-content {
+    width: 100%;
+  }
+
+  .deals-badge {
+    min-width: 40px;
+    height: 32px;
+  }
+
+  .deals-count {
+    font-size: 1rem;
+  }
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+  .stage-conversion-container {
+    box-shadow: none;
+  }
+
+  .data-row:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .table-footer {
+    page-break-inside: avoid;
+  }
+}
+
+/* ==================== ANIMATION ==================== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.data-row {
+  animation: slideIn 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.data-row:nth-child(1) { animation-delay: 0.1s; }
+.data-row:nth-child(2) { animation-delay: 0.2s; }
+.data-row:nth-child(3) { animation-delay: 0.3s; }
+.data-row:nth-child(4) { animation-delay: 0.4s; }

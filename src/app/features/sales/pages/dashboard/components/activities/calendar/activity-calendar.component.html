@@ -1,0 +1,207 @@
+<!-- activity-calendar.component.html - FIXED VERSION -->
+
+<div class="calendar-container">
+
+  <!-- ==================== MONTH VIEW ==================== -->
+  @if (view === 'month') {
+    <div class="month-view">
+
+      <!-- Month Header with Weekday Labels -->
+      <div class="month-header">
+        @for (day of weekdays; track day; let i = $index) {
+          <div class="weekday-label">
+            <span class="weekday-en">{{ day }}</span>
+            <span class="weekday-th">{{ weekdaysTh[i] }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="month-grid">
+        @for (week of calendarWeeks(); track week) {
+          <div class="calendar-row">
+            @for (day of week.days; track day.date.toISO()) {
+              <div
+                class="calendar-cell"
+                [class.other-month]="!day.isCurrentMonth"
+                [class.today]="day.isToday"
+                [class.selected-date]="isSelectedDate(day.date)"
+                [class.weekend]="day.isWeekend"
+                [class.clickable]="true"
+                (click)="onDayClick(day.date, $event)"
+              >
+                <!-- Day Number -->
+                <div class="day-header">
+                  <span
+                    class="day-number"
+                    [class.today-number]="day.isToday"
+                  >
+                    {{ day.day }}
+                  </span>
+                </div>
+
+                <!-- Activities List -->
+                <div class="day-activities">
+                  @for (activity of day.activities; track activity.id) {
+                    <div
+                      class="activity-bar"
+                      [class]="getTypeClass(activity.type)"
+                      [style]="getActivityBarStyle(activity, day.date)"
+                      [class.overdue-activity]="isOverdue(activity)"
+                      (click)="onActivityClick(activity.id, $event)"
+                      [title]="activity.title"
+                    >
+                      <!-- Activity Content -->
+                      <div class="activity-content">
+                        <span class="activity-title">
+                          {{ formatActivityTitle(activity.title, 20) }}
+                        </span>
+                        @if (getActivityTimeDisplay(activity)) {
+                          <span class="activity-time">
+                            {{ getActivityTimeDisplay(activity) }}
+                          </span>
+                        }
+                      </div>
+
+                      <!-- Status Indicator -->
+                      <div
+                        class="activity-status-dot"
+                        [class]="getStatusClass(activity.status)"
+                      ></div>
+                    </div>
+                  }
+
+                  <!-- Show "+N more" if more than 3 activities -->
+                  @if (day.activities.length >= 3) {
+                    <div class="more-activities" (click)="onDayClick(day.date, $event)">
+                      +{{ day.activities.length - 3 }} เพิ่มเติม
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ==================== WEEK VIEW ==================== -->
+  @if (view === 'week') {
+    <div class="week-view">
+
+      <!-- Week Header with Days -->
+      <div class="week-header">
+        <!-- Time column header -->
+        <div class="time-column-header"></div>
+
+        <!-- Day columns -->
+        @for (day of weekViewDays(); track day.date.toISO()) {
+          <div
+            class="day-column-header"
+            [class.today-column]="day.isToday"
+            [class.clickable]="true"
+            (click)="onDayClick(day.date, $event)"
+          >
+            <div class="day-info">
+              <span class="day-name">{{ day.dayName.toUpperCase() }}</span>
+              <span
+                class="day-date"
+                [class.today-date]="day.isToday"
+              >
+                {{ day.dayNumber }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Week Grid Container -->
+      <div class="week-grid-container">
+
+        <!-- Time Column -->
+        <div class="time-column">
+          @for (slot of timeSlots(); track slot.hour) {
+            <div class="time-slot">
+              @if (slot.hour >= 0) {
+                <span class="time-label">{{ getTimeLabel(slot.hour) }}</span>
+              } @else {
+                <span class="time-label timezone">{{ slot.label }}</span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Days Grid -->
+        <div class="days-grid">
+          <!-- Grid Lines (Background) -->
+          <div class="grid-lines">
+            @for (slot of timeSlots(); track slot.hour) {
+              @if (slot.hour >= 0) {
+                <div class="grid-line"></div>
+              }
+            }
+          </div>
+
+          <!-- Day Columns with Activities -->
+          @for (day of weekViewDays(); track day.date.toISO(); let i = $index) {
+            <div
+              class="day-column"
+              [class.today-column]="day.isToday"
+              [class.clickable]="true"
+              (click)="onDayClick(day.date, $event)"
+            >
+              <!-- Activities for this day -->
+              @for (activityWithTime of day.activities; track activityWithTime.activity.id) {
+                <div
+                  class="week-activity"
+                  [class]="getTypeClass(activityWithTime.activity.type)"
+                  [class.overdue-activity]="isOverdue(activityWithTime.activity)"
+                  [style]="getWeekViewActivityStyle(activityWithTime)"
+                  (click)="onActivityClick(activityWithTime.activity.id, $event)"
+                >
+                  <!-- Activity Content -->
+                  <div class="week-activity-content">
+                    <div class="activity-header">
+                      <span class="activity-title-week">
+                        {{ formatActivityTitle(activityWithTime.activity.title, 25) }}
+                      </span>
+                      <span
+                        class="activity-status-badge"
+                        [class]="getStatusClass(activityWithTime.activity.status)"
+                      ></span>
+                    </div>
+
+                    <div class="activity-time-week">
+                      {{ activityWithTime.startTime.toFormat('HH:mm') }} -
+                      {{ activityWithTime.endTime.toFormat('HH:mm') }}
+                    </div>
+
+                    @if (activityWithTime.spansDays > 1) {
+                      <div class="activity-duration">
+                        <i class="pi pi-calendar"></i>
+                        <span>{{ activityWithTime.spansDays }} วัน</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Current Time Indicator (only for today) -->
+              @if (day.isToday) {
+                <div
+                  class="current-time-indicator"
+                  [style.top.px]="(DateTime.now().hour * 60 + DateTime.now().minute) / 60 * 60"
+                >
+                  <div class="time-dot"></div>
+                  <div class="time-line"></div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

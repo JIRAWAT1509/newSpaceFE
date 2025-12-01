@@ -1,0 +1,144 @@
+<div class="floor-plan-wrapper">
+  <!-- Top Left: Building Selector -->
+  <div class="top-left-controls">
+    <p-select
+      [options]="getBuildingOptions()"
+      [ngModel]="selectedBuildingId()"
+      (ngModelChange)="onBuildingChanged($event)"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="building-dropdown"
+      placeholder="Select Building"
+    />
+  </div>
+
+  <!-- Top Center: Floor Dropdown -->
+  <div class="top-center-controls">
+    <p-select
+      [options]="getFloorOptions()"
+      [ngModel]="selectedFloorId()"
+      (ngModelChange)="onFloorChanged($event)"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="floor-dropdown"
+      placeholder="Select Floor"
+    />
+  </div>
+
+  <!-- Top Right: Zoom Controls -->
+  <div class="top-right-controls">
+    <div class="zoom-controls">
+      <button
+        type="button"
+        class="zoom-button"
+        (click)="onZoomIn()"
+        [disabled]="zoomLevel() >= 3.0"
+      >
+        <i class="pi pi-plus"></i>
+      </button>
+      <button
+        type="button"
+        class="zoom-button"
+        (click)="onZoomOut()"
+        [disabled]="zoomLevel() <= 0.5"
+      >
+        <i class="pi pi-minus"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Middle Left: Previous Floor Arrow -->
+  <button
+    type="button"
+    class="arrow-button arrow-left"
+    (click)="goToPreviousFloor()"
+  >
+    <i class="pi pi-chevron-left"></i>
+  </button>
+
+  <!-- Middle Right: Next Floor Arrow -->
+  <button
+    type="button"
+    class="arrow-button arrow-right"
+    (click)="goToNextFloor()"
+  >
+    <i class="pi pi-chevron-right"></i>
+  </button>
+
+  <!-- Floor Plan Container -->
+  <div
+    class="floor-plan-container"
+    (wheel)="onWheel($event)"
+    (mousedown)="onMouseDown($event)"
+    (mousemove)="onMouseMove($event)"
+    (mouseup)="onMouseUp($event)"
+  >
+    <div
+      class="floor-plan-content"
+      [style.transform]="'translate(' + panOffset().x + 'px, ' + panOffset().y + 'px) scale(' + zoomLevel() + ')'"
+    >
+      <!-- Floor Plan Image -->
+      @if (currentFloorImage()) {
+        <img
+          [src]="currentFloorImage()"
+          alt="Floor Plan"
+          class="floor-plan-image"
+        />
+      }
+
+      <!-- Area Markers -->
+      @for (area of visibleAreas(); track area.id) {
+        <app-area-marker
+          [area]="area"
+          [zoomLevel]="zoomLevel()"
+          [isSelected]="selectedAreaId() === area.id"
+          [isDraggable]="false"
+          [shouldPulse]="shouldPulseMarker(area)"
+          (markerClicked)="onMarkerClicked($event)"
+        />
+      }
+    </div>
+  </div>
+
+  <!-- Bottom Left: Filter Toggle -->
+  <div class="bottom-left-controls">
+    <button
+      type="button"
+      class="filter-toggle-button"
+      (click)="toggleFilterBar()"
+      [title]="showFilterBar() ? 'Hide status bar' : 'Show status bar'"
+    >
+      <i [class]="showFilterBar() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+    </button>
+  </div>
+
+  <!-- Bottom Center: Status Bar -->
+  @if (showFilterBar()) {
+    <div class="bottom-center-controls">
+      <app-floor-status-bar
+        [statusDistribution]="floorStatusDistribution()"
+      />
+    </div>
+  }
+
+  <!-- Bottom Right: Edit Button -->
+  <div class="bottom-right-controls">
+    <button
+      type="button"
+      class="edit-button"
+      (click)="onEditAreas()"
+    >
+      <i class="pi pi-pencil"></i>
+      <span>แก้ไขพื้นที่</span>
+    </button>
+  </div>
+</div>
+
+<!-- Edit Floor Modal -->
+<app-edit-floor-modal
+  [visible]="showEditModal()"
+  [currentFloor]="currentFloor()"
+  [areas]="areas()"
+  (closed)="onEditModalClose()"
+  (saved)="onEditModalSave($event)"
+/>

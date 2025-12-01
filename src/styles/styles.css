@@ -3,4 +3,28 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './styles/table.css';
+/* Import table styles - same folder */
+@import './table.css';
+
+/* Import PrimeNG - use ~ for node_modules */
+@import '~primeng/resources/themes/lara-light-blue/theme.css';
+@import '~primeng/resources/primeng.min.css';
+@import '~primeicons/primeicons.css';
+
+/* Import PrimeNG overrides - same folder as this file */
+@import './primeng-overrides.css';
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+  font-size: 14px;
+  color: #1f2937;
+  background-color: #f8f9fa;
+}

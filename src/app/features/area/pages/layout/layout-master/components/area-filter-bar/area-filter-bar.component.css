@@ -1,0 +1,103 @@
+.filter-bar-container {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4;
+}
+
+.filter-bar-content {
+  @apply flex flex-wrap items-center gap-6;
+}
+
+.filter-group {
+  @apply flex items-center gap-3;
+}
+
+.filter-label {
+  @apply text-sm font-semibold text-gray-700 whitespace-nowrap;
+}
+
+.filter-buttons {
+  @apply flex items-center gap-2;
+}
+
+.filter-chip {
+  @apply px-4 py-2 text-sm font-medium rounded-lg;
+  @apply border-2 border-gray-300 bg-white text-gray-700;
+  @apply hover:border-blue-400 hover:bg-blue-50;
+  @apply transition-all duration-200;
+  @apply flex items-center gap-2;
+}
+
+.filter-chip i {
+  @apply text-xs;
+}
+
+.filter-chip.active {
+  @apply border-blue-500 bg-blue-500 text-white;
+  @apply hover:border-blue-600 hover:bg-blue-600;
+}
+
+.clear-filter-button {
+  @apply flex items-center gap-2 px-3 py-2 text-sm font-medium;
+  @apply text-red-600 hover:text-red-700;
+  @apply hover:bg-red-50 rounded-lg;
+  @apply transition-colors duration-200;
+}
+
+.clear-filter-button i {
+  @apply text-xs;
+}
+
+.search-group {
+  @apply flex-1;
+}
+
+.search-input-wrapper {
+  @apply relative flex items-center flex-1;
+  @apply min-w-[300px];
+}
+
+.search-icon {
+  @apply absolute left-3 text-gray-400 text-sm;
+}
+
+.search-input {
+  @apply w-full pl-10 pr-10 py-2 text-sm;
+  @apply border-2 border-gray-300 rounded-lg;
+  @apply focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200;
+  @apply transition-all duration-200;
+}
+
+.search-input::placeholder {
+  @apply text-gray-400;
+}
+
+.clear-button {
+  @apply absolute right-3 text-gray-400 hover:text-gray-600;
+  @apply transition-colors duration-200;
+}
+
+.clear-button i {
+  @apply text-sm;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .filter-bar-content {
+    @apply flex-col items-stretch gap-4;
+  }
+
+  .filter-group {
+    @apply flex-col items-start;
+  }
+
+  .filter-buttons {
+    @apply w-full flex-wrap;
+  }
+
+  .filter-chip {
+    @apply flex-1;
+  }
+
+  .search-input-wrapper {
+    @apply min-w-full;
+  }
+}

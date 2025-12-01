@@ -1,0 +1,270 @@
+<!-- monte-carlo-forecast.component.html -->
+
+<div class="monte-carlo-container">
+
+  <!-- ==================== HEADER ==================== -->
+  <div class="forecast-header">
+    <div class="header-content">
+      <h3 class="forecast-title">
+        <i class="pi pi-chart-line"></i>
+        Monte Carlo Forecast
+      </h3>
+      <p class="forecast-subtitle">การคาดการณ์แบบจำลอง</p>
+    </div>
+
+    <!-- Run Simulation Button -->
+    <button
+      class="simulate-btn"
+      [class.running]="isSimulating()"
+      [disabled]="isSimulating()"
+      (click)="onRunSimulation()"
+    >
+      @if (isSimulating()) {
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Running...</span>
+      } @else {
+        <i class="pi pi-refresh"></i>
+        <span>Run Simulation</span>
+      }
+    </button>
+  </div>
+
+  @if (simulationData()) {
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div class="forecast-content">
+
+      <!-- Left: Probability Gauge -->
+      <div class="probability-section">
+
+        <!-- Circular Gauge -->
+        <div class="probability-gauge">
+          <svg viewBox="0 0 200 200" class="gauge-svg">
+
+            <!-- Background circle -->
+            <circle
+              cx="100"
+              cy="100"
+              r="85"
+              fill="none"
+              stroke="#f3f4f6"
+              stroke-width="12"
+            />
+
+            <!-- Progress circle -->
+            <circle
+              cx="100"
+              cy="100"
+              r="85"
+              fill="none"
+              [attr.stroke]="getProbabilityColor()"
+              stroke-width="12"
+              stroke-linecap="round"
+              [style.stroke-dasharray]="534"
+              [style.stroke-dashoffset]="534 - (534 * currentProbability() / 100)"
+              class="gauge-progress"
+            />
+
+            <!-- Center content -->
+            <text
+              x="100"
+              y="90"
+              text-anchor="middle"
+              class="gauge-percentage"
+            >
+              {{ currentProbability() }}%
+            </text>
+            <text
+              x="100"
+              y="110"
+              text-anchor="middle"
+              class="gauge-label"
+            >
+              Success Rate
+            </text>
+            <text
+              x="100"
+              y="125"
+              text-anchor="middle"
+              class="gauge-sublabel"
+            >
+              อัตราความสำเร็จ
+            </text>
+          </svg>
+
+          <!-- Status badge -->
+          <div
+            class="status-badge"
+            [class]="successLikelihood()"
+          >
+            <i class="pi" [class.pi-check-circle]="successLikelihood() === 'excellent' || successLikelihood() === 'good'" [class.pi-exclamation-triangle]="successLikelihood() === 'fair' || successLikelihood() === 'poor'"></i>
+            <span>{{ getProbabilityLabel() }} | {{ getProbabilityLabelTh() }}</span>
+          </div>
+        </div>
+
+        <!-- Simulation Info -->
+        <div class="simulation-info">
+          <div class="info-item">
+            <i class="pi pi-calculator"></i>
+            <span>{{ simulationData()!.simulations }} simulations</span>
+          </div>
+          @if (lastSimulationTime()) {
+            <div class="info-item">
+              <i class="pi pi-clock"></i>
+              <span>Last run: {{ lastSimulationTime() }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right: Metrics -->
+      <div class="metrics-section">
+
+        <!-- Target vs Pipeline -->
+        <div class="metric-card target-card">
+          <div class="metric-header">
+            <i class="pi pi-flag"></i>
+            <span class="metric-title">Target vs Pipeline</span>
+          </div>
+          <div class="metric-values">
+            <div class="value-row">
+              <span class="value-label">Target:</span>
+              <span class="value-amount target">{{ formatCurrency(simulationData()!.target) }}</span>
+            </div>
+            <div class="value-row">
+              <span class="value-label">Pipeline:</span>
+              <span class="value-amount pipeline">{{ formatCurrency(simulationData()!.currentPipeline) }}</span>
+            </div>
+            <div class="value-row highlight">
+              <span class="value-label">Expected:</span>
+              <span class="value-amount expected">{{ formatCurrency(simulationData()!.expectedRevenue) }}</span>
+            </div>
+          </div>
+          <!-- Coverage bar -->
+          <div class="coverage-bar">
+            <div class="coverage-label">
+              <span>Pipeline Coverage:</span>
+              <span class="coverage-value">{{ pipelineCoverage() }}%</span>
+            </div>
+            <div class="coverage-progress">
+              <div
+                class="coverage-fill"
+                [style.width.%]="pipelineCoverage()"
+                [class.good]="pipelineCoverage() >= 100"
+                [class.warning]="pipelineCoverage() < 100 && pipelineCoverage() >= 80"
+                [class.danger]="pipelineCoverage() < 80"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gap Analysis -->
+        <div class="metric-card gap-card">
+          <div class="metric-header">
+            <i class="pi pi-chart-bar"></i>
+            <span class="metric-title">Gap Analysis</span>
+          </div>
+          <div class="gap-content">
+            <div class="gap-value-display">
+              <span class="gap-amount" [class.positive]="gapToTarget() >= 0" [class.negative]="gapToTarget() < 0">
+                {{ gapToTarget() >= 0 ? '+' : '' }}{{ formatCurrency(gapToTarget()) }}
+              </span>
+              <span class="gap-percentage" [class.positive]="gapPercentage() >= 0" [class.negative]="gapPercentage() < 0">
+                ({{ gapPercentage() >= 0 ? '+' : '' }}{{ gapPercentage() }}%)
+              </span>
+            </div>
+            <div class="gap-label">
+              @if (gapToTarget() >= 0) {
+                <i class="pi pi-arrow-up"></i>
+                <span>Above target | เหนือเป้าหมาย</span>
+              } @else {
+                <i class="pi pi-arrow-down"></i>
+                <span>Below target | ต่ำกว่าเป้าหมาย</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Confidence Interval -->
+        <div class="metric-card confidence-card">
+          <div class="metric-header">
+            <i class="pi pi-sliders-h"></i>
+            <span class="metric-title">95% Confidence Interval</span>
+          </div>
+          <div class="confidence-range">
+            <div class="range-value lower">
+              <span class="range-label">Lower:</span>
+              <span class="range-amount">{{ formatCurrency(simulationData()!.confidenceInterval.lower) }}</span>
+            </div>
+            <div class="range-separator">
+              <i class="pi pi-arrows-h"></i>
+            </div>
+            <div class="range-value upper">
+              <span class="range-label">Upper:</span>
+              <span class="range-amount">{{ formatCurrency(simulationData()!.confidenceInterval.upper) }}</span>
+            </div>
+          </div>
+          <div class="confidence-bar">
+            <div
+              class="confidence-fill"
+              [style.left.%]="(simulationData()!.confidenceInterval.lower / simulationData()!.target) * 100"
+              [style.width.%]="((simulationData()!.confidenceInterval.upper - simulationData()!.confidenceInterval.lower) / simulationData()!.target) * 100"
+            ></div>
+            <div
+              class="target-marker"
+              [style.left.%]="100"
+            >
+              <i class="pi pi-flag-fill"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== SIMULATION PROGRESS ==================== -->
+    @if (isSimulating()) {
+      <div class="simulation-progress">
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            [style.width.%]="simulationProgress()"
+          ></div>
+        </div>
+        <div class="progress-text">
+          <span>Running {{ simulationData()!.simulations }} simulations...</span>
+          <span class="progress-percentage">{{ simulationProgress() }}%</span>
+        </div>
+      </div>
+    }
+
+    <!-- ==================== FOOTER ==================== -->
+    <div class="forecast-footer">
+      <div class="insight-item">
+        <i class="pi pi-info-circle"></i>
+        <span>Based on historical win rate of {{ winRate }}%</span>
+      </div>
+
+      <button
+        class="export-btn"
+        (click)="exportSimulationData()"
+        title="Export simulation data"
+      >
+        <i class="pi pi-download"></i>
+        <span>Export</span>
+      </button>
+    </div>
+
+  } @else {
+
+    <!-- ==================== NO DATA STATE ==================== -->
+    <div class="no-data-state">
+      <i class="pi pi-chart-line"></i>
+      <p>No forecast data available</p>
+      <span>Run a simulation to see predictions</span>
+    </div>
+
+  }
+
+</div>

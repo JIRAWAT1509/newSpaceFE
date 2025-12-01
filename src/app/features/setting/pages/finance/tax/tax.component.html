@@ -1,0 +1,444 @@
+<div class="tax-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">ภาษี</h1>
+        <p class="page-subtitle">จัดการข้อมูลภาษีมูลค่าเพิ่มและภาษีหัก ณ ที่จ่าย</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <!-- VAT Card -->
+    <div
+      class="summary-card"
+      [class.active]="selectedTaxType() === 'vat'"
+      (click)="selectTaxType('vat')">
+      <div class="card-icon vat-icon">
+        <i class="pi pi-percentage"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">ภาษีมูลค่าเพิ่ม</div>
+        <div class="card-value">{{ vatCount() }}</div>
+        <div class="card-sublabel">VAT</div>
+      </div>
+    </div>
+
+    <!-- Withholding Tax Card -->
+    <div
+      class="summary-card"
+      [class.active]="selectedTaxType() === 'withholding'"
+      (click)="selectTaxType('withholding')">
+      <div class="card-icon withholding-icon">
+        <i class="pi pi-wallet"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-label">ภาษีหัก ณ ที่จ่าย</div>
+        <div class="card-value">{{ withholdingCount() }}</div>
+        <div class="card-sublabel">WITHHOLDING TAX</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Section -->
+  <div class="data-section">
+    <!-- VAT Section -->
+    @if (selectedTaxType() === 'vat') {
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="pi pi-percentage"></i>
+          ภาษีมูลค่าเพิ่ม
+        </h2>
+        <div class="section-actions">
+          <div class="search-box">
+            <i class="pi pi-search search-icon"></i>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="ค้นหา..."
+              [value]="searchQuery()"
+              (input)="onSearch($event)">
+          </div>
+          <button
+            pButton
+            type="button"
+            label="เพิ่ม"
+            icon="pi pi-plus"
+            class="p-button-primary"
+            (click)="openVATModal()"></button>
+        </div>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <i class="pi pi-spin pi-spinner loading-icon"></i>
+          <p>กำลังโหลดข้อมูล...</p>
+        </div>
+      } @else if (filteredVATTaxes().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox empty-icon"></i>
+          <p>ไม่พบข้อมูล</p>
+        </div>
+      } @else {
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">
+                  <input type="checkbox" />
+                </th>
+                <th>รหัสภาษี</th>
+                <th>ชื่อภาษี</th>
+                <th>อัตราภาษี (%)</th>
+                <th>รหัสภาษีบัญชีแยกเงิน (SAP)</th>
+                <th>เลขที่บัญชี</th>
+                <th>เลขที่บัญชีรับวิธีการที่เกี่ยวข้องกัน</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (tax of filteredVATTaxes(); track tax.id) {
+                <tr class="clickable-row" (click)="onVATRowClick(tax)">
+                  <td (click)="$event.stopPropagation()">
+                    <input type="checkbox" />
+                  </td>
+                  <td><strong>{{ tax.code }}</strong></td>
+                  <td>{{ tax.name }}</td>
+                  <td>{{ tax.rate | number:'1.2-2' }}</td>
+                  <td>{{ tax.sapAccountCode }}</td>
+                  <td>{{ tax.accountNumber }}</td>
+                  <td>{{ tax.relatedAccountNumber }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-section">
+          <div class="pagination-info">
+            Displaying items 1 - {{ filteredVATTaxes().length }} of {{ filteredVATTaxes().length }}
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Withholding Tax Section -->
+    @if (selectedTaxType() === 'withholding') {
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="pi pi-wallet"></i>
+          ภาษีหัก ณ ที่จ่าย
+        </h2>
+        <div class="section-actions">
+          <div class="search-box">
+            <i class="pi pi-search search-icon"></i>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="ค้นหา..."
+              [value]="searchQuery()"
+              (input)="onSearch($event)">
+          </div>
+          <button
+            pButton
+            type="button"
+            label="เพิ่ม"
+            icon="pi pi-plus"
+            class="p-button-primary"
+            (click)="openWithholdingModal()"></button>
+        </div>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <i class="pi pi-spin pi-spinner loading-icon"></i>
+          <p>กำลังโหลดข้อมูล...</p>
+        </div>
+      } @else if (filteredWithholdingTaxes().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox empty-icon"></i>
+          <p>ไม่พบข้อมูล</p>
+        </div>
+      } @else {
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">
+                  <input type="checkbox" />
+                </th>
+                <th>รหัสภาษี</th>
+                <th>ชื่อภาษี</th>
+                <th>อัตราภาษี (%)</th>
+                <th>เลขที่บัญชี</th>
+                <th>เลขที่บัญชีรับวิธีการที่เกี่ยวข้องกัน</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (tax of filteredWithholdingTaxes(); track tax.id) {
+                <tr class="clickable-row" (click)="onWithholdingRowClick(tax)">
+                  <td (click)="$event.stopPropagation()">
+                    <input type="checkbox" />
+                  </td>
+                  <td><strong>{{ tax.code }}</strong></td>
+                  <td>{{ tax.name }}</td>
+                  <td>{{ tax.rate | number:'1.2-2' }}</td>
+                  <td>{{ tax.accountNumber }}</td>
+                  <td>{{ tax.relatedAccountNumber }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-section">
+          <div class="pagination-info">
+            Displaying items 1 - {{ filteredWithholdingTaxes().length }} of {{ filteredWithholdingTaxes().length }}
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- VAT Modal -->
+<p-dialog
+  [(visible)]="showVATModal"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [header]="isEditMode() ? 'ภาษีมูลค่าเพิ่ม (แก้ไข)' : 'ภาษีมูลค่าเพิ่ม (เพิ่ม)'"
+  [draggable]="false"
+  [resizable]="false">
+
+  <div class="modal-content">
+    <!-- Tab-like header -->
+    <div class="modal-tabs">
+      <button class="modal-tab active">ข้อมูล</button>
+      <button class="modal-tab">อื่อ</button>
+    </div>
+
+    <!-- Code -->
+    <div class="form-field" [class.has-error]="vatErrors().code">
+      <label class="form-label required">รหัสภาษี:</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="vatForm().code"
+        (ngModelChange)="updateVATForm('code', $event)"
+        placeholder="กรอกรหัสภาษี">
+      @if (vatErrors().code) {
+        <span class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ vatErrors().code }}
+        </span>
+      }
+    </div>
+
+    <!-- Name -->
+    <div class="form-field" [class.has-error]="vatErrors().name">
+      <label class="form-label required">ชื่อภาษี:</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="vatForm().name"
+        (ngModelChange)="updateVATForm('name', $event)"
+        placeholder="กรอกชื่อภาษี">
+      @if (vatErrors().name) {
+        <span class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ vatErrors().name }}
+        </span>
+      }
+    </div>
+
+    <!-- Rate -->
+    <div class="form-field" [class.has-error]="vatErrors().rate">
+      <label class="form-label required">อัตราภาษี (%):</label>
+      <input
+        type="number"
+        class="form-input"
+        [(ngModel)]="vatForm().rate"
+        (ngModelChange)="updateVATForm('rate', $event)"
+        placeholder="0.00"
+        step="0.01">
+      @if (vatErrors().rate) {
+        <span class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ vatErrors().rate }}
+        </span>
+      }
+    </div>
+
+    <!-- SAP Account Code -->
+    <div class="form-field">
+      <label class="form-label">รหัสภาษีบัญชีแยกเงิน (SAP):</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="vatForm().sapAccountCode"
+        (ngModelChange)="updateVATForm('sapAccountCode', $event)"
+        placeholder="กรอกรหัสภาษีบัญชีแยกเงิน">
+    </div>
+
+    <!-- Account Number -->
+    <div class="form-field">
+      <label class="form-label">เลขที่บัญชี:</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="vatForm().accountNumber"
+        (ngModelChange)="updateVATForm('accountNumber', $event)"
+        placeholder="กรอกเลขที่บัญชี">
+    </div>
+
+    <!-- Related Account Number -->
+    <div class="form-field">
+      <label class="form-label">เลขที่บัญชีรับวิธีการที่เกี่ยวข้องกัน:</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="vatForm().relatedAccountNumber"
+        (ngModelChange)="updateVATForm('relatedAccountNumber', $event)"
+        placeholder="กรอกเลขที่บัญชีรับวิธีการที่เกี่ยวข้องกัน">
+    </div>
+
+    <!-- Footer note -->
+    <div class="form-note">
+      ชื่อผู้ใช้ล่าสุด : SPACE วันที่ใช้ล่าสุด : 11/11/2025
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <button
+        pButton
+        type="button"
+        label="ยกเลิก"
+        class="p-button-secondary p-button-outlined"
+        (click)="closeVATModal()"></button>
+      <button
+        pButton
+        type="button"
+        label="บันทึก"
+        class="p-button-primary"
+        (click)="saveVAT()"></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Withholding Tax Modal -->
+<p-dialog
+  [(visible)]="showWithholdingModal"
+  [modal]="true"
+  [style]="{ width: '600px' }"
+  [header]="isEditMode() ? 'ภาษีหัก ณ ที่จ่าย (แก้ไข)' : 'ภาษีหัก ณ ที่จ่าย (เพิ่ม)'"
+  [draggable]="false"
+  [resizable]="false">
+
+  <div class="modal-content">
+    <!-- Tab-like header -->
+    <div class="modal-tabs">
+      <button class="modal-tab active">ข้อมูล</button>
+      <button class="modal-tab">อื่อ</button>
+    </div>
+
+    <!-- Code -->
+    <div class="form-field" [class.has-error]="withholdingErrors().code">
+      <label class="form-label required">รหัสภาษี:</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="withholdingForm().code"
+        (ngModelChange)="updateWithholdingForm('code', $event)"
+        placeholder="กรอกรหัสภาษี">
+      @if (withholdingErrors().code) {
+        <span class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ withholdingErrors().code }}
+        </span>
+      }
+    </div>
+
+    <!-- Name -->
+    <div class="form-field" [class.has-error]="withholdingErrors().name">
+      <label class="form-label required">ชื่อภาษี:</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="withholdingForm().name"
+        (ngModelChange)="updateWithholdingForm('name', $event)"
+        placeholder="กรอกชื่อภาษี">
+      @if (withholdingErrors().name) {
+        <span class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ withholdingErrors().name }}
+        </span>
+      }
+    </div>
+
+    <!-- Rate -->
+    <div class="form-field" [class.has-error]="withholdingErrors().rate">
+      <label class="form-label required">อัตราภาษี (%):</label>
+      <input
+        type="number"
+        class="form-input"
+        [(ngModel)]="withholdingForm().rate"
+        (ngModelChange)="updateWithholdingForm('rate', $event)"
+        placeholder="0.00"
+        step="0.01">
+      @if (withholdingErrors().rate) {
+        <span class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ withholdingErrors().rate }}
+        </span>
+      }
+    </div>
+
+    <!-- Account Number -->
+    <div class="form-field">
+      <label class="form-label">เลขที่บัญชี:</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="withholdingForm().accountNumber"
+        (ngModelChange)="updateWithholdingForm('accountNumber', $event)"
+        placeholder="กรอกเลขที่บัญชี">
+    </div>
+
+    <!-- Related Account Number -->
+    <div class="form-field">
+      <label class="form-label">เลขที่บัญชีรับวิธีการที่เกี่ยวข้องกัน:</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="withholdingForm().relatedAccountNumber"
+        (ngModelChange)="updateWithholdingForm('relatedAccountNumber', $event)"
+        placeholder="กรอกเลขที่บัญชีรับวิธีการที่เกี่ยวข้องกัน">
+    </div>
+
+    <!-- Footer note -->
+    <div class="form-note">
+      ชื่อผู้ใช้ล่าสุด : SPACE วันที่ใช้ล่าสุด : 11/11/2025
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <button
+        pButton
+        type="button"
+        label="ยกเลิก"
+        class="p-button-secondary p-button-outlined"
+        (click)="closeWithholdingModal()"></button>
+      <button
+        pButton
+        type="button"
+        label="บันทึก"
+        class="p-button-primary"
+        (click)="saveWithholding()"></button>
+    </div>
+  </ng-template>
+</p-dialog>

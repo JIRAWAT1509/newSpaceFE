@@ -1,0 +1,124 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '90vw', height: '85vh' }"
+  styleClass="edit-floor-modal"
+  (onHide)="onModalHide()"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="pi pi-pencil"></i>
+        Edit Floor Plan - {{ currentFloor()?.floorName || 'Floor' }}
+      </h2>
+      <div class="header-actions">
+        @if (hasDraftChanges()) {
+          <span class="draft-indicator">
+            <i class="pi pi-save"></i>
+            Draft saved
+          </span>
+        }
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Content -->
+  <div class="modal-content">
+    <!-- Left: Editable Floor Plan (3/4) -->
+    <div class="floor-plan-section">
+      <app-editable-floor-plan
+        [floor]="currentFloor()"
+        [areas]="editableAreas()"
+        [selectedAreaId]="selectedAreaId()"
+        (markerDragged)="onMarkerDragged($event)"
+        (markerClicked)="onMarkerClicked($event)"
+        (uploadPlan)="onUploadPlan($event)"
+        (areaDroppedOnMap)="onAreaDroppedOnMap($event)"
+        (cursorOverMap)="onCursorOverMap($event)"
+        (markerDragStarted)="onMarkerDragStarted($event)"
+        (markerDragEnded)="onMarkerDragEnded()"
+        (markerDraggedOutside)="onMarkerDraggedOutside($event)"
+      />
+    </div>
+
+    <!-- Right: Marker List Panel (1/4) -->
+    <div class="marker-list-section">
+      <app-marker-list-panel
+        #markerListPanel
+        [activeAreas]="activeAreas()"
+        [inactiveAreas]="inactiveAreas()"
+        [selectedAreaId]="selectedAreaId()"
+        (areaClicked)="onAreaListClick($event)"
+        (addAreaClicked)="onAddAreaClicked()"
+        (dragToMap)="onDragAreaToMap($event)"
+        (dragToInactive)="onDragAreaToInactive($event)"
+        (areaActivated)="onAreaActivated($event)"
+      />
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn-cancel"
+        (click)="onCancel()"
+      >
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="btn-close"
+        (click)="onClose()"
+      >
+        <i class="pi pi-save"></i>
+        Close (Save Draft)
+      </button>
+
+      <button
+        type="button"
+        class="btn-save"
+        (click)="onSave()"
+        [disabled]="!hasChanges()"
+      >
+        <i class="pi pi-check"></i>
+        Save Changes
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Close Warning Dialog -->
+<p-dialog
+  [(visible)]="showCloseWarning"
+  [modal]="true"
+  [closable]="false"
+  [style]="{ width: '400px' }"
+  header="Unsaved Changes"
+>
+  <p class="warning-message">
+    You have unsaved changes. Are you sure you want to cancel?
+  </p>
+  <ng-template pTemplate="footer">
+    <button type="button" class="btn-secondary" (click)="showCloseWarning = false">
+      No, Continue Editing
+    </button>
+    <button type="button" class="btn-danger" (click)="confirmCancel()">
+      Yes, Discard Changes
+    </button>
+  </ng-template>
+</p-dialog>
+
+<!-- Add Area Wizard Modal -->
+<app-add-area-wizard
+  [visible]="showAddAreaWizard()"
+  [floorId]="currentFloor()?.id || ''"
+  (closed)="onAddAreaWizardClose($event)"
+/>

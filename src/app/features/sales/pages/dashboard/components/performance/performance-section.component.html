@@ -1,0 +1,90 @@
+<!-- performance-section.component.html -->
+
+<!-- <div class="performance-section-container"> -->
+
+  <!-- ==================== LOADING STATE ==================== -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>กำลังโหลดข้อมูล...</p>
+    </div>
+  } @else {
+
+    <!-- ==================== MAIN DASHBOARD LAYOUT ==================== -->
+    <div class="dashboard-layout">
+
+      <!-- LEFT SIDEBAR: Team Overview Panel -->
+      <div class="left-sidebar">
+        <app-team-overview-panel
+          [teamTotals]="teamTotals()"
+          [leaderboard]="leaderboard()"
+          [weeklySales]="teamWeeklySales()"
+        ></app-team-overview-panel>
+      </div>
+
+      <!-- RIGHT CONTENT: Team Cards + Analytics -->
+      <div class="right-content">
+
+        <!-- Team Member Cards (4 cards) -->
+        <div class="team-cards-section">
+          <app-team-member-cards
+            [members]="salesTeam()"
+            [selectedMemberId]="selectedMemberId()"
+            (memberSelect)="onMemberSelect($event)"
+          ></app-team-member-cards>
+        </div>
+
+        <!-- Member Details Section (appears when member selected) -->
+        @if (selectedMember()) {
+          <div class="member-details-section">
+            <app-member-details
+              [member]="selectedMember()!"
+              [activities]="selectedMemberActivities()"
+              (close)="onMemberDeselect()"
+            ></app-member-details>
+          </div>
+        }
+
+        <!-- Analytics Grid (Stage Conversion, Source Attribution, Monte Carlo) -->
+        <div class="analytics-grid">
+
+          <!-- Stage Conversion Table -->
+          <div class="analytics-card stage-conversion-card">
+            <app-stage-conversion-table
+              [stages]="pipelineStages()"
+            ></app-stage-conversion-table>
+          </div>
+
+          <!-- Source Attribution Chart -->
+          <div class="analytics-card source-attribution-card">
+            <app-source-attribution-chart
+              [attribution]="sourceAttribution()"
+            ></app-source-attribution-chart>
+          </div>
+
+          <!-- Monte Carlo Forecast -->
+          <div class="analytics-card monte-carlo-card">
+            <app-monte-carlo-forecast
+              [data]="monteCarloData()"
+              [isRunning]="isMonteCarloRunning()"
+              (runSimulation)="runMonteCarloSimulation()"
+            ></app-monte-carlo-forecast>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== REPORTS & KPIs SECTION (BOTTOM) ==================== -->
+    <div class="reports-section">
+      <app-reports-kpis-section
+        [executiveSummary]="executiveSummary()"
+        [managers]="salesTeam()"
+      ></app-reports-kpis-section>
+    </div>
+
+  }
+
+<!-- </div> -->

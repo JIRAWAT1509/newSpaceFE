@@ -1,0 +1,339 @@
+<!-- reports-kpis-section.component.html -->
+
+<div class="reports-kpis-container">
+
+  <!-- ==================== SECTION HEADER ==================== -->
+  <div class="section-header">
+    <div class="header-content">
+      <h2 class="section-title">
+        <i class="pi pi-chart-bar"></i>
+        Reports & KPIs
+      </h2>
+      <p class="section-subtitle">รายงานและตัวชี้วัดผลงาน</p>
+    </div>
+
+    <button
+      class="export-all-btn"
+      [class.exporting]="isExporting()"
+      [disabled]="isExporting()"
+      (click)="exportAllData()"
+    >
+      @if (isExporting()) {
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Exporting...</span>
+      } @else {
+        <i class="pi pi-download"></i>
+        <span>Export All</span>
+      }
+    </button>
+  </div>
+
+  <div class="reports-layout">
+
+    <!-- ==================== EXECUTIVE SUMMARY CARD ==================== -->
+    @if (summaryData()) {
+      <div class="executive-summary-card">
+
+        <!-- Card Header -->
+        <div class="card-header">
+          <div class="header-left">
+            <h3 class="card-title">
+              <i class="pi pi-flag"></i>
+              Executive Summary
+            </h3>
+            <p class="card-subtitle">สรุปผลการดำเนินงาน</p>
+          </div>
+          <button
+            class="export-btn"
+            (click)="exportSummary()"
+            title="Export executive summary"
+          >
+            <i class="pi pi-download"></i>
+          </button>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+
+          <!-- KPI Grid -->
+          <div class="kpi-grid">
+
+            <!-- Attainment -->
+            <div class="kpi-card">
+              <div class="kpi-icon-wrapper attainment">
+                <i class="pi pi-chart-line"></i>
+              </div>
+              <div class="kpi-content">
+                <div class="kpi-value">{{ formatPercentage(summaryData()!.attainment) }}</div>
+                <div class="kpi-label">Attainment YTD</div>
+                <div class="kpi-label-th">ความสำเร็จต่อเป้าหมาย</div>
+
+                <!-- Change badge -->
+                @if (summaryData()!.attainmentChange !== 0) {
+                  <div
+                    class="change-badge"
+                    [class.positive]="summaryData()!.attainmentChange > 0"
+                    [class.negative]="summaryData()!.attainmentChange < 0"
+                  >
+                    <i
+                      class="pi"
+                      [class.pi-arrow-up]="summaryData()!.attainmentChange > 0"
+                      [class.pi-arrow-down]="summaryData()!.attainmentChange < 0"
+                    ></i>
+                    <span>{{ summaryData()!.attainmentChange < 0 ? -summaryData()!.attainmentChange : summaryData()!.attainmentChange }}% MoM</span>
+                  </div>
+                }
+
+                <!-- Status badge -->
+                <div
+                  class="status-badge"
+                  [class]="performanceStatus()"
+                >
+                  {{ getAttainmentLabel() }} | {{ getAttainmentLabelTh() }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Win Rate -->
+            <div class="kpi-card">
+              <div class="kpi-icon-wrapper win-rate">
+                <i class="pi pi-trophy"></i>
+              </div>
+              <div class="kpi-content">
+                <div class="kpi-value">{{ formatPercentage(summaryData()!.winRate) }}</div>
+                <div class="kpi-label">Win Rate (60d)</div>
+                <div class="kpi-label-th">อัตราการชนะ</div>
+              </div>
+            </div>
+
+            <!-- Avg Deal Cycle -->
+            <div class="kpi-card">
+              <div class="kpi-icon-wrapper cycle">
+                <i class="pi pi-clock"></i>
+              </div>
+              <div class="kpi-content">
+                <div class="kpi-value">{{ summaryData()!.avgDealCycle }} <span class="kpi-unit">days</span></div>
+                <div class="kpi-label">Avg Deal Cycle</div>
+                <div class="kpi-label-th">ระยะเวลาเฉลี่ย</div>
+              </div>
+            </div>
+
+            <!-- Occupancy -->
+            <div class="kpi-card">
+              <div class="kpi-icon-wrapper occupancy">
+                <i class="pi pi-building"></i>
+              </div>
+              <div class="kpi-content">
+                <div class="kpi-value">{{ formatPercentage(summaryData()!.occupancy) }}</div>
+                <div class="kpi-label">Occupancy</div>
+                <div class="kpi-label-th">อัตราการเช่า</div>
+
+                <!-- Target vs Current -->
+                <div class="occupancy-bar">
+                  <div
+                    class="occupancy-fill"
+                    [style.width.%]="summaryData()!.occupancy"
+                    [class.good]="summaryData()!.occupancy >= summaryData()!.occupancyTarget"
+                    [class.warning]="summaryData()!.occupancy < summaryData()!.occupancyTarget"
+                  ></div>
+                  <div class="target-marker" [style.left.%]="summaryData()!.occupancyTarget">
+                    <i class="pi pi-flag-fill"></i>
+                  </div>
+                </div>
+                <div class="target-label">
+                  Target: {{ formatPercentage(summaryData()!.occupancyTarget) }}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    }
+
+    <!-- ==================== MANAGER PERFORMANCE TABLE ==================== -->
+    <div class="manager-performance-card">
+
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="header-left">
+          <h3 class="card-title">
+            <i class="pi pi-users"></i>
+            Manager Performance
+          </h3>
+          <p class="card-subtitle">ผลงานผู้จัดการฝ่ายขาย</p>
+        </div>
+        <button
+          class="export-btn"
+          (click)="exportManagersPerformance()"
+          title="Export managers performance"
+        >
+          <i class="pi pi-download"></i>
+        </button>
+      </div>
+
+      <!-- Card Body -->
+      <div class="card-body">
+
+        <!-- Average Metrics Summary -->
+        @if (managersData().length > 0) {
+          <div class="avg-metrics-summary">
+            <div class="avg-metric">
+              <span class="avg-label">Avg Pipeline:</span>
+              <span class="avg-value">{{ formatCurrency(avgMetrics().avgPipeline) }}</span>
+            </div>
+            <div class="avg-metric">
+              <span class="avg-label">Avg Coverage:</span>
+              <span class="avg-value">{{ formatPercentage(avgMetrics().avgCoverage) }}</span>
+            </div>
+            <div class="avg-metric">
+              <span class="avg-label">Avg Win Rate:</span>
+              <span class="avg-value">{{ formatPercentage(avgMetrics().avgWinRate) }}</span>
+            </div>
+            <div class="avg-metric">
+              <span class="avg-label">Total Pipeline:</span>
+              <span class="avg-value highlight">{{ formatCurrency(avgMetrics().totalPipeline) }}</span>
+            </div>
+          </div>
+        }
+
+        <!-- Table -->
+        <div class="table-wrapper">
+          <table class="performance-table">
+
+            <!-- Table Header -->
+            <thead>
+              <tr>
+                <th class="rank-col">#</th>
+                <th
+                  class="manager-col sortable"
+                  (click)="onSort('name')"
+                >
+                  <div class="th-content">
+                    <span>Manager</span>
+                    <i class="pi" [class]="getSortIcon('name')"></i>
+                  </div>
+                </th>
+                <th
+                  class="pipeline-col sortable"
+                  (click)="onSort('pipeline')"
+                >
+                  <div class="th-content">
+                    <span>Pipeline Value</span>
+                    <i class="pi" [class]="getSortIcon('pipeline')"></i>
+                  </div>
+                </th>
+                <th
+                  class="coverage-col sortable"
+                  (click)="onSort('coverage')"
+                >
+                  <div class="th-content">
+                    <span>Coverage</span>
+                    <i class="pi" [class]="getSortIcon('coverage')"></i>
+                  </div>
+                </th>
+                <th
+                  class="win-rate-col sortable"
+                  (click)="onSort('winRate')"
+                >
+                  <div class="th-content">
+                    <span>Win Rate</span>
+                    <i class="pi" [class]="getSortIcon('winRate')"></i>
+                  </div>
+                </th>
+                <th
+                  class="deals-col sortable"
+                  (click)="onSort('deals')"
+                >
+                  <div class="th-content">
+                    <span>Deals</span>
+                    <i class="pi" [class]="getSortIcon('deals')"></i>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+
+            <!-- Table Body -->
+            <tbody>
+              @for (manager of sortedManagers(); track manager.id; let i = $index) {
+                <tr
+                  class="manager-row"
+                  [class.selected]="isSelected(manager.id)"
+                  [class.top-performer]="i === 0"
+                  (click)="onManagerSelect(manager.id)"
+                >
+                  <!-- Rank -->
+                  <td class="rank-cell">
+                    @if (i < 3) {
+                      <div class="rank-badge" [class]="'rank-' + (i + 1)">
+                        {{ i + 1 }}
+                      </div>
+                    } @else {
+                      <span class="rank-number">{{ i + 1 }}</span>
+                    }
+                  </td>
+
+                  <!-- Manager Info -->
+                  <td class="manager-cell">
+                    <div class="manager-info">
+                      <div class="manager-avatar">{{ manager.avatar }}</div>
+                      <div class="manager-details">
+                        <div class="manager-name">{{ manager.name }}</div>
+                        <div class="manager-region">{{ manager.region }} | {{ manager.regionTh }}</div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Pipeline Value -->
+                  <td class="pipeline-cell">
+                    <div class="pipeline-value">{{ formatCurrency(manager.pipelineValue) }}</div>
+                  </td>
+
+                  <!-- Coverage -->
+                  <td class="coverage-cell">
+                    <div
+                      class="coverage-badge"
+                      [class]="getCoverageColorClass(manager.coverage)"
+                    >
+                      {{ formatPercentage(manager.coverage) }}
+                    </div>
+                  </td>
+
+                  <!-- Win Rate -->
+                  <td class="win-rate-cell">
+                    <div
+                      class="win-rate-badge"
+                      [class]="getWinRateColorClass(manager.winRate)"
+                    >
+                      {{ formatPercentage(manager.winRate) }}
+                    </div>
+                  </td>
+
+                  <!-- Deal Count -->
+                  <td class="deals-cell">
+                    <div class="deals-count">{{ manager.dealCount }}</div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+
+          </table>
+
+          <!-- No Data -->
+          @if (managersData().length === 0) {
+            <div class="no-data">
+              <i class="pi pi-inbox"></i>
+              <p>No manager data available</p>
+            </div>
+          }
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

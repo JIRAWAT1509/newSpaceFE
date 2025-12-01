@@ -1,0 +1,699 @@
+/* member-details.component.css - LIGHT BLUE THEME */
+
+/* ==================== CONTAINER ==================== */
+.member-details-container {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 2px solid #3b82f6;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== HEADER ==================== */
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.member-avatar-large {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: 4px solid #dbeafe;
+  border-radius: 50%;
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.member-name-large {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.member-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+}
+
+.region-badge,
+.role-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: #f3f4f6;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.region-badge i,
+.role-badge i {
+  color: #3b82f6;
+}
+
+.header-right {
+  flex-shrink: 0;
+}
+
+.btn-close-details {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-close-details:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.btn-close-details i {
+  font-size: 1rem;
+}
+
+/* ==================== SECTIONS ==================== */
+.statistics-section,
+.sales-breakdown-section,
+.calendar-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1.25rem 0;
+}
+
+.section-title i {
+  color: #3b82f6;
+  font-size: 1.375rem;
+}
+
+/* ==================== STATISTICS GRID ==================== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.stat-card {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  gap: 1rem;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card.stat-blue {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-color: #3b82f6;
+}
+
+.stat-card.stat-blue:hover {
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.2);
+}
+
+.stat-card.stat-green {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border-color: #10b981;
+}
+
+.stat-card.stat-green:hover {
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.2);
+}
+
+.stat-card.stat-purple {
+  background: linear-gradient(135deg, #faf5ff, #f3e8ff);
+  border-color: #8b5cf6;
+}
+
+.stat-card.stat-purple:hover {
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2);
+}
+
+.stat-card.stat-orange {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border-color: #f59e0b;
+}
+
+.stat-card.stat-orange:hover {
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.2);
+}
+
+.stat-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 10px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.stat-blue .stat-icon-wrapper i {
+  color: #3b82f6;
+  font-size: 1.5rem;
+}
+
+.stat-green .stat-icon-wrapper i {
+  color: #10b981;
+  font-size: 1.5rem;
+}
+
+.stat-purple .stat-icon-wrapper i {
+  color: #8b5cf6;
+  font-size: 1.5rem;
+}
+
+.stat-orange .stat-icon-wrapper i {
+  color: #f59e0b;
+  font-size: 1.5rem;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.stat-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.stat-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.label-en {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.label-th {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.stat-subvalue {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+/* ==================== SALES BREAKDOWN ==================== */
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.breakdown-card {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s;
+}
+
+.breakdown-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.breakdown-card.primary {
+  background: linear-gradient(135deg, #eff6ff, #ffffff);
+  border-color: #3b82f6;
+}
+
+.breakdown-header {
+  margin-bottom: 0.75rem;
+}
+
+.breakdown-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.breakdown-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+
+.breakdown-card.primary .breakdown-value {
+  color: #3b82f6;
+}
+
+.breakdown-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progress-bar-breakdown {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill-breakdown {
+  height: 100%;
+  background: linear-gradient(90deg, #2196F3, #42A5F5);
+  border-radius: 4px;
+  transition: width 1s ease-out;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.breakdown-comparison {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.comparison-label {
+  color: #6b7280;
+}
+
+.comparison-value {
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ==================== CALENDAR SECTION ==================== */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.section-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.section-subtitle {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-calendar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-calendar-toggle:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-calendar-nav,
+.btn-today {
+  padding: 0.5rem 0.75rem;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-calendar-nav:hover,
+.btn-today:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.btn-calendar-nav {
+  min-width: 36px;
+}
+
+.calendar-content {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-height: 400px;
+}
+
+/* ==================== CALENDAR PLACEHOLDER ==================== */
+.calendar-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  text-align: center;
+}
+
+.placeholder-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+}
+
+.placeholder-icon i {
+  font-size: 2.5rem;
+  color: #3b82f6;
+}
+
+.calendar-placeholder h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.calendar-placeholder p {
+  font-size: 0.9375rem;
+  color: #6b7280;
+  margin: 0.25rem 0;
+}
+
+.placeholder-note {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3b82f6;
+  margin: 0.5rem 0 1rem 0;
+}
+
+.placeholder-activities {
+  width: 100%;
+  max-width: 600px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.placeholder-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.placeholder-activity-item i {
+  font-size: 0.5rem;
+}
+
+.placeholder-activity-item span:first-of-type {
+  flex: 1;
+  font-weight: 500;
+  color: #374151;
+}
+
+.activity-date {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.placeholder-more {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 600;
+  padding: 0.5rem;
+}
+
+.integration-note {
+  max-width: 700px;
+  padding: 1rem;
+  background: #fffbeb;
+  border: 2px solid #fbbf24;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #92400e;
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+.integration-note code {
+  background: #fef3c7;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8125rem;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1280px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .breakdown-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .member-details-container {
+    padding: 1.5rem;
+  }
+
+  .details-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .header-right {
+    align-self: flex-end;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .breakdown-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .member-details-container {
+    padding: 1.25rem;
+  }
+
+  .header-left {
+    gap: 1rem;
+  }
+
+  .member-avatar-large {
+    width: 64px;
+    height: 64px;
+    font-size: 2rem;
+  }
+
+  .member-name-large {
+    font-size: 1.5rem;
+  }
+
+  .member-subtitle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-value {
+    font-size: 1.625rem;
+  }
+
+  .breakdown-value {
+    font-size: 1.75rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .calendar-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 640px) {
+  .member-details-container {
+    padding: 1rem;
+  }
+
+  .details-header {
+    padding-bottom: 1rem;
+  }
+
+  .member-avatar-large {
+    width: 56px;
+    height: 56px;
+    font-size: 1.75rem;
+  }
+
+  .member-name-large {
+    font-size: 1.25rem;
+  }
+
+  .btn-close-details span {
+    display: none;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .breakdown-card {
+    padding: 1.25rem;
+  }
+
+  .breakdown-value {
+    font-size: 1.5rem;
+  }
+
+  .calendar-content {
+    padding: 1rem;
+  }
+
+  .placeholder-activities {
+    padding: 0.75rem;
+  }
+}
