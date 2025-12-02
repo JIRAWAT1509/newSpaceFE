@@ -36,15 +36,53 @@ export class AreaDataService {
   private buildingData = signal<BuildingWithFloors>(getCompleteBuildingData());
   private currentMode = signal<ViewMode>('normal');
   private targetDate = signal<Date>(new Date());
+  private selectedFloorId = signal<string | null>(null); // NEW: Track current floor
 
   // Public read-only signals
   readonly building = this.buildingData.asReadonly();
   readonly mode = this.currentMode.asReadonly();
   readonly selectedDate = this.targetDate.asReadonly();
+  readonly currentFloorId = this.selectedFloorId.asReadonly(); // NEW: Expose current floor
 
   constructor() {
     console.log('AreaDataService initialized');
     console.log('Building data:', this.buildingData());
+
+    // Set initial floor to first floor
+    const building = this.buildingData();
+    if (building.floors && building.floors.length > 0) {
+      this.selectedFloorId.set(building.floors[0].id);
+    }
+  }
+
+  /**
+   * Set the current floor
+   */
+  setCurrentFloor(floorId: string): void {
+    this.selectedFloorId.set(floorId);
+  }
+
+  /**
+   * Get the current floor
+   */
+  getCurrentFloor(): FloorWithAreas | null {
+    const floorId = this.selectedFloorId();
+    if (!floorId) return null;
+    return this.getFloorById(floorId);
+  }
+
+  /**
+   * Add a new floor to the building
+   */
+  addFloor(floor: Floor): void {
+    const building = this.buildingData();
+    const floorWithAreas: FloorWithAreas = {
+      ...floor,
+      areas: []
+    };
+    building.floors.push(floorWithAreas);
+    // Trigger signal update
+    this.buildingData.set({ ...building });
   }
 
   /**

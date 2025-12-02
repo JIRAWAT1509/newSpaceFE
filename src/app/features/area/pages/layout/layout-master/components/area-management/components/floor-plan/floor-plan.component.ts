@@ -99,8 +99,20 @@ export class FloorPlanComponent implements OnInit {
   });
 
   constructor(private areaDataService: AreaDataService) {
+    // Watch for current floor changes from service
     effect(() => {
-      this.loadFloorData();
+      const floorId = this.areaDataService.currentFloorId();
+      if (floorId && floorId !== this.selectedFloorId()) {
+        const building = this.areaDataService.building();
+        const floor = building.floors.find(f => f.id === floorId);
+        if (floor) {
+          this.currentFloor.set(floor);
+          this.selectedFloorId.set(floor.id);
+          const areas = this.areaDataService.getAreasForCurrentContext(floor);
+          this.areas.set(areas);
+          setTimeout(() => this.resetZoom(), 100);
+        }
+      }
     });
 
     // Watch for area selection changes
@@ -128,9 +140,15 @@ export class FloorPlanComponent implements OnInit {
     this.currentBuilding.set(building);
     this.selectedBuildingId.set(building.id);
 
-    const floor = building.floors[0];
+    // Use current floor from service if available
+    const currentFloorId = this.areaDataService.currentFloorId();
+    const floor = currentFloorId
+      ? building.floors.find(f => f.id === currentFloorId) || building.floors[0]
+      : building.floors[0];
+
     this.currentFloor.set(floor);
     this.selectedFloorId.set(floor.id);
+    this.areaDataService.setCurrentFloor(floor.id);
 
     const areas = this.areaDataService.getAreasForCurrentContext(floor);
     this.areas.set(areas);
@@ -201,6 +219,7 @@ export class FloorPlanComponent implements OnInit {
     if (floor) {
       this.currentFloor.set(floor);
       this.selectedFloorId.set(floor.id);
+      this.areaDataService.setCurrentFloor(floor.id);
       const areas = this.areaDataService.getAreasForCurrentContext(floor);
       this.areas.set(areas);
       this.resetZoom();

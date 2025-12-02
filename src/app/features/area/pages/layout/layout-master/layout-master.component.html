@@ -11,6 +11,7 @@
   <div class="section section-filter-bar">
     <app-area-filter-bar
       (filterChanged)="onTypeFilterChanged($event)"
+      (createFloorClicked)="onCreateFloorClicked()"
     />
   </div>
 
@@ -32,3 +33,10 @@
     />
   </div>
 </div>
+
+<!-- Add Floor Modal -->
+<app-add-floor-modal
+  #addFloorModal
+  (floorCreated)="onFloorCreated($event)"
+  (closed)="onAddFloorModalClosed()"
+/>

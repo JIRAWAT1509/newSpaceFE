@@ -99,17 +99,12 @@ export class AreaMarkerComponent {
   }
 
   onMarkerClick(event: MouseEvent): void {
-    // Only emit click if we didn't drag
-    const dragDistance = Math.sqrt(
-      Math.pow(event.clientX - this.clickStartPos.x, 2) +
-      Math.pow(event.clientY - this.clickStartPos.y, 2)
-    );
-
-    if (!this.isDragging && dragDistance < 5) {
+    if (!this.isDragging) {
       event.stopPropagation();
       this.markerClicked.emit(this.area().id);
     }
   }
+
 
   onMouseDown(event: MouseEvent): void {
     if (!this.isDraggable()) return;

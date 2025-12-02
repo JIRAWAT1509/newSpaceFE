@@ -133,6 +133,22 @@ export class AreaListComponent {
         this.currentPage.set(Math.max(1, total));
       }
     }, { allowSignalWrites: true });
+
+    // Navigate to page when area selected from map
+    effect(() => {
+      const selectedId = this.selectedAreaId();
+      if (selectedId) {
+        const areas = this.filteredAreas();
+        const areaIndex = areas.findIndex(a => a.id === selectedId);
+
+        if (areaIndex !== -1) {
+          const targetPage = Math.floor(areaIndex / this.itemsPerPage) + 1;
+          if (this.currentPage() !== targetPage) {
+            this.currentPage.set(targetPage);
+          }
+        }
+      }
+    }, { allowSignalWrites: true });
   }
 
   private loadAreas(): void {

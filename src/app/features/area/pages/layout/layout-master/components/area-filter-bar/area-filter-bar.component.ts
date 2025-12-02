@@ -21,6 +21,7 @@ export class AreaFilterBarComponent {
   searchQuery = '';
 
   filterChanged = output<FilterChangeEvent>();
+  createFloorClicked = output<void>();
 
   isTypeSelected(type: ActionType): boolean {
     return this.selectedTypes().includes(type);
@@ -54,6 +55,10 @@ export class AreaFilterBarComponent {
   clearSearch(): void {
     this.searchQuery = '';
     this.emitFilterChange();
+  }
+
+  onCreateFloor(): void {
+    this.createFloorClicked.emit();
   }
 
   private emitFilterChange(): void {

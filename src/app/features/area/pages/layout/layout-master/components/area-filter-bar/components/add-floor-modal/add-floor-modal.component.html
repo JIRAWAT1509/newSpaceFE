@@ -1,0 +1,141 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '500px' }"
+  styleClass="add-floor-modal"
+  (onHide)="onModalHide()"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="pi pi-plus-circle"></i>
+        Add New Floor
+      </h2>
+    </div>
+  </ng-template>
+
+  <!-- Content -->
+  <div class="modal-content">
+    <form [formGroup]="floorForm" class="floor-form">
+      <!-- Floor Number -->
+      <div class="form-group">
+        <label class="form-label required">Floor Number</label>
+        <input
+          type="number"
+          formControlName="floorNumber"
+          class="form-input"
+          placeholder="e.g., 55"
+          [class.error]="isFieldInvalid('floorNumber')"
+        />
+        @if (isFieldInvalid('floorNumber')) {
+          <span class="error-message">
+            @if (floorForm.get('floorNumber')?.hasError('required')) {
+              Floor number is required
+            }
+            @if (floorForm.get('floorNumber')?.hasError('floorExists')) {
+              This floor number already exists
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Floor Name -->
+      <div class="form-group">
+        <label class="form-label required">Floor Name</label>
+        <input
+          type="text"
+          formControlName="floorName"
+          class="form-input"
+          placeholder="e.g., Fl. 55"
+          [class.error]="isFieldInvalid('floorName')"
+        />
+        @if (isFieldInvalid('floorName')) {
+          <span class="error-message">Floor name is required</span>
+        }
+      </div>
+
+      <!-- Floor Name (Thai) -->
+      <div class="form-group">
+        <label class="form-label">Floor Name (Thai)</label>
+        <input
+          type="text"
+          formControlName="floorNameTh"
+          class="form-input"
+          placeholder="e.g., ชั้น 55"
+        />
+      </div>
+
+      <!-- Floor Name (English) -->
+      <div class="form-group">
+        <label class="form-label">Floor Name (English)</label>
+        <input
+          type="text"
+          formControlName="floorNameEn"
+          class="form-input"
+          placeholder="e.g., Floor 55"
+        />
+      </div>
+
+      <!-- Floor Plan Image Upload -->
+      <div class="form-group">
+        <label class="form-label">Floor Plan Image (Optional)</label>
+        <div class="upload-area" (click)="fileInput.click()">
+          @if (!selectedFile()) {
+            <div class="upload-placeholder">
+              <i class="pi pi-cloud-upload"></i>
+              <p>Click to upload floor plan image</p>
+              <span class="upload-hint">PNG, JPG up to 10MB</span>
+            </div>
+          } @else {
+            <div class="file-selected">
+              <i class="pi pi-file"></i>
+              <span>{{ selectedFile()?.name }}</span>
+              <button
+                type="button"
+                class="remove-file"
+                (click)="removeFile($event)"
+              >
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+          }
+        </div>
+        <input
+          #fileInput
+          type="file"
+          accept="image/png,image/jpeg,image/jpg"
+          (change)="onFileSelected($event)"
+          style="display: none"
+        />
+      </div>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn-cancel"
+        (click)="onCancel()"
+      >
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="btn-save"
+        (click)="onSave()"
+        [disabled]="!floorForm.valid || isSaving()"
+      >
+        <i class="pi pi-check"></i>
+        {{ isSaving() ? 'Creating...' : 'Create Floor' }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

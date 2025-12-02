@@ -1,0 +1,128 @@
+/* Override PrimeNG Dialog Styles */
+:host ::ng-deep .add-floor-modal {
+  .p-dialog {
+    @apply rounded-lg shadow-2xl;
+  }
+
+  .p-dialog-header {
+    @apply bg-gradient-to-r from-green-600 to-green-500 text-white;
+    @apply px-6 py-4 rounded-t-lg;
+  }
+
+  .p-dialog-content {
+    @apply p-6;
+  }
+
+  .p-dialog-footer {
+    @apply px-6 py-4 bg-gray-50 border-t border-gray-200;
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  @apply flex items-center justify-between w-full;
+}
+
+.modal-title {
+  @apply text-xl font-bold flex items-center gap-3;
+}
+
+.modal-title i {
+  @apply text-lg;
+}
+
+/* Form Styles */
+.floor-form {
+  @apply space-y-5;
+}
+
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.form-label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.form-label.required::after {
+  content: ' *';
+  @apply text-red-500;
+}
+
+.form-input {
+  @apply w-full px-4 py-2.5 text-sm;
+  @apply border-2 border-gray-300 rounded-lg;
+  @apply focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200;
+  @apply transition-all duration-200;
+}
+
+.form-input.error {
+  @apply border-red-500 focus:border-red-500 focus:ring-red-200;
+}
+
+.error-message {
+  @apply text-xs text-red-600 mt-1;
+}
+
+/* Upload Area */
+.upload-area {
+  @apply border-2 border-dashed border-gray-300 rounded-lg;
+  @apply p-6 cursor-pointer;
+  @apply hover:border-blue-400 hover:bg-blue-50;
+  @apply transition-all duration-200;
+}
+
+.upload-placeholder {
+  @apply flex flex-col items-center gap-2 text-center;
+}
+
+.upload-placeholder i {
+  @apply text-4xl text-gray-400;
+}
+
+.upload-placeholder p {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.upload-hint {
+  @apply text-xs text-gray-500;
+}
+
+.file-selected {
+  @apply flex items-center gap-3 p-3 bg-blue-50 rounded-lg;
+}
+
+.file-selected i {
+  @apply text-xl text-blue-600;
+}
+
+.file-selected span {
+  @apply flex-1 text-sm font-medium text-gray-700 truncate;
+}
+
+.remove-file {
+  @apply p-1 text-red-600 hover:bg-red-100 rounded;
+  @apply transition-colors duration-200;
+}
+
+/* Modal Footer */
+.modal-footer {
+  @apply flex items-center justify-end gap-3;
+}
+
+.btn-cancel,
+.btn-save {
+  @apply flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium;
+  @apply transition-all duration-200;
+}
+
+.btn-cancel {
+  @apply bg-white text-gray-700 border-2 border-gray-300;
+  @apply hover:bg-gray-50 hover:border-gray-400;
+}
+
+.btn-save {
+  @apply bg-green-600 text-white;
+  @apply hover:bg-green-700;
+  @apply disabled:bg-gray-300 disabled:cursor-not-allowed;
+}
