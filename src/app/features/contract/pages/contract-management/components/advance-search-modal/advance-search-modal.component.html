@@ -1,0 +1,103 @@
+<!-- advance-search-modal.component.html -->
+
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h3>Advanced Search</h3>
+      <button class="modal-close" (click)="close.emit()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Filter Rows -->
+      @for (filter of localFilters(); track filter.id; let idx = $index) {
+        <div class="filter-row">
+          <!-- Checkbox -->
+          <input
+            type="checkbox"
+            class="filter-checkbox"
+            [checked]="filter.isComplete"
+            [disabled]="!filter.isComplete"
+          />
+
+          <!-- Field Select -->
+          <select
+            class="filter-field-select"
+            [(ngModel)]="filter.field"
+            (ngModelChange)="onFieldChange(idx)"
+          >
+            <option [value]="null">Select field...</option>
+            @for (fieldKey of getFieldKeys(); track fieldKey) {
+              <option [value]="fieldKey">
+                {{ getFieldLabel(fieldKey) }}
+              </option>
+            }
+          </select>
+
+          <!-- Value Input -->
+          @if (filter.field) {
+            @if (isTextField(filter.field)) {
+              <!-- Text Input -->
+              <input
+                type="text"
+                class="filter-value-input"
+                placeholder="Enter value..."
+                [(ngModel)]="filter.value"
+                (ngModelChange)="onValueChange(idx)"
+              />
+            } @else {
+              <!-- Multi-Select -->
+              <p-multiSelect
+                class="filter-value-select"
+                [(ngModel)]="filter.value"
+                [options]="getSelectOptions(filter.field)"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select..."
+                display="chip"
+                (ngModelChange)="onValueChange(idx)"
+              ></p-multiSelect>
+            }
+          } @else {
+            <!-- Placeholder when no field selected -->
+            <div class="filter-value-placeholder">
+              Select a field first
+            </div>
+          }
+
+          <!-- Delete Button -->
+          <button
+            class="delete-filter-btn"
+            (click)="removeFilter(idx)"
+            [disabled]="localFilters().length === 1"
+          >
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+      }
+
+      <!-- Add Filter Button -->
+      <button class="add-filter-btn" (click)="addFilter()">
+        <i class="pi pi-plus"></i>
+        <span>Add Filter</span>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        class="btn-primary"
+        [disabled]="!hasValidFilters()"
+        (click)="onSearch()"
+      >
+        Search
+      </button>
+    </div>
+  </div>
+</div>

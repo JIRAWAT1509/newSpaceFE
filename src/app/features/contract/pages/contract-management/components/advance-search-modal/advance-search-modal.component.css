@@ -1,0 +1,128 @@
+/* advance-search-modal.component.css */
+
+.modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-50;
+  @apply flex items-center justify-center p-4;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-2xl;
+  @apply max-w-4xl w-full max-h-[90vh];
+  @apply flex flex-col;
+}
+
+/* ==================== Header ==================== */
+.modal-header {
+  @apply flex items-center justify-between px-6 py-4;
+  @apply border-b border-gray-200;
+}
+
+.modal-header h3 {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.modal-close {
+  @apply text-gray-400 hover:text-gray-600;
+  @apply transition-colors text-xl;
+}
+
+/* ==================== Body ==================== */
+.modal-body {
+  @apply flex-1 overflow-auto px-6 py-4;
+  @apply flex flex-col gap-3;
+}
+
+/* Filter Row */
+.filter-row {
+  @apply flex items-center gap-3;
+  @apply p-3 bg-gray-50 rounded-lg;
+}
+
+.filter-checkbox {
+  @apply w-5 h-5 rounded border-gray-300;
+  @apply text-blue-600 focus:ring-blue-500;
+  @apply flex-shrink-0;
+}
+
+.filter-field-select {
+  @apply flex-shrink-0 w-48 px-3 py-2;
+  @apply border border-gray-300 rounded-lg;
+  @apply focus:border-blue-500 focus:ring-2 focus:ring-blue-100;
+  @apply text-sm;
+}
+
+.filter-value-input {
+  @apply flex-1 px-3 py-2;
+  @apply border border-gray-300 rounded-lg;
+  @apply focus:border-blue-500 focus:ring-2 focus:ring-blue-100;
+  @apply text-sm;
+}
+
+.filter-value-select {
+  @apply flex-1;
+}
+
+::ng-deep .filter-value-select .p-multiselect {
+  @apply w-full;
+}
+
+.filter-value-placeholder {
+  @apply flex-1 px-3 py-2;
+  @apply bg-gray-100 border border-gray-200 rounded-lg;
+  @apply text-sm text-gray-400 italic;
+}
+
+.delete-filter-btn {
+  @apply w-10 h-10 rounded flex-shrink-0;
+  @apply flex items-center justify-center;
+  @apply text-red-600 hover:bg-red-50;
+  @apply transition-colors;
+  @apply disabled:opacity-30 disabled:cursor-not-allowed;
+}
+
+/* Add Filter Button */
+.add-filter-btn {
+  @apply flex items-center justify-center gap-2;
+  @apply px-4 py-3 mt-2;
+  @apply border-2 border-dashed border-gray-300 rounded-lg;
+  @apply text-gray-600 hover:text-gray-900 hover:border-gray-400;
+  @apply transition-all text-sm font-medium;
+}
+
+/* ==================== Footer ==================== */
+.modal-footer {
+  @apply flex items-center justify-end gap-3 px-6 py-4;
+  @apply border-t border-gray-200;
+}
+
+.btn-secondary {
+  @apply px-5 py-2 rounded-lg;
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
+  @apply font-medium text-sm transition-colors;
+}
+
+.btn-primary {
+  @apply px-5 py-2 rounded-lg;
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+  @apply font-medium text-sm transition-colors;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px) {
+  .modal-content {
+    @apply max-w-full;
+  }
+
+  .filter-row {
+    @apply flex-col items-stretch;
+  }
+
+  .filter-field-select {
+    @apply w-full;
+  }
+
+  .filter-checkbox {
+    @apply self-start;
+  }
+}

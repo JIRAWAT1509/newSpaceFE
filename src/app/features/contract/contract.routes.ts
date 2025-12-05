@@ -4,10 +4,16 @@ import { Routes } from '@angular/router';
 export const CONTRACT_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'quotation/daily',
+    redirectTo: 'contract/management',
     pathMatch: 'full'
   },
-
+  {
+    path: 'management',
+    loadComponent: () =>
+      import('./pages/contract-management/contract-management.component').then(
+        (m) => m.ContractManagementComponent
+      ),
+  },
   // Quotation Management
   {
     path: 'quotation/daily',

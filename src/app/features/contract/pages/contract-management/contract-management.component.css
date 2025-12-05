@@ -1,0 +1,83 @@
+/* contract-management.component.css */
+
+.contract-management-container {
+  @apply h-full flex flex-col bg-gray-50;
+}
+
+/* ==================== Header ==================== */
+.page-header {
+  @apply bg-white border-b border-gray-200 px-6 py-4;
+}
+
+.page-title {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+/* ==================== Tabs ==================== */
+::ng-deep .contract-tabs {
+  @apply flex-1 flex flex-col bg-white;
+}
+
+::ng-deep .contract-tabs .p-tablist {
+  @apply bg-white border-b border-gray-200;
+  @apply flex gap-1 px-6;
+}
+
+::ng-deep .contract-tabs .p-tab {
+  @apply px-6 py-3 cursor-pointer;
+  @apply text-gray-600 hover:text-gray-900;
+  @apply border-b-2 border-transparent;
+  @apply transition-all duration-200;
+}
+
+::ng-deep .contract-tabs .p-tab[aria-selected="true"] {
+  @apply text-blue-600 border-blue-600;
+  @apply bg-blue-50;
+}
+
+::ng-deep .contract-tabs .p-tabpanels {
+  @apply flex-1 overflow-auto;
+}
+
+::ng-deep .contract-tabs .p-tabpanel {
+  @apply h-full;
+}
+
+.tab-header {
+  @apply flex items-center gap-2;
+}
+
+.tab-header i {
+  @apply text-base;
+}
+
+.tab-header span {
+  @apply font-medium text-sm;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px) {
+  .page-header {
+    @apply px-4 py-3;
+  }
+
+  .page-title {
+    @apply text-xl;
+  }
+
+  ::ng-deep .contract-tabs .p-tablist {
+    @apply px-4;
+  }
+
+  ::ng-deep .contract-tabs .p-tab {
+    @apply px-4 py-2;
+  }
+
+  .tab-header span {
+    @apply hidden;
+  }
+
+  .tab-header i {
+    @apply text-lg;
+  }
+}

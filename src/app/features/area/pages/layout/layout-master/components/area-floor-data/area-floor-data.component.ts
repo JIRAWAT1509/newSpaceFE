@@ -53,7 +53,7 @@ export class AreaFloorDataComponent {
     const areaId = this.selectedAreaId();
     if (areaId) {
       // Navigate to contract processing page with area context
-      this.router.navigate(['/contract/quotation/processing'], {
+      this.router.navigate(['/contract/management'], {
         queryParams: {
           areaId: areaId,
           roomNumber: this.getAreaRoomNumber()

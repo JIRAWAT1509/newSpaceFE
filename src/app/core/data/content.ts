@@ -78,6 +78,19 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     primary_content: 'contract',
     secondary_content: [
       {
+        name: 'contract_management',
+        icon: 'assets/icons/business-outline.svg',
+        route: '/contract/management',
+        // sub: [
+        //   {
+        //     name: 'contract_preparation_data',
+        //     route: '/setting/system/contract',
+        //     hasDeeper: true,
+        //     deeperNote: 'Contains: Profit center, Business types, Categories, Sales type, Contract types, Product groups, Signatories, Cost center'
+        //   }
+        // ]
+      },
+      {
         name: 'quotation_management',
         icon: 'assets/icons/briefcase-outline.svg',
         sub: [

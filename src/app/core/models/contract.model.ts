@@ -1,4 +1,4 @@
-// src/app/core/models/contract.model.ts
+// contract.model.ts - FINAL VERSION with all required fields
 
 export interface Contract {
   CONTRACT_ID: string;
@@ -25,6 +25,16 @@ export interface Contract {
   TENANT_NAME_TH: string;
   TENANT_NAME_EN: string;
   LANDLORD_NAME: string;
+
+  // Customer/Tenant Details (NEW FIELDS)
+  CUSTOMER_ID?: string;         // รหัสลูกค้า (e.g., "CUST-2024-001")
+
+  // Related Contracts (NEW FIELDS)
+  BOOKING_NUMBER?: string;      // เลขที่สัญญาจอง (reference to DEPOSIT_AGREEMENT)
+  QUOTATION_NUMBER?: string;    // เลขที่ใบเสนอราคา (reference to QUOTATION_AGREEMENT)
+
+  // Location (NEW FIELD)
+  BUILDING_CODE?: string;       // อาคาร (A, B, C)
 
   // Financial terms
   MONTHLY_RENT?: number;
@@ -69,8 +79,8 @@ export type ContractType =
   | 'LEASE_RENEWAL'            // ต่อสัญญาเช่า
   | 'LEASE_AMENDMENT'          // แก้ไขสัญญา
   | 'LEASE_TERMINATION'        // เลิกสัญญา
-  | 'DEPOSIT_AGREEMENT'        // สัญญามัดจำ
-  | 'QUOTATION_AGREEMENT'      // สัญญาใบเสนอราคา
+  | 'DEPOSIT_AGREEMENT'        // สัญญามัดจำ (สัญญาจอง)
+  | 'QUOTATION_AGREEMENT'      // สัญญาใบเสนอราคา (ใบเสนอราคา)
   | 'MAINTENANCE_AGREEMENT'    // สัญญาบำรุงรักษา
   | 'ADDENDUM'                 // ภาคผนวก
   | 'OTHER';
@@ -89,7 +99,7 @@ export const CONTRACT_TYPE_LABELS: Record<ContractType, { TH: string; EN: string
   'LEASE_AMENDMENT': { TH: 'แก้ไขสัญญา', EN: 'Lease Amendment' },
   'LEASE_TERMINATION': { TH: 'เลิกสัญญา', EN: 'Lease Termination' },
   'DEPOSIT_AGREEMENT': { TH: 'สัญญามัดจำ', EN: 'Deposit Agreement' },
-  'QUOTATION_AGREEMENT': { TH: 'สัญญาใบเสนอราคา', EN: 'Quotation Agreement' },
+  'QUOTATION_AGREEMENT': { TH: 'ใบเสนอราคา', EN: 'Quotation Agreement' },
   'MAINTENANCE_AGREEMENT': { TH: 'สัญญาบำรุงรักษา', EN: 'Maintenance Agreement' },
   'ADDENDUM': { TH: 'ภาคผนวก', EN: 'Addendum' },
   'OTHER': { TH: 'อื่นๆ', EN: 'Other' }

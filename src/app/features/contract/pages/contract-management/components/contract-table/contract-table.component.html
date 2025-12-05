@@ -1,0 +1,232 @@
+<!-- contract-table.component.html -->
+
+<div class="contract-table-container">
+  <!-- Search Section -->
+  <div class="search-section">
+    <!-- Simple Search Bar -->
+    <div class="search-bar">
+      <div class="search-input-wrapper">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search"
+          [(ngModel)]="simpleSearchText"
+          (keyup.enter)="onSimpleSearch()"
+        />
+        @if (simpleSearchText()) {
+          <button class="clear-btn" (click)="clearSimpleSearch()">
+            <i class="pi pi-times"></i>
+          </button>
+        }
+      </div>
+
+      <button class="advance-search-btn" (click)="openAdvanceSearch()">
+        <i class="pi pi-filter"></i>
+        <span>Advance search</span>
+      </button>
+    </div>
+
+    <!-- Saved Bookmarks -->
+    @if (savedSearches().length > 0) {
+      <div class="bookmarks">
+        @for (bookmark of savedSearches(); track bookmark.id) {
+          <button class="bookmark-chip" (click)="applyBookmark(bookmark)">
+            {{ bookmark.name }}
+            <i class="pi pi-times-circle"></i>
+          </button>
+        }
+        <button class="add-bookmark-btn">
+          <i class="pi pi-plus-circle"></i>
+        </button>
+      </div>
+    }
+
+    <!-- Active Filters (Tags) -->
+    @if (activeFilters().length > 0) {
+      <div class="active-filters">
+        @for (filter of activeFilters(); track filter.id) {
+          <div class="filter-tag">
+            <span class="filter-field">{{ getFieldLabel(filter.field!) }}</span>
+            <span class="filter-value">{{ formatFilterValue(filter) }}</span>
+            <button class="remove-filter-btn" (click)="removeFilter(filter.id)">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+        }
+        <button class="clear-all-btn" (click)="clearAllFilters()">
+          Clear all
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Actions Section -->
+  <div class="actions-section">
+    <div class="actions-left">
+      <!-- Bulk Actions -->
+      <button
+        class="action-btn manage-btn"
+        [disabled]="selectedIds().length === 0"
+        (click)="showBulkActions = !showBulkActions"
+      >
+        <i class="pi pi-cog"></i>
+        <span>จัดการ</span>
+      </button>
+
+      @if (showBulkActions && selectedIds().length > 0) {
+        <div class="bulk-actions-menu">
+          <button class="menu-item" (click)="onBulkAction('extend')">
+            <i class="pi pi-calendar-plus"></i>
+            <span>Extend</span>
+          </button>
+          <button class="menu-item" (click)="onBulkAction('terminate')">
+            <i class="pi pi-ban"></i>
+            <span>Terminate</span>
+          </button>
+          <button class="menu-item" (click)="onBulkAction('discount')">
+            <i class="pi pi-percentage"></i>
+            <span>Discount</span>
+          </button>
+          <button class="menu-item" (click)="onBulkAction('renew')">
+            <i class="pi pi-refresh"></i>
+            <span>Renew</span>
+          </button>
+          <button class="menu-item" (click)="onBulkAction('edit')">
+            <i class="pi pi-pencil"></i>
+            <span>แก้ไขสัญญาเช่า เดี่ยว</span>
+          </button>
+        </div>
+      }
+
+      <span class="selected-count" *ngIf="selectedIds().length > 0">
+        {{ selectedIds().length }} selected
+      </span>
+    </div>
+
+    <div class="actions-right">
+      <button class="action-btn add-btn" (click)="openAddModal()">
+        <i class="pi pi-plus"></i>
+        <span>เพิ่ม</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="checkbox-col">
+            <input
+              type="checkbox"
+              [checked]="isAllSelected()"
+              [indeterminate]="isSomeSelected()"
+              (change)="toggleSelectAll()"
+            />
+          </th>
+          <th>เลขที่สัญญาเช่า</th>
+          <th>ประเภทสัญญา</th>
+          <th>วันเริ่มต้นสัญญา</th>
+          <th>วันสิ้นสุดสัญญา</th>
+          <th>เลขที่สัญญาจอง</th>
+          <th>รหัสลูกค้า</th>
+          <th class="actions-col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of filteredData(); track item.CONTRACT_ID) {
+          <tr>
+            <td class="checkbox-col">
+              <input
+                type="checkbox"
+                [checked]="isSelected(item.CONTRACT_ID)"
+                (change)="toggleSelect(item.CONTRACT_ID)"
+              />
+            </td>
+            <td>
+              <div class="contract-number-cell">
+                <div
+                  class="status-dot"
+                  [style.background-color]="getStatusColor(item.STATUS)"
+                ></div>
+                <div class="contract-info">
+                  <div class="contract-number">{{ item.CONTRACT_NUMBER }}</div>
+                  <div class="company-name">{{ item.TENANT_NAME_TH }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ getContractTypeLabel(item.CONTRACT_TYPE) }}</td>
+            <td>{{ formatDate(item.START_DATE) }}</td>
+            <td>{{ formatDate(item.END_DATE) }}</td>
+            <td>{{ item.BOOKING_NUMBER || '-' }}</td>
+            <td>{{ item.CUSTOMER_ID || '-' }}</td>
+            <td class="actions-col">
+              <button class="row-actions-btn" (click)="showRowActions(item.CONTRACT_ID)">
+                <i class="pi pi-ellipsis-v"></i>
+              </button>
+
+              @if (activeRowMenu() === item.CONTRACT_ID) {
+                <div class="row-actions-menu">
+                  <button class="menu-item" (click)="onRowAction('edit', item)">
+                    <i class="pi pi-pencil"></i>
+                    <span>แก้ไขข้อมูล</span>
+                  </button>
+                  <button class="menu-item" (click)="onRowAction('copy-booking', item)">
+                    <i class="pi pi-copy"></i>
+                    <span>คัดลอกสัญญาเช่าไปเป็นสัญญาจอง</span>
+                  </button>
+                  <button class="menu-item" (click)="onRowAction('copy-quotation', item)">
+                    <i class="pi pi-copy"></i>
+                    <span>คัดลอกสัญญาเช่าไปเป็นใบเสนอราคา</span>
+                  </button>
+                  <button class="menu-item" (click)="onRowAction('addendum', item)">
+                    <i class="pi pi-file-plus"></i>
+                    <span>ยกเลิกสัญญา + addendum</span>
+                  </button>
+                </div>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="8" class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <p>No contracts found</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Advance Search Modal -->
+@if (showAdvanceSearchModal()) {
+  <app-advance-search-modal
+    [filters]="activeFilters()"
+    (filtersChange)="onFiltersChange($event)"
+    (close)="closeAdvanceSearch()"
+  />
+}
+
+<!-- Add Contract Modal (Placeholder) -->
+@if (showAddModal()) {
+  <div class="modal-backdrop" (click)="closeAddModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add New Contract</h3>
+        <button class="modal-close" (click)="closeAddModal()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Form fields will be added here...</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeAddModal()">Cancel</button>
+        <button class="btn-primary" (click)="saveNewContract()">Save</button>
+      </div>
+    </div>
+  </div>
+}
