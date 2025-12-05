@@ -1,15 +1,77 @@
+/* area-floor-data.component.css */
+
 .area-floor-data-container {
-  @apply p-6 h-full flex flex-col bg-white;
+  @apply h-full flex flex-col bg-white overflow-hidden;
 }
 
-.data-header {
-  @apply mb-6 pb-4 border-b border-gray-200;
+/* ==================== Tabs Wrapper ==================== */
+.tabs-wrapper {
+  @apply flex-1 flex flex-col overflow-hidden;
+}
+
+/* ==================== PrimeNG v20 Tab Styling ==================== */
+::ng-deep .area-tabs {
+  @apply h-full flex flex-col;
+}
+
+::ng-deep .area-tabs .p-tablist {
+  @apply bg-gray-50 border-b border-gray-200;
+  @apply flex gap-1 px-4;
+}
+
+::ng-deep .area-tabs .p-tab {
+  @apply px-4 py-3 cursor-pointer;
+  @apply text-gray-600 hover:text-gray-900;
+  @apply border-b-2 border-transparent;
+  @apply transition-all duration-200;
+}
+
+::ng-deep .area-tabs .p-tab[aria-selected="true"] {
+  @apply text-blue-600 border-blue-600;
+  @apply bg-white;
+}
+
+::ng-deep .area-tabs .p-tabpanels {
+  @apply flex-1 overflow-auto bg-white;
+}
+
+::ng-deep .area-tabs .p-tabpanel {
+  @apply h-full;
+}
+
+.tab-header {
+  @apply flex items-center gap-2;
+}
+
+.tab-header i {
+  @apply text-base;
+}
+
+.tab-header span {
+  @apply font-medium text-sm;
+}
+
+/* ==================== Tab Content ==================== */
+.tab-content {
+  @apply h-full flex flex-col;
+}
+
+/* ==================== Area Header (for tabs 2-4) ==================== */
+.area-header {
+  @apply flex items-center justify-between px-6 py-4;
+  @apply border-b border-gray-200 bg-gray-50;
+}
+
+.section-title {
+  @apply text-xl font-bold text-gray-800;
 }
 
 .back-button {
-  @apply flex items-center gap-2 px-4 py-2 text-sm;
-  @apply text-blue-600 hover:text-blue-700;
-  @apply hover:bg-blue-50 rounded-lg;
+  @apply flex items-center gap-2 px-4 py-2;
+  @apply text-sm font-medium;
+  @apply text-gray-600 hover:text-gray-900;
+  @apply bg-white hover:bg-gray-100;
+  @apply border border-gray-300 rounded-lg;
   @apply transition-colors duration-200;
 }
 
@@ -17,43 +79,129 @@
   @apply text-base;
 }
 
-.data-title {
-  @apply text-2xl font-bold text-gray-800;
+.contract-action-btn {
+  @apply flex items-center gap-2 px-5 py-2.5;
+  @apply text-sm font-semibold;
+  @apply text-white;
+  @apply bg-blue-600 hover:bg-blue-700;
+  @apply rounded-lg shadow-sm hover:shadow-md;
+  @apply transition-all duration-200;
 }
 
-.data-content {
-  @apply flex-1 flex flex-col items-center justify-center;
+.contract-action-btn i {
+  @apply text-base;
 }
 
-.placeholder-text {
-  @apply text-lg text-gray-600 mb-2;
+/* ==================== Floor General View ==================== */
+.floor-general-view {
+  @apply flex flex-col items-center justify-center h-full p-6;
 }
 
-.phase-note {
-  @apply text-sm text-gray-400 italic;
+.floor-general-view .section-title {
+  @apply mb-8;
 }
 
-/* Specific View Styles */
-.specific-view {
-  @apply h-full flex flex-col;
+/* Empty State (No area selected) */
+.empty-state {
+  @apply flex flex-col items-center justify-center text-gray-400;
+  @apply py-12;
 }
 
-/* General View Styles */
-.general-view {
-  @apply h-full flex flex-col;
+.empty-state i {
+  @apply text-6xl mb-4;
 }
 
-/* Responsive */
+.empty-state p {
+  @apply text-lg font-medium mb-2;
+}
+
+.empty-hint {
+  @apply text-sm text-gray-400;
+}
+
+/* Area Selected State */
+.area-selected-state {
+  @apply flex flex-col items-center gap-6;
+  @apply bg-blue-50 border border-blue-200 rounded-lg p-8;
+  @apply max-w-2xl;
+}
+
+.selected-info {
+  @apply flex items-start gap-4;
+  @apply text-left;
+}
+
+.selected-info i {
+  @apply text-3xl text-blue-600 flex-shrink-0;
+}
+
+.selected-text {
+  @apply text-base text-gray-700 mb-1;
+}
+
+.selected-text strong {
+  @apply text-blue-600 font-bold;
+}
+
+.selected-hint {
+  @apply text-sm text-gray-500;
+}
+
+.view-details-btn {
+  @apply flex items-center gap-2 px-6 py-3;
+  @apply bg-blue-600 hover:bg-blue-700;
+  @apply text-white font-medium rounded-lg;
+  @apply transition-colors duration-200;
+  @apply shadow-sm hover:shadow-md;
+}
+
+.view-details-btn i {
+  @apply text-base;
+}
+
+/* ==================== Responsive ==================== */
 @media (max-width: 768px) {
-  .area-floor-data-container {
+  .area-header {
+    @apply px-4 py-3 flex-col items-start gap-3;
+  }
+
+  .section-title {
+    @apply text-lg;
+  }
+
+  .back-button {
+    @apply w-full justify-center;
+  }
+
+  .contract-action-btn {
+    @apply w-full justify-center;
+  }
+
+  .floor-general-view {
     @apply p-4;
   }
 
-  .data-title {
-    @apply text-xl;
+  ::ng-deep .area-tabs .p-tablist {
+    @apply px-2 gap-0;
   }
 
-  .placeholder-text {
-    @apply text-base;
+  ::ng-deep .area-tabs .p-tab {
+    @apply px-3 py-2;
+  }
+
+  .tab-header span {
+    @apply hidden;
+  }
+
+  .tab-header i {
+    @apply text-lg;
+  }
+
+  .area-selected-state {
+    @apply p-6;
+  }
+
+  .view-details-btn {
+    @apply w-full justify-center;
   }
 }

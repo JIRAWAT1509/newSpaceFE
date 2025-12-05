@@ -1,0 +1,132 @@
+<!-- area-general-data-tab.component.html -->
+
+<div class="general-data-container">
+  @if (areaData()) {
+    <!-- Area Basic Info Card -->
+    <div class="info-card">
+      <h3 class="section-title">Area Information</h3>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Room Number</span>
+          <span class="info-value">{{ areaData()!.roomNumber }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Area Type</span>
+          <span class="info-value">{{ getTypeLabel(areaData()!.type) }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Size</span>
+          <span class="info-value">{{ areaData()!.size }} sq.m.</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Current Status</span>
+          <span class="status-badge" [style.background-color]="getStatusColor(areaData()!.status)">
+            {{ getStatusLabel(areaData()!.status) }}
+          </span>
+        </div>
+
+        @if (areaData()!.currentTenant) {
+          <div class="info-item full-width">
+            <span class="info-label">Current Tenant</span>
+            <span class="info-value">{{ areaData()!.currentTenant!.name }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Monthly Rent</span>
+            <span class="info-value rent">฿{{ formatNumber(areaData()!.currentTenant!.monthlyRent) }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Lease Period</span>
+            <span class="info-value">
+              {{ formatDate(areaData()!.currentTenant!.leaseStart) }} -
+              {{ formatDate(areaData()!.currentTenant!.leaseEnd) }}
+            </span>
+          </div>
+
+          @if (areaData()!.currentTenant!.hasWarning) {
+            <div class="info-item full-width">
+              <span class="warning-badge">
+                <i class="pi pi-exclamation-triangle"></i>
+                <span>Contract expires in {{ areaData()!.currentTenant!.daysUntilExpiry }} days</span>
+              </span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Area Pictures Gallery -->
+    <div class="pictures-card">
+      <h3 class="section-title">Area Pictures</h3>
+
+      @if (areaPictures().length > 0) {
+        <div class="pictures-grid">
+          @for (picture of areaPictures(); track picture.id) {
+            <div class="picture-item" (click)="onPictureClick(picture)">
+              <img [src]="picture.url" [alt]="picture.description" />
+              <div class="picture-overlay">
+                <i class="pi pi-search-plus"></i>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <i class="pi pi-image"></i>
+          <p>No pictures available</p>
+        </div>
+      }
+    </div>
+
+    <!-- Rent Rate History Chart -->
+    <div class="chart-card">
+      <h3 class="section-title">Rent Rate History</h3>
+
+      @if (rentRateTimeline().length > 0) {
+        <div class="chart-container">
+          <canvas #rentChart></canvas>
+        </div>
+
+        <div class="chart-legend">
+          <div class="legend-item">
+            <span class="legend-dot" style="background-color: #2196F3;"></span>
+            <span class="legend-label">Monthly Rent (THB)</span>
+          </div>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <i class="pi pi-chart-line"></i>
+          <p>No rental history available</p>
+        </div>
+      }
+    </div>
+
+  } @else {
+    <!-- Loading or No Data -->
+    <div class="empty-state-main">
+      <i class="pi pi-inbox"></i>
+      <p>No area data available</p>
+    </div>
+  }
+</div>
+
+<!-- Picture Preview Modal -->
+@if (showPictureModal()) {
+  <div class="modal-backdrop" (click)="closePictureModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closePictureModal()">
+        <i class="pi pi-times"></i>
+      </button>
+
+      @if (selectedPicture()) {
+        <img [src]="selectedPicture()!.url" [alt]="selectedPicture()!.description" />
+        <p class="modal-description">{{ selectedPicture()!.description }}</p>
+      }
+    </div>
+  </div>
+}

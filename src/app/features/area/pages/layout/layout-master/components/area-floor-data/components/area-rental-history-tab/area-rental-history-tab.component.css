@@ -1,0 +1,216 @@
+/* area-rental-history-tab.component.css */
+
+.rental-history-container {
+  @apply flex flex-col gap-4 p-6;
+}
+
+/* ==================== Header Bar ==================== */
+.header-bar {
+  @apply flex items-center justify-between gap-4 mb-2;
+  @apply flex-wrap;
+}
+
+.header-left {
+  @apply flex items-center gap-3;
+}
+
+.header-title {
+  @apply text-xl font-bold text-gray-800;
+}
+
+.header-right {
+  @apply flex items-center gap-3;
+}
+
+/* ==================== History List ==================== */
+.history-list {
+  @apply flex flex-col gap-3;
+}
+
+.history-item {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200;
+  @apply transition-all duration-200;
+}
+
+.history-item.expanded {
+  @apply shadow-md border-blue-300;
+}
+
+/* ==================== History Header (Collapsed) ==================== */
+.history-header {
+  @apply p-4 cursor-pointer;
+  @apply hover:bg-gray-50 transition-colors duration-150;
+  @apply flex items-center justify-between gap-4;
+}
+
+.history-main {
+  @apply flex items-center gap-6 flex-1;
+  @apply flex-wrap;
+}
+
+.tenant-info {
+  @apply flex flex-col gap-1 min-w-[200px];
+}
+
+.tenant-name {
+  @apply text-base font-semibold text-gray-800;
+}
+
+.tenant-email {
+  @apply text-sm text-gray-500;
+}
+
+.lease-dates,
+.rental-duration {
+  @apply flex items-center gap-2 text-sm text-gray-600;
+}
+
+.lease-dates i,
+.rental-duration i {
+  @apply text-blue-500;
+}
+
+.monthly-rent {
+  @apply flex flex-col gap-1;
+}
+
+.rent-label {
+  @apply text-xs font-medium text-gray-500 uppercase tracking-wide;
+}
+
+.rent-value {
+  @apply text-lg font-bold text-blue-600;
+}
+
+.history-actions {
+  @apply flex items-center gap-3;
+}
+
+.category-badge {
+  @apply px-3 py-1 rounded-full text-xs font-medium text-white;
+  @apply whitespace-nowrap;
+}
+
+.expand-btn {
+  @apply w-8 h-8 rounded-full;
+  @apply flex items-center justify-center;
+  @apply bg-gray-100 hover:bg-gray-200;
+  @apply text-gray-600 hover:text-gray-800;
+  @apply transition-colors duration-150;
+}
+
+/* ==================== History Details (Expanded) ==================== */
+.history-details {
+  @apply border-t border-gray-200 p-4 bg-gray-50;
+}
+
+.details-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.detail-section {
+  @apply flex flex-col gap-3;
+}
+
+.detail-section.full-width {
+  @apply md:col-span-2;
+}
+
+.detail-title {
+  @apply text-sm font-bold text-gray-700 uppercase tracking-wide;
+  @apply pb-2 border-b border-gray-300;
+}
+
+.detail-items {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.detail-item {
+  @apply flex flex-col gap-1;
+}
+
+.detail-item.full-width {
+  @apply col-span-full;
+}
+
+.detail-label {
+  @apply text-xs font-medium text-gray-500 uppercase;
+}
+
+.detail-value {
+  @apply text-sm font-semibold text-gray-800;
+}
+
+.detail-value.highlight {
+  @apply text-base text-blue-600;
+}
+
+.category-badge-detail {
+  @apply inline-flex px-3 py-1 rounded-full text-xs font-medium text-white w-fit;
+}
+
+/* ==================== Revenue by Year ==================== */
+.year-revenue-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4;
+}
+
+.year-card {
+  @apply bg-white rounded-lg border border-gray-200 p-4;
+  @apply flex flex-col gap-2 text-center;
+}
+
+.year-label {
+  @apply text-sm font-medium text-gray-500;
+}
+
+.year-revenue {
+  @apply text-xl font-bold text-blue-600;
+}
+
+.year-avg {
+  @apply text-xs text-gray-500;
+}
+
+/* ==================== Empty State ==================== */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-20 text-gray-400;
+}
+
+.empty-state i {
+  @apply text-6xl mb-4;
+}
+
+.empty-state p {
+  @apply text-lg font-medium mb-2;
+}
+
+.empty-hint {
+  @apply text-sm text-gray-400;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px) {
+  .rental-history-container {
+    @apply p-4;
+  }
+
+  .header-bar {
+    @apply flex-col items-stretch;
+  }
+
+  .header-right {
+    @apply flex-col items-stretch;
+  }
+
+  .history-main {
+    @apply flex-col items-start gap-3;
+  }
+
+  .history-actions {
+    @apply justify-between w-full;
+  }
+
+  .details-grid {
+    @apply grid-cols-1;
+  }
+}

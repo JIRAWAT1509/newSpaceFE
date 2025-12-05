@@ -27,10 +27,11 @@
 
   <!-- Section 3: Floor/Area Data Display -->
   <div class="section section-data-display">
-    <app-area-floor-data
-      [selectedAreaId]="selectedAreaId()"
-      (backToGeneral)="onBackToGeneral()"
-    />
+<app-area-floor-data
+  [floorId]="currentFloorId()"
+  [selectedAreaId]="selectedAreaId()"
+  (backToGeneral)="onBackToGeneral()"
+/>
   </div>
 </div>
 

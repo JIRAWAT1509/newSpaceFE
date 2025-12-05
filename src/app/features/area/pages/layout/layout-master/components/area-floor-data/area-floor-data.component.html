@@ -1,33 +1,98 @@
 <div class="area-floor-data-container">
-  @if (selectedAreaId()) {
-    <!-- Specific Area View -->
-    <div class="specific-view">
-      <div class="data-header">
-        <button
-          type="button"
-          class="back-button"
-          (click)="onBackToGeneral()"
-        >
-          <i class="pi pi-arrow-left"></i>
-          <span>Back to Floor Overview</span>
-        </button>
-      </div>
+  <!-- Always Show Tabs -->
+  <div class="tabs-wrapper">
+    <!-- PrimeNG Tabs (v20 syntax) -->
+    <p-tabs [(value)]="activeTabIndex" styleClass="area-tabs">
+      <p-tablist>
+        <!-- Tab 1: Floor General (Always visible) -->
+        <p-tab value="0">
+          <div class="tab-header">
+            <i class="pi pi-th-large"></i>
+            <span>Floor Overview</span>
+          </div>
+        </p-tab>
 
-      <div class="data-content">
-        <h3 class="data-title">Area Details</h3>
-        <p class="placeholder-text">area data : {{ selectedAreaId() }}</p>
-      </div>
-    </div>
-  } @else {
-    <!-- General Floor View -->
-    <div class="general-view">
-      <div class="data-header">
-        <h3 class="data-title">Floor Overview</h3>
-      </div>
+        <!-- Tabs 2-4: Area-specific (Only when area selected) -->
+        @if (selectedAreaId()) {
+          <p-tab value="1">
+            <div class="tab-header">
+              <i class="pi pi-info-circle"></i>
+              <span>Area Details</span>
+            </div>
+          </p-tab>
 
-      <div class="data-content">
-        <p class="placeholder-text">General floor info</p>
-      </div>
-    </div>
-  }
+          <p-tab value="2">
+            <div class="tab-header">
+              <i class="pi pi-history"></i>
+              <span>Rental History</span>
+            </div>
+          </p-tab>
+
+          <p-tab value="3">
+            <div class="tab-header">
+              <i class="pi pi-file"></i>
+              <span>Contracts</span>
+            </div>
+          </p-tab>
+        }
+      </p-tablist>
+
+      <p-tabpanels>
+        <!-- Tab Panel 1: Floor General -->
+        <p-tabpanel value="0">
+          <div class="tab-content">
+            <app-floor-overview-tab [floorId]="floorId()" />
+          </div>
+        </p-tabpanel>
+
+        <!-- Tab Panel 2: Area General -->
+        @if (selectedAreaId()) {
+          <p-tabpanel value="1">
+            <div class="tab-content">
+              <div class="area-header">
+                <h3 class="section-title">{{ getAreaRoomNumber() }}</h3>
+                <button class="contract-action-btn" (click)="onGoToContract()">
+                  <i class="pi pi-file-edit"></i>
+                  <span>Contract Processing</span>
+                </button>
+              </div>
+              <app-area-general-data-tab [areaData]="getSelectedArea()" />
+            </div>
+          </p-tabpanel>
+        }
+
+        <!-- Tab Panel 3: Rental History -->
+        @if (selectedAreaId()) {
+          <p-tabpanel value="2">
+            <div class="tab-content">
+              <div class="area-header">
+                <h3 class="section-title">Rental History: {{ getAreaRoomNumber() }}</h3>
+                <button class="contract-action-btn" (click)="onGoToContract()">
+                  <i class="pi pi-file-edit"></i>
+                  <span>Contract Processing</span>
+                </button>
+              </div>
+              <app-area-rental-history-tab [areaId]="selectedAreaId()!" />
+            </div>
+          </p-tabpanel>
+        }
+
+        <!-- Tab Panel 4: Contracts -->
+        @if (selectedAreaId()) {
+          <p-tabpanel value="3">
+            <div class="tab-content">
+              <div class="area-header">
+                <h3 class="section-title">Contracts: {{ getAreaRoomNumber() }}</h3>
+                <button class="contract-action-btn" (click)="onGoToContract()">
+                  <i class="pi pi-file-edit"></i>
+                  <span>Contract Processing</span>
+                </button>
+              </div>
+              <app-area-contract-list-tab [areaId]="selectedAreaId()!" />
+            </div>
+          </p-tabpanel>
+        }
+      </p-tabpanels>
+    </p-tabs>
+  </div>
 </div>

@@ -6,6 +6,7 @@ import { AreaFilterBarComponent, FilterChangeEvent as TypeFilterChangeEvent, Act
 import { AddFloorModalComponent, AddFloorResult } from './components//area-filter-bar/components/add-floor-modal/add-floor-modal.component';
 import { AreaStatus } from '@core/models/area.model';
 import { AreaDataService, FloorWithAreas } from '@core/services/area/area-data.service';
+import { computed } from '@angular/core';
 
 @Component({
   selector: 'app-layout-master',
@@ -77,6 +78,11 @@ export class LayoutMasterComponent {
       }, 100);
     }
   }
+
+  currentFloorId = computed(() => {
+    const floor = this.areaDataService.getCurrentFloor();
+    return floor?.id || 'floor-2m'; // fallback to floor-2m
+  });
 
   onAddFloorModalClosed(): void {
     console.log('Add floor modal closed');

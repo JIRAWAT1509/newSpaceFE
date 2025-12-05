@@ -1,0 +1,155 @@
+<!-- floor-overview-tab.component.html -->
+
+<div class="floor-overview-container">
+  @if (floorStats()) {
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: #E3F2FD;">
+          <i class="pi pi-th-large" style="color: #2196F3;"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total Areas</span>
+          <span class="stat-value">{{ floorStats()!.TOTAL_AREAS_COUNT }}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: #FFF3E0;">
+          <i class="pi pi-chart-line" style="color: #FF9800;"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Occupancy Rate</span>
+          <span class="stat-value">{{ floorStats()!.OCCUPANCY_RATE.toFixed(1) }}%</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: #E8F5E9;">
+          <i class="pi pi-money-bill" style="color: #4CAF50;"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Monthly Revenue</span>
+          <span class="stat-value">฿{{ formatNumber(floorStats()!.TOTAL_MONTHLY_REVENUE) }}</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: #F3E5F5;">
+          <i class="pi pi-calculator" style="color: #9C27B0;"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Avg Rent/Sqm</span>
+          <span class="stat-value">฿{{ formatNumber(floorStats()!.AVERAGE_RENT_PER_SQM) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Area Distribution Chart & Recommended Categories -->
+    <div class="chart-row">
+      <!-- Left: Pie Chart -->
+      <div class="chart-card pie-chart-section">
+        <h3 class="section-title">Area Distribution by Type</h3>
+
+        <div class="pie-chart-wrapper">
+          <!-- Legend (Left) -->
+          <div class="pie-legend">
+            @for (type of floorStats()!.AREA_BY_TYPE; track type.TYPE) {
+              <button
+                class="legend-item"
+                [class.opacity-50]="!typeVisibility()[type.TYPE]"
+                (click)="toggleType(type.TYPE)"
+              >
+                <div
+                  class="legend-color"
+                  [style.background-color]="typeVisibility()[type.TYPE] ? type.COLOR : '#E5E7EB'"
+                ></div>
+                <div class="legend-text">
+                  <span
+                    class="legend-label"
+                    [style.text-decoration]="!typeVisibility()[type.TYPE] ? 'line-through' : 'none'"
+                  >
+                    {{ type.TYPE_LABEL_EN }}
+                  </span>
+                  <span class="legend-count">{{ type.COUNT }} areas</span>
+                </div>
+              </button>
+            }
+          </div>
+
+          <!-- Chart (Right) -->
+          <div class="pie-chart-container">
+            <canvas #pieChart></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Recommended Categories -->
+      <div class="categories-card">
+        <h3 class="section-title">Recommended Store Categories</h3>
+
+        <div class="categories-list">
+          @for (category of floorStats()!.RECOMMENDED_CATEGORIES; track category.CATEGORY_ID) {
+            <div class="category-item">
+              <div class="category-header">
+                <span class="category-name">{{ category.CATEGORY_NAME_EN }}</span>
+                <div class="category-stars">
+                  @for (star of [1,2,3,4,5]; track star) {
+                    <i
+                      class="pi pi-star-fill"
+                      [class.active]="star <= category.RECOMMENDED_SCORE"
+                    ></i>
+                  }
+                </div>
+              </div>
+              <p class="category-reason">{{ category.REASON_EN }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Rent Rate Trend Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3 class="section-title">Rent Rate Trend</h3>
+
+        <div class="chart-filters">
+          <!-- Type Filter -->
+          <p-multiSelect
+            [ngModel]="selectedTypes()"
+            (ngModelChange)="selectedTypes.set($event)"
+            [options]="typeFilterOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="All Types"
+            styleClass="w-48"
+            display="chip"
+          ></p-multiSelect>
+
+          <!-- Time Range Filter -->
+          <p-select
+            [ngModel]="timeRange()"
+            (ngModelChange)="timeRange.set($event)"
+            [options]="timeRangeOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Time Range"
+            styleClass="w-40"
+          ></p-select>
+        </div>
+      </div>
+
+      <div class="line-chart-container">
+        <canvas #lineChart></canvas>
+      </div>
+    </div>
+
+  } @else {
+    <!-- Loading State -->
+    <div class="empty-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Loading floor data...</p>
+    </div>
+  }
+</div>

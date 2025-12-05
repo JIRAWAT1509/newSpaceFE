@@ -1,0 +1,190 @@
+<!-- area-rental-history-tab.component.html -->
+
+<div class="rental-history-container">
+  @if (rentalHistory().length > 0) {
+    <!-- Header with Sort/Filter -->
+    <div class="header-bar">
+      <div class="header-left">
+        <h3 class="header-title">Rental History ({{ rentalHistory().length }})</h3>
+      </div>
+
+      <div class="header-right">
+        <!-- Sort Dropdown -->
+        <p-select
+          [(ngModel)]="sortBy"
+          [options]="sortOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Sort by"
+          styleClass="w-48"
+          (onChange)="onSortChange()"
+        ></p-select>
+
+        <!-- Filter by Move-out Category -->
+        <p-select
+          [(ngModel)]="filterCategory"
+          [options]="categoryOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="All Categories"
+          [showClear]="true"
+          styleClass="w-52"
+          (onChange)="onFilterChange()"
+        ></p-select>
+      </div>
+    </div>
+
+    <!-- Rental History List -->
+    <div class="history-list">
+      @for (history of filteredHistory(); track history.RENTAL_HISTORY_ID) {
+        <div class="history-item" [class.expanded]="expandedId() === history.RENTAL_HISTORY_ID">
+          <!-- Collapsed View -->
+          <div class="history-header" (click)="toggleExpand(history.RENTAL_HISTORY_ID)">
+            <div class="history-main">
+              <div class="tenant-info">
+                <h4 class="tenant-name">{{ history.TENANT_NAME_TH }}</h4>
+                <p class="tenant-email">{{ history.TENANT_EMAIL || 'No email' }}</p>
+              </div>
+
+              <div class="lease-dates">
+                <i class="pi pi-calendar"></i>
+                <span>{{ formatDate(history.LEASE_START) }} - {{ formatDate(history.LEASE_END) }}</span>
+              </div>
+
+              <div class="rental-duration">
+                <i class="pi pi-clock"></i>
+                <span>{{ history.OCCUPANCY_DAYS }} days</span>
+              </div>
+
+              <div class="monthly-rent">
+                <span class="rent-label">Monthly Rent</span>
+                <span class="rent-value">฿{{ formatNumber(history.MONTHLY_RENT) }}</span>
+              </div>
+            </div>
+
+            <div class="history-actions">
+              <span
+                class="category-badge"
+                [style.background-color]="getCategoryColor(history.MOVE_OUT_CATEGORY!)"
+              >
+                {{ getCategoryLabel(history.MOVE_OUT_CATEGORY!) }}
+              </span>
+
+              <button class="expand-btn">
+                <i class="pi" [class.pi-chevron-down]="expandedId() !== history.RENTAL_HISTORY_ID"
+                             [class.pi-chevron-up]="expandedId() === history.RENTAL_HISTORY_ID"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded View -->
+          @if (expandedId() === history.RENTAL_HISTORY_ID) {
+            <div class="history-details">
+              <div class="details-grid">
+                <!-- Tenant Details -->
+                <div class="detail-section">
+                  <h5 class="detail-title">Tenant Information</h5>
+                  <div class="detail-items">
+                    <div class="detail-item">
+                      <span class="detail-label">Company Name (TH)</span>
+                      <span class="detail-value">{{ history.TENANT_NAME_TH }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Company Name (EN)</span>
+                      <span class="detail-value">{{ history.TENANT_NAME_EN }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Email</span>
+                      <span class="detail-value">{{ history.TENANT_EMAIL || '-' }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Phone</span>
+                      <span class="detail-value">{{ history.TENANT_PHONE || '-' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Financial Details -->
+                <div class="detail-section">
+                  <h5 class="detail-title">Financial Summary</h5>
+                  <div class="detail-items">
+                    <div class="detail-item">
+                      <span class="detail-label">Monthly Rent</span>
+                      <span class="detail-value highlight">฿{{ formatNumber(history.MONTHLY_RENT) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Total Revenue</span>
+                      <span class="detail-value highlight">฿{{ formatNumber(history.TOTAL_REVENUE) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Avg Revenue/Day</span>
+                      <span class="detail-value">฿{{ formatNumber(history.AVG_REVENUE_PER_DAY) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Occupancy Days</span>
+                      <span class="detail-value">{{ history.OCCUPANCY_DAYS }} days</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Revenue by Year -->
+                @if (history.REVENUE_BY_YEAR.length > 0) {
+                  <div class="detail-section full-width">
+                    <h5 class="detail-title">Revenue by Year</h5>
+                    <div class="year-revenue-grid">
+                      @for (year of history.REVENUE_BY_YEAR; track year.YEAR) {
+                        <div class="year-card">
+                          <div class="year-label">{{ year.YEAR }}</div>
+                          <div class="year-revenue">฿{{ formatNumber(year.REVENUE) }}</div>
+                          <div class="year-avg">Avg: ฿{{ formatNumber(year.AVG_MONTHLY_REVENUE) }}/mo</div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Move-out Information -->
+                <div class="detail-section full-width">
+                  <h5 class="detail-title">Move-out Information</h5>
+                  <div class="detail-items">
+                    <div class="detail-item">
+                      <span class="detail-label">Category</span>
+                      <span
+                        class="category-badge-detail"
+                        [style.background-color]="getCategoryColor(history.MOVE_OUT_CATEGORY!)"
+                      >
+                        {{ getCategoryLabel(history.MOVE_OUT_CATEGORY!) }}
+                      </span>
+                    </div>
+                    <div class="detail-item full-width">
+                      <span class="detail-label">Reason (TH)</span>
+                      <span class="detail-value">{{ history.MOVE_OUT_REASON_TH || '-' }}</span>
+                    </div>
+                    <div class="detail-item full-width">
+                      <span class="detail-label">Reason (EN)</span>
+                      <span class="detail-value">{{ history.MOVE_OUT_REASON_EN || '-' }}</span>
+                    </div>
+                    @if (history.MOVE_OUT_NOTES) {
+                      <div class="detail-item full-width">
+                        <span class="detail-label">Notes</span>
+                        <span class="detail-value">{{ history.MOVE_OUT_NOTES }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  } @else {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <i class="pi pi-history"></i>
+      <p>No rental history available</p>
+      <span class="empty-hint">Rental history will appear here once tenants move out</span>
+    </div>
+  }
+</div>

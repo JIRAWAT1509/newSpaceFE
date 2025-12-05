@@ -1,0 +1,413 @@
+/* area-contract-list-tab.component.css */
+
+.contract-list-container {
+  @apply flex flex-col gap-4 p-6;
+}
+
+/* ==================== Header Bar ==================== */
+.header-bar {
+  @apply flex items-center justify-between gap-4 mb-2 flex-wrap;
+}
+
+.header-left {
+  @apply flex items-center gap-3;
+}
+
+.header-title {
+  @apply text-xl font-bold text-gray-800;
+}
+
+.header-right {
+  @apply flex items-center gap-3 flex-wrap;
+}
+
+/* ==================== Contract List ==================== */
+.contract-list {
+  @apply flex flex-col gap-3;
+}
+
+.contract-item {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200;
+  @apply transition-all duration-200;
+}
+
+.contract-item.expanded {
+  @apply shadow-md border-blue-300;
+}
+
+/* ==================== Contract Header ==================== */
+.contract-header {
+  @apply p-4 cursor-pointer;
+  @apply hover:bg-gray-50 transition-colors duration-150;
+  @apply flex items-start justify-between gap-4;
+}
+
+.contract-main {
+  @apply flex flex-col gap-4 flex-1;
+}
+
+.contract-info {
+  @apply flex flex-col gap-2;
+}
+
+.contract-number-row {
+  @apply flex items-center gap-3;
+}
+
+.contract-number {
+  @apply text-sm font-mono font-semibold text-blue-600;
+}
+
+.status-badge {
+  @apply px-3 py-1 rounded-full text-xs font-medium text-white whitespace-nowrap;
+}
+
+.contract-topic {
+  @apply text-base font-semibold text-gray-800;
+}
+
+.contract-tenant {
+  @apply text-sm text-gray-600;
+}
+
+.contract-meta {
+  @apply flex items-center gap-6 flex-wrap;
+}
+
+.meta-item {
+  @apply flex items-start gap-2;
+}
+
+.meta-item i {
+  @apply text-blue-500 text-sm mt-1;
+}
+
+.meta-content {
+  @apply flex flex-col gap-0.5;
+}
+
+.meta-label {
+  @apply text-xs font-medium text-gray-500 uppercase;
+}
+
+.meta-value {
+  @apply text-sm font-semibold text-gray-800;
+}
+
+.meta-value.rent {
+  @apply text-blue-600;
+}
+
+.contract-actions {
+  @apply flex flex-col items-end gap-3;
+}
+
+.type-badge {
+  @apply px-3 py-1 rounded-md text-xs font-medium;
+  @apply bg-blue-100 text-blue-700;
+}
+
+.expand-btn {
+  @apply w-8 h-8 rounded-full;
+  @apply flex items-center justify-center;
+  @apply bg-gray-100 hover:bg-gray-200;
+  @apply text-gray-600 hover:text-gray-800;
+  @apply transition-colors duration-150;
+}
+
+/* ==================== Contract Details ==================== */
+.contract-details {
+  @apply border-t border-gray-200 p-4 bg-gray-50;
+}
+
+.details-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.detail-section {
+  @apply flex flex-col gap-3;
+}
+
+.detail-section.full-width {
+  @apply md:col-span-2;
+}
+
+.detail-title {
+  @apply text-sm font-bold text-gray-700 uppercase tracking-wide;
+  @apply pb-2 border-b border-gray-300;
+}
+
+.detail-items {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.detail-item {
+  @apply flex flex-col gap-1;
+}
+
+.detail-item.full-width {
+  @apply col-span-full;
+}
+
+.detail-label {
+  @apply text-xs font-medium text-gray-500 uppercase;
+}
+
+.detail-value {
+  @apply text-sm font-semibold text-gray-800;
+}
+
+.type-badge-detail {
+  @apply inline-flex px-3 py-1 rounded-md text-xs font-medium;
+  @apply bg-blue-100 text-blue-700 w-fit;
+}
+
+/* ==================== Financial Grid ==================== */
+.financial-grid {
+  @apply grid grid-cols-1 sm:grid-cols-3 gap-4;
+}
+
+.financial-card {
+  @apply bg-white rounded-lg border border-gray-200 p-4;
+  @apply flex flex-col gap-2;
+}
+
+.financial-label {
+  @apply text-sm font-medium text-gray-500;
+}
+
+.financial-value {
+  @apply text-xl font-bold text-blue-600;
+}
+
+/* ==================== Files Section ==================== */
+.files-header {
+  @apply flex items-center justify-between mb-3;
+}
+
+.preview-toggle {
+  @apply flex items-center gap-2 cursor-pointer;
+  @apply text-sm text-gray-600 hover:text-gray-800;
+}
+
+.preview-toggle input[type="checkbox"] {
+  @apply w-4 h-4 rounded border-gray-300;
+  @apply text-blue-600 focus:ring-blue-500;
+}
+
+.files-grid {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.file-card {
+  @apply bg-white rounded-lg border border-gray-200 p-3;
+  @apply flex items-center gap-3;
+  @apply hover:border-blue-300 hover:shadow-sm;
+  @apply transition-all duration-150;
+}
+
+.file-icon {
+  @apply w-12 h-12 rounded-lg;
+  @apply flex items-center justify-center;
+  @apply bg-blue-50 text-blue-600;
+  @apply flex-shrink-0;
+}
+
+.file-icon i {
+  @apply text-2xl;
+}
+
+.file-info {
+  @apply flex-1 min-w-0;
+}
+
+.file-name {
+  @apply text-sm font-semibold text-gray-800 truncate;
+}
+
+.file-meta {
+  @apply flex items-center gap-2 mt-1;
+  @apply text-xs text-gray-500;
+}
+
+.file-size,
+.file-pages {
+  @apply whitespace-nowrap;
+}
+
+.main-badge {
+  @apply px-2 py-0.5 rounded text-xs font-medium;
+  @apply bg-green-100 text-green-700;
+}
+
+.download-btn {
+  @apply w-10 h-10 rounded-lg;
+  @apply flex items-center justify-center;
+  @apply bg-blue-50 hover:bg-blue-100;
+  @apply text-blue-600 hover:text-blue-700;
+  @apply transition-colors duration-150;
+  @apply flex-shrink-0;
+}
+
+.download-btn i {
+  @apply text-lg;
+}
+
+/* File Preview */
+.file-preview {
+  @apply relative aspect-video rounded-lg overflow-hidden;
+  @apply cursor-pointer border-2 border-gray-200;
+  @apply hover:border-blue-400 transition-all duration-200;
+}
+
+.file-preview img {
+  @apply w-full h-full object-cover;
+}
+
+.preview-overlay {
+  @apply absolute inset-0 bg-black bg-opacity-0;
+  @apply hover:bg-opacity-40;
+  @apply flex items-center justify-center;
+  @apply transition-all duration-200;
+}
+
+.preview-overlay i {
+  @apply text-white text-2xl opacity-0;
+  @apply transition-opacity duration-200;
+}
+
+.file-preview:hover .preview-overlay i {
+  @apply opacity-100;
+}
+
+/* ==================== Notes ==================== */
+.notes-text {
+  @apply text-sm text-gray-700 italic;
+  @apply bg-yellow-50 border-l-4 border-yellow-400;
+  @apply p-3 rounded;
+}
+
+/* ==================== Empty State ==================== */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-20 text-gray-400;
+}
+
+.empty-state i {
+  @apply text-6xl mb-4;
+}
+
+.empty-state p {
+  @apply text-lg font-medium mb-2;
+}
+
+.empty-hint {
+  @apply text-sm text-gray-400;
+}
+
+/* ==================== File Preview Modal ==================== */
+.modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-75 z-50;
+  @apply flex items-center justify-center p-4;
+  @apply animate-fadeIn;
+}
+
+.modal-content {
+  @apply relative bg-white rounded-lg shadow-2xl;
+  @apply max-w-4xl max-h-[90vh];
+  @apply overflow-hidden;
+  @apply animate-scaleIn;
+}
+
+.modal-close {
+  @apply absolute top-4 right-4 z-10;
+  @apply bg-white bg-opacity-90 hover:bg-opacity-100;
+  @apply rounded-full p-2;
+  @apply text-gray-700 hover:text-gray-900;
+  @apply transition-all duration-200;
+  @apply shadow-lg;
+}
+
+.modal-close i {
+  @apply text-xl;
+}
+
+.modal-file img {
+  @apply w-full h-auto max-h-[80vh] object-contain;
+}
+
+.pdf-placeholder {
+  @apply flex flex-col items-center justify-center;
+  @apply p-12 min-h-[400px];
+  @apply text-gray-500;
+}
+
+.pdf-placeholder i {
+  @apply text-6xl mb-4 text-red-500;
+}
+
+.pdf-placeholder p {
+  @apply text-lg font-medium mb-6;
+}
+
+.download-btn-large {
+  @apply flex items-center gap-2 px-6 py-3;
+  @apply bg-blue-600 hover:bg-blue-700;
+  @apply text-white rounded-lg;
+  @apply transition-colors duration-150;
+}
+
+/* ==================== Animations ==================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px) {
+  .contract-list-container {
+    @apply p-4;
+  }
+
+  .header-bar {
+    @apply flex-col items-stretch;
+  }
+
+  .header-right {
+    @apply flex-col items-stretch;
+  }
+
+  .contract-meta {
+    @apply flex-col items-start gap-3;
+  }
+
+  .contract-actions {
+    @apply flex-row items-center justify-between w-full;
+  }
+
+  .details-grid {
+    @apply grid-cols-1;
+  }
+
+  .financial-grid {
+    @apply grid-cols-1;
+  }
+}

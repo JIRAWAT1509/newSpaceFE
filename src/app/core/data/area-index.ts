@@ -54,7 +54,7 @@ export function getCompleteFloorData() {
     ...MOCK_FLOOR,
     areas: MOCK_AREAS.map((area: Area) => ({
       ...area,
-      rentalHistory: MOCK_RENTAL_HISTORY.filter(rh => rh.areaId === area.id)
+      rentalHistory: MOCK_RENTAL_HISTORY.filter(rh => rh.AREA_ID === area.id)
     }))
   };
 }

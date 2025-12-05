@@ -1,0 +1,298 @@
+<!-- area-contract-list-tab.component.html -->
+
+<div class="contract-list-container">
+  @if (contracts().length > 0) {
+    <!-- Header with Sort/Filter -->
+    <div class="header-bar">
+      <div class="header-left">
+        <h3 class="header-title">Contracts ({{ contracts().length }})</h3>
+      </div>
+
+      <div class="header-right">
+        <!-- Sort Dropdown -->
+        <p-select
+          [(ngModel)]="sortBy"
+          [options]="sortOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Sort by"
+          styleClass="w-48"
+          (onChange)="onSortChange()"
+        ></p-select>
+
+        <!-- Filter by Status -->
+        <p-select
+          [(ngModel)]="filterStatus"
+          [options]="statusOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="All Statuses"
+          [showClear]="true"
+          styleClass="w-48"
+          (onChange)="onFilterChange()"
+        ></p-select>
+
+        <!-- Filter by Type -->
+        <p-select
+          [(ngModel)]="filterType"
+          [options]="typeOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="All Types"
+          [showClear]="true"
+          styleClass="w-48"
+          (onChange)="onFilterChange()"
+        ></p-select>
+      </div>
+    </div>
+
+    <!-- Contract List -->
+    <div class="contract-list">
+      @for (contract of filteredContracts(); track contract.CONTRACT_ID) {
+        <div class="contract-item" [class.expanded]="expandedId() === contract.CONTRACT_ID">
+          <!-- Collapsed View -->
+          <div class="contract-header" (click)="toggleExpand(contract.CONTRACT_ID)">
+            <div class="contract-main">
+              <div class="contract-info">
+                <div class="contract-number-row">
+                  <span class="contract-number">{{ contract.CONTRACT_NUMBER }}</span>
+                  <span
+                    class="status-badge"
+                    [style.background-color]="getStatusColor(contract.STATUS)"
+                  >
+                    {{ contract.STATUS_NAME }}
+                  </span>
+                </div>
+                <h4 class="contract-topic">{{ contract.CONTRACT_TOPIC_TH }}</h4>
+                <p class="contract-tenant">{{ contract.TENANT_NAME_TH }}</p>
+              </div>
+
+              <div class="contract-meta">
+                <div class="meta-item">
+                  <i class="pi pi-calendar"></i>
+                  <div class="meta-content">
+                    <span class="meta-label">Issue Date</span>
+                    <span class="meta-value">{{ formatDate(contract.ISSUE_DATE) }}</span>
+                  </div>
+                </div>
+
+                <div class="meta-item">
+                  <i class="pi pi-clock"></i>
+                  <div class="meta-content">
+                    <span class="meta-label">Expiry Date</span>
+                    <span class="meta-value">{{ formatDate(contract.EXPIRY_DATE) }}</span>
+                  </div>
+                </div>
+
+                @if (contract.MONTHLY_RENT) {
+                  <div class="meta-item">
+                    <i class="pi pi-money-bill"></i>
+                    <div class="meta-content">
+                      <span class="meta-label">Monthly Rent</span>
+                      <span class="meta-value rent">฿{{ formatNumber(contract.MONTHLY_RENT) }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="contract-actions">
+              <span class="type-badge">{{ getTypeLabel(contract.CONTRACT_TYPE) }}</span>
+
+              <button class="expand-btn">
+                <i class="pi" [class.pi-chevron-down]="expandedId() !== contract.CONTRACT_ID"
+                             [class.pi-chevron-up]="expandedId() === contract.CONTRACT_ID"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded View -->
+          @if (expandedId() === contract.CONTRACT_ID) {
+            <div class="contract-details">
+              <div class="details-grid">
+                <!-- Contract Information -->
+                <div class="detail-section">
+                  <h5 class="detail-title">Contract Information</h5>
+                  <div class="detail-items">
+                    <div class="detail-item">
+                      <span class="detail-label">Contract Type</span>
+                      <span class="type-badge-detail">{{ getTypeLabel(contract.CONTRACT_TYPE) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Topic (TH)</span>
+                      <span class="detail-value">{{ contract.CONTRACT_TOPIC_TH }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Topic (EN)</span>
+                      <span class="detail-value">{{ contract.CONTRACT_TOPIC_EN }}</span>
+                    </div>
+                    @if (contract.SIGNED_DATE) {
+                      <div class="detail-item">
+                        <span class="detail-label">Signed Date</span>
+                        <span class="detail-value">{{ formatDate(contract.SIGNED_DATE) }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Parties -->
+                <div class="detail-section">
+                  <h5 class="detail-title">Parties</h5>
+                  <div class="detail-items">
+                    <div class="detail-item">
+                      <span class="detail-label">Tenant (TH)</span>
+                      <span class="detail-value">{{ contract.TENANT_NAME_TH }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Tenant (EN)</span>
+                      <span class="detail-value">{{ contract.TENANT_NAME_EN }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Landlord</span>
+                      <span class="detail-value">{{ contract.LANDLORD_NAME }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Financial Details -->
+                @if (contract.MONTHLY_RENT || contract.DEPOSIT_AMOUNT || contract.TOTAL_VALUE) {
+                  <div class="detail-section full-width">
+                    <h5 class="detail-title">Financial Details</h5>
+                    <div class="financial-grid">
+                      @if (contract.MONTHLY_RENT) {
+                        <div class="financial-card">
+                          <span class="financial-label">Monthly Rent</span>
+                          <span class="financial-value">฿{{ formatNumber(contract.MONTHLY_RENT) }}</span>
+                        </div>
+                      }
+                      @if (contract.DEPOSIT_AMOUNT) {
+                        <div class="financial-card">
+                          <span class="financial-label">Deposit</span>
+                          <span class="financial-value">฿{{ formatNumber(contract.DEPOSIT_AMOUNT) }}</span>
+                        </div>
+                      }
+                      @if (contract.TOTAL_VALUE) {
+                        <div class="financial-card">
+                          <span class="financial-label">Total Value</span>
+                          <span class="financial-value">฿{{ formatNumber(contract.TOTAL_VALUE) }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Contract Files -->
+                @if (contract.FILES.length > 0) {
+                  <div class="detail-section full-width">
+                    <div class="files-header">
+                      <h5 class="detail-title">Contract Files ({{ contract.FILES.length }})</h5>
+                      <label class="preview-toggle">
+                        <input
+                          type="checkbox"
+                          [(ngModel)]="showPreview"
+                          (change)="onPreviewToggle()"
+                        />
+                        <span>Show Preview</span>
+                      </label>
+                    </div>
+
+                    <div class="files-grid">
+                      @for (file of contract.FILES; track file.FILE_ID) {
+                        <div class="file-card">
+                          <div class="file-icon">
+                            @if (file.FILE_TYPE === 'PDF') {
+                              <i class="pi pi-file-pdf"></i>
+                            } @else if (file.FILE_TYPE === 'IMAGE') {
+                              <i class="pi pi-image"></i>
+                            } @else {
+                              <i class="pi pi-file"></i>
+                            }
+                          </div>
+
+                          <div class="file-info">
+                            <div class="file-name">{{ file.FILE_NAME }}</div>
+                            <div class="file-meta">
+                              <span class="file-size">{{ file.FILE_SIZE_MB }} MB</span>
+                              @if (file.PAGE_COUNT) {
+                                <span class="file-pages">{{ file.PAGE_COUNT }} pages</span>
+                              }
+                              @if (file.IS_MAIN_CONTRACT === 'Y') {
+                                <span class="main-badge">Main</span>
+                              }
+                            </div>
+                          </div>
+
+                          <button
+                            class="download-btn"
+                            (click)="onDownloadFile(file)"
+                            title="Download"
+                          >
+                            <i class="pi pi-download"></i>
+                          </button>
+                        </div>
+
+                        <!-- Preview -->
+                        @if (showPreview() && file.THUMBNAIL_URL) {
+                          <div class="file-preview" (click)="onPreviewFile(file)">
+                            <img [src]="file.THUMBNAIL_URL" [alt]="file.FILE_NAME" />
+                            <div class="preview-overlay">
+                              <i class="pi pi-search-plus"></i>
+                            </div>
+                          </div>
+                        }
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Notes -->
+                @if (contract.NOTES) {
+                  <div class="detail-section full-width">
+                    <h5 class="detail-title">Notes</h5>
+                    <p class="notes-text">{{ contract.NOTES }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  } @else {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <i class="pi pi-file"></i>
+      <p>No contracts available</p>
+      <span class="empty-hint">Contracts will appear here once created</span>
+    </div>
+  }
+</div>
+
+<!-- File Preview Modal -->
+@if (showFileModal()) {
+  <div class="modal-backdrop" (click)="closeFileModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeFileModal()">
+        <i class="pi pi-times"></i>
+      </button>
+
+      @if (selectedFile()) {
+        <div class="modal-file">
+          @if (selectedFile()!.FILE_TYPE === 'IMAGE' && selectedFile()!.THUMBNAIL_URL) {
+            <img [src]="selectedFile()!.THUMBNAIL_URL" [alt]="selectedFile()!.FILE_NAME" />
+          } @else {
+            <div class="pdf-placeholder">
+              <i class="pi pi-file-pdf"></i>
+              <p>{{ selectedFile()!.FILE_NAME }}</p>
+              <button class="download-btn-large" (click)="onDownloadFile(selectedFile()!)">
+                <i class="pi pi-download"></i>
+                <span>Download File</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
