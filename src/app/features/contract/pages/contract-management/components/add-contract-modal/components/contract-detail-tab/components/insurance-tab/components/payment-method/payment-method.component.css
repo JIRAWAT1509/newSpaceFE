@@ -1,0 +1,48 @@
+/* payment-method.component.css */
+
+.payment-method-section {
+  @apply space-y-3;
+}
+
+.payment-table-section {
+  @apply bg-white p-3 rounded border border-gray-200;
+}
+
+.table-header-row {
+  @apply flex items-center justify-between mb-2;
+}
+
+.table-header-row h6 {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.data-table-sm {
+  @apply w-full text-sm;
+}
+
+.data-table-sm thead {
+  @apply bg-blue-500 text-white;
+}
+
+.data-table-sm th {
+  @apply px-2 py-2 text-left text-xs font-semibold;
+}
+
+.data-table-sm td {
+  @apply px-2 py-1 border-b border-gray-200;
+}
+
+.btn-add-sm {
+  @apply flex items-center gap-1 px-2 py-1;
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+  @apply rounded text-xs transition-colors;
+}
+
+.btn-icon-delete-sm {
+  @apply w-6 h-6 flex items-center justify-center;
+  @apply text-red-600 hover:bg-red-50 rounded transition-colors text-xs;
+}
+
+.w-16 {
+  width: 4rem;
+}

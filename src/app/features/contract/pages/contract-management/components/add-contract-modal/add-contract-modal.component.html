@@ -1,1 +1,89 @@
-<p>add-contract-modal works!</p>
+<!-- add-contract-modal.component.html - FIXED -->
+
+<div class="modal-backdrop" (click)="onCancel()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">{{ modalTitle() }}</h2>
+      <button class="modal-close-btn" (click)="onCancel()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button
+        *ngFor="let tab of tabs; let i = index"
+        class="tab-btn"
+        [class.active]="activeTabIndex() === i"
+        [class.completed]="isTabCompleted(i)"
+        [disabled]="!canNavigateToTab(i)"
+        (click)="goToTab(i)"
+      >
+        <span class="tab-number">{{ i + 1 }}</span>
+        <span class="tab-label">{{ tab.label }}</span>
+        @if (isTabCompleted(i)) {
+          <i class="pi pi-check tab-check"></i>
+        }
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="modal-body">
+      @if (activeTabIndex() === 0) {
+        <app-general-detail-tab [form]="generalDetailForm" />
+      }
+
+      @if (activeTabIndex() === 1) {
+        <app-contract-detail-tab />
+      }
+
+      @if (activeTabIndex() === 2) {
+        <app-conditions-tab />
+      }
+
+      @if (activeTabIndex() === 3) {
+        <app-document-tab [form]="documentForm" />
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <div class="footer-left">
+        @if (activeTabIndex() > 0) {
+          <button type="button" class="btn-secondary" (click)="previousTab()">
+            <i class="pi pi-chevron-left"></i>
+            <span>ย้อนกลับ</span>
+          </button>
+        }
+      </div>
+
+      <div class="footer-right">
+        <button type="button" class="btn-secondary" (click)="onCancel()">
+          ยกเลิก
+        </button>
+
+        @if (activeTabIndex() < tabs.length - 1) {
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="nextTab()"
+          >
+            <span>ถัดไป</span>
+            <i class="pi pi-chevron-right"></i>
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn-success"
+            (click)="onSubmit()"
+            [disabled]="!isAllFormsValid()"
+          >
+            <i class="pi pi-check"></i>
+            <span>{{ mode() === 'edit' ? 'บันทึกการแก้ไข' : 'บันทึก' }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>

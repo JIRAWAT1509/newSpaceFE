@@ -1,0 +1,213 @@
+/* general-detail-tab.component.css */
+
+/* ==================== Tab Content Wrapper ==================== */
+.tab-content-wrapper {
+  @apply space-y-6;
+}
+
+/* ==================== Progress Indicator ==================== */
+.progress-indicator {
+  @apply mb-6 p-4 bg-white rounded-lg;
+}
+
+.progress-steps {
+  @apply flex items-center justify-between gap-2;
+}
+
+.progress-step {
+  @apply flex items-center gap-3 cursor-pointer transition-all flex-shrink-0;
+}
+
+.progress-step:hover .step-circle {
+  @apply transform scale-110;
+}
+
+.step-circle {
+  @apply w-16 h-16 rounded-full;
+  @apply flex items-center justify-center;
+  @apply bg-gray-300 text-white font-bold text-lg;
+  @apply transition-all;
+}
+
+.progress-step.completed .step-circle {
+  @apply bg-green-600;
+}
+
+.step-info {
+  @apply flex flex-col;
+}
+
+.step-name {
+  @apply text-sm font-semibold text-gray-700 whitespace-nowrap;
+}
+
+.step-progress {
+  @apply text-xs text-gray-500;
+}
+
+.step-arrow {
+  @apply text-2xl text-gray-400 mx-2;
+}
+
+.step-letter {
+  @apply text-xl;
+}
+
+/* ==================== Form Sections ==================== */
+.form-section {
+  @apply space-y-4;
+}
+
+.header-section {
+  @apply mb-6;
+}
+
+.subsection {
+  @apply bg-gray-50 border border-gray-200 rounded-lg p-6 mt-6;
+}
+
+.section-title {
+  @apply text-lg font-bold text-gray-900 mb-4;
+  @apply flex items-center gap-2;
+}
+
+.section-title::before {
+  content: '';
+  @apply w-1 h-6 bg-blue-600 rounded;
+}
+
+/* ==================== Form Grid ==================== */
+.form-grid-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.form-group.full-width {
+  @apply col-span-full;
+}
+
+.form-group label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.form-group.required label::after {
+  content: ' *';
+  @apply text-red-600;
+}
+
+.error-msg {
+  @apply text-red-600 text-xs mt-1;
+}
+
+/* ==================== Selector Field ==================== */
+.selector-field {
+  @apply relative cursor-pointer;
+}
+
+.selector-field input {
+  @apply pr-10;
+}
+
+.selector-icon {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2;
+  @apply text-gray-400 pointer-events-none;
+}
+
+/* ==================== Input with Button ==================== */
+.input-with-button {
+  @apply flex gap-2;
+}
+
+.input-with-button .flex-1 {
+    flex: 1 1 0%;
+  }
+
+.action-btn {
+  @apply px-4 py-2 flex-shrink-0;
+  @apply bg-blue-100 hover:bg-blue-200 text-blue-700;
+  @apply border border-blue-300 rounded;
+  @apply text-sm font-medium whitespace-nowrap;
+  @apply transition-colors;
+}
+
+/* ==================== Radio Group ==================== */
+.radio-group {
+  @apply flex gap-4;
+}
+
+/* ==================== Selector Modal ==================== */
+.selector-modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-[60];
+  @apply flex items-center justify-center p-4;
+}
+
+.selector-modal-content {
+  @apply bg-white rounded-lg w-full max-w-md max-h-[80vh];
+  @apply flex flex-col shadow-2xl;
+}
+
+.selector-header {
+  @apply flex items-center justify-between p-4 border-b border-gray-200;
+}
+
+.selector-header h3 {
+  @apply text-lg font-bold text-gray-900;
+}
+
+.modal-close-btn {
+  @apply w-8 h-8 rounded-full;
+  @apply flex items-center justify-center;
+  @apply text-gray-500 hover:text-gray-700 hover:bg-gray-100;
+  @apply transition-colors;
+}
+
+.selector-search {
+  @apply relative p-4 border-b border-gray-200;
+}
+
+.selector-search i {
+  @apply absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400;
+}
+
+.selector-search input {
+  @apply pl-8 w-full;
+}
+
+.selector-list {
+  @apply flex-1 overflow-auto p-2;
+}
+
+.selector-item {
+  @apply px-4 py-3 hover:bg-blue-50 rounded cursor-pointer;
+  @apply transition-colors text-gray-700;
+}
+
+.selector-item:active {
+  @apply bg-blue-100;
+}
+
+.selector-empty {
+  @apply text-center py-8 text-gray-500 italic;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px) {
+  .form-grid-2 {
+    @apply grid-cols-1;
+  }
+
+  .progress-steps {
+    @apply justify-start;
+  }
+
+  .step-name {
+    @apply hidden;
+  }
+
+  .step-arrow {
+    @apply mx-1;
+  }
+}

@@ -214,6 +214,11 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
 
       // --- FINANCE SECTION ---
       {
+        name: 'finance_master',
+        icon: 'assets/icons/business-outline.svg',
+        route: '/finance/master'
+      },
+      {
         name: 'finance_receipts',
         icon: 'assets/icons/business-outline.svg',
         sub: [

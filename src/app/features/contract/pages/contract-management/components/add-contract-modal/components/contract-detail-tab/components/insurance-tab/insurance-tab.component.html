@@ -1,0 +1,542 @@
+<!-- deposit-tab.component.html -->
+
+<div class="deposit-wrapper">
+
+  <!-- Back to Top Button -->
+  <button
+    class="back-to-top-btn"
+    [class.visible]="showBackToTop()"
+    (click)="scrollToTop()"
+  >
+    <i class="pi pi-arrow-up"></i>
+  </button>
+
+  <!-- Progress Indicator -->
+  <div class="progress-indicator" id="progress-section">
+    <div class="progress-steps">
+      @for (section of sections; track section.id; let i = $index) {
+        <div
+          class="progress-step"
+          [class.completed]="isSectionCompleted(section.id)"
+          (click)="scrollToSection(section.id)"
+        >
+          <div class="step-circle">
+            @if (isSectionCompleted(section.id)) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span class="step-number">{{ i + 1 }}</span>
+            }
+          </div>
+          <div class="step-info">
+            <div class="step-name">{{ section.name }}</div>
+            <div class="step-progress">{{ getSectionProgress(section.id) }}%</div>
+          </div>
+          @if (i < sections.length - 1) {
+            <div class="step-arrow">→</div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- VAT Rate Configuration -->
+  <div class="vat-config">
+    <label>อัตราภาษี VAT (%):</label>
+    <input
+      type="number"
+      pInputText
+      [(ngModel)]="vatRate"
+      class="vat-input"
+      min="0"
+      max="100"
+      step="0.01"
+    />
+  </div>
+
+  <form [formGroup]="form">
+
+    <!-- Section 1: วางเงินประกัน (Deposit Configuration) -->
+    <div class="form-section" id="section-deposit-config">
+      <div class="section-header">
+        <h4>วางเงินประกัน</h4>
+      </div>
+
+      <div class="deposit-period-selector">
+        <label class="required">วางเงินประกัน:</label>
+        <p-select
+          formControlName="depositPeriod"
+          [options]="depositPeriodOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="เลือกระยะเวลา"
+          styleClass="w-full md:w-80"
+          (onChange)="onDepositPeriodChange()"
+        ></p-select>
+      </div>
+
+      @if (form.get('depositPeriod')?.value !== 'none') {
+        <div class="deposit-grid">
+          <div class="grid-header">
+            <div class="col-label">ประเภท</div>
+            <div class="col-rate">อัตรา/เดือน</div>
+            <div class="col-vat">ก่อน Vat</div>
+            <div class="col-vat">Vat</div>
+            <div class="col-total">รวม</div>
+          </div>
+
+          <!-- Left Column -->
+          <div class="grid-row">
+            <div class="row-label">เงินประกันค่าเช่า:</div>
+            <div class="row-input">
+              <input type="number" pInputText formControlName="rentDepositRate" class="w-full" (input)="calculateDeposits()" />
+            </div>
+            <div class="row-value">{{ getDepositAmount('rentDeposit', 'beforeVat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('rentDeposit', 'vat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('rentDeposit', 'total') | number:'1.2-2' }}</div>
+            <div class="row-unit">บาท</div>
+          </div>
+
+          <div class="grid-row">
+            <div class="row-label">เงินประกันค่าบริการ:</div>
+            <div class="row-input">
+              <input type="number" pInputText formControlName="serviceDepositRate" class="w-full" (input)="calculateDeposits()" />
+            </div>
+            <div class="row-value">{{ getDepositAmount('serviceDeposit', 'beforeVat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('serviceDeposit', 'vat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('serviceDeposit', 'total') | number:'1.2-2' }}</div>
+            <div class="row-unit">บาท</div>
+          </div>
+
+          <div class="grid-row">
+            <div class="row-label">เงินประกันส่วนกลาง:</div>
+            <div class="row-input">
+              <input type="number" pInputText formControlName="commonDepositRate" class="w-full" (input)="calculateDeposits()" />
+            </div>
+            <div class="row-value">{{ getDepositAmount('commonDeposit', 'beforeVat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('commonDeposit', 'vat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('commonDeposit', 'total') | number:'1.2-2' }}</div>
+            <div class="row-unit">บาท</div>
+          </div>
+
+          <div class="grid-row">
+            <div class="row-label">จำนวนเงิน:</div>
+            <div class="row-input">
+              <input type="number" pInputText formControlName="totalDepositRate" class="w-full" (input)="calculateDeposits()" />
+            </div>
+            <div class="row-value">{{ getDepositAmount('totalDeposit', 'beforeVat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('totalDeposit', 'vat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('totalDeposit', 'total') | number:'1.2-2' }}</div>
+            <div class="row-unit">บาท</div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="grid-row right-column">
+            <div class="row-label">เงินประกันค่าโทรศัพท์/ค่าลากสาย:</div>
+            <div class="row-value">{{ getDepositAmount('phoneDeposit', 'beforeVat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('phoneDeposit', 'vat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('phoneDeposit', 'total') | number:'1.2-2' }}</div>
+            <div class="row-unit">บาท</div>
+          </div>
+
+          <div class="grid-row right-column">
+            <div class="row-label">เงินประกันมิเตอร์:</div>
+            <div class="row-value">{{ getDepositAmount('meterDeposit', 'beforeVat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('meterDeposit', 'vat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('meterDeposit', 'total') | number:'1.2-2' }}</div>
+            <div class="row-unit">บาท</div>
+          </div>
+
+          <div class="grid-row right-column">
+            <div class="row-label">เงินประกันตกแต่ง/เสียหาย:</div>
+            <div class="row-value">{{ getDepositAmount('decorationDeposit', 'beforeVat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('decorationDeposit', 'vat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getDepositAmount('decorationDeposit', 'total') | number:'1.2-2' }}</div>
+            <div class="row-unit">บาท</div>
+          </div>
+
+          <div class="grid-row right-column">
+            <div class="row-label">จำนวนเงิน:</div>
+            <div class="row-value">{{ getRightColumnTotal('beforeVat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getRightColumnTotal('vat') | number:'1.2-2' }}</div>
+            <div class="row-value">{{ getRightColumnTotal('total') | number:'1.2-2' }}</div>
+            <div class="row-unit">บาท</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Section 2: หลักประกัน (Guarantee Documents) -->
+    <div class="form-section" id="section-guarantee">
+      <div class="section-header">
+        <h4>หลักประกัน</h4>
+        <button type="button" class="btn-add" (click)="openGuaranteeDrawer()">
+          <i class="pi pi-plus"></i>
+          <span>เพิ่ม</span>
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>หนังสือค้ำประกันเลขที่</th>
+              <th>วงเงินค้ำประกัน</th>
+              <th>ธนาคาร</th>
+              <th>สาขา</th>
+              <th>ค้ำประกันกับบริษัท</th>
+              <th class="w-20"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of guaranteeList(); track $index) {
+              <tr>
+                <td>{{ item.documentNumber }}</td>
+                <td class="text-right">{{ item.amount | number:'1.2-2' }}</td>
+                <td>{{ item.bank }}</td>
+                <td>{{ item.branch }}</td>
+                <td>{{ item.company }}</td>
+                <td>
+                  <button type="button" class="btn-icon-delete" (click)="removeGuarantee($index)">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="text-center py-4 text-gray-500">No records to display.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 3: การชำระเงินประกัน (Deposit Payments) -->
+    <div class="form-section" id="section-payments">
+      <div class="section-header">
+        <h4>การชำระเงินประกัน</h4>
+      </div>
+
+      <!-- 3.1: เงินจากใบเสร็จ -->
+      <div class="subsection">
+        <h5 class="subsection-title">เงินจากใบเสร็จ</h5>
+
+        <!-- Receipt Transfers -->
+        <div class="payment-table-section">
+          <div class="table-header-row">
+            <h6>เงินโอนจากใบเสร็จ</h6>
+            <button type="button" class="btn-add-sm" (click)="addReceiptTransfer()">
+              <i class="pi pi-plus"></i>
+            </button>
+          </div>
+
+          <table class="data-table-sm">
+            <thead>
+              <tr>
+                <th>ใบเสร็จรับเงินเลขที่</th>
+                <th>วันที่รับใบเสร็จ</th>
+                <th>จำนวนเงิน</th>
+                <th>บริษัท</th>
+                <th class="w-16"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of receiptTransfers(); track $index) {
+                <tr>
+                  <td><input type="text" pInputText [(ngModel)]="item.receiptNumber" [ngModelOptions]="{standalone: true}" class="w-full" /></td>
+                  <td><p-datepicker [(ngModel)]="item.date" [ngModelOptions]="{standalone: true}" dateFormat="dd/mm/yy" styleClass="w-full"></p-datepicker></td>
+                  <td><input type="number" pInputText [(ngModel)]="item.amount" [ngModelOptions]="{standalone: true}" class="w-full" /></td>
+                  <td><input type="text" pInputText [(ngModel)]="item.company" [ngModelOptions]="{standalone: true}" class="w-full" /></td>
+                  <td><button type="button" class="btn-icon-delete-sm" (click)="removeReceiptTransfer($index)"><i class="pi pi-trash"></i></button></td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" class="text-center py-2 text-gray-500">ไม่มีข้อมูล</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Payment by Transfer -->
+        <app-payment-method
+          title="ชำระด้วยเงินโอน"
+          [transfers]="receiptPaymentTransfers()"
+          (addTransfer)="addReceiptPaymentTransfer()"
+          (removeTransfer)="removeReceiptPaymentTransfer($event)"
+        ></app-payment-method>
+
+        <!-- Payment by Check -->
+        <app-payment-method
+          title="ชำระด้วยเช็ค"
+          [checks]="receiptPaymentChecks()"
+          (addCheck)="addReceiptPaymentCheck()"
+          (removeCheck)="removeReceiptPaymentCheck($event)"
+        ></app-payment-method>
+      </div>
+
+      <!-- 3.2: งวดการชำระ (Payment Installments) -->
+      <div class="subsection">
+        <div class="subsection-header">
+          <h5 class="subsection-title">งวดการชำระ</h5>
+          <button type="button" class="btn-add" (click)="addInstallment()">
+            <i class="pi pi-plus"></i>
+            <span>เพิ่มงวด</span>
+          </button>
+        </div>
+
+        @for (installment of installments(); track $index) {
+          <div class="installment-card">
+            <div class="card-header">
+              <h6>งวดที่ {{ $index + 1 }}</h6>
+              <button type="button" class="btn-icon-delete" (click)="removeInstallment($index)">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+
+            <div class="form-grid-3">
+              <div class="form-group required">
+                <label>วันที่ครบกำหนดชำระเงิน</label>
+                <p-datepicker [(ngModel)]="installment.dueDate" [ngModelOptions]="{standalone: true}" dateFormat="dd/mm/yy" styleClass="w-full"></p-datepicker>
+              </div>
+
+              <div class="form-group">
+                <label>จำนวนเงินงวดที่{{ $index + 1 }}(ก่อน Vat)</label>
+                <input type="number" pInputText [(ngModel)]="installment.amount" [ngModelOptions]="{standalone: true}" class="w-full" (input)="calculateInstallmentVat($index)" />
+              </div>
+
+              <div class="form-group">
+                <label>เงินประกันค่าเช่า(ก่อน Vat)</label>
+                <input type="number" pInputText [(ngModel)]="installment.rentDeposit" [ngModelOptions]="{standalone: true}" class="w-full" (input)="calculateInstallmentVat($index)" />
+              </div>
+
+              <div class="form-group">
+                <label>เงินประกันค่าบริการ(ก่อน Vat)</label>
+                <input type="number" pInputText [(ngModel)]="installment.serviceDeposit" [ngModelOptions]="{standalone: true}" class="w-full" (input)="calculateInstallmentVat($index)" />
+              </div>
+
+              <div class="form-group">
+                <label>เงินประกันส่วนกลาง(ก่อน Vat)</label>
+                <input type="number" pInputText [(ngModel)]="installment.commonDeposit" [ngModelOptions]="{standalone: true}" class="w-full" (input)="calculateInstallmentVat($index)" />
+              </div>
+
+              <div class="form-group">
+                <label>จำนวนเงินรวม Vat</label>
+                <input type="number" pInputText [value]="installment.totalWithVat" readonly class="w-full bg-gray-100" />
+              </div>
+
+              <div class="form-group">
+                <label>ชำระด้วยเงินสด</label>
+                <input type="number" pInputText [(ngModel)]="installment.cashPayment" [ngModelOptions]="{standalone: true}" class="w-full" />
+              </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <app-payment-method
+              title="ชำระด้วยเงินโอน"
+              [transfers]="installment.transfers"
+              (addTransfer)="addInstallmentTransfer($index)"
+              (removeTransfer)="removeInstallmentTransfer($index, $event)"
+            ></app-payment-method>
+
+            <app-payment-method
+              title="ชำระด้วยเช็ค"
+              [checks]="installment.checks"
+              (addCheck)="addInstallmentCheck($index)"
+              (removeCheck)="removeInstallmentCheck($index, $event)"
+            ></app-payment-method>
+          </div>
+        } @empty {
+          <p class="text-gray-500 text-center py-4">ยังไม่มีงวดการชำระ คลิก "เพิ่มงวด" เพื่อเพิ่มข้อมูล</p>
+        }
+      </div>
+
+      <!-- 3.3: เงินประกันมิเตอร์,เงินค่าลากสาย -->
+      <div class="subsection">
+        <h5 class="subsection-title">เงินประกันมิเตอร์,เงินค่าลากสาย</h5>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>วันที่ครบกำหนดชำระเงิน</label>
+            <p-datepicker formControlName="meterDueDate" [showIcon]="true" dateFormat="dd/mm/yy" styleClass="w-full"></p-datepicker>
+          </div>
+
+          <div class="form-group">
+            <label>จำนวนเงิน(ก่อน Vat)</label>
+            <input type="number" pInputText formControlName="meterAmount" class="w-full" (input)="calculateMeterVat()" />
+          </div>
+
+          <div class="form-group">
+            <label>จำนวนเงินรวม Vat</label>
+            <input type="number" pInputText [value]="meterTotalWithVat()" readonly class="w-full bg-gray-100" />
+          </div>
+
+          <div class="form-group">
+            <label>ชำระด้วยเงินสด</label>
+            <input type="number" pInputText formControlName="meterCashPayment" class="w-full" />
+          </div>
+        </div>
+
+        <app-payment-method
+          title="ชำระด้วยเงินโอน"
+          [transfers]="meterTransfers()"
+          (addTransfer)="addMeterTransfer()"
+          (removeTransfer)="removeMeterTransfer($event)"
+        ></app-payment-method>
+
+        <app-payment-method
+          title="ชำระด้วยเช็ค"
+          [checks]="meterChecks()"
+          (addCheck)="addMeterCheck()"
+          (removeCheck)="removeMeterCheck($event)"
+        ></app-payment-method>
+      </div>
+
+      <!-- 3.4: ค่าประกันตกแต่ง/เสียหาย -->
+      <div class="subsection">
+        <h5 class="subsection-title">ค่าประกันตกแต่ง/เสียหาย</h5>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>วันที่ครบกำหนดชำระเงิน</label>
+            <p-datepicker formControlName="decorationDueDate" [showIcon]="true" dateFormat="dd/mm/yy" styleClass="w-full"></p-datepicker>
+          </div>
+
+          <div class="form-group">
+            <label>จำนวนเงิน(ก่อน Vat)</label>
+            <input type="number" pInputText formControlName="decorationAmount" class="w-full" (input)="calculateDecorationVat()" />
+          </div>
+
+          <div class="form-group">
+            <label>จำนวนเงินรวม Vat</label>
+            <input type="number" pInputText [value]="decorationTotalWithVat()" readonly class="w-full bg-gray-100" />
+          </div>
+
+          <div class="form-group">
+            <label>ชำระด้วยเงินสด</label>
+            <input type="number" pInputText formControlName="decorationCashPayment" class="w-full" />
+          </div>
+        </div>
+
+        <app-payment-method
+          title="ชำระด้วยเงินโอน"
+          [transfers]="decorationTransfers()"
+          (addTransfer)="addDecorationTransfer()"
+          (removeTransfer)="removeDecorationTransfer($event)"
+        ></app-payment-method>
+
+        <app-payment-method
+          title="ชำระด้วยเช็ค"
+          [checks]="decorationChecks()"
+          (addCheck)="addDecorationCheck()"
+          (removeCheck)="removeDecorationCheck($event)"
+        ></app-payment-method>
+      </div>
+    </div>
+
+    <!-- Section 4: พื้นที่รวมทั้งหมด (Area Summary) -->
+    <div class="form-section" id="section-area-summary">
+      <div class="section-header">
+        <h4>พื้นที่รวมทั้งหมด (ตร.ม.)</h4>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>อาคาร</th>
+              <th>ชื่อชั้น</th>
+              <th>เลขที่ยูนิต</th>
+              <th>สถานะ</th>
+              <th>บริเวณ</th>
+              <th>กว้าง</th>
+              <th>ยาว</th>
+              <th>รวมเนื้อที่ (ตร.ม.)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (area of areaList(); track $index) {
+              <tr>
+                <td>{{ area.building }}</td>
+                <td>{{ area.floor }}</td>
+                <td>{{ area.unitNumber }}</td>
+                <td>{{ area.status }}</td>
+                <td>{{ area.zone }}</td>
+                <td class="text-right">{{ area.width }}</td>
+                <td class="text-right">{{ area.length }}</td>
+                <td class="text-right">{{ area.totalArea | number:'1.2-2' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="text-center py-4 text-gray-500">ไม่มีข้อมูลพื้นที่</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- Guarantee Drawer -->
+@if (showGuaranteeDrawer()) {
+  <div class="drawer-backdrop" (click)="closeDrawer()">
+    <div class="drawer-panel" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <h3>เพิ่มหลักประกัน</h3>
+        <button class="drawer-close" (click)="closeDrawer()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <form [formGroup]="guaranteeForm">
+          <div class="form-group required">
+            <label>หนังสือค้ำประกันเลขที่</label>
+            <input type="text" pInputText formControlName="documentNumber" class="w-full" />
+          </div>
+
+          <div class="form-group required">
+            <label>วงเงินค้ำประกัน</label>
+            <input type="number" pInputText formControlName="amount" class="w-full" />
+          </div>
+
+          <div class="form-group required">
+            <label>ธนาคาร</label>
+            <p-select
+              formControlName="bank"
+              [options]="bankOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="เลือกธนาคาร"
+              styleClass="w-full"
+              (onChange)="onBankChange()"
+            ></p-select>
+          </div>
+
+          <div class="form-group required">
+            <label>สาขา</label>
+            <p-select
+              formControlName="branch"
+              [options]="branchOptions()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="เลือกสาขา"
+              styleClass="w-full"
+              [disabled]="!guaranteeForm.get('bank')?.value"
+            ></p-select>
+          </div>
+
+          <div class="form-group required">
+            <label>ค้ำประกันกับบริษัท</label>
+            <input type="text" pInputText formControlName="company" class="w-full" />
+          </div>
+        </form>
+      </div>
+
+      <div class="drawer-footer">
+        <button type="button" class="btn-secondary" (click)="closeDrawer()">ยกเลิก</button>
+        <button type="button" class="btn-primary" (click)="saveGuarantee()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+}

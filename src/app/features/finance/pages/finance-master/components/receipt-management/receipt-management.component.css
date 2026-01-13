@@ -1,0 +1,217 @@
+/* receipt-management.component.css */
+
+.receipt-container {
+  @apply space-y-6;
+}
+
+/* Sub-tab Navigation */
+.sub-tab-navigation {
+  @apply flex gap-2 border-b-2 border-gray-200 mb-6;
+}
+
+.sub-tab-btn {
+  @apply px-6 py-3 font-semibold text-gray-600;
+  @apply border-b-2 border-transparent transition-all duration-200;
+  @apply bg-transparent cursor-pointer;
+}
+
+.sub-tab-btn:hover {
+  @apply text-blue-600 border-blue-300;
+}
+
+.sub-tab-btn.active {
+  @apply text-blue-600 border-blue-600;
+}
+
+/* Header */
+.content-header {
+  @apply flex items-start justify-between gap-4 mb-6;
+}
+
+.page-title {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+.page-subtitle {
+  @apply text-gray-600 mt-1;
+}
+
+/* Bulk Actions Bar */
+.bulk-actions-bar {
+  @apply flex items-center gap-4 p-4 bg-blue-50 border border-blue-200 rounded-lg;
+}
+
+.selected-count {
+  @apply text-sm font-semibold text-blue-600;
+}
+
+.bulk-btn-group {
+  @apply flex items-center gap-2;
+}
+
+.bulk-btn {
+  @apply flex items-center gap-2 px-4 py-2;
+  @apply bg-white hover:bg-blue-600 text-gray-700 hover:text-white;
+  @apply font-medium rounded-lg transition-all duration-200;
+  @apply border border-gray-300 cursor-pointer;
+}
+
+/* Table */
+.table-container {
+  @apply bg-white rounded-xl border border-gray-200 overflow-hidden;
+}
+
+.receipt-table {
+  @apply w-full border-collapse;
+}
+
+.receipt-table thead {
+  @apply bg-gray-50;
+}
+
+.receipt-table th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200;
+}
+
+.receipt-table td {
+  @apply px-4 py-3 border-b border-gray-200;
+}
+
+.receipt-table tbody tr {
+  @apply transition-colors duration-200;
+}
+
+.receipt-table tbody tr:hover {
+  @apply bg-blue-50;
+}
+
+.receipt-table tbody tr.selected {
+  @apply bg-blue-100;
+}
+
+.checkbox-col {
+  @apply w-12;
+}
+
+.checkbox-col input[type="checkbox"] {
+  @apply w-4 h-4 cursor-pointer;
+}
+
+/* Table Content */
+.contract-number {
+  @apply font-mono text-sm text-gray-800;
+}
+
+.customer-name {
+  @apply font-medium text-gray-800;
+}
+
+.collection-item {
+  @apply text-gray-700;
+}
+
+.amount {
+  @apply font-bold text-gray-800;
+}
+
+.date {
+  @apply text-gray-600;
+}
+
+/* Status Badge */
+.status-badge {
+  @apply inline-block px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-badge.status-open {
+  @apply bg-green-100 text-green-700;
+}
+
+.status-badge.status-cancel {
+  @apply bg-red-100 text-red-700;
+}
+
+/* Row Actions */
+.row-actions {
+  @apply flex items-center justify-center gap-2;
+}
+
+.action-btn {
+  @apply w-8 h-8 flex items-center justify-center;
+  @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50;
+  @apply rounded-lg transition-all duration-200;
+  @apply border-none cursor-pointer;
+}
+
+/* Menu Wrapper & Dropdown */
+.menu-wrapper {
+  @apply relative;
+}
+
+.menu-overlay {
+  @apply fixed inset-0 z-30;
+}
+
+.action-menu {
+  @apply absolute right-0 top-full mt-2 w-56;
+  @apply bg-white rounded-lg shadow-xl border border-gray-200;
+  @apply py-2 z-40;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-item {
+  @apply w-full flex items-center gap-3 px-4 py-2;
+  @apply text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600;
+  @apply transition-colors duration-200;
+  @apply border-none bg-transparent cursor-pointer;
+}
+
+.menu-item i {
+  @apply text-lg;
+}
+
+.menu-item.danger {
+  @apply hover:bg-red-50 hover:text-red-600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-header {
+    @apply flex-col items-start;
+  }
+
+  .bulk-actions-bar {
+    @apply flex-col items-start;
+  }
+
+  .bulk-btn-group {
+    @apply w-full flex-col;
+  }
+
+  .bulk-btn {
+    @apply w-full justify-center;
+  }
+
+  .sub-tab-navigation {
+    @apply flex-col gap-0;
+  }
+
+  .sub-tab-btn {
+    @apply w-full text-left border-b-0 border-l-4;
+  }
+
+  .sub-tab-btn.active {
+    @apply border-l-blue-600;
+  }
+}

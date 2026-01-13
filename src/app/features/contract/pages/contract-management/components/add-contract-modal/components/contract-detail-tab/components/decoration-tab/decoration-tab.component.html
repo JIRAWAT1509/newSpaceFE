@@ -1,0 +1,276 @@
+<!-- decoration-tab.component.html -->
+
+<div class="decoration-wrapper">
+
+  <!-- Progress Indicator -->
+  <div class="progress-indicator">
+    <div class="progress-steps">
+      @for (section of sections; track section.id; let i = $index) {
+        <div
+          class="progress-step"
+          [class.completed]="isSectionCompleted(section.id)"
+          (click)="scrollToSection(section.id)"
+        >
+          <div class="step-circle">
+            @if (isSectionCompleted(section.id)) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span class="step-number">{{ i + 1 }}</span>
+            }
+          </div>
+          <div class="step-info">
+            <div class="step-name">{{ section.name }}</div>
+            <div class="step-progress">{{ getSectionProgress(section.id) }}%</div>
+          </div>
+          @if (i < sections.length - 1) {
+            <div class="step-arrow">→</div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <form [formGroup]="form">
+
+    <!-- Section 1: การตกแต่งสถานที่ -->
+    <div class="form-section" id="section-decoration">
+      <div class="section-header">
+        <h4>การตกแต่งสถานที่</h4>
+      </div>
+
+      <div class="checkbox-field">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            formControlName="noDecoration"
+            (change)="onNoDecorationChange()"
+          />
+          <span>ไม่ตกแต่ง</span>
+        </label>
+      </div>
+
+      <div class="form-grid-3">
+        <div class="form-group">
+          <label>วันที่ตกแต่งสถานที่เช่าเริ่มต้น</label>
+          <p-datepicker
+            formControlName="decorationStartDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            styleClass="w-full"
+            [disabled]="form.get('noDecoration')?.value"
+            (onSelect)="calculateDecorationDays()"
+          ></p-datepicker>
+        </div>
+
+        <div class="form-group">
+          <label>สิ้นสุด</label>
+          <p-datepicker
+            formControlName="decorationEndDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            styleClass="w-full"
+            [disabled]="form.get('noDecoration')?.value"
+            (onSelect)="calculateDecorationDays()"
+          ></p-datepicker>
+        </div>
+
+        <div class="form-group">
+          <label>จำนวน(วัน)</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="decorationDays"
+            class="w-full bg-gray-100"
+            readonly
+          />
+        </div>
+
+        <div class="form-group">
+          <label>ราคา/ตารางเมตร/วัน</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="pricePerSqmPerDay"
+            class="w-full"
+            [disabled]="form.get('noDecoration')?.value"
+            (input)="calculateTotalPrice()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>รวมราคา</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="totalPrice"
+            class="w-full bg-gray-100"
+            readonly
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: รายละเอียดร้านค้า -->
+    <div class="form-section" id="section-store-details">
+      <div class="section-header">
+        <h4>รายละเอียดร้านค้า</h4>
+      </div>
+
+      <div class="form-grid-3">
+        <!-- Operating Hours -->
+        <div class="form-group span-2">
+          <label>เวลาเปิด/ปิดบริการ</label>
+          <div class="time-range-inputs">
+            <input
+              type="text"
+              pInputText
+              formControlName="openTime"
+              class="flex-1"
+              placeholder="เปิด (เช่น 09:00)"
+            />
+            <span class="separator">ถึง</span>
+            <input
+              type="text"
+              pInputText
+              formControlName="closeTime"
+              class="flex-1"
+              placeholder="ปิด (เช่น 22:00)"
+            />
+          </div>
+        </div>
+
+        <!-- Sales Amount VAT -->
+        <div class="form-group span-3">
+          <label>ยอดจำหน่ายสินค้า</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input
+                type="radio"
+                formControlName="salesAmountVat"
+                value="include"
+              />
+              <span>Include VAT</span>
+            </label>
+            <label class="radio-label">
+              <input
+                type="radio"
+                formControlName="salesAmountVat"
+                value="exclude"
+              />
+              <span>Exclude VAT</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Phone Numbers -->
+        <div class="form-group">
+          <label>จำนวนหมายเลขโทรศัพท์</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="phoneNumberCount"
+            class="w-full"
+            min="0"
+          />
+        </div>
+
+        <!-- ATM/Vending Machines -->
+        <div class="form-group">
+          <label>จำนวนเครื่อง ATM/Vending</label>
+          <div class="dual-input">
+            <input
+              type="number"
+              pInputText
+              formControlName="atmCount"
+              class="flex-1"
+              placeholder="เครื่อง"
+              min="0"
+            />
+            <input
+              type="number"
+              pInputText
+              formControlName="vendingCount"
+              class="flex-1"
+              placeholder="เครื่อง"
+              min="0"
+            />
+          </div>
+        </div>
+
+        <!-- Signal Installation Points -->
+        <div class="form-group">
+          <label>จำนวนจุดติดตั้งสัญญาณโทรศัพท์</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="signalInstallationPoints"
+            class="w-full"
+            min="0"
+          />
+        </div>
+
+        <!-- Service Contract Type -->
+        <div class="form-group span-2">
+          <label>สัญญาใช้บริการสถานที่เพื่อติดตั้ง</label>
+          <p-select
+            formControlName="serviceContractType"
+            [options]="serviceContractTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="เลือกประเภท"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: พื้นที่รวมทั้งหมด (Area Summary) -->
+    <div class="form-section" id="section-area-summary">
+      <div class="section-header">
+        <h4>พื้นที่รวมทั้งหมด (ตร.ม.)</h4>
+        <div class="header-info">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="requestAreaMeasurement" />
+            <span>ขอวัดขนาดพื้นที่</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>อาคาร</th>
+              <th>ชื่อชั้น</th>
+              <th>เลขที่ยูนิต</th>
+              <th>สถานะ</th>
+              <th>บริเวณ</th>
+              <th>กว้าง</th>
+              <th>ยาว</th>
+              <th>รวมเนื้อที่ (ตร.ม.)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (area of areaList(); track $index) {
+              <tr>
+                <td>{{ area.building }}</td>
+                <td>{{ area.floor }}</td>
+                <td>{{ area.unitNumber }}</td>
+                <td>{{ area.status }}</td>
+                <td>{{ area.zone }}</td>
+                <td class="text-right">{{ area.width }}</td>
+                <td class="text-right">{{ area.length }}</td>
+                <td class="text-right">{{ area.totalArea | number:'1.2-2' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="text-center py-4 text-gray-500">ไม่มีข้อมูลพื้นที่</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </form>
+</div>

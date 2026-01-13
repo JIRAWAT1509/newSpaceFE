@@ -1,0 +1,197 @@
+/* meter-input-card.component.css */
+
+.meter-card {
+  @apply relative bg-white rounded-xl p-6 border-2 border-gray-200;
+  @apply transition-all duration-300;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.meter-card:hover {
+  @apply border-blue-300;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.meter-card.success {
+  @apply border-green-500;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  animation: successPulse 0.5s ease;
+}
+
+@keyframes successPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* Card Header */
+.meter-header {
+  @apply flex items-center justify-between mb-4 pb-4 border-b border-gray-200;
+}
+
+.meter-type {
+  @apply flex items-center gap-3;
+}
+
+.meter-icon {
+  @apply w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.meter-info {
+  @apply flex flex-col;
+}
+
+.room-number {
+  @apply font-bold text-gray-800 text-lg;
+}
+
+.tenant-name {
+  @apply text-sm text-gray-600;
+}
+
+.update-info {
+  @apply flex items-center gap-2 text-xs text-gray-500;
+  @apply bg-gray-100 px-3 py-1 rounded-full;
+}
+
+/* Meter Details */
+.meter-details {
+  @apply mb-4 space-y-2;
+}
+
+.detail-row {
+  @apply flex gap-4;
+}
+
+.detail-item {
+  @apply flex flex-col gap-1 flex-1;
+}
+
+.detail-item.full-width {
+  @apply w-full;
+}
+
+.detail-label {
+  @apply text-xs text-gray-500 font-medium;
+}
+
+.detail-value {
+  @apply text-sm font-semibold text-gray-800;
+}
+
+.detail-value.mono {
+  @apply font-mono text-xs bg-gray-100 px-2 py-1 rounded;
+}
+
+/* Input Section */
+.input-section {
+  @apply space-y-3;
+}
+
+.input-label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.required {
+  @apply text-red-500;
+}
+
+/* Input Group */
+.input-group {
+  @apply flex gap-2;
+}
+
+input[type="number"] {
+  @apply flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg;
+  @apply transition-all duration-200;
+}
+
+input:focus {
+  @apply outline-none border-blue-500;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+input.error {
+  @apply border-red-500;
+}
+
+input.error:focus {
+  @apply border-red-500;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+input.success {
+  @apply border-green-500 bg-green-50;
+}
+
+input:disabled {
+  @apply bg-gray-100 cursor-not-allowed;
+}
+
+/* Save Button */
+.save-btn {
+  @apply flex items-center gap-2 px-6 py-3;
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg;
+  @apply transition-all duration-200 border-none cursor-pointer;
+  white-space: nowrap;
+}
+
+.save-btn:disabled {
+  @apply bg-gray-400 cursor-not-allowed;
+}
+
+.save-btn.saving {
+  @apply bg-yellow-500;
+}
+
+.save-btn.success {
+  @apply bg-green-600;
+}
+
+.save-btn i {
+  @apply text-lg;
+}
+
+/* Expected Range */
+.expected-range {
+  @apply flex items-center gap-2 text-xs text-gray-600;
+  @apply bg-blue-50 px-3 py-2 rounded-lg;
+}
+
+.expected-range.warning {
+  @apply bg-yellow-50 text-yellow-700;
+}
+
+.expected-range.warning i {
+  @apply text-yellow-600;
+}
+
+/* Error Message */
+.error-message {
+  @apply flex items-center gap-2 text-sm text-red-600;
+  @apply bg-red-50 px-3 py-2 rounded-lg;
+}
+
+/* Status Badge */
+.status-badge {
+  @apply absolute top-4 right-4;
+  @apply flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-badge.pending {
+  @apply bg-yellow-100 text-yellow-700;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .input-group {
+    @apply flex-col;
+  }
+
+  .save-btn {
+    @apply w-full justify-center;
+  }
+
+  .detail-row {
+    @apply flex-col gap-2;
+  }
+}

@@ -1,0 +1,201 @@
+<!-- invoice-management.component.html -->
+
+<div class="invoice-container">
+  <!-- Header with Actions -->
+  <div class="content-header">
+    <div>
+      <h2 class="page-title">ตารางรายการสัญญาที่พร้อมเรียกเก็บในเดือนนี้</h2>
+      <p class="page-subtitle">เลือกรายการเพื่อออกใบแจ้งหนี้</p>
+    </div>
+
+    <!-- Top Right Actions -->
+    <div class="header-actions">
+      <!-- Bulk Actions (shown when items selected) -->
+      @if (showBulkActions()) {
+        <div class="bulk-action-group">
+          <span class="selected-count">เลือกแล้ว {{ getSelectedCount() }} รายการ</span>
+
+          <!-- Split Button with Dropdown -->
+          <div class="split-button-wrapper">
+            <button class="btn btn-primary" (click)="toggleActionDropdown()">
+              <span>ดูประวัติ การออกใบแจ้งหนี้</span>
+              <i class="pi" [ngClass]="showActionDropdown() ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+            </button>
+
+            @if (showActionDropdown()) {
+              <div class="dropdown-menu">
+                <button class="dropdown-item" (click)="onIssueInvoice('ออกใบแจ้งหนี้')">
+                  ออกใบแจ้งหนี้
+                </button>
+                <button class="dropdown-item" (click)="onIssueInvoice('ออกใบแจ้งหนี้ + พิมพ์เอกสาร')">
+                  ออกใบแจ้งหนี้ + พิมพ์เอกสาร
+                </button>
+                <button class="dropdown-item" (click)="onIssueInvoice('ออกใบแจ้งหนี้ + ส่งอีเมล')">
+                  ออกใบแจ้งหนี้ + ส่งอีเมล
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Create Button (always shown) -->
+      <button class="btn btn-create" (click)="openCreateDrawer()">
+        <i class="pi pi-plus"></i>
+        <span>สร้างใบแจ้งหนี้ - อื่นๆ Manual</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Invoice Table -->
+  <div class="table-container">
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th class="checkbox-col">
+            <input
+              type="checkbox"
+              [checked]="isAllSelected()"
+              (change)="toggleSelectAll($event)"
+            />
+          </th>
+          <th>เลขที่สัญญาเช่า</th>
+          <th>ชื่อลูกค้า</th>
+          <th>รายการเรียกเก็บหลัก</th>
+          <th>ยอดเงิน (รวมภาษี)</th>
+          <th>วันที่เริ่มต้นเรียกเก็บ</th>
+          <th>สถานะ</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (invoice of invoices(); track invoice.id) {
+          <tr [class.selected]="isSelected(invoice.id)">
+            <td class="checkbox-col">
+              <input
+                type="checkbox"
+                [checked]="isSelected(invoice.id)"
+                (change)="toggleSelection(invoice.id)"
+              />
+            </td>
+            <td>
+              <div class="contract-number">{{ invoice.contractNumber }}</div>
+            </td>
+            <td>
+              <div class="customer-name">{{ invoice.customerName }}</div>
+            </td>
+            <td>
+              <div class="collection-item">{{ invoice.collectionItem }}</div>
+            </td>
+            <td>
+              <div class="amount">฿{{ invoice.amount.toLocaleString() }}</div>
+            </td>
+            <td>
+              <div class="date">{{ invoice.startDate }}</div>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="'status-' + invoice.status">
+                {{ invoice.status === 'ready' ? 'Ready' : invoice.status }}
+              </span>
+            </td>
+            <td>
+              <div class="row-actions">
+                <button class="action-btn" title="Preview" (click)="onPreview(invoice)">
+                  <i class="pi pi-eye"></i>
+                </button>
+                <button class="action-btn" title="Edit" (click)="onEdit(invoice)">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button class="action-btn danger" title="Cancel" (click)="onCancel(invoice)">
+                  <i class="pi pi-times"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create Invoice Drawer (Right Side) -->
+@if (showCreateDrawer()) {
+  <div class="drawer-overlay" (click)="closeCreateDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <h3>สร้างใบแจ้งหนี้ - อื่นๆ Manual</h3>
+      <button class="close-btn" (click)="closeCreateDrawer()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="drawer-content">
+      <!-- Form Fields (Mock) -->
+      <div class="form-group">
+        <label>ลูกค้า</label>
+        <input type="text" placeholder="Placeholder..." />
+      </div>
+
+      <div class="form-group">
+        <label>ชื่อกิจการ</label>
+        <input type="text" placeholder="Placeholder..." />
+      </div>
+
+      <div class="form-group">
+        <label>เลขที่สัญญาเช่า บ. หลัก</label>
+        <input type="text" placeholder="Placeholder..." />
+      </div>
+
+      <div class="form-group">
+        <label>อาคาร:</label>
+        <input type="text" placeholder="Placeholder..." />
+      </div>
+
+      <div class="form-group">
+        <label>หมวดสินค้า/บริการ:</label>
+        <input type="text" placeholder="Placeholder..." />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>ประเภทสัญญา</label>
+          <input type="text" placeholder="Placeholder..." />
+        </div>
+        <div class="form-group">
+          <label>สถานะสัญญาเช่า</label>
+          <input type="text" placeholder="Placeholder..." />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="toggle-label">
+          <span>สัญญาหลัก</span>
+          <input type="checkbox" />
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label class="toggle-label">
+          <span>สัญญาเสริม</span>
+          <input type="checkbox" />
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label class="toggle-label">
+          <span>Discount</span>
+          <input type="checkbox" />
+        </label>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" (click)="closeCreateDrawer()">
+        ยกเลิก
+      </button>
+      <button class="btn btn-primary" (click)="onCreateInvoice()">
+        ออกใบเรียกเก็บ
+      </button>
+    </div>
+  </div>
+}
