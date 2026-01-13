@@ -1,4 +1,4 @@
-// meter.model.ts - Data models for Meter Management System
+// meter.model.ts - UPDATED with Group support
 
 export interface Meter {
   id: string;
@@ -14,7 +14,17 @@ export interface Meter {
   expectedMax: number;
   lastUpdated: string;
   status: MeterStatus;
-  unit: string; // kWh, m³, etc.
+  unit: string;
+  groupIds: string[]; // NEW: Array of group IDs this meter belongs to
+}
+
+export interface MeterGroup {
+  id: string;
+  name: string;
+  description: string;
+  meterIds: string[]; // Array of meter IDs in this group
+  createdDate: string;
+  updatedDate: string;
 }
 
 export type MeterType = 'electricity' | 'water' | 'gas' | 'ac';
@@ -47,25 +57,25 @@ export const METER_TYPE_LABELS: Record<MeterType, { TH: string; EN: string; icon
     TH: 'ไฟฟ้า',
     EN: 'Electricity',
     icon: 'pi-bolt',
-    color: '#FFD700' // Yellow/Gold
+    color: '#FFD700'
   },
   water: {
     TH: 'น้ำประปา',
     EN: 'Water',
     icon: 'pi-droplet',
-    color: '#4CA3FF' // Blue
+    color: '#4CA3FF'
   },
   gas: {
     TH: 'แก๊ส',
     EN: 'Gas',
     icon: 'pi-fire',
-    color: '#FF6384' // Red
+    color: '#FF6384'
   },
   ac: {
     TH: 'เครื่องปรับอากาศ',
     EN: 'Air Conditioning',
     icon: 'pi-sun',
-    color: '#80E08E' // Green
+    color: '#80E08E'
   }
 };
 

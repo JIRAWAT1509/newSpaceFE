@@ -1,6 +1,6 @@
-// meter.mock.ts - Mock data for Meter Management
+// meter.mock.ts - UPDATED Mock data with Group support
 
-import { Meter, MeterStats } from '@core/models/meter.model';
+import { Meter, MeterStats, MeterGroup } from '@core/models/meter.model';
 
 export const MOCK_METER_STATS: MeterStats = {
   totalActiveMeters: 127,
@@ -31,7 +31,8 @@ export const MOCK_METERS: Meter[] = [
     expectedMax: 1450,
     lastUpdated: '2024-12-25',
     status: 'active',
-    unit: 'kWh'
+    unit: 'kWh',
+    groupIds: ['GRP-001'] // Building A - Floor 1 Electric
   },
   {
     id: 'MTR-002',
@@ -47,7 +48,8 @@ export const MOCK_METERS: Meter[] = [
     expectedMax: 1180,
     lastUpdated: '2024-12-23',
     status: 'pending',
-    unit: 'kWh'
+    unit: 'kWh',
+    groupIds: ['GRP-001'] // Building A - Floor 1 Electric
   },
   {
     id: 'MTR-003',
@@ -63,7 +65,8 @@ export const MOCK_METERS: Meter[] = [
     expectedMax: 1800,
     lastUpdated: '2024-12-18',
     status: 'pending',
-    unit: 'kWh'
+    unit: 'kWh',
+    groupIds: [] // No group assigned
   },
   {
     id: 'MTR-004',
@@ -79,7 +82,8 @@ export const MOCK_METERS: Meter[] = [
     expectedMax: 270,
     lastUpdated: '2024-12-25',
     status: 'active',
-    unit: 'm³'
+    unit: 'm³',
+    groupIds: ['GRP-002'] // Building B - Water System
   },
   {
     id: 'MTR-005',
@@ -95,7 +99,8 @@ export const MOCK_METERS: Meter[] = [
     expectedMax: 220,
     lastUpdated: '2024-12-24',
     status: 'pending',
-    unit: 'm³'
+    unit: 'm³',
+    groupIds: ['GRP-002'] // Building B - Water System
   },
   {
     id: 'MTR-006',
@@ -111,7 +116,8 @@ export const MOCK_METERS: Meter[] = [
     expectedMax: 480,
     lastUpdated: '2024-12-25',
     status: 'active',
-    unit: 'm³'
+    unit: 'm³',
+    groupIds: [] // No group assigned
   },
   {
     id: 'MTR-007',
@@ -127,7 +133,8 @@ export const MOCK_METERS: Meter[] = [
     expectedMax: 920,
     lastUpdated: '2024-12-22',
     status: 'pending',
-    unit: 'kWh'
+    unit: 'kWh',
+    groupIds: ['GRP-003'] // Zone C - AC Units
   },
   {
     id: 'MTR-008',
@@ -143,7 +150,44 @@ export const MOCK_METERS: Meter[] = [
     expectedMax: 1260,
     lastUpdated: '2024-12-25',
     status: 'active',
-    unit: 'kWh'
+    unit: 'kWh',
+    groupIds: ['GRP-001', 'GRP-004'] // Multiple groups: Building A + Critical Systems
+  }
+];
+
+// Mock Meter Groups
+export const MOCK_METER_GROUPS: MeterGroup[] = [
+  {
+    id: 'GRP-001',
+    name: 'Building A - Floor 1 Electric',
+    description: 'All electricity meters on Building A, Floor 1',
+    meterIds: ['MTR-001', 'MTR-002', 'MTR-008'],
+    createdDate: '2025-01-01',
+    updatedDate: '2025-01-10'
+  },
+  {
+    id: 'GRP-002',
+    name: 'Building B - Water System',
+    description: 'Water meters across all floors in Building B',
+    meterIds: ['MTR-004', 'MTR-005'],
+    createdDate: '2025-01-05',
+    updatedDate: '2025-01-12'
+  },
+  {
+    id: 'GRP-003',
+    name: 'Zone C - AC Units',
+    description: 'Air conditioning units in Zone C',
+    meterIds: ['MTR-007'],
+    createdDate: '2025-01-08',
+    updatedDate: '2025-01-13'
+  },
+  {
+    id: 'GRP-004',
+    name: 'Critical Systems',
+    description: 'Meters for critical infrastructure that require priority monitoring',
+    meterIds: ['MTR-008'],
+    createdDate: '2025-01-10',
+    updatedDate: '2025-01-13'
   }
 ];
 
@@ -155,6 +199,24 @@ export function getMetersByType(type: string): Meter[] {
 // Helper function to get pending meters
 export function getPendingMeters(): Meter[] {
   return MOCK_METERS.filter(m => m.status === 'pending');
+}
+
+// Helper function to get meters by group
+export function getMetersByGroup(groupId: string): Meter[] {
+  return MOCK_METERS.filter(m => m.groupIds.includes(groupId));
+}
+
+// Helper function to get meters without any group
+export function getMetersWithoutGroup(): Meter[] {
+  return MOCK_METERS.filter(m => m.groupIds.length === 0);
+}
+
+// Helper function to get groups that a meter belongs to
+export function getGroupsForMeter(meterId: string): MeterGroup[] {
+  const meter = MOCK_METERS.find(m => m.id === meterId);
+  if (!meter) return [];
+
+  return MOCK_METER_GROUPS.filter(g => meter.groupIds.includes(g.id));
 }
 
 // Helper function to calculate stats
@@ -177,5 +239,24 @@ export function calculateMeterStats(): MeterStats {
       consumption: 3.8,
       savings: 8.4
     }
+  };
+}
+
+// Helper function to get group statistics
+export function getGroupStats(groupId: string): {
+  totalMeters: number;
+  activeMeters: number;
+  pendingMeters: number;
+  totalConsumption: number;
+} {
+  const meters = getMetersByGroup(groupId);
+
+  return {
+    totalMeters: meters.length,
+    activeMeters: meters.filter(m => m.status === 'active').length,
+    pendingMeters: meters.filter(m => m.status === 'pending').length,
+    totalConsumption: meters.reduce((sum, m) =>
+      sum + (m.currentReading - m.previousReading), 0
+    )
   };
 }

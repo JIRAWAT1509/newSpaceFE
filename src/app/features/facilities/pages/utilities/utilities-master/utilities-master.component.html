@@ -1,4 +1,4 @@
-<!-- utilities-master.component.html -->
+<!-- utilities-master.component.html - FINAL -->
 
 <div class="utilities-container">
   <!-- Header -->
@@ -40,10 +40,10 @@
       </div>
     }
 
-    <!-- Create Meter Tab -->
-    @if (isActiveTab('create')) {
+    <!-- Meter Groups Tab -->
+    @if (isActiveTab('groups')) {
       <div class="tab-panel">
-        <app-meter-create-form />
+        <app-meter-group-create-form />
       </div>
     }
 
@@ -51,6 +51,13 @@
     @if (isActiveTab('fill')) {
       <div class="tab-panel">
         <app-meter-input-list />
+      </div>
+    }
+
+    <!-- Meter List Tab (NEW) -->
+    @if (isActiveTab('list')) {
+      <div class="tab-panel">
+        <app-meter-list />
       </div>
     }
   </div>

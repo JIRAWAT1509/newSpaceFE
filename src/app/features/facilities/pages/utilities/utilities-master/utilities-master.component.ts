@@ -1,9 +1,10 @@
-// utilities-master.component.ts
+// utilities-master.component.ts - FINAL with Meter List tab
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StatsOverviewComponent } from './components/stats-overview/stats-overview.component';
-import { MeterCreateFormComponent } from './components/meter-create-form/meter-create-form.component';
+import { MeterGroupCreateFormComponent } from './components/meter-group-create-form/meter-group-create-form.component';
 import { MeterInputListComponent } from './components/meter-input-list/meter-input-list.component';
+import { MeterListComponent } from './components/meter-list/meter-list.component';
 import { AnalyticsChartsComponent } from './components/analytics-charts/analytics-charts.component';
 
 interface Tab {
@@ -18,8 +19,9 @@ interface Tab {
   imports: [
     CommonModule,
     StatsOverviewComponent,
-    MeterCreateFormComponent,
+    MeterGroupCreateFormComponent,
     MeterInputListComponent,
+    MeterListComponent,
     AnalyticsChartsComponent
   ],
   templateUrl: './utilities-master.component.html',
@@ -30,8 +32,9 @@ export class UtilitiesMasterComponent {
 
   tabs: Tab[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'pi-chart-bar' },
-    { id: 'create', label: 'Create Meter', icon: 'pi-plus-circle' },
-    { id: 'fill', label: 'Fill Readings', icon: 'pi-pencil' }
+    { id: 'groups', label: 'กลุ่มมิเตอร์', icon: 'pi-sitemap' },
+    { id: 'fill', label: 'Fill Readings', icon: 'pi-pencil' },
+    { id: 'list', label: 'Meter List', icon: 'pi-list' }
   ];
 
   setActiveTab(tabId: string): void {

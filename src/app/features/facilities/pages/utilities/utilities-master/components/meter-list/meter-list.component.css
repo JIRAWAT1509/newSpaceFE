@@ -1,6 +1,6 @@
-/* meter-input-list.component.css - FINAL CORRECTED */
+/* meter-list.component.css - FINAL CORRECTED */
 
-.input-list-container {
+.meter-list-container {
   @apply space-y-8;
 }
 
@@ -18,24 +18,24 @@
   @apply shadow-lg -translate-y-1;
 }
 
-.stat-item.warning {
-  @apply border-yellow-200 bg-yellow-50;
-}
-
 .stat-item.success {
   @apply border-green-200 bg-green-50;
 }
 
-.stat-item i {
-  @apply text-3xl text-blue-600;
+.stat-item.primary {
+  @apply border-blue-200 bg-blue-50;
 }
 
-.stat-item.warning i {
-  @apply text-yellow-600;
+.stat-item i {
+  @apply text-3xl text-gray-600;
 }
 
 .stat-item.success i {
   @apply text-green-600;
+}
+
+.stat-item.primary i {
+  @apply text-blue-600;
 }
 
 .stat-value {
@@ -103,6 +103,7 @@
 
 .section-header {
   @apply mb-6 pb-4 border-b border-gray-200;
+  @apply flex items-center justify-between;
 }
 
 .section-title {
@@ -111,6 +112,16 @@
 
 .meter-count {
   @apply text-gray-500 font-normal;
+}
+
+.export-btn {
+  @apply flex items-center gap-2 px-4 py-2;
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg;
+  @apply transition-all duration-200 border-none cursor-pointer;
+}
+
+.export-btn i {
+  @apply text-lg;
 }
 
 /* Meters Grid - ALWAYS Compact by Default */
@@ -137,37 +148,6 @@
   @apply text-gray-500;
 }
 
-/* Bulk Actions */
-.bulk-actions {
-  @apply bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200;
-}
-
-.bulk-title {
-  @apply text-lg font-bold text-gray-800 mb-4;
-}
-
-.action-buttons {
-  @apply flex flex-wrap gap-3;
-}
-
-.action-btn {
-  @apply flex items-center gap-2 px-6 py-3;
-  @apply font-semibold rounded-lg transition-all duration-200;
-  @apply border-none cursor-pointer;
-}
-
-.action-btn.primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white;
-}
-
-.action-btn.secondary {
-  @apply bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300;
-}
-
-.action-btn i {
-  @apply text-lg;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .header-stats {
@@ -182,15 +162,15 @@
     @apply w-full;
   }
 
+  .section-header {
+    @apply flex-col items-start gap-4;
+  }
+
+  .export-btn {
+    @apply w-full justify-center;
+  }
+
   .meters-grid {
     grid-template-columns: 1fr;
-  }
-
-  .action-buttons {
-    @apply flex-col;
-  }
-
-  .action-btn {
-    @apply w-full justify-center;
   }
 }

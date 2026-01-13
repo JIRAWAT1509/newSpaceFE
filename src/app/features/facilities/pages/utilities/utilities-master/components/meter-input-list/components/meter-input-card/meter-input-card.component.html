@@ -1,107 +1,212 @@
-<!-- meter-input-card.component.html -->
+<!-- meter-input-card.component.html - FINAL CORRECTED -->
 
-<div class="meter-card" [class.success]="showSuccess()">
-  <!-- Card Header -->
-  <div class="meter-header">
-    <div class="meter-type">
-      <div class="meter-icon" [style.background-color]="getMeterColor()">
-        <i class="pi" [ngClass]="getMeterIcon()"></i>
-      </div>
-      <div class="meter-info">
-        <div class="room-number">{{ meter().roomNumber }}</div>
-        <div class="tenant-name">{{ meter().tenantName }}</div>
-      </div>
+<!-- COMPACT MODE (Default) -->
+@if (!isExpanded()) {
+  <div class="meter-card compact" (click)="onCardClick($event)">
+    <!-- Type Icon -->
+    <div class="compact-icon" [style.background-color]="getMeterColor()">
+      <i class="pi" [ngClass]="getMeterIcon()"></i>
     </div>
 
-    <!-- Last Update Info -->
-    <div class="update-info">
-      <i class="pi pi-clock"></i>
-      <span>{{ getDaysSinceUpdate() }}d ago</span>
-    </div>
-  </div>
-
-  <!-- Meter Details -->
-  <div class="meter-details">
-    <div class="detail-row">
-      <div class="detail-item">
-        <span class="detail-label">Previous Reading</span>
-        <span class="detail-value">{{ meter().currentReading.toLocaleString() }} {{ meter().unit }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">Avg Consumption</span>
-        <span class="detail-value">{{ meter().averageConsumption.toLocaleString() }} {{ meter().unit }}</span>
-      </div>
+    <!-- Meter Info -->
+    <div class="compact-header">
+      <div class="meter-type-label">{{ getMeterLabel() }}</div>
+      <div class="meter-number">{{ meter().meterNumber }}</div>
     </div>
 
-    <div class="detail-row">
-      <div class="detail-item full-width">
-        <span class="detail-label">Meter Number</span>
-        <span class="detail-value mono">{{ meter().meterNumber }}</span>
+    <!-- Stats Grid -->
+    <div class="compact-stats">
+      <div class="compact-stat">
+        <div class="stat-label">Last Reading</div>
+        <div class="stat-value">{{ meter().currentReading.toLocaleString() }}</div>
+      </div>
+      <div class="compact-stat">
+        <div class="stat-label">Current Month</div>
+        <div class="stat-value">{{ (meter().currentReading + 100).toLocaleString() }}</div>
+      </div>
+      <div class="compact-stat">
+        <div class="stat-label">Consumption</div>
+        <div class="stat-value positive">+{{ getConsumption() }}</div>
+      </div>
+      <div class="compact-stat">
+        <div class="stat-label">Avg Monthly</div>
+        <div class="stat-value">{{ meter().averageConsumption }}</div>
       </div>
     </div>
   </div>
+}
 
-  <!-- Input Section -->
-  <div class="input-section">
-    <label class="input-label">
-      Current Reading ({{ meter().unit }})
-      <span class="required">*</span>
-    </label>
+<!-- NORMAL MODE (Expanded) -->
+@if (isExpanded()) {
+  <div class="meter-card normal" [class.success]="showSuccess()" [class.editing]="isEditing()" (click)="onCardClick($event)">
+    <!-- Card Header -->
+    <div class="meter-header">
+      <div class="meter-type">
+        <div class="meter-icon" [style.background-color]="getMeterColor()">
+          <i class="pi" [ngClass]="getMeterIcon()"></i>
+        </div>
+        <div class="meter-info">
+          <div class="room-number">Room {{ meter().roomNumber }}</div>
+          <div class="tenant-name">Tenant: {{ meter().tenantName }}</div>
+        </div>
+      </div>
 
-    <div class="input-group">
-      <input
-        type="number"
-        pInputText
-        [(ngModel)]="currentReading"
-        (ngModelChange)="onInputChange()"
-        placeholder="Enter current reading"
-        [class.error]="hasError()"
-        [class.success]="showSuccess()"
-        [disabled]="isSaving() || showSuccess()"
-        min="0"
-        step="0.01"
-      />
+      <!-- Edit Button (for completed meters) -->
+      @if (isCompleted() && !isEditing()) {
+        <button class="settings-btn" (click)="onEdit($event)">
+          <i class="pi pi-pencil"></i>
+        </button>
+      } @else if (!isCompleted()) {
+        <button class="settings-btn" (click)="backgroundClicked.emit(meter().id)">
+          <i class="pi pi-times"></i>
+        </button>
+      }
+    </div>
 
-      <button
-        class="save-btn"
-        [class.saving]="isSaving()"
-        [class.success]="showSuccess()"
-        [disabled]="isSaving() || showSuccess() || !currentReading()"
-        (click)="onSave()"
-      >
-        @if (isSaving()) {
-          <i class="pi pi-spin pi-spinner"></i>
-          <span>Saving...</span>
-        } @else if (showSuccess()) {
-          <i class="pi pi-check"></i>
-          <span>Saved!</span>
-        } @else {
-          <i class="pi pi-save"></i>
-          <span>Save</span>
+    <!-- Meter Details -->
+    <div class="meter-details">
+      <div class="detail-row">
+        <div class="detail-item">
+          <span class="detail-label">Previous Month</span>
+          <span class="detail-value">{{ meter().currentReading.toLocaleString() }} {{ meter().unit }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Avg Consumption</span>
+          <span class="detail-value">{{ meter().averageConsumption.toLocaleString() }} {{ meter().unit }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Section (Only if not completed or in edit mode) -->
+    @if (!isCompleted() || isEditing()) {
+      <div class="input-section" (click)="$event.stopPropagation()">
+        <label class="input-label">
+          Current Reading ({{ meter().unit }})
+          <span class="required">*</span>
+        </label>
+
+        <div class="input-group">
+          <input
+            type="number"
+            pInputText
+            [(ngModel)]="currentReading"
+            (ngModelChange)="onInputChange()"
+            (click)="$event.stopPropagation()"
+            placeholder="Enter current reading"
+            [class.error]="hasError()"
+            [class.success]="showSuccess()"
+            [disabled]="isSaving() || showSuccess()"
+            min="0"
+            step="0.01"
+          />
+
+          @if (isEditing()) {
+            <button class="save-btn secondary" (click)="onCancelEdit($event)">
+              <i class="pi pi-times"></i>
+              <span>Cancel</span>
+            </button>
+            <button
+              class="save-btn"
+              (click)="onSaveEdit($event)"
+              [disabled]="!currentReading()"
+            >
+              <i class="pi pi-check"></i>
+              <span>Update</span>
+            </button>
+          } @else {
+            <button
+              class="save-btn"
+              [class.saving]="isSaving()"
+              [class.success]="showSuccess()"
+              [disabled]="isSaving() || showSuccess() || !currentReading()"
+              (click)="onSave($event)"
+            >
+              @if (isSaving()) {
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Saving...</span>
+              } @else if (showSuccess()) {
+                <i class="pi pi-check"></i>
+                <span>Saved!</span>
+              } @else {
+                <span>บันทึก</span>
+              }
+            </button>
+          }
+        </div>
+
+        <!-- Expected Range -->
+        <div class="expected-range" [class.warning]="isOutOfRange()">
+          <i class="pi" [ngClass]="isOutOfRange() ? 'pi-exclamation-triangle' : 'pi-info-circle'"></i>
+          <span>Expected range: {{ getExpectedRange() }} {{ meter().unit }}</span>
+        </div>
+
+        <!-- Error Message -->
+        @if (hasError()) {
+          <div class="error-message">
+            <i class="pi pi-times-circle"></i>
+            <span>{{ errorMessage() }}</span>
+          </div>
         }
-      </button>
-    </div>
+      </div>
 
-    <!-- Expected Range -->
-    <div class="expected-range" [class.warning]="isOutOfRange()">
-      <i class="pi" [ngClass]="isOutOfRange() ? 'pi-exclamation-triangle' : 'pi-info-circle'"></i>
-      <span>Expected range: {{ getExpectedRange() }} {{ meter().unit }}</span>
-    </div>
+      <!-- Photo Attachment Section -->
+      <div class="photo-section" (click)="$event.stopPropagation()">
+        <div class="photo-grid">
+          <!-- Attached Photos -->
+          @for (photo of attachedPhotos(); track $index) {
+            <div class="photo-item">
+              <img [src]="photo" alt="Meter photo" />
+              <button class="remove-photo" (click)="removePhoto($index, $event)">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+          }
 
-    <!-- Error Message -->
-    @if (hasError()) {
-      <div class="error-message">
-        <i class="pi pi-times-circle"></i>
-        <span>{{ errorMessage() }}</span>
+          <!-- Camera Button -->
+          @if (canAttachMorePhotos()) {
+            <button class="photo-upload-btn camera" (click)="onTakePhoto()">
+              <i class="pi pi-camera"></i>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Completed View (Show completed reading and photos) -->
+    @if (isCompleted() && !isEditing()) {
+      <div class="completed-info">
+        <div class="detail-row">
+          <div class="detail-item">
+            <span class="detail-label">Completed Reading</span>
+            <span class="detail-value highlight">{{ meter().currentReading.toLocaleString() }} {{ meter().unit }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Consumption</span>
+            <span class="detail-value positive">+{{ getConsumption() }} {{ meter().unit }}</span>
+          </div>
+        </div>
+      </div>
+
+      @if (attachedPhotos().length > 0) {
+        <div class="photo-section">
+          <div class="photo-label">Attached Photos</div>
+          <div class="photo-grid">
+            @for (photo of attachedPhotos(); track $index) {
+              <div class="photo-item">
+                <img [src]="photo" alt="Meter photo" />
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+
+    <!-- Status Badge -->
+    @if (meter().status === 'pending' && !isCompleted()) {
+      <div class="status-badge pending">
+        <i class="pi pi-clock"></i>
+        <span>Pending</span>
       </div>
     }
   </div>
-
-  <!-- Status Badge -->
-  @if (meter().status === 'pending') {
-    <div class="status-badge pending">
-      <i class="pi pi-clock"></i>
-      <span>Pending</span>
-    </div>
-  }
-</div>
+}

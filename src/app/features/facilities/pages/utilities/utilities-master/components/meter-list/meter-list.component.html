@@ -1,29 +1,29 @@
-<!-- meter-input-list.component.html - FINAL CORRECTED -->
+<!-- meter-list.component.html - FINAL CORRECTED -->
 
-<div class="input-list-container">
+<div class="meter-list-container">
   <!-- Header Stats -->
   <div class="header-stats">
-    <div class="stat-item">
-      <i class="pi pi-th-large"></i>
-      <div>
-        <div class="stat-value">{{ totalMeters() }}</div>
-        <div class="stat-label">Total Meters</div>
-      </div>
-    </div>
-
-    <div class="stat-item warning">
-      <i class="pi pi-clock"></i>
-      <div>
-        <div class="stat-value">{{ pendingMeters() }}</div>
-        <div class="stat-label">Pending Readings</div>
-      </div>
-    </div>
-
     <div class="stat-item success">
       <i class="pi pi-check-circle"></i>
       <div>
-        <div class="stat-value">{{ savedCount() }}</div>
-        <div class="stat-label">Saved This Session</div>
+        <div class="stat-value">{{ totalCompleted() }}</div>
+        <div class="stat-label">Total Completed</div>
+      </div>
+    </div>
+
+    <div class="stat-item primary">
+      <i class="pi pi-calendar"></i>
+      <div>
+        <div class="stat-value">{{ thisMonthCompleted() }}</div>
+        <div class="stat-label">This Month</div>
+      </div>
+    </div>
+
+    <div class="stat-item">
+      <i class="pi pi-chart-line"></i>
+      <div>
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Completion Rate</div>
       </div>
     </div>
   </div>
@@ -75,6 +75,10 @@
         {{ sectionTitle() }}
         <span class="meter-count">({{ filteredMeters().length }})</span>
       </h3>
+      <button class="export-btn" (click)="onExportData()">
+        <i class="pi pi-download"></i>
+        <span>Export Data</span>
+      </button>
     </div>
 
     @if (filteredMeters().length > 0) {
@@ -83,6 +87,7 @@
           <app-meter-input-card
             [meter]="meter"
             [isExpanded]="isCardExpanded(meter.id)"
+            [isCompleted]="true"
             (readingSaved)="onReadingSaved($event)"
             (cardClicked)="onCardClicked($event)"
             (backgroundClicked)="onCardBackgroundClicked($event)"
@@ -92,30 +97,9 @@
     } @else {
       <div class="empty-state">
         <i class="pi pi-inbox"></i>
-        <h3>No meters found</h3>
-        <p>Try selecting a different filter</p>
+        <h3>No completed meters</h3>
+        <p>Meters will appear here after readings are saved</p>
       </div>
     }
   </div>
-
-  <!-- Bulk Actions -->
-  <div class="bulk-actions">
-    <h3 class="bulk-title">Bulk Actions</h3>
-    <div class="action-buttons">
-      <button class="action-btn primary" (click)="onImportCSV()">
-        <i class="pi pi-upload"></i>
-        <span>Import from CSV</span>
-      </button>
-
-      <button class="action-btn secondary" (click)="onExportData()">
-        <i class="pi pi-download"></i>
-        <span>Export Data</span>
-      </button>
-
-      <button class="action-btn secondary" (click)="onSendNotifications()">
-        <i class="pi pi-send"></i>
-        <span>Send Notifications</span>
-      </button>
-    </div>
-  </div>
-</div>
+</div>s

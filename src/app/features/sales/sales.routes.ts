@@ -17,5 +17,6 @@ export const SALES_ROUTES: Routes = [
         (m) => m.SalesDashboardComponent
       ),
   },
+
   // Will be populated in future development
 ];
