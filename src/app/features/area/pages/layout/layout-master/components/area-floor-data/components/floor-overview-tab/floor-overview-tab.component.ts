@@ -395,7 +395,7 @@ export class FloorOverviewTabComponent implements AfterViewInit, OnDestroy {
 
   private getTypeColorByIndex(index: number, total: number): string {
     const palette = getChartPalette(Math.max(total, 1));
-    return palette[Math.max(index, 0) % palette.length];
+    return palette[Math.max(index, 0) % palette.length];   
   }
 
   private getLineColorByIndex(index: number): string {
