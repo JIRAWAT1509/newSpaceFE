@@ -1,0 +1,31 @@
+<!-- csat-chart.component.html -->
+
+<div class="csat-chart-container">
+
+  <!-- Current CSAT Display -->
+  <div class="current-csat">
+    <div class="csat-value-wrapper">
+      <span class="csat-value">{{ currentValue().toFixed(1) }}</span>
+      <span class="csat-max">/5.0</span>
+    </div>
+
+    <div class="csat-stars">
+      @for (star of getStars(currentValue()); track $index) {
+        <i class="pi" [ngClass]="star ? 'pi-star-fill' : 'pi-star'"></i>
+      }
+    </div>
+
+    <div class="csat-label">Average Customer Satisfaction</div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-wrapper">
+    <canvas
+      baseChart
+      [data]="chartData()"
+      [options]="chartOptions"
+      [type]="'line'"
+    ></canvas>
+  </div>
+
+</div>

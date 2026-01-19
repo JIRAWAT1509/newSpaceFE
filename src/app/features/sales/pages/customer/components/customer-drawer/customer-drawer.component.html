@@ -1,0 +1,321 @@
+<!-- customer-drawer.component.html -->
+
+<div class="drawer-content">
+
+  <!-- Header -->
+  <div class="drawer-header">
+    <h2 class="drawer-title">
+      {{ mode() === 'create' ? 'เพิ่มลูกค้าใหม่' : 'แก้ไขข้อมูลลูกค้า' }}
+    </h2>
+    <button class="btn-close" (click)="onCancel()">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="drawer-body">
+
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">Basic Information</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label required">First Name</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="firstName"
+            placeholder="ชื่อ"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="lastName"
+            placeholder="นามสกุล"
+            class="form-input"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Company Name</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="companyName"
+          placeholder="ชื่อบริษัท (ถ้ามี)"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Business Type</label>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="businessType"
+          placeholder="ประเภทธุรกิจ"
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <!-- Contact Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">Contact Information</h3>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input
+          type="email"
+          pInputText
+          [(ngModel)]="email"
+          placeholder="email@example.com"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input
+          type="tel"
+          pInputText
+          [(ngModel)]="phone"
+          placeholder="02-xxx-xxxx"
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <!-- Sales Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">Sales Information</h3>
+
+      <div class="form-group">
+        <label class="form-label required">Channel</label>
+        <p-select
+          [options]="channelOptions"
+          [(ngModel)]="channel"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="เลือก Channel"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">Status</label>
+        <p-select
+          [options]="statusOptions"
+          [(ngModel)]="status"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="เลือกสถานะ"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+
+      <!-- Segment with Add New -->
+      <div class="form-group">
+        <label class="form-label">Segment</label>
+
+        @if (!isAddingNewSegment()) {
+          <div class="segment-selector">
+            <p-select
+              [options]="segmentOptions()"
+              [(ngModel)]="selectedSegment"
+              (onChange)="onSegmentChange($event)"
+              placeholder="เลือก Segment"
+              styleClass="flex-1"
+            ></p-select>
+            <button class="btn-add-segment" (click)="openAddSegment()">
+              <i class="pi pi-plus"></i>
+              <span>Add New</span>
+            </button>
+          </div>
+        } @else {
+          <div class="add-segment-form">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="newSegmentName"
+              placeholder="ชื่อ Segment ใหม่"
+              class="form-input"
+            />
+            <div class="add-segment-actions">
+              <button class="btn-save-segment" (click)="saveNewSegment()">
+                <i class="pi pi-check"></i>
+              </button>
+              <button class="btn-cancel-segment" (click)="cancelAddSegment()">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Interested Areas Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        Interested Areas
+        <span class="area-count">({{ interestedAreas().length }}/5)</span>
+      </h3>
+
+      <!-- Selected Areas -->
+      @if (interestedAreas().length > 0) {
+        <div class="selected-areas">
+          @for (area of interestedAreas(); track area.areaId) {
+            <div class="area-chip">
+              <div class="area-info">
+                <span class="area-name">{{ area.areaName }}</span>
+                <span class="area-building">{{ area.buildingName }} - Floor {{ area.floorNumber }}</span>
+              </div>
+              <button class="btn-remove-area" (click)="removeInterestedArea($index)">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Add Area -->
+      @if (canAddMoreAreas()) {
+        <div class="add-area-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Building</label>
+              <p-select
+                [options]="buildingOptions"
+                [(ngModel)]="selectedBuildingForNewArea"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="เลือกอาคาร"
+                styleClass="w-full"
+              ></p-select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Area</label>
+              <p-select
+                [options]="availableAreaOptions()"
+                [(ngModel)]="selectedAreaForNewArea"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="เลือกพื้นที่"
+                [disabled]="!selectedBuildingForNewArea()"
+                styleClass="w-full"
+              ></p-select>
+            </div>
+          </div>
+
+          <button
+            class="btn-add-area"
+            (click)="addInterestedArea()"
+            [disabled]="!selectedBuildingForNewArea() || !selectedAreaForNewArea()"
+          >
+            <i class="pi pi-plus"></i>
+            <span>Add Area</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Additional Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">Additional Information</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Budget (฿)</label>
+          <input
+            type="number"
+            pInputText
+            [(ngModel)]="budget"
+            placeholder="0"
+            class="form-input"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Expected Closing Date</label>
+          <p-datepicker
+            [(ngModel)]="expectedClosingDate"
+            dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
+            styleClass="w-full"
+            [showIcon]="true"
+          ></p-datepicker>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Remark</label>
+        <textarea
+          pTextarea
+          [(ngModel)]="remark"
+          placeholder="หมายเหตุเพิ่มเติม..."
+          rows="4"
+          class="form-input"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- System Fields (Edit Mode Only) -->
+    @if (mode() === 'edit') {
+      <div class="form-section">
+        <h3 class="section-title">System Information</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">ARR (฿)</label>
+            <input
+              type="number"
+              pInputText
+              [(ngModel)]="arr"
+              class="form-input"
+              min="0"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">CSAT (1-5)</label>
+            <input
+              type="number"
+              pInputText
+              [(ngModel)]="csat"
+              class="form-input"
+              min="1"
+              max="5"
+              step="0.1"
+            />
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- Footer -->
+  <div class="drawer-footer">
+    <button class="btn-cancel" (click)="onCancel()">
+      Cancel
+    </button>
+    <button
+      class="btn-save"
+      (click)="onSave()"
+      [disabled]="!isValid()"
+    >
+      <i class="pi pi-check"></i>
+      <span>{{ mode() === 'create' ? 'Create' : 'Update' }}</span>
+    </button>
+  </div>
+
+</div>

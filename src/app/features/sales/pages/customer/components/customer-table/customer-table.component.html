@@ -1,0 +1,174 @@
+<!-- customer-table.component.html -->
+
+<div class="table-wrapper">
+  <table class="customer-table">
+    <thead>
+      <tr>
+        <!-- Name -->
+        <th class="sortable" [class.sorted]="isSorted('name')" (click)="toggleSort('name')">
+          <div class="th-content">
+            <span>Name</span>
+            <i class="pi" [ngClass]="getSortIcon('name')"></i>
+          </div>
+        </th>
+
+        <!-- Class -->
+        <th class="sortable" [class.sorted]="isSorted('class')" (click)="toggleSort('class')">
+          <div class="th-content">
+            <span>Class</span>
+            <i class="pi" [ngClass]="getSortIcon('class')"></i>
+          </div>
+        </th>
+
+        <!-- Segment -->
+        <th class="sortable" [class.sorted]="isSorted('segment')" (click)="toggleSort('segment')">
+          <div class="th-content">
+            <span>Segment</span>
+            <i class="pi" [ngClass]="getSortIcon('segment')"></i>
+          </div>
+        </th>
+
+        <!-- Owner -->
+        <th class="sortable" [class.sorted]="isSorted('owner')" (click)="toggleSort('owner')">
+          <div class="th-content">
+            <span>Owner</span>
+            <i class="pi" [ngClass]="getSortIcon('owner')"></i>
+          </div>
+        </th>
+
+        <!-- ARR -->
+        <th class="sortable" [class.sorted]="isSorted('arr')" (click)="toggleSort('arr')">
+          <div class="th-content">
+            <span>ARR</span>
+            <i class="pi" [ngClass]="getSortIcon('arr')"></i>
+          </div>
+        </th>
+
+        <!-- CSAT -->
+        <th class="sortable" [class.sorted]="isSorted('csat')" (click)="toggleSort('csat')">
+          <div class="th-content">
+            <span>CSAT</span>
+            <i class="pi" [ngClass]="getSortIcon('csat')"></i>
+          </div>
+        </th>
+
+        <!-- Churn Risk -->
+        <th class="sortable" [class.sorted]="isSorted('churnRisk')" (click)="toggleSort('churnRisk')">
+          <div class="th-content">
+            <span>Churn Risk</span>
+            <i class="pi" [ngClass]="getSortIcon('churnRisk')"></i>
+          </div>
+        </th>
+
+        <!-- Next Action -->
+        <th class="sortable" [class.sorted]="isSorted('nextAction')" (click)="toggleSort('nextAction')">
+          <div class="th-content">
+            <span>Next Action</span>
+            <i class="pi" [ngClass]="getSortIcon('nextAction')"></i>
+          </div>
+        </th>
+
+        <!-- Actions -->
+        <th class="actions-col">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (customer of sortedCustomers(); track customer.id) {
+        <tr class="customer-row" (click)="onRowClick(customer.id)">
+
+          <!-- Name -->
+          <td class="name-cell">
+            <div class="customer-name">
+              <div class="name-primary">{{ getDisplayName(customer) }}</div>
+              @if (customer.companyName) {
+                <div class="name-secondary">{{ customer.owner }}</div>
+              }
+            </div>
+          </td>
+
+          <!-- Class -->
+          <td>
+            <div
+              class="class-badge tooltip-trigger"
+              [style.background-color]="getClassInfo(customer.class)?.bgColor"
+              [style.color]="getClassInfo(customer.class)?.color"
+              [attr.data-tooltip]="getClassInfo(customer.class)?.criteria?.description"
+            >
+              {{ customer.class }}
+            </div>
+            <div class="tooltip">
+              <div class="tooltip-title">{{ getClassInfo(customer.class)?.nameTh }}</div>
+              <div class="tooltip-content">{{ getClassInfo(customer.class)?.criteria?.description }}</div>
+            </div>
+          </td>
+
+          <!-- Segment -->
+          <td>
+            <span class="segment-text">{{ customer.segment }}</span>
+          </td>
+
+          <!-- Owner -->
+          <td>
+            <div class="owner-cell">
+              <div class="owner-avatar">{{ customer.owner.charAt(0) }}</div>
+              <span>{{ customer.owner }}</span>
+            </div>
+          </td>
+
+          <!-- ARR -->
+          <td class="number-cell">
+            <span class="arr-value">{{ formatCurrency(customer.arr) }}</span>
+          </td>
+
+          <!-- CSAT -->
+          <td>
+            <div class="csat-cell">
+              <div class="csat-stars">
+                @for (star of getCSATStars(customer.csat); track $index) {
+                  <i class="pi" [ngClass]="star ? 'pi-star-fill' : 'pi-star'"></i>
+                }
+              </div>
+              <span class="csat-value">{{ formatCSAT(customer.csat) }}</span>
+            </div>
+          </td>
+
+          <!-- Churn Risk -->
+          <td>
+            <span
+              class="risk-badge"
+              [style.color]="getChurnRiskInfo(customer.churnRisk)?.color"
+            >
+              <i class="pi pi-circle-fill"></i>
+              {{ getChurnRiskInfo(customer.churnRisk)?.th }}
+            </span>
+          </td>
+
+          <!-- Next Action -->
+          <td>
+            <span class="next-action">{{ customer.nextAction || '-' }}</span>
+          </td>
+
+          <!-- Actions -->
+          <td class="actions-cell">
+            <button
+              class="action-btn edit"
+              (click)="onEdit(customer.id, $event)"
+              title="Edit"
+            >
+              <i class="pi pi-pencil"></i>
+            </button>
+            <button
+              class="action-btn delete"
+              (click)="onDelete(customer.id, $event)"
+              title="Delete"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </td>
+
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

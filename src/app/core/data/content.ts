@@ -13,28 +13,39 @@ import { NavigationItem } from '../models/navigation.model';
  */
 
 export const NAVIGATION_CONTENT: NavigationItem[] = [
-  // ============================================
-  // 1. SALES (New Module - Empty for now)
-  // ============================================
-  {
-    primary_content: 'sales',
-    secondary_content: [
+ // ============================================
+// SALES MODULE - RESTRUCTURED (5 Pages)
+// ============================================
 {
-        name: 'sales_dashboard',
-        icon: 'assets/icons/business-outline.svg',
-        route: '/sales/dashboard',
-        // sub: [
-        //   {
-        //     name: 'contract_preparation_data',
-        //     route: '/setting/system/contract',
-        //     hasDeeper: true,
-        //     deeperNote: 'Contains: Profit center, Business types, Categories, Sales type, Contract types, Product groups, Signatories, Cost center'
-        //   }
-        // ]
-      },
-
-    ]
-  },
+  primary_content: 'sales',
+  secondary_content: [
+    {
+      name: 'sales_dashboard',
+      icon: 'assets/icons/dashboard.svg',
+      route: '/sales/dashboard',
+    },
+    {
+      name: 'customer_management',
+      icon: 'assets/icons/users.svg',
+      route: '/sales/customer',
+    },
+    {
+      name: 'budget_management',
+      icon: 'assets/icons/wallet.svg',
+      route: '/sales/budget',
+    },
+    {
+      name: 'pipeline_management',
+      icon: 'assets/icons/sitemap.svg',
+      route: '/sales/pipeline',
+    },
+    {
+      name: 'activities_management',
+      icon: 'assets/icons/calendar.svg',
+      route: '/sales/activities',
+    },
+  ]
+},
 
   // ============================================
   // 2. AREA

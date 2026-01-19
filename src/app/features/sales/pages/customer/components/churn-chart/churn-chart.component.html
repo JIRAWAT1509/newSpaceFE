@@ -1,0 +1,65 @@
+<!-- churn-chart.component.html -->
+
+<div class="churn-chart-container">
+
+  <!-- Period Selector -->
+  <div class="period-selector">
+    <button
+      class="period-btn"
+      [class.active]="isPeriodSelected('month')"
+      (click)="selectPeriod('month')"
+    >
+      Month
+    </button>
+    <button
+      class="period-btn"
+      [class.active]="isPeriodSelected('quarter')"
+      (click)="selectPeriod('quarter')"
+    >
+      Quarter
+    </button>
+    <button
+      class="period-btn"
+      [class.active]="isPeriodSelected('year')"
+      (click)="selectPeriod('year')"
+    >
+      Year
+    </button>
+  </div>
+
+  <!-- Current Churn Rate Display -->
+  <div class="current-churn">
+    <div class="churn-rate-display">
+      <div class="churn-value">{{ data().currentRate.toFixed(1) }}%</div>
+      <div class="churn-trend" [class.improvement]="isImprovement()" [class.decline]="!isImprovement()">
+        <i class="pi" [ngClass]="isImprovement() ? 'pi-arrow-down' : 'pi-arrow-up'"></i>
+        <span>{{ Math.abs(getTrend()).toFixed(1) }}%</span>
+      </div>
+    </div>
+
+    <div class="churn-details">
+      <div class="churn-detail-item">
+        <span class="detail-label">Customers Lost:</span>
+        <span class="detail-value">{{ data().customersLost }}</span>
+      </div>
+      <div class="churn-detail-item">
+        <span class="detail-label">Total Customers:</span>
+        <span class="detail-value">{{ data().totalCustomers }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Churn Reasons Chart -->
+  <!-- <div class="reasons-section">
+    <h4 class="reasons-title">Churn Reasons</h4>
+    <div class="chart-wrapper">
+      <canvas
+        baseChart
+        [data]="chartData()"
+        [options]="chartOptions"
+        [type]="'doughnut'"
+      ></canvas>
+    </div>
+  </div> -->
+
+</div>

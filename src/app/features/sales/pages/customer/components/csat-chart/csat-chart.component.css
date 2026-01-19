@@ -1,0 +1,90 @@
+/* csat-chart.component.css */
+
+.csat-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+/* ==================== CURRENT CSAT DISPLAY ==================== */
+.current-csat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 8px;
+  border: 2px solid #3b82f6;
+  flex-shrink: 0;
+}
+
+.csat-value-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.csat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e40af;
+  line-height: 1;
+}
+
+.csat-max {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.csat-stars {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+}
+
+.csat-stars i {
+  font-size: 1rem;
+  color: #fbbf24;
+}
+
+.csat-stars i.pi-star {
+  color: #d1d5db;
+}
+
+.csat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1e40af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ==================== CHART ==================== */
+.chart-wrapper {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .csat-value {
+    font-size: 2rem;
+  }
+
+  .csat-max {
+    font-size: 1rem;
+  }
+
+  .csat-chart-container {
+    height: auto;
+  }
+
+  .chart-wrapper {
+    height: 200px;
+    flex: none;
+  }
+}

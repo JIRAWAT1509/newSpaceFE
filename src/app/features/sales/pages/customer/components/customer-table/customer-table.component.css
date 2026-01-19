@@ -1,0 +1,309 @@
+/* customer-table.component.css */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.customer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  background: white;
+}
+
+/* ==================== HEADER ==================== */
+.customer-table thead {
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.customer-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.customer-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.customer-table th.sortable:hover {
+  background: #f3f4f6;
+}
+
+.customer-table th.sortable.sorted {
+  background: #e0e7ff;
+  color: #3b82f6;
+}
+
+.th-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.th-content i {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  transition: color 0.2s;
+}
+
+.customer-table th.sorted .th-content i {
+  color: #3b82f6;
+}
+
+.customer-table th.actions-col {
+  text-align: center;
+  width: 120px;
+}
+
+/* ==================== BODY ==================== */
+.customer-table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.2s;
+}
+
+.customer-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.customer-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.customer-table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* ==================== NAME CELL ==================== */
+.name-cell {
+  min-width: 220px;
+}
+
+.customer-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.name-primary {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.name-secondary {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* ==================== CLASS BADGE ==================== */
+.class-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: help;
+}
+
+.class-badge:hover + .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  min-width: 300px;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1f2937;
+}
+
+.tooltip-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.tooltip-content {
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+/* ==================== SEGMENT ==================== */
+.segment-text {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ==================== OWNER CELL ==================== */
+.owner-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.owner-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+/* ==================== NUMBER CELL ==================== */
+.number-cell {
+  text-align: right;
+}
+
+.arr-value {
+  font-weight: 600;
+  color: #10b981;
+}
+
+/* ==================== CSAT CELL ==================== */
+.csat-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.csat-stars {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.csat-stars i {
+  font-size: 0.875rem;
+  color: #fbbf24;
+}
+
+.csat-stars i.pi-star {
+  color: #d1d5db;
+}
+
+.csat-value {
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+/* ==================== RISK BADGE ==================== */
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.risk-badge i {
+  font-size: 0.5rem;
+}
+
+/* ==================== NEXT ACTION ==================== */
+.next-action {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* ==================== ACTIONS ==================== */
+.actions-cell {
+  text-align: center;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin: 0 0.25rem;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.action-btn.edit:hover {
+  background: #dbeafe;
+  color: #3b82f6;
+}
+
+.action-btn.delete:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.action-btn i {
+  font-size: 0.875rem;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1280px) {
+  .customer-table {
+    font-size: 0.8125rem;
+  }
+
+  .customer-table th,
+  .customer-table td {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-wrapper {
+    overflow-x: scroll;
+  }
+
+  .customer-table {
+    min-width: 1000px;
+  }
+}

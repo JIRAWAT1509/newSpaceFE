@@ -1,0 +1,129 @@
+<!-- team-activity-feed.component.html -->
+
+<div class="feed-container">
+
+  <!-- ==================== FEED HEADER ==================== -->
+  <div class="feed-header">
+    <div class="feed-header-content">
+      <span class="feed-count">{{ feedItems.length }} รายการ</span>
+      <span class="feed-separator">•</span>
+      <span class="last-update">
+        อัพเดทล่าสุด: {{ getRelativeTimeTh(lastRefreshTime().toISO()) }}
+      </span>
+    </div>
+
+    <button
+      class="btn-refresh"
+      (click)="manualRefresh()"
+      [disabled]="isLoading()"
+      title="รีเฟรช"
+    >
+      <i
+        class="pi pi-refresh"
+        [class.spin]="isLoading()"
+      ></i>
+    </button>
+  </div>
+
+  <!-- ==================== FEED CONTENT ==================== -->
+  <div class="feed-content">
+
+    @if (feedItems.length === 0) {
+      <!-- Empty State -->
+      <div class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p class="empty-title">ไม่มีกิจกรรม</p>
+        <p class="empty-subtitle">ยังไม่มีการอัพเดทจากทีม</p>
+      </div>
+    } @else {
+      <!-- Feed Items List -->
+      <div class="feed-list">
+        @for (item of feedItems.slice(0, maxItems); track item.id) {
+          <div
+            class="feed-item"
+            [class.recent]="isRecentItem(item.timestamp)"
+            (click)="onFeedItemClick(item.activityId, $event)"
+          >
+            <!-- Left: Avatar -->
+            <div class="feed-item-avatar">
+              @if (item.userAvatar) {
+                <div class="avatar-emoji">{{ item.userAvatar }}</div>
+              } @else {
+                <div class="avatar-initials">{{ getUserInitials(item.userName) }}</div>
+              }
+
+              <!-- Action Badge -->
+              <div
+                class="action-badge"
+                [class]="getActionColorClass(item.action)"
+              >
+                <i [class]="getActionIconClass(item.action)"></i>
+              </div>
+            </div>
+
+            <!-- Right: Content -->
+            <div class="feed-item-content">
+              <!-- Header: User & Time -->
+              <div class="feed-item-header">
+                <span class="user-name">{{ item.userName }}</span>
+                <span class="timestamp" [title]="getFullTimestamp(item.timestamp)">
+                  {{ getRelativeTime(item.timestamp) }}
+                </span>
+              </div>
+
+              <!-- Action Description -->
+              <div class="feed-item-action">
+                <span class="action-text">{{ getActionText(item.action) }}</span>
+                <span class="activity-title">{{ truncateTitle(item.activityTitle) }}</span>
+              </div>
+
+              <!-- Description -->
+              @if (item.description) {
+                <div class="feed-item-description">
+                  {{ item.description }}
+                </div>
+              }
+
+              <!-- Metadata -->
+              @if (item.metadata) {
+                <div class="feed-item-metadata">
+                  <i class="pi pi-tag"></i>
+                  <span>{{ item.metadata }}</span>
+                </div>
+              }
+
+              <!-- Recent Indicator -->
+              @if (isRecentItem(item.timestamp)) {
+                <div class="recent-indicator">
+                  <span class="pulse-dot"></span>
+                  <span class="recent-text">ใหม่</span>
+                </div>
+              }
+            </div>
+
+            <!-- Hover Arrow -->
+            <div class="feed-item-arrow">
+              <i class="pi pi-angle-right"></i>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Show More Indicator (if items exceed maxItems) -->
+      @if (feedItems.length > maxItems) {
+        <div class="more-indicator">
+          +{{ feedItems.length - maxItems }} รายการเพิ่มเติม
+        </div>
+      }
+    }
+  </div>
+
+  <!-- ==================== AUTO REFRESH INDICATOR ==================== -->
+  @if (autoRefresh) {
+    <div class="auto-refresh-indicator">
+      <span class="indicator-dot"></span>
+      <span class="indicator-text">รีเฟรชอัตโนมัติทุก 30 วินาที</span>
+    </div>
+  }
+
+</div>

@@ -1,0 +1,170 @@
+<!-- customer-master.component.html -->
+
+<div class="customer-master-container">
+
+  <!-- ==================== PAGE HEADER ==================== -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="pi pi-users"></i>
+      </div>
+      <div>
+        <h1 class="header-title">Customer Management</h1>
+        <p class="header-subtitle">จัดการข้อมูลลูกค้า</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-export" (click)="exportCustomers()">
+        <i class="pi pi-download"></i>
+        <span>Export</span>
+      </button>
+
+      <button class="btn-add" (click)="openCreateDrawer()">
+        <i class="pi pi-plus"></i>
+        <span>เพิ่มลูกค้า</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== STATS CARDS ==================== -->
+  <!-- <app-customer-stats
+    [stats]="stats()"
+  ></app-customer-stats> -->
+
+  <!-- ==================== CHARTS & STATS SECTION ==================== -->
+  <div class="analytics-section">
+
+    <!-- Column 1: Compact Stats -->
+    <div class="compact-stats-column">
+      <div class="compact-stat-card customers">
+        <div class="compact-stat-icon">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="compact-stat-content">
+          <div class="compact-stat-label">Total Customers</div>
+          <div class="compact-stat-value">{{ stats().totalCustomers }}</div>
+          <div class="compact-stat-sublabel">รวมลูกค้าทั้งหมด</div>
+        </div>
+      </div>
+
+      <div class="compact-stat-card deals">
+        <div class="compact-stat-icon">
+          <i class="pi pi-briefcase"></i>
+        </div>
+        <div class="compact-stat-content">
+          <div class="compact-stat-label">Active Deals</div>
+          <div class="compact-stat-value">{{ stats().activeDeals }}</div>
+          <div class="compact-stat-trend" [class.positive]="stats().dealsTrend > 0">
+            <i class="pi" [ngClass]="stats().dealsTrend > 0 ? 'pi-arrow-up' : 'pi-arrow-down'"></i>
+            <span>{{ Math.abs(stats().dealsTrend).toFixed(1) }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 2: CSAT Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3 class="chart-title">Customer Satisfaction (CSAT)</h3>
+        <p class="chart-subtitle">ความพึงพอใจลูกค้าเฉลี่ย</p>
+      </div>
+      <app-csat-chart
+        [data]="csatTrend()"
+        [currentValue]="stats().averageCSAT"
+      ></app-csat-chart>
+    </div>
+
+    <!-- Column 3: Churn Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3 class="chart-title">Churn Rate</h3>
+        <p class="chart-subtitle">อัตราการสูญเสียลูกค้า</p>
+      </div>
+      <app-churn-chart
+        [data]="churnData()"
+      ></app-churn-chart>
+    </div>
+
+  </div>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <div class="main-content">
+
+    <!-- Full Width Table Section -->
+    <div class="table-section">
+
+      <!-- TABLE -->
+      <div class="table-container">
+        <div class="table-header-wrapper">
+          <div class="table-title-row">
+            <h3 class="table-title">
+              รายการลูกค้า
+              <span class="customer-count">({{ filteredCustomers().length }})</span>
+            </h3>
+          </div>
+
+          <!-- HORIZONTAL FILTERS -->
+          <app-customer-filters
+            [customers]="customers()"
+            [uniqueOwners]="uniqueOwners()"
+            [availableSegments]="availableSegments()"
+            [currentFilters]="filters()"
+            (filtersChange)="onFiltersChange($event)"
+            (clearFilters)="clearFilters()"
+          ></app-customer-filters>
+        </div>
+
+        @if (isLoading()) {
+          <div class="loading-state">
+            <i class="pi pi-spin pi-spinner"></i>
+            <p>กำลังโหลดข้อมูล...</p>
+          </div>
+        } @else if (filteredCustomers().length === 0) {
+          <div class="empty-state">
+            <i class="pi pi-users"></i>
+            <h3>ไม่พบข้อมูลลูกค้า</h3>
+            <p>ลองปรับเปลี่ยนตัวกรองหรือเพิ่มลูกค้าใหม่</p>
+            <button class="btn-add-empty" (click)="openCreateDrawer()">
+              <i class="pi pi-plus"></i>
+              <span>เพิ่มลูกค้าใหม่</span>
+            </button>
+          </div>
+        } @else {
+          <app-customer-table
+            [customers]="filteredCustomers()"
+            (editCustomer)="openEditDrawer($event)"
+            (deleteCustomer)="deleteCustomer($event)"
+            (viewCustomer)="openDetailModal($event)"
+          ></app-customer-table>
+        }
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== DRAWER: CREATE/EDIT ==================== -->
+  @if (isDrawerOpen()) {
+    <div class="drawer-overlay" (click)="closeDrawer()"></div>
+
+    <div class="drawer-container" [class.open]="isDrawerOpen()">
+      <app-customer-drawer
+        [mode]="drawerMode()"
+        [customer]="selectedCustomer()"
+        [availableSegments]="availableSegments()"
+        (save)="drawerMode() === 'create' ? createCustomer($event) : updateCustomer(selectedCustomerId()!, $event)"
+        (cancel)="closeDrawer()"
+      ></app-customer-drawer>
+    </div>
+  }
+
+  <!-- ==================== DETAIL MODAL ==================== -->
+  @if (isDetailModalOpen() && detailModalCustomer()) {
+    <app-customer-detail-modal
+      [customer]="detailModalCustomer()!"
+      (close)="closeDetailModal()"
+      (edit)="openEditDrawer($event); closeDetailModal()"
+    ></app-customer-detail-modal>
+  }
+
+</div>

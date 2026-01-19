@@ -1,0 +1,273 @@
+<!-- customer-detail-modal.component.html -->
+
+<div class="modal-overlay" (click)="onClose()">
+
+  <div class="modal-container" (click)="onModalClick($event)">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <h2 class="modal-title">{{ getDisplayName() }}</h2>
+        <p class="modal-subtitle">Customer Details</p>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+
+      <!-- Basic Information Section -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <i class="pi pi-user"></i>
+          Basic Information
+        </h3>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">First Name:</span>
+            <span class="info-value">{{ customer().firstName }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Last Name:</span>
+            <span class="info-value">{{ customer().lastName }}</span>
+          </div>
+
+          @if (customer().companyName) {
+            <div class="info-item full-width">
+              <span class="info-label">Company Name:</span>
+              <span class="info-value">{{ customer().companyName }}</span>
+            </div>
+          }
+
+          @if (customer().businessType) {
+            <div class="info-item">
+              <span class="info-label">Business Type:</span>
+              <span class="info-value">{{ customer().businessType }}</span>
+            </div>
+          }
+
+          <div class="info-item">
+            <span class="info-label">Channel:</span>
+            <span class="info-value">{{ getChannelInfo().th }} ({{ getChannelInfo().en }})</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Status:</span>
+            <span class="status-badge" [style.color]="getStatusInfo().color">
+              <i class="pi pi-circle-fill"></i>
+              {{ getStatusInfo().th }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information Section -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <i class="pi pi-phone"></i>
+          Contact Information
+        </h3>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span class="info-value">{{ customer().email || '-' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Phone:</span>
+            <span class="info-value">{{ customer().phone || '-' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Metrics Section -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <i class="pi pi-chart-line"></i>
+          Business Metrics
+        </h3>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Class:</span>
+            <span
+              class="class-badge-large"
+              [style.background-color]="getClassInfo()!.bgColor"
+              [style.color]="getClassInfo()!.color"
+            >
+              {{ customer().class }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Segment:</span>
+            <span class="info-value">{{ customer().segment }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Owner:</span>
+            <span class="info-value">{{ customer().owner }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">ARR:</span>
+            <span class="info-value highlighted">{{ formatCurrency(customer().arr) }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">CSAT:</span>
+            <div class="csat-display">
+              <div class="stars">
+                @for (star of getCSATStars(); track $index) {
+                  <i class="pi" [ngClass]="star ? 'pi-star-fill' : 'pi-star'"></i>
+                }
+              </div>
+              <span class="csat-value">{{ customer().csat.toFixed(1) }}/5.0</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Churn Risk:</span>
+            <span
+              class="risk-badge"
+              [style.color]="getChurnRiskInfo().color"
+            >
+              <i class="pi pi-circle-fill"></i>
+              {{ getChurnRiskInfo().th }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Budget:</span>
+            <span class="info-value">{{ formatCurrency(customer().budget) }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Total Revenue:</span>
+            <span class="info-value highlighted">{{ formatCurrency(customer().totalRevenue) }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Active Contracts:</span>
+            <span class="info-value">{{ customer().activeContracts }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Overdue Payments:</span>
+            <span class="info-value" [class.warning]="customer().overduePayments > 0">
+              {{ customer().overduePayments }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interested Areas Section -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <i class="pi pi-map-marker"></i>
+          Interested Areas
+        </h3>
+
+        @if (customer().interestedAreas.length > 0) {
+          <div class="areas-list">
+            @for (area of customer().interestedAreas; track area.areaId) {
+              <div class="area-card" (click)="onAreaClick(area.areaName)">
+                <div class="area-info">
+                  <div class="area-name">{{ area.areaName }}</div>
+                  <div class="area-details">
+                    {{ area.buildingName }} - Floor {{ area.floorNumber }}
+                  </div>
+                </div>
+                <i class="pi pi-external-link"></i>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="no-data">ไม่มีพื้นที่ที่สนใจ</p>
+        }
+      </div>
+
+      <!-- Contracts Section (Mock) -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <i class="pi pi-file"></i>
+          Contracts
+        </h3>
+
+        @if (customer().activeContracts > 0) {
+          <div class="contracts-list">
+            @for (i of [].constructor(customer().activeContracts); track $index) {
+              <div class="contract-card" (click)="onContractClick($index)">
+                <div class="contract-icon">
+                  <i class="pi pi-file-pdf"></i>
+                </div>
+                <div class="contract-info">
+                  <div class="contract-name">Contract #{{ $index + 1 }}</div>
+                  <div class="contract-status">Active</div>
+                </div>
+                <i class="pi pi-external-link"></i>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="no-data">ไม่มีสัญญาที่ใช้งานอยู่</p>
+        }
+      </div>
+
+      <!-- Additional Information Section -->
+      <div class="info-section">
+        <h3 class="section-title">
+          <i class="pi pi-info-circle"></i>
+          Additional Information
+        </h3>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Next Action:</span>
+            <span class="info-value">{{ customer().nextAction || '-' }}</span>
+          </div>
+
+          @if (customer().expectedClosingDate) {
+            <div class="info-item">
+              <span class="info-label">Expected Closing Date:</span>
+              <span class="info-value">{{ formatDate(customer().expectedClosingDate) }}</span>
+            </div>
+          }
+
+          <div class="info-item">
+            <span class="info-label">Last Contact:</span>
+            <span class="info-value">{{ formatDate(customer().lastContactDate) }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Created At:</span>
+            <span class="info-value">{{ formatDate(customer().createdAt) }}</span>
+          </div>
+
+          @if (customer().remark) {
+            <div class="info-item full-width">
+              <span class="info-label">Remark:</span>
+              <span class="info-value">{{ customer().remark }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn-edit" (click)="onEdit()">
+        <i class="pi pi-pencil"></i>
+        <span>Edit Customer</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>
