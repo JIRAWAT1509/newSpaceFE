@@ -10,6 +10,7 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     service: "Service",
     finance: "Finance",
     dashboard: "Dashboard",
+    report_dashboard: "Report",
 
     // Area - Secondary
     area_management: "Area Management",
@@ -257,6 +258,7 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     service: "บริการ",
     finance: "การเงิน",
     dashboard: "แดชบอร์ด",
+    report_dashboard: "รายงาน",
 
     // Area - Secondary
     area_management: "การจัดการพื้นที่",
@@ -504,6 +506,7 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     service: "服务",
     finance: "财务",
     dashboard: "仪表板",
+    report_dashboard: "报告",
 
     // Area - Secondary
     area_management: "区域管理",

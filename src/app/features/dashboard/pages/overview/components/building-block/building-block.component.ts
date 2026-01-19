@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { DashboardService, BuildingAreaItem } from '@core/services/dashboard.service';
 import { UtilitiesService } from '@core/services/utilities.service';
+import { getStatusPalette, getStatusPaletteWithAlpha } from '@core/utils/chart-colors';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -169,6 +170,8 @@ export class BuildingBlockComponent implements OnInit {
 
     console.log('Creating chart with data:', { labels, freeData, reserveData, rentData });
 
+    const statusColors = getStatusPalette();
+    const statusColorsAlpha = getStatusPaletteWithAlpha(0.8);
     const config: ChartConfiguration<'bar'> = {
       type: 'bar',
       data: {
@@ -176,24 +179,24 @@ export class BuildingBlockComponent implements OnInit {
         datasets: [
           {
             label: 'Unit / พื้นที่จอง (ตร.ม.)',
-            backgroundColor: 'rgba(255, 99, 132, 0.8)',
-            borderColor: '#FF6384',
+            backgroundColor: statusColorsAlpha.danger,
+            borderColor: statusColors.danger,
             borderWidth: 1,
             data: reserveData,
             hidden: !this.datasetVisibility.reserve
           },
           {
             label: 'Unit / พื้นที่เช่า (ตร.ม.)',
-            backgroundColor: 'rgba(255, 208, 95, 0.8)',
-            borderColor: '#FFD05F',
+            backgroundColor: statusColorsAlpha.warning,
+            borderColor: statusColors.warning,
             borderWidth: 1,
             data: rentData,
             hidden: !this.datasetVisibility.rent
           },
           {
             label: 'Unit / พื้นที่ว่าง (ตร.ม.)',
-            backgroundColor: 'rgba(128, 224, 142, 0.8)',
-            borderColor: '#80E08E',
+            backgroundColor: statusColorsAlpha.success,
+            borderColor: statusColors.success,
             borderWidth: 1,
             data: freeData,
             hidden: !this.datasetVisibility.free

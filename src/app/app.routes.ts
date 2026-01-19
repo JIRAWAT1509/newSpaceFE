@@ -10,10 +10,20 @@ export const routes: Routes = [
     redirectTo: '/dashboard/overview',
     pathMatch: 'full'
   },
+  {
+    path: 'dashboard',
+    redirectTo: 'dashboard/overview',
+    pathMatch: 'full'
+  },
 
   // ============================================
   // 1. SALES MODULE (Empty for now - Future implementation)
   // ============================================
+  {
+    path: 'sales',
+    redirectTo: 'sales/dashboard',
+    pathMatch: 'full'
+  },
   {
     path: 'sales',
     loadChildren: () => import('./features/sales/sales.routes').then(m => m.SALES_ROUTES)
@@ -24,12 +34,22 @@ export const routes: Routes = [
   // ============================================
   {
     path: 'area',
+    redirectTo: 'area/layout/master',
+    pathMatch: 'full'
+  },
+  {
+    path: 'area',
     loadChildren: () => import('./features/area/area.routes').then(m => m.AREA_ROUTES)
   },
 
   // ============================================
   // 3. CONTRACT MODULE
   // ============================================
+  {
+    path: 'contract',
+    redirectTo: 'contract/management',
+    pathMatch: 'full'
+  },
   {
     path: 'contract',
     loadChildren: () => import('./features/contract/contract.routes').then(m => m.CONTRACT_ROUTES)
@@ -44,12 +64,22 @@ export const routes: Routes = [
   },
   {
     path: 'finance',
+    redirectTo: 'finance/master',
+    pathMatch: 'full'
+  },
+  {
+    path: 'finance',
     loadChildren: () => import('./features/finance/finance.routes').then(m => m.FINANCE_ROUTES)
   },
 
   // ============================================
   // 5. FACILITIES MANAGEMENT MODULE
   // ============================================
+  {
+    path: 'facilities',
+    redirectTo: 'facilities/utilities/master',
+    pathMatch: 'full'
+  },
   {
     path: 'facilities',
     loadChildren: () => import('./features/facilities/facilities.routes').then(m => m.FACILITIES_ROUTES)
@@ -70,6 +100,11 @@ export const routes: Routes = [
   // ============================================
   // 7. SETTING MODULE
   // ============================================
+  {
+    path: 'setting',
+    redirectTo: 'setting/user-accounts/data',
+    pathMatch: 'full'
+  },
   {
     path: 'setting',
     loadChildren: () => import('./features/setting/setting.routes').then(m => m.SETTING_ROUTES)

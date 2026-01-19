@@ -274,7 +274,10 @@ export class ContractTableComponent {
   }
 
   getStatusColor(status: string): string {
-    return CONTRACT_STATUS_LABELS[status as keyof typeof CONTRACT_STATUS_LABELS]?.COLOR || '#9CA3AF';
+    return (
+      CONTRACT_STATUS_LABELS[status as keyof typeof CONTRACT_STATUS_LABELS]?.COLOR ||
+      'rgb(var(--muted))'
+    );
   }
 
   getContractTypeLabel(type: string): string {

@@ -356,23 +356,23 @@
 }
 
 .badge-primary {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: rgb(var(--primary) / 0.18);
+  color: rgb(var(--primary));
 }
 
 .badge-success {
-  background-color: #d1fae5;
-  color: #065f46;
+  background-color: rgb(var(--success) / 0.18);
+  color: rgb(var(--success));
 }
 
 .badge-warning {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: rgb(var(--warning) / 0.18);
+  color: rgb(var(--warning));
 }
 
 .badge-secondary {
-  background-color: #f3f4f6;
-  color: #6b7280;
+  background-color: rgb(var(--muted) / 0.15);
+  color: rgb(var(--muted));
 }
 
 /* ==================== EMPTY STATE ==================== */

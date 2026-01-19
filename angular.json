@@ -25,11 +25,12 @@
               "src/favicon.ico",
               "src/assets"
             ],
-"styles": [
-  "src/styles/styles.css",
-  "node_modules/primeicons/primeicons.css",
-  "src/styles/primeng-overrides.css"
-],
+            "styles": [
+              "src/styles/styles.css",
+              "primeicons/primeicons.css",
+              "src/styles/primeng-overrides.css",
+              "src/styles/table.css"
+            ],
 
             "scripts": []
           },
@@ -89,7 +90,10 @@
               }
             ],
             "styles": [
-              "src/styles/styles.css"
+              "src/styles/styles.css",
+              "primeicons/primeicons.css",
+              "src/styles/primeng-overrides.css",
+              "src/styles/table.css"
             ],
             "scripts": []
           }
@@ -126,12 +130,16 @@
   "cli": {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     "analytics": "a112d4b6-2f7e-44b4-92f4-ee7213377096"
 =======
     "analytics": "55857ed7-0db5-41e9-b5eb-133250e1f5ac"
 >>>>>>> Stashed changes
 =======
     "analytics": "55857ed7-0db5-41e9-b5eb-133250e1f5ac"
+>>>>>>> Stashed changes
+=======
+    "analytics": "e1a58899-1286-4352-9af3-f0c43ba022e9"
 >>>>>>> Stashed changes
   }
 }

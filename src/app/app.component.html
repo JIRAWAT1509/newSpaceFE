@@ -33,20 +33,22 @@
 
 
 
-<app-header></app-header>
+<app-header
+  [style.--sidebar-width]="isSidebarExpanded() ? '18rem' : '5rem'"
+></app-header>
 
-<div class="flex h-screen overflow-hidden bg-gray-100 min-w-0">
+<div class="flex h-screen overflow-hidden bg-bg min-w-0">
   <app-sidebar
-    class="h-full col transition-all duration-300"
-    [style.padding-top]="!isScrolled() ? '152px' : '64px'"
+    class="h-full flex-shrink-0 transition-all duration-300 relative z-20"
+    [style.padding-top]="!isScrolled() ? '96px' : '64px'"
   >
   </app-sidebar>
 
-  <div class="flex-1 flex flex-col overflow-hidden">
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0 relative z-10">
     <main
       (scroll)="onContentScroll($event)"
       class="flex-1 overflow-x-hidden overflow-y-auto transition-all duration-300"
-      [style.padding-top]="!isScrolled() ? '152px' : '64px'"
+      [style.padding-top]="!isScrolled() ? '96px' : '64px'"
     >
       <div class="container mx-auto px-4 py-8">
         <router-outlet />

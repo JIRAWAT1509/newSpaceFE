@@ -1,0 +1,282 @@
+/* invoice-management.component.css */
+
+.invoice-container {
+  @apply space-y-6;
+}
+
+/* Header */
+.content-header {
+  @apply flex items-start justify-between gap-4 mb-6;
+}
+
+.page-title {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+.page-subtitle {
+  @apply text-gray-600 mt-1;
+}
+
+/* Header Actions */
+.header-actions {
+  @apply flex items-center gap-3;
+}
+
+.bulk-action-group {
+  @apply flex items-center gap-3;
+}
+
+.selected-count {
+  @apply text-sm font-semibold text-blue-600;
+}
+
+/* Split Button */
+.split-button-wrapper {
+  @apply relative;
+}
+
+.split-button-wrapper .btn {
+  @apply flex items-center gap-2;
+}
+
+.dropdown-menu {
+  @apply absolute top-full right-0 mt-2 w-64;
+  @apply bg-white rounded-lg shadow-xl border border-gray-200;
+  @apply py-2 z-50;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  @apply w-full px-4 py-2 text-left;
+  @apply text-gray-700 hover:bg-blue-50 hover:text-blue-600;
+  @apply transition-colors duration-200;
+  @apply border-none bg-transparent cursor-pointer;
+}
+
+/* Buttons */
+.btn {
+  @apply flex items-center gap-2 px-4 py-2;
+  @apply font-semibold rounded-lg transition-all duration-200;
+  @apply border-none cursor-pointer;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
+}
+
+.btn-create {
+  @apply bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white;
+}
+
+/* Table */
+.table-container {
+  @apply bg-white rounded-xl border border-gray-200 overflow-hidden;
+}
+
+.invoice-table {
+  @apply w-full border-collapse;
+}
+
+.invoice-table thead {
+  @apply bg-gray-50;
+}
+
+.invoice-table th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200;
+}
+
+.invoice-table td {
+  @apply px-4 py-3 border-b border-gray-200;
+}
+
+.invoice-table tbody tr {
+  @apply transition-colors duration-200;
+}
+
+.invoice-table tbody tr:hover {
+  @apply bg-blue-50;
+}
+
+.invoice-table tbody tr.selected {
+  @apply bg-blue-100;
+}
+
+.checkbox-col {
+  @apply w-12;
+}
+
+.checkbox-col input[type="checkbox"] {
+  @apply w-4 h-4 cursor-pointer;
+}
+
+/* Table Content */
+.contract-number {
+  @apply font-mono text-sm text-gray-800;
+}
+
+.customer-name {
+  @apply font-medium text-gray-800;
+}
+
+.collection-item {
+  @apply text-gray-700;
+}
+
+.amount {
+  @apply font-bold text-gray-800;
+}
+
+.date {
+  @apply text-gray-600;
+}
+
+/* Status Badge */
+.status-badge {
+  @apply inline-block px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-badge.status-ready {
+  background: rgb(var(--success) / 0.18);
+  color: rgb(var(--success));
+}
+
+.status-badge.status-open {
+  background: rgb(var(--info) / 0.18);
+  color: rgb(var(--info));
+}
+
+.status-badge.status-cancel {
+  background: rgb(var(--danger) / 0.18);
+  color: rgb(var(--danger));
+}
+
+/* Row Actions */
+.row-actions {
+  @apply flex items-center justify-center gap-2;
+}
+
+.action-btn {
+  @apply w-8 h-8 flex items-center justify-center;
+  @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50;
+  @apply rounded-lg transition-all duration-200;
+  @apply border-none cursor-pointer;
+}
+
+.action-btn.danger {
+  @apply hover:text-red-600 hover:bg-red-50;
+}
+
+/* Drawer */
+.drawer-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-40;
+  animation: fadeIn 0.3s ease;
+}
+
+.drawer-panel {
+  @apply fixed top-0 right-0 h-full w-full md:w-2/3 lg:w-1/2 xl:w-1/3;
+  @apply bg-white shadow-2xl z-50;
+  @apply flex flex-col;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.drawer-header {
+  @apply flex items-center justify-between px-6 py-4 border-b border-gray-200;
+}
+
+.drawer-header h3 {
+  @apply text-xl font-bold text-gray-800;
+}
+
+.close-btn {
+  @apply w-8 h-8 flex items-center justify-center;
+  @apply text-gray-600 hover:text-red-600 hover:bg-red-50;
+  @apply rounded-lg transition-all duration-200;
+  @apply border-none cursor-pointer;
+}
+
+.drawer-content {
+  @apply flex-1 overflow-y-auto px-6 py-4 space-y-4;
+}
+
+.drawer-footer {
+  @apply flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200;
+}
+
+/* Form */
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.form-group label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.form-group input[type="text"] {
+  @apply w-full px-4 py-2 border-2 border-gray-300 rounded-lg;
+  @apply transition-all duration-200;
+}
+
+.form-group input[type="text"]:focus {
+  @apply outline-none border-blue-500;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-row {
+  @apply grid grid-cols-2 gap-4;
+}
+
+.toggle-label {
+  @apply flex items-center justify-between cursor-pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+  @apply w-10 h-6 cursor-pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-header {
+    @apply flex-col items-start;
+  }
+
+  .header-actions {
+    @apply w-full flex-col;
+  }
+
+  .bulk-action-group {
+    @apply w-full flex-col items-start;
+  }
+
+  .form-row {
+    @apply grid-cols-1;
+  }
+}

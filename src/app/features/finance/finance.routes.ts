@@ -4,7 +4,7 @@ import { Routes } from '@angular/router';
 export const FINANCE_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'receipt/daily',
+    redirectTo: 'master',
     pathMatch: 'full'
   },
 

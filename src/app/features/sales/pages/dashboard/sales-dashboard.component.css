@@ -2,9 +2,15 @@
 
 /* ==================== CONTAINER ==================== */
 .sales-dashboard-container {
+<<<<<<< Updated upstream
   max-width: 1600px;
   margin: 0 auto;
   padding: 1.5rem;
+=======
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--content-padding);
+>>>>>>> Stashed changes
   background-color: #f8f9fa;
   min-height: 100vh;
 }
@@ -206,8 +212,13 @@
 
 .card-badge {
   padding: 0.25rem 0.75rem;
+<<<<<<< Updated upstream
   background-color: #fef3c7;
   color: #92400e;
+=======
+  background-color: rgb(var(--warning) / 0.18);
+  color: rgb(var(--warning));
+>>>>>>> Stashed changes
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 600;

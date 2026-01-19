@@ -17,5 +17,9 @@ export const SALES_ROUTES: Routes = [
         (m) => m.SalesDashboardComponent
       ),
   },
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
   // Will be populated in future development
 ];

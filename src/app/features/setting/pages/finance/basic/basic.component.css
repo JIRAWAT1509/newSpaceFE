@@ -169,12 +169,12 @@
   font-weight: 600;
 }
 .badge-success {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgb(var(--success) / 0.18);
+  color: rgb(var(--success));
 }
 .badge-secondary {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: rgb(var(--muted) / 0.15);
+  color: rgb(var(--muted));
 }
 
 @media (max-width: 1024px) {

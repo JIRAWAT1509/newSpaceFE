@@ -23,7 +23,7 @@
         class="flex items-center gap-2 text-xs cursor-pointer hover:opacity-75 transition-opacity"
         [class.opacity-50]="!datasetVisibility.reserve">
         <div class="w-4 h-4 rounded"
-             [style.background-color]="datasetVisibility.reserve ? '#FF6384' : '#E5E7EB'"
+             [style.background-color]="datasetVisibility.reserve ? 'rgb(var(--danger))' : 'rgb(var(--border))'"
              [style.text-decoration]="!datasetVisibility.reserve ? 'line-through' : 'none'"></div>
         <span class="text-gray-700"
               [style.text-decoration]="!datasetVisibility.reserve ? 'line-through' : 'none'">
@@ -35,7 +35,7 @@
         class="flex items-center gap-2 text-xs cursor-pointer hover:opacity-75 transition-opacity"
         [class.opacity-50]="!datasetVisibility.rent">
         <div class="w-4 h-4 rounded"
-             [style.background-color]="datasetVisibility.rent ? '#FFD05F' : '#E5E7EB'"
+             [style.background-color]="datasetVisibility.rent ? 'rgb(var(--warning))' : 'rgb(var(--border))'"
              [style.text-decoration]="!datasetVisibility.rent ? 'line-through' : 'none'"></div>
         <span class="text-gray-700"
               [style.text-decoration]="!datasetVisibility.rent ? 'line-through' : 'none'">
@@ -47,7 +47,7 @@
         class="flex items-center gap-2 text-xs cursor-pointer hover:opacity-75 transition-opacity"
         [class.opacity-50]="!datasetVisibility.free">
         <div class="w-4 h-4 rounded"
-             [style.background-color]="datasetVisibility.free ? '#80E08E' : '#E5E7EB'"
+             [style.background-color]="datasetVisibility.free ? 'rgb(var(--success))' : 'rgb(var(--border))'"
              [style.text-decoration]="!datasetVisibility.free ? 'line-through' : 'none'"></div>
         <span class="text-gray-700"
               [style.text-decoration]="!datasetVisibility.free ? 'line-through' : 'none'">

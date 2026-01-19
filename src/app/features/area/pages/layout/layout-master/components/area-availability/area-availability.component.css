@@ -1,5 +1,5 @@
 .area-availability-container {
-  @apply p-6 bg-white rounded-lg shadow-sm border border-gray-200;
+  @apply p-6 bg-card rounded-lg shadow-sm border border-border;
 }
 
 .section-header {
@@ -7,7 +7,7 @@
 }
 
 .section-title {
-  @apply text-2xl font-bold text-gray-800;
+  @apply text-2xl font-bold text-fg;
 }
 
 /* Status Cards Grid - 4 columns */
@@ -17,13 +17,13 @@
 
 .status-card {
   @apply relative flex items-center gap-4 p-4 rounded-xl;
-  @apply bg-white border-2 border-gray-200;
+  @apply bg-card border-2 border-border;
   @apply cursor-pointer transition-all duration-200;
-  @apply hover:shadow-md hover:border-gray-300;
+  @apply hover:shadow-md hover:border-border;
 }
 
 .status-card.active {
-  @apply border-blue-500 bg-blue-50 shadow-lg;
+  @apply border-primary bg-primary/10 shadow-lg;
 }
 
 .status-card.dimmed {
@@ -51,21 +51,21 @@
 }
 
 .card-label-th {
-  @apply text-sm font-semibold text-gray-800;
+  @apply text-sm font-semibold text-fg;
 }
 
 .card-count {
-  @apply text-2xl font-bold text-gray-900;
+  @apply text-2xl font-bold text-fg;
 }
 
 .card-label-en {
-  @apply text-xs text-gray-500 uppercase tracking-wide;
+  @apply text-xs text-muted uppercase tracking-wide;
 }
 
 /* Selection Check */
 .selection-check {
   @apply absolute -top-2 -right-2;
-  @apply w-6 h-6 rounded-full bg-blue-500 text-white;
+  @apply w-6 h-6 rounded-full bg-primary text-primary-foreground;
   @apply flex items-center justify-center;
   @apply shadow-md;
 }
@@ -77,7 +77,7 @@
 /* Percentage Bar */
 .percentage-bar {
   @apply flex h-10 rounded-lg overflow-hidden shadow-inner;
-  @apply bg-gray-100;
+  @apply bg-bg;
 }
 
 .bar-segment {
@@ -125,5 +125,5 @@
 }
 
 .status-card.active:hover {
-  @apply border-blue-600 shadow-xl;
+  @apply border-primary shadow-xl;
 }

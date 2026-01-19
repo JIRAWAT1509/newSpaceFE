@@ -6,57 +6,65 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Base colors
-        'white-primary': '#FFFFFF',
-        'black-primary': '#000000',
+        bg: "rgb(var(--bg) / <alpha-value>)",
+        fg: "rgb(var(--fg) / <alpha-value>)",
+        muted: "rgb(var(--muted) / <alpha-value>)",
+        primary: "rgb(var(--primary) / <alpha-value>)",
+        "primary-fg": "rgb(var(--primary-fg) / <alpha-value>)",
+        "primary-foreground": "rgb(var(--primary-foreground) / <alpha-value>)",
+        secondary: "rgb(var(--secondary) / <alpha-value>)",
+        "secondary-fg": "rgb(var(--secondary-fg) / <alpha-value>)",
+        "secondary-foreground": "rgb(var(--secondary-foreground) / <alpha-value>)",
+        card: "rgb(var(--card) / <alpha-value>)",
+        border: "rgb(var(--border) / <alpha-value>)",
+        input: "rgb(var(--input) / <alpha-value>)",
+        success: "rgb(var(--success) / <alpha-value>)",
+        "success-fg": "rgb(var(--success-fg) / <alpha-value>)",
+        "success-foreground": "rgb(var(--success-foreground) / <alpha-value>)",
+        warning: "rgb(var(--warning) / <alpha-value>)",
+        "warning-fg": "rgb(var(--warning-fg) / <alpha-value>)",
+        "warning-foreground": "rgb(var(--warning-foreground) / <alpha-value>)",
+        danger: "rgb(var(--danger) / <alpha-value>)",
+        "danger-fg": "rgb(var(--danger-fg) / <alpha-value>)",
+        "danger-foreground": "rgb(var(--danger-foreground) / <alpha-value>)",
+        info: "rgb(var(--info) / <alpha-value>)",
+        "info-fg": "rgb(var(--info-fg) / <alpha-value>)",
+        "info-foreground": "rgb(var(--info-foreground) / <alpha-value>)",
+        link: "rgb(var(--link) / <alpha-value>)",
+        ring: "rgb(var(--ring) / <alpha-value>)",
+        shadow: "rgb(var(--shadow) / <alpha-value>)",
 
-        // Header / Top Bar
-        'header-primary': '#2196F3',
-        'header-gradient-start': '#2196F3',
-        'header-gradient-end': '#42A5F5',
-
-        // Sidebar colors
-        'sidebar-main': '#1565C0',
-        'sidebar-sub': '#0D47A1',
-        'sidebar-hover': '#1976D2',
-        'sidebar-active-bg': '#E3F2FD',
-        'sidebar-active-text': '#0D47A1',
-        'sidebar-accent': '#64B5F6',
-        'sidebar-sub-text': '#BBDEFB',
-
-        // Accent colors
-        'accent-primary': '#64B5F6',
-        'accent-highlight': '#00F2FF',
-
-        // Text colors
-        'text-primary': '#FFFFFF',
-        'text-secondary': '#BBDEFB',
-        'text-disabled': '#A1A1A1',
-        'text-muted': '#90A4AE',
-
-        // Icon colors
-        'icon-default': '#90A4AE',
-        'icon-active': '#FFFFFF',
-
-        // Button colors
-        'btn-primary': '#1976D2',
-        'btn-hover': '#1565C0',
-
-        // Graph colors (keep existing)
-        'graph-primary': '#80E08E', // Green
-        'graph-secondary': '#FFD05F', // Yellow
-        'graph-tertiary': '#FF6384', // Red
-
-        // Table specific colors
-        'table-border-primary': '#9CDCFF',
-        'table-border-secondary': '#EBEBEB',
-        'table-hover': '#F8FEFF',
-
-        // Area Status colors - NEW
-        'status-unallocated': '#FF6384', // Red/Pink
-        'status-quotation': '#4CA3FF', // Blue
-        'status-leased': '#FFD05F', // Yellow
-        'status-vacant': '#80E08E', // Green
+        // Legacy semantic aliases mapped to tokens
+        'header-primary': "rgb(var(--primary) / <alpha-value>)",
+        'header-gradient-start': "rgb(var(--primary) / <alpha-value>)",
+        'header-gradient-end': "rgb(var(--secondary) / <alpha-value>)",
+        'sidebar-main': "rgb(var(--primary) / <alpha-value>)",
+        'sidebar-sub': "rgb(var(--primary) / <alpha-value>)",
+        'sidebar-hover': "rgb(var(--secondary) / <alpha-value>)",
+        'sidebar-active-bg': "rgb(var(--primary) / 0.12)",
+        'sidebar-active-text': "rgb(var(--primary) / <alpha-value>)",
+        'sidebar-accent': "rgb(var(--secondary) / <alpha-value>)",
+        'sidebar-sub-text': "rgb(var(--primary-fg) / 0.75)",
+        'accent-primary': "rgb(var(--secondary) / <alpha-value>)",
+        'accent-highlight': "rgb(var(--secondary) / <alpha-value>)",
+        'text-primary': "rgb(var(--primary-fg) / <alpha-value>)",
+        'text-secondary': "rgb(var(--muted) / <alpha-value>)",
+        'text-disabled': "rgb(var(--muted) / 0.7)",
+        'text-muted': "rgb(var(--muted) / <alpha-value>)",
+        'icon-default': "rgb(var(--muted) / <alpha-value>)",
+        'icon-active': "rgb(var(--primary-fg) / <alpha-value>)",
+        'btn-primary': "rgb(var(--primary) / <alpha-value>)",
+        'btn-hover': "rgb(var(--secondary) / <alpha-value>)",
+        'graph-primary': "rgb(var(--success) / <alpha-value>)",
+        'graph-secondary': "rgb(var(--warning) / <alpha-value>)",
+        'graph-tertiary': "rgb(var(--danger) / <alpha-value>)",
+        'table-border-primary': "rgb(var(--border) / <alpha-value>)",
+        'table-border-secondary': "rgb(var(--border) / <alpha-value>)",
+        'table-hover': "rgb(var(--primary) / 0.06)",
+        'status-unallocated': "rgb(var(--danger) / <alpha-value>)",
+        'status-quotation': "rgb(var(--info) / <alpha-value>)",
+        'status-leased': "rgb(var(--warning) / <alpha-value>)",
+        'status-vacant': "rgb(var(--success) / <alpha-value>)",
 
       }
     },

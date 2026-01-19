@@ -4,7 +4,7 @@ import { Routes } from '@angular/router';
 export const CONTRACT_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'contract/management',
+    redirectTo: 'management',
     pathMatch: 'full'
   },
   {

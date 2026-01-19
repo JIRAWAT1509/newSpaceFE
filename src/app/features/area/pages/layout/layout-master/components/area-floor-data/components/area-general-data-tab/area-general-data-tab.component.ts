@@ -5,6 +5,7 @@ import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { Area, AreaStatus, AreaType } from '@core/models/area.model';
 import { getRentRateTimeline } from '@core/data/rental-history.mock';
 import { fromDateString } from '@core/utils/date-utils';
+import { getChartPalette, getChartPaletteWithAlpha, getStatusPalette } from '@core/utils/chart-colors';
 
 Chart.register(...registerables);
 
@@ -98,6 +99,8 @@ export class AreaGeneralDataTabComponent implements AfterViewInit {
     const ctx = canvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
+    const palette = getChartPalette(1);
+    const paletteAlpha = getChartPaletteWithAlpha(1, 0.1);
     const config: ChartConfiguration = {
       type: 'line',
       data: {
@@ -105,13 +108,13 @@ export class AreaGeneralDataTabComponent implements AfterViewInit {
         datasets: [{
           label: 'Monthly Rent (THB)',
           data: timeline.map(t => t.rent),
-          borderColor: '#2196F3',
-          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+          borderColor: palette[0],
+          backgroundColor: paletteAlpha[0],
           borderWidth: 3,
           fill: true,
           tension: 0.4,
           pointRadius: 5,
-          pointBackgroundColor: '#2196F3',
+          pointBackgroundColor: palette[0],
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
           pointHoverRadius: 7
@@ -211,13 +214,14 @@ export class AreaGeneralDataTabComponent implements AfterViewInit {
   }
 
   getStatusColor(status: AreaStatus): string {
+    const statusColors = getStatusPalette();
     const colors: Record<AreaStatus, string> = {
-      'vacant': '#80E08E',
-      'leased': '#FFD05F',
-      'quotation': '#4CA3FF',
-      'unallocated': '#FF6384'
+      vacant: statusColors.success,
+      leased: statusColors.warning,
+      quotation: statusColors.info,
+      unallocated: statusColors.danger,
     };
-    return colors[status] || '#9CA3AF';
+    return colors[status] || 'rgb(var(--muted))';
   }
 
   formatNumber(value: number): string {

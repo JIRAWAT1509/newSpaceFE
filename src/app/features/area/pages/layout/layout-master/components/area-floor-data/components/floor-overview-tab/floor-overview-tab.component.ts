@@ -8,6 +8,7 @@ import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { FloorStatistics, AreaTypeDistribution, RentRateHistoryPoint } from '@core/models/floor-statistics.model';
 import { getFloorStatistics, generateFloorStatistics } from '@core/data/floor-statistics.mock';
 import { fromDateString } from '@core/utils/date-utils';
+import { getChartPalette, getChartPaletteWithAlpha } from '@core/utils/chart-colors';
 
 Chart.register(...registerables);
 
@@ -119,7 +120,9 @@ export class FloorOverviewTabComponent implements AfterViewInit, OnDestroy {
 
     const visibility = this.typeVisibility();
     const data = stats.AREA_BY_TYPE.map(t => visibility[t.TYPE] ? t.COUNT : 0);
-    const colors = stats.AREA_BY_TYPE.map(t => visibility[t.TYPE] ? t.COLOR : 'transparent');
+    const colors = stats.AREA_BY_TYPE.map((t, index) =>
+      visibility[t.TYPE] ? this.getTypeColorByIndex(index, stats.AREA_BY_TYPE.length) : 'transparent'
+    );
 
     const config: ChartConfiguration<'doughnut'> = {
       type: 'doughnut',
@@ -230,13 +233,13 @@ export class FloorOverviewTabComponent implements AfterViewInit, OnDestroy {
       datasets.push({
         label: 'Average',
         data: history.map(h => h.AVERAGE_RENT),
-        borderColor: '#9C27B0',
-        backgroundColor: 'rgba(156, 39, 176, 0.1)',
+        borderColor: this.getLineColorByIndex(0),
+        backgroundColor: this.getLineColorAlphaByIndex(0),
         borderWidth: 3,
         fill: false,
         tension: 0.4,
         pointRadius: 4,
-        pointBackgroundColor: '#9C27B0'
+        pointBackgroundColor: this.getLineColorByIndex(0)
       });
     }
 
@@ -245,13 +248,13 @@ export class FloorOverviewTabComponent implements AfterViewInit, OnDestroy {
       datasets.push({
         label: 'Log',
         data: history.map(h => h.LOG_AVERAGE || 0),
-        borderColor: '#2196F3',
-        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+        borderColor: this.getLineColorByIndex(1),
+        backgroundColor: this.getLineColorAlphaByIndex(1),
         borderWidth: 2,
         fill: false,
         tension: 0.4,
         pointRadius: 3,
-        pointBackgroundColor: '#2196F3'
+        pointBackgroundColor: this.getLineColorByIndex(1)
       });
     }
 
@@ -260,13 +263,13 @@ export class FloorOverviewTabComponent implements AfterViewInit, OnDestroy {
       datasets.push({
         label: 'Kiosk',
         data: history.map(h => h.KIOSK_AVERAGE || 0),
-        borderColor: '#FF9800',
-        backgroundColor: 'rgba(255, 152, 0, 0.1)',
+        borderColor: this.getLineColorByIndex(2),
+        backgroundColor: this.getLineColorAlphaByIndex(2),
         borderWidth: 2,
         fill: false,
         tension: 0.4,
         pointRadius: 3,
-        pointBackgroundColor: '#FF9800'
+        pointBackgroundColor: this.getLineColorByIndex(2)
       });
     }
 
@@ -275,13 +278,13 @@ export class FloorOverviewTabComponent implements AfterViewInit, OnDestroy {
       datasets.push({
         label: 'Open Plan',
         data: history.map(h => h.OPEN_PLAN_AVERAGE || 0),
-        borderColor: '#4CAF50',
-        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+        borderColor: this.getLineColorByIndex(3),
+        backgroundColor: this.getLineColorAlphaByIndex(3),
         borderWidth: 2,
         fill: false,
         tension: 0.4,
         pointRadius: 3,
-        pointBackgroundColor: '#4CAF50'
+        pointBackgroundColor: this.getLineColorByIndex(3)
       });
     }
 
@@ -379,5 +382,29 @@ export class FloorOverviewTabComponent implements AfterViewInit, OnDestroy {
       year: 'numeric',
       month: 'short'
     });
+  }
+
+  getTypeColor(type: string): string {
+    const stats = this.floorStats();
+    if (!stats) {
+      return 'rgb(var(--muted))';
+    }
+    const index = stats.AREA_BY_TYPE.findIndex((item) => item.TYPE === type);
+    return this.getTypeColorByIndex(index, stats.AREA_BY_TYPE.length);
+  }
+
+  private getTypeColorByIndex(index: number, total: number): string {
+    const palette = getChartPalette(Math.max(total, 1));
+    return palette[Math.max(index, 0) % palette.length];
+  }
+
+  private getLineColorByIndex(index: number): string {
+    const palette = getChartPalette(4);
+    return palette[index % palette.length];
+  }
+
+  private getLineColorAlphaByIndex(index: number): string {
+    const palette = getChartPaletteWithAlpha(4, 0.1);
+    return palette[index % palette.length];
   }
 }

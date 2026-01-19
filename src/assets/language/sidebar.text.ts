@@ -31,6 +31,15 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     alerts: 'Alerts',
     widgets: 'Widgets',
     customization: 'Customization',
+    interface_configuration: 'Interface Change',
+    report_all: 'All Reports',
+    report_area: 'Area',
+    report_service: 'Service',
+    report_contract: 'Contract',
+    report_budget: 'Budget',
+    report_finance: 'Finance',
+    report_collection: 'Collection',
+    report_interface: 'Interface',
 
     // --- Sub-menu Items ---
     view_all_areas: 'View All Areas',
@@ -205,6 +214,15 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     alerts: 'การแจ้งเตือน',
     widgets: 'วิดเจ็ต',
     customization: 'การปรับแต่ง',
+    interface_configuration: 'ปรับหน้าตาอินเทอร์เฟซ',
+    report_all: 'รายงานทั้งหมด',
+    report_area: 'พื้นที่',
+    report_service: 'บริการ',
+    report_contract: 'สัญญา',
+    report_budget: 'งบประมาณ',
+    report_finance: 'การเงิน',
+    report_collection: 'การจัดเก็บ',
+    report_interface: 'อินเทอร์เฟซ',
 
     // --- Sub-menu Items ---
     view_all_areas: 'ดูพื้นที่ทั้งหมด',
@@ -379,6 +397,15 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     alerts: '警报',
     widgets: '小部件',
     customization: '自定义',
+    interface_configuration: '界面设置',
+    report_all: '全部报告',
+    report_area: '区域',
+    report_service: '服务',
+    report_contract: '合同',
+    report_budget: '预算',
+    report_finance: '财务',
+    report_collection: '收款',
+    report_interface: '接口',
 
     // --- Sub-menu Items ---
     view_all_areas: '查看所有区域',

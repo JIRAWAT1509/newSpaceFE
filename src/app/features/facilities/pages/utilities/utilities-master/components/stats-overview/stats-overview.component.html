@@ -1,0 +1,45 @@
+<!-- stats-overview.component.html -->
+
+<div class="stats-section">
+  <h2 class="section-title">Dashboard Overview</h2>
+
+  <div class="stats-grid">
+    @for (card of statCards(); track card.label) {
+      <div
+        class="stat-card"
+        [ngClass]="'stat-card--' + card.tone"
+      >
+        <!-- Decorative Background -->
+        <div class="stat-card-bg"></div>
+
+        <!-- Icon -->
+        <div class="stat-icon">
+          <i class="pi" [ngClass]="card.icon"></i>
+        </div>
+
+        <!-- Value -->
+        <div class="stat-value">
+          {{ card.value }}
+          @if (card.unit) {
+            <span class="stat-unit">{{ card.unit }}</span>
+          }
+        </div>
+
+        <!-- Label -->
+        <div class="stat-label">{{ card.label }}</div>
+
+        <!-- Change Badge -->
+        <div
+          class="stat-change"
+          [ngClass]="card.change > 0 ? 'stat-change--positive' : 'stat-change--negative'"
+        >
+          <i class="pi" [ngClass]="getChangeIcon(card.change)"></i>
+          <span>{{ card.change > 0 ? '+' : '' }}{{ card.change }}%</span>
+        </div>
+
+        <!-- Change Label -->
+        <div class="stat-change-label">{{ card.changeLabel }}</div>
+      </div>
+    }
+  </div>
+</div>

@@ -162,13 +162,13 @@ export function formatAreaSize(sqm: number): string {
  */
 export function getStatusColor(status: string): string {
   const colorMap: { [key: string]: string } = {
-    'unallocated': '#FF6384',
-    'quotation': '#4CA3FF',
-    'leased': '#FFD05F',
-    'vacant': '#80E08E',
-    'inactive': '#9CA3AF'
+    'unallocated': 'rgb(var(--danger))',
+    'quotation': 'rgb(var(--info))',
+    'leased': 'rgb(var(--warning))',
+    'vacant': 'rgb(var(--success))',
+    'inactive': 'rgb(var(--muted))'
   };
-  return colorMap[status] || '#9CA3AF';
+  return colorMap[status] || 'rgb(var(--muted))';
 }
 
 /**

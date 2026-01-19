@@ -277,64 +277,45 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   {
     primary_content: 'report_dashboard',
     secondary_content: [
-      // --- REPORTS SECTION ---
       {
-        name: 'budget_reports',
-        icon: 'assets/icons/briefcase-outline.svg',
-        sub: [
-          { name: 'revenue_details_main', route: '/reports/budget/revenue-main' },
-          { name: 'revenue_details_discount', route: '/reports/budget/revenue-discount' },
-          { name: 'revenue_details_other', route: '/reports/budget/revenue-other' },
-          { name: 'salable_area_report', route: '/reports/budget/salable-area' },
-          { name: 'revenue_vs_budget_actual', route: '/reports/budget/vs-budget-actual' },
-          { name: 'revenue_vs_budget_income', route: '/reports/budget/vs-budget-income' }
-        ]
-      },
-      {
-        name: 'interface_reports',
-        icon: 'assets/icons/business-outline.svg',
-        sub: [
-          { name: 'monthly_billing_summary', route: '/reports/interface/monthly-billing' },
-          { name: 'interface_logs', route: '/reports/interface/logs' }
-        ]
-      },
-
-      // --- DASHBOARD SECTION ---
-      {
-        name: 'dashboard_executive',
+        name: 'report_all',
         icon: 'assets/icons/clipboard-outline.svg',
-        sub: [
-          { name: 'receive_tracking', route: '/dashboard/executive/receive-tracking' },
-          { name: 'receive_tracking_exhibition', route: '/dashboard/executive/exhibition' },
-          { name: 'guarantee_info', route: '/dashboard/executive/guarantee' },
-          { name: 'expire_list', route: '/dashboard/executive/expire' },
-          { name: 'pending_contracts', route: '/dashboard/executive/pending' }
-        ]
+        route: '/reports'
       },
       {
-        name: 'dashboard_sales',
-        icon: 'assets/icons/business-outline.svg',
-        sub: [
-          { name: 'sales_and_traffic', route: '/dashboard/sales/traffic' },
-          { name: 'data_projection', route: '/dashboard/sales/projection' }
-        ]
-      },
-      {
-        name: 'dashboard_finance',
+        name: 'report_area',
         icon: 'assets/icons/briefcase-outline.svg',
-        sub: [
-          { name: 'receive_tracking_order', route: '/dashboard/finance/receive-order' },
-          { name: 'receive_tracking_group', route: '/dashboard/finance/receive-group' },
-          { name: 'invoice_delivery_summary', route: '/dashboard/finance/invoice-delivery' }
-        ]
+        route: '/reports/category/area'
       },
       {
-        name: 'dashboard_operation',
+        name: 'report_service',
+        icon: 'assets/icons/business-outline.svg',
+        route: '/reports/category/service'
+      },
+      {
+        name: 'report_contract',
         icon: 'assets/icons/clipboard-outline.svg',
-        sub: [
-          { name: 'export_query_to_file', route: '/dashboard/operation/export-query' },
-          { name: 'operational_tools', route: '/dashboard/operation/tools' }
-        ]
+        route: '/reports/category/contract'
+      },
+      {
+        name: 'report_budget',
+        icon: 'assets/icons/briefcase-outline.svg',
+        route: '/reports/category/budget'
+      },
+      {
+        name: 'report_finance',
+        icon: 'assets/icons/business-outline.svg',
+        route: '/reports/category/finance'
+      },
+      {
+        name: 'report_collection',
+        icon: 'assets/icons/clipboard-outline.svg',
+        route: '/reports/category/collection'
+      },
+      {
+        name: 'report_interface',
+        icon: 'assets/icons/business-outline.svg',
+        route: '/reports/category/interface'
       }
     ]
   },
