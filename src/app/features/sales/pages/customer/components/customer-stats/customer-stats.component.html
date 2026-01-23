@@ -1,0 +1,62 @@
+<!-- customer-stats.component.html -->
+
+<div class="stats-grid">
+
+  <!-- Total Customers -->
+  <div class="stat-card">
+    <div class="stat-icon blue">
+      <i class="pi pi-users"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-label">Total Customers</div>
+      <div class="stat-value">{{ stats().totalCustomers }}</div>
+      <div class="stat-sublabel">รวมลูกค้าทั้งหมด</div>
+    </div>
+  </div>
+
+  <!-- Average CSAT -->
+  <div class="stat-card">
+    <div class="stat-icon green">
+      <i class="pi pi-star-fill"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-label">Average CSAT</div>
+      <div class="stat-value">{{ stats().averageCSAT.toFixed(1) }}<span class="stat-unit">/5.0</span></div>
+      <div class="stat-trend" [class.positive]="isPositiveTrend(stats().csatTrend)" [class.negative]="!isPositiveTrend(stats().csatTrend)">
+        <i class="pi" [ngClass]="isPositiveTrend(stats().csatTrend) ? 'pi-arrow-up' : 'pi-arrow-down'"></i>
+        <span>{{ formatTrend(stats().csatTrend) }} vs last month</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Churn Rate -->
+  <div class="stat-card">
+    <div class="stat-icon orange">
+      <i class="pi pi-exclamation-triangle"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-label">Churn Rate</div>
+      <div class="stat-value">{{ stats().churnRate.toFixed(1) }}<span class="stat-unit">%</span></div>
+      <div class="stat-trend" [class.positive]="!isPositiveTrend(stats().churnTrend)" [class.negative]="isPositiveTrend(stats().churnTrend)">
+        <i class="pi" [ngClass]="!isPositiveTrend(stats().churnTrend) ? 'pi-arrow-down' : 'pi-arrow-up'"></i>
+        <span>{{ formatTrend(stats().churnTrend) }} vs last period</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Deals -->
+  <div class="stat-card">
+    <div class="stat-icon purple">
+      <i class="pi pi-briefcase"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-label">Active Deals</div>
+      <div class="stat-value">{{ stats().activeDeals }}</div>
+      <div class="stat-trend" [class.positive]="isPositiveTrend(stats().dealsTrend)" [class.negative]="!isPositiveTrend(stats().dealsTrend)">
+        <i class="pi" [ngClass]="isPositiveTrend(stats().dealsTrend) ? 'pi-arrow-up' : 'pi-arrow-down'"></i>
+        <span>{{ formatTrend(stats().dealsTrend) }} vs last month</span>
+      </div>
+    </div>
+  </div>
+
+</div>

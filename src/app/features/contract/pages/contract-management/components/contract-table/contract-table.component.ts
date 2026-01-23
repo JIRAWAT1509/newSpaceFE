@@ -1,4 +1,4 @@
-// contract-table.component.ts - UPDATED with shared state
+// contract-table.component.ts - WITH EDIT MODE INTEGRATED
 import { Component, input, output, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,11 +6,12 @@ import { Contract, CONTRACT_STATUS_LABELS } from '@core/models/contract.model';
 import { SearchFilter, SavedSearch, SearchFieldType, SEARCH_FIELD_CONFIG } from '@core/models/contract-search.model';
 import { fromDateString } from '@core/utils/date-utils';
 import { AdvanceSearchModalComponent } from '../advance-search-modal/advance-search-modal.component';
+import { AddContractModalComponent } from '../add-contract-modal/add-contract-modal.component';
 
 @Component({
   selector: 'app-contract-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, AdvanceSearchModalComponent],
+  imports: [CommonModule, FormsModule, AdvanceSearchModalComponent, AddContractModalComponent],
   templateUrl: './contract-table.component.html',
   styleUrl: './contract-table.component.css'
 })
@@ -49,9 +50,11 @@ export class ContractTableComponent {
   // Selection
   selectedIds = signal<string[]>([]);
 
-  // UI State
+  // UI State - UPDATED FOR EDIT MODE
   showAdvanceSearchModal = signal<boolean>(false);
   showAddModal = signal<boolean>(false);
+  modalMode = signal<'add' | 'edit'>('add');
+  selectedContract = signal<Contract | null>(null);
   showBulkActions = false;
   activeRowMenu = signal<string | null>(null);
 
@@ -107,7 +110,6 @@ export class ContractTableComponent {
           }
           break;
         case 'AREA_ID':
-          // NEW: Filter by area ID
           contracts = contracts.filter(c =>
             c.AREA_ID.toLowerCase().includes((filter.value as string).toLowerCase())
           );
@@ -151,7 +153,6 @@ export class ContractTableComponent {
   // ==================== SEARCH ====================
 
   onSimpleSearch(): void {
-    // Emit to parent for cross-tab sync
     this.searchTextChange.emit(this.simpleSearchText());
   }
 
@@ -170,25 +171,25 @@ export class ContractTableComponent {
 
   onFiltersChange(filters: SearchFilter[]): void {
     this.activeFilters.set(filters);
-    this.filtersChange.emit(filters); // Emit to parent for cross-tab sync
+    this.filtersChange.emit(filters);
   }
 
   removeFilter(id: string): void {
     const updated = this.activeFilters().filter(f => f.id !== id);
     this.activeFilters.set(updated);
-    this.filtersChange.emit(updated); // Emit to parent
+    this.filtersChange.emit(updated);
   }
 
   clearAllFilters(): void {
     this.activeFilters.set([]);
     this.simpleSearchText.set('');
-    this.filtersChange.emit([]); // Emit to parent
+    this.filtersChange.emit([]);
     this.searchTextChange.emit('');
   }
 
   applyBookmark(bookmark: SavedSearch): void {
     this.activeFilters.set([...bookmark.filters]);
-    this.filtersChange.emit([...bookmark.filters]); // Emit to parent
+    this.filtersChange.emit([...bookmark.filters]);
   }
 
   getFieldLabel(field: SearchFieldType): string {
@@ -226,7 +227,7 @@ export class ContractTableComponent {
     return this.selectedIds().includes(id);
   }
 
-  // ==================== ACTIONS ====================
+  // ==================== ACTIONS - UPDATED WITH EDIT MODE ====================
 
   onBulkAction(action: string): void {
     console.log('Bulk action:', action, 'on', this.selectedIds());
@@ -241,21 +242,62 @@ export class ContractTableComponent {
   onRowAction(action: string, contract: Contract): void {
     console.log('Row action:', action, 'on', contract.CONTRACT_ID);
     this.activeRowMenu.set(null);
-    alert(`${action} for ${contract.CONTRACT_NUMBER}`);
+
+    switch (action) {
+      case 'edit':
+        this.openEditModal(contract);
+        break;
+      case 'copy-booking':
+        alert(`คัดลอกสัญญาเช่าไปเป็นสัญญาจอง: ${contract.CONTRACT_NUMBER}`);
+        break;
+      case 'copy-quotation':
+        alert(`คัดลอกสัญญาเช่าไปเป็นใบเสนอราคา: ${contract.CONTRACT_NUMBER}`);
+        break;
+      case 'addendum':
+        alert(`ยกเลิกสัญญา + addendum: ${contract.CONTRACT_NUMBER}`);
+        break;
+      default:
+        alert(`${action} for ${contract.CONTRACT_NUMBER}`);
+    }
   }
 
   openAddModal(): void {
+    this.modalMode.set('add');
+    this.selectedContract.set(null);
+    this.showAddModal.set(true);
+  }
+
+  openEditModal(contract: Contract): void {
+    this.modalMode.set('edit');
+    this.selectedContract.set(contract);
     this.showAddModal.set(true);
   }
 
   closeAddModal(): void {
     this.showAddModal.set(false);
+    this.modalMode.set('add');
+    this.selectedContract.set(null);
   }
 
-  saveNewContract(): void {
-    console.log('Saving new contract...');
+  saveNewContract(formData: any): void {
+    const mode = formData.mode || 'add';
+
+    if (mode === 'edit') {
+      console.log('Updating contract:', formData.contractId, formData);
+      alert(`สัญญาถูกแก้ไขเรียบร้อยแล้ว!\nเลขที่สัญญา: ${formData.contractId}`);
+    } else {
+      console.log('Creating new contract:', formData);
+      alert(`สัญญาใหม่ถูกบันทึกแล้ว!`);
+    }
+
     this.closeAddModal();
-    alert('Contract saved! (placeholder)');
+
+    // TODO: Call API to save/update contract
+    // if (mode === 'edit') {
+    //   this.contractService.updateContract(formData).subscribe(...)
+    // } else {
+    //   this.contractService.createContract(formData).subscribe(...)
+    // }
   }
 
   // ==================== HELPERS ====================

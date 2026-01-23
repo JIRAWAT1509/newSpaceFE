@@ -1,0 +1,172 @@
+/* decoration-tab.component.css */
+
+.decoration-wrapper {
+  @apply space-y-6;
+}
+
+/* ==================== PROGRESS INDICATOR ==================== */
+.progress-indicator {
+  @apply mb-6 p-4 bg-white rounded-lg;
+}
+
+.progress-steps {
+  @apply flex items-center justify-between gap-2;
+}
+
+.progress-step {
+  @apply flex items-center gap-3 cursor-pointer transition-all flex-shrink-0;
+}
+
+.step-circle {
+  @apply w-16 h-16 rounded-full flex items-center justify-center;
+  @apply bg-gray-300 text-white font-bold text-lg transition-all;
+}
+
+.progress-step.completed .step-circle {
+  @apply bg-green-600;
+}
+
+.step-info {
+  @apply flex flex-col;
+}
+
+.step-name {
+  @apply text-sm font-semibold text-gray-700 whitespace-nowrap;
+}
+
+.step-progress {
+  @apply text-xs text-gray-500;
+}
+
+.step-arrow {
+  @apply text-2xl text-gray-400 mx-2;
+}
+
+.step-number {
+  @apply text-xl;
+}
+
+/* ==================== FORM SECTIONS ==================== */
+.form-section {
+  @apply bg-white border border-gray-200 rounded-lg p-6 space-y-4;
+}
+
+.section-header {
+  @apply flex items-center justify-between mb-4 pb-2 border-b-2 border-blue-600;
+}
+
+.section-header h4 {
+  @apply text-lg font-bold text-gray-900;
+}
+
+.header-info {
+  @apply flex items-center gap-3;
+}
+
+/* ==================== FORM GRID ==================== */
+.form-grid-3 {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.form-group.span-2 {
+  @apply md:col-span-2;
+}
+
+.form-group.span-3 {
+  @apply md:col-span-3;
+}
+
+.form-group label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+/* ==================== CHECKBOX ==================== */
+.checkbox-field {
+  @apply mb-4;
+}
+
+.checkbox-label {
+  @apply flex items-center gap-2 cursor-pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  @apply w-4 h-4;
+}
+
+.checkbox-label span {
+  @apply text-sm font-medium text-gray-700;
+}
+
+/* ==================== SPECIAL INPUTS ==================== */
+.time-range-inputs {
+  @apply flex items-center gap-2;
+}
+
+.time-range-inputs input {
+  flex: 1 1 0%;
+}
+
+.time-range-inputs .separator {
+  @apply text-sm text-gray-600 px-2;
+}
+
+.dual-input {
+  @apply flex items-center gap-2;
+}
+
+.dual-input input {
+  flex: 1 1 0%;
+}
+
+/* ==================== RADIO GROUP ==================== */
+.radio-group {
+  @apply flex items-center gap-4;
+}
+
+.radio-label {
+  @apply flex items-center gap-2 cursor-pointer;
+}
+
+.radio-label input[type="radio"] {
+  @apply w-4 h-4;
+}
+
+.radio-label span {
+  @apply text-sm text-gray-700;
+}
+
+/* ==================== TABLE ==================== */
+.table-wrapper {
+  @apply overflow-x-auto border border-gray-200 rounded;
+}
+
+.data-table {
+  @apply w-full;
+}
+
+.data-table thead {
+  @apply bg-blue-600 text-white;
+}
+
+.data-table th {
+  @apply px-4 py-3 text-left text-sm font-semibold whitespace-nowrap;
+}
+
+.data-table td {
+  @apply px-4 py-2 border-b border-gray-200;
+}
+
+.data-table tbody tr:hover {
+  @apply bg-gray-50;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .form-grid-3 {
+    @apply grid-cols-1;
+  }
+}

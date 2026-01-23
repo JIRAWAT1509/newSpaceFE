@@ -1,0 +1,173 @@
+<!-- conditions-tab.component.html -->
+
+<div class="conditions-wrapper">
+
+  <!-- Progress Indicator -->
+  <div class="progress-indicator">
+    <div class="progress-steps">
+      @for (section of sections; track section.id; let i = $index) {
+        <div
+          class="progress-step"
+          [class.completed]="isSectionCompleted(section.id)"
+          (click)="scrollToSection(section.id)"
+        >
+          <div class="step-circle">
+            @if (isSectionCompleted(section.id)) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span class="step-number">{{ i + 1 }}</span>
+            }
+          </div>
+          <div class="step-info">
+            <div class="step-name">{{ section.name }}</div>
+            <div class="step-progress">{{ getSectionProgress(section.id) }}%</div>
+          </div>
+          @if (i < sections.length - 1) {
+            <div class="step-arrow">→</div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <form [formGroup]="form">
+
+    <!-- Section 1: เรื่อง -->
+    <div class="form-section" id="section-subject">
+      <div class="section-header">
+        <h4>เรื่อง</h4>
+      </div>
+
+      <div class="form-group">
+        <textarea
+          pInputTextarea
+          formControlName="subject"
+          rows="4"
+          class="w-full"
+          placeholder="กรอกเรื่อง..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Section 2: เงื่อนไขตามสัญญา -->
+    <div class="form-section" id="section-contract-conditions">
+      <div class="section-header">
+        <h4>เงื่อนไขตามสัญญา</h4>
+        <button type="button" class="btn-add" (click)="openConditionDrawer()">
+          <i class="pi pi-plus"></i>
+          <span>เพิ่ม</span>
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 80px;">ข้อที่</th>
+              <th style="width: 250px;">หัวข้อ</th>
+              <th>เนื้อหา</th>
+              <th style="width: 100px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (condition of conditionList(); track $index) {
+              <tr>
+                <td class="text-center">{{ condition.itemNumber }}</td>
+                <td>{{ condition.title }}</td>
+                <td>
+                  <div class="content-preview">{{ condition.content }}</div>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button type="button" class="btn-icon-edit" (click)="editCondition($index)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button type="button" class="btn-icon-delete" (click)="removeCondition($index)">
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="text-center py-4 text-gray-500">No records to display.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 3: บันทึกภายใน -->
+    <div class="form-section" id="section-internal-notes">
+      <div class="section-header">
+        <h4>บันทึกภายใน</h4>
+      </div>
+
+      <div class="form-group">
+        <textarea
+          pInputTextarea
+          formControlName="internalNotes"
+          rows="6"
+          class="w-full"
+          placeholder="กรอกบันทึกภายใน..."
+        ></textarea>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- Condition Drawer (Add/Edit) -->
+@if (showConditionDrawer()) {
+  <div class="drawer-backdrop" (click)="closeDrawer()">
+    <div class="drawer-panel" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <h3>{{ editingIndex() !== null ? 'แก้ไขเงื่อนไข' : 'เพิ่มเงื่อนไข' }}</h3>
+        <button class="drawer-close" (click)="closeDrawer()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <form [formGroup]="conditionForm">
+          <div class="form-group required">
+            <label>ข้อที่</label>
+            <input
+              type="number"
+              pInputText
+              formControlName="itemNumber"
+              class="w-full"
+              min="1"
+            />
+          </div>
+
+          <div class="form-group required">
+            <label>หัวข้อ</label>
+            <input
+              type="text"
+              pInputText
+              formControlName="title"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-group required">
+            <label>เนื้อหา</label>
+            <textarea
+              pInputTextarea
+              formControlName="content"
+              rows="10"
+              class="w-full"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="drawer-footer">
+        <button type="button" class="btn-secondary" (click)="closeDrawer()">ยกเลิก</button>
+        <button type="button" class="btn-primary" (click)="saveCondition()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+}

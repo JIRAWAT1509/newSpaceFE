@@ -61,50 +61,52 @@ export class AreaContractListTabComponent {
     { label: CONTRACT_TYPE_LABELS.QUOTATION_AGREEMENT.TH, value: 'QUOTATION_AGREEMENT' }
   ];
 
-  // Computed
-  contracts = computed<Contract[]>(() => {
-    return getContractsByAreaId(this.areaId());
+  // Computed - Load contracts for this area
+  contracts = computed(() => {
+    const areaId = this.areaId();
+    return getContractsByAreaId(areaId);
   });
 
-  filteredContracts = computed<Contract[]>(() => {
-    let contracts = [...this.contracts()];
+  // Computed - Filter and sort contracts
+  filteredContracts = computed(() => {
+    let contractList = [...this.contracts()];
 
     // Apply status filter
     const status = this.filterStatus();
     if (status) {
-      contracts = contracts.filter(c => c.STATUS === status);
+      contractList = contractList.filter(c => c.STATUS === status);
     }
 
     // Apply type filter
     const type = this.filterType();
     if (type) {
-      contracts = contracts.filter(c => c.CONTRACT_TYPE === type);
+      contractList = contractList.filter(c => c.CONTRACT_TYPE === type);
     }
 
     // Apply sorting
     const sort = this.sortBy();
     switch (sort) {
       case 'date-desc':
-        contracts.sort((a, b) => this.getTimestamp(b.ISSUE_DATE) - this.getTimestamp(a.ISSUE_DATE));
+        contractList.sort((a, b) => this.getTimestamp(b.ISSUE_DATE) - this.getTimestamp(a.ISSUE_DATE));
         break;
       case 'date-asc':
-        contracts.sort((a, b) => this.getTimestamp(a.ISSUE_DATE) - this.getTimestamp(b.ISSUE_DATE));
+        contractList.sort((a, b) => this.getTimestamp(a.ISSUE_DATE) - this.getTimestamp(b.ISSUE_DATE));
         break;
       case 'expiry-asc':
-        contracts.sort((a, b) => this.getTimestamp(a.EXPIRY_DATE) - this.getTimestamp(b.EXPIRY_DATE));
+        contractList.sort((a, b) => this.getTimestamp(a.EXPIRY_DATE) - this.getTimestamp(b.EXPIRY_DATE));
         break;
       case 'expiry-desc':
-        contracts.sort((a, b) => this.getTimestamp(b.EXPIRY_DATE) - this.getTimestamp(a.EXPIRY_DATE));
+        contractList.sort((a, b) => this.getTimestamp(b.EXPIRY_DATE) - this.getTimestamp(a.EXPIRY_DATE));
         break;
       case 'value-desc':
-        contracts.sort((a, b) => (b.TOTAL_VALUE || 0) - (a.TOTAL_VALUE || 0));
+        contractList.sort((a, b) => (b.TOTAL_VALUE || 0) - (a.TOTAL_VALUE || 0));
         break;
       case 'value-asc':
-        contracts.sort((a, b) => (a.TOTAL_VALUE || 0) - (b.TOTAL_VALUE || 0));
+        contractList.sort((a, b) => (a.TOTAL_VALUE || 0) - (b.TOTAL_VALUE || 0));
         break;
     }
 
-    return contracts;
+    return contractList;
   });
 
   // ==================== ACTIONS ====================

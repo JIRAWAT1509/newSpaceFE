@@ -1,0 +1,170 @@
+/* customer-filters.component.css */
+
+.filters-container {
+  width: 100%;
+}
+
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filter-item {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.filter-item.search-filter {
+  flex: 1 1 200px;
+  max-width: 300px;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Clear button */
+.btn-clear-filters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-clear-filters:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+/* Custom filter option styles */
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.class-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* PrimeNG MultiSelect Override - Compact */
+::ng-deep .compact-select.p-multiselect {
+  min-width: 150px;
+  max-width: 200px;
+}
+
+::ng-deep .p-multiselect {
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  transition: all 0.2s;
+  height: 36px;
+}
+
+::ng-deep .p-multiselect:not(.p-disabled):hover {
+  border-color: #d1d5db;
+}
+
+::ng-deep .p-multiselect:not(.p-disabled).p-focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+::ng-deep .p-multiselect .p-multiselect-label {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .filter-item.search-filter {
+    flex: 1 1 150px;
+    max-width: 250px;
+  }
+
+  ::ng-deep .compact-select.p-multiselect {
+    min-width: 130px;
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 992px) {
+  .filters-row {
+    gap: 0.5rem;
+  }
+
+  .filter-item.search-filter {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters-row {
+    flex-wrap: wrap;
+  }
+
+  .filter-item {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 120px;
+  }
+
+  .filter-item.search-filter {
+    flex: 1 1 100%;
+  }
+
+  ::ng-deep .compact-select.p-multiselect {
+    min-width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .filter-item {
+    flex: 1 1 100%;
+  }
+}

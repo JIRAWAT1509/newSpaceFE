@@ -1,0 +1,91 @@
+<!-- customer-filters.component.html -->
+
+<div class="filters-container">
+
+  <div class="filters-row">
+
+    <!-- Search -->
+    <div class="filter-item search-filter">
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="ค้นหา..."
+        class="filter-input"
+      />
+    </div>
+
+    <!-- Class Filter -->
+    <div class="filter-item">
+      <p-multiselect
+        [options]="classOptions"
+        [(ngModel)]="selectedClasses"
+        (onChange)="onClassChange($event)"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Class"
+        [showClear]="true"
+        styleClass="w-full compact-select"
+      >
+        <ng-template let-option pTemplate="item">
+          <div class="filter-option">
+            <span
+              class="class-badge"
+              [style.background-color]="option.bgColor"
+              [style.color]="option.color"
+            >
+              {{ option.value }}
+            </span>
+          </div>
+        </ng-template>
+      </p-multiselect>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="filter-item">
+      <p-multiselect
+        [options]="statusOptions"
+        [(ngModel)]="selectedStatuses"
+        (onChange)="onStatusChange($event)"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Status"
+        [showClear]="true"
+        styleClass="w-full compact-select"
+      ></p-multiselect>
+    </div>
+
+    <!-- Segment Filter -->
+    <div class="filter-item">
+      <p-multiselect
+        [options]="availableSegments()"
+        [(ngModel)]="selectedSegments"
+        (onChange)="onSegmentChange($event)"
+        placeholder="Segment"
+        [showClear]="true"
+        styleClass="w-full compact-select"
+      ></p-multiselect>
+    </div>
+
+    <!-- Owner Filter -->
+    <div class="filter-item">
+      <p-multiselect
+        [options]="uniqueOwners()"
+        [(ngModel)]="selectedOwners"
+        (onChange)="onOwnerChange($event)"
+        placeholder="Owner"
+        [showClear]="true"
+        styleClass="w-full compact-select"
+      ></p-multiselect>
+    </div>
+
+    <!-- Clear Button -->
+    @if (hasActiveFilters()) {
+      <button class="btn-clear-filters" (click)="onClearFilters()">
+        <i class="pi pi-times"></i>
+      </button>
+    }
+
+  </div>
+
+</div>

@@ -1,0 +1,34 @@
+<!-- contract-detail-tab.component.html -->
+
+<div class="contract-detail-wrapper">
+  <!-- Sub-Tab Navigation -->
+  <div class="sub-tab-navigation">
+    <button
+      *ngFor="let subTab of subTabs; let i = index"
+      class="sub-tab-btn"
+      [class.active]="activeSubTabIndex() === i"
+      (click)="switchSubTab(i)"
+    >
+      {{ subTab.label }}
+    </button>
+  </div>
+
+  <!-- Sub-Tab Content -->
+  <div class="sub-tab-content">
+    @if (activeSubTabIndex() === 0) {
+      <app-contract-info-tab />
+    }
+
+    @if (activeSubTabIndex() === 1) {
+      <app-revenue-tab />
+    }
+
+    @if (activeSubTabIndex() === 2) {
+      <app-insurance-tab />
+    }
+
+    @if (activeSubTabIndex() === 3) {
+      <app-decoration-tab />
+    }
+  </div>
+</div>

@@ -1,4 +1,4 @@
-<!-- contract-table.component.html -->
+<!-- contract-table.component.html - WITH EDIT MODE INTEGRATED -->
 
 <div class="contract-table-container">
   <!-- Search Section -->
@@ -210,23 +210,12 @@
   />
 }
 
-<!-- Add Contract Modal (Placeholder) -->
+<!-- Add/Edit Contract Modal - UPDATED WITH EDIT MODE SUPPORT -->
 @if (showAddModal()) {
-  <div class="modal-backdrop" (click)="closeAddModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Add New Contract</h3>
-        <button class="modal-close" (click)="closeAddModal()">
-          <i class="pi pi-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Form fields will be added here...</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" (click)="closeAddModal()">Cancel</button>
-        <button class="btn-primary" (click)="saveNewContract()">Save</button>
-      </div>
-    </div>
-  </div>
+  <app-add-contract-modal
+    [mode]="modalMode()"
+    [contractData]="selectedContract()"
+    (close)="closeAddModal()"
+    (save)="saveNewContract($event)"
+  />
 }

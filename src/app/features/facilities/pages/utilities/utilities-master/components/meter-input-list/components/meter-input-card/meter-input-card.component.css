@@ -1,0 +1,322 @@
+/* meter-input-card.component.css - FINAL CORRECTED */
+
+/* ==================== COMPACT MODE (Default: 250px x 200px) ==================== */
+.meter-card.compact {
+  @apply relative bg-white rounded-xl p-4 border-2 border-gray-200;
+  @apply transition-all duration-300 cursor-pointer;
+  @apply flex flex-col gap-3;
+  width: 250px;
+  height: 200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.meter-card.compact:hover {
+  @apply border-blue-400 shadow-lg -translate-y-1;
+}
+
+.compact-icon {
+  @apply w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.compact-header {
+  @apply flex flex-col gap-1;
+}
+
+.meter-type-label {
+  @apply font-bold text-gray-800 text-sm;
+}
+
+.meter-number {
+  @apply text-xs text-gray-600;
+}
+
+.compact-stats {
+  @apply grid grid-cols-2 gap-2;
+}
+
+.compact-stat {
+  @apply flex flex-col;
+}
+
+.compact-stat .stat-label {
+  @apply text-xs text-gray-500;
+}
+
+.compact-stat .stat-value {
+  @apply text-sm font-bold text-gray-800;
+}
+
+.compact-stat .stat-value.positive {
+  @apply text-red-600;
+}
+
+/* ==================== NORMAL MODE (Expanded: 500px x 400px) ==================== */
+.meter-card.normal {
+  @apply relative bg-white rounded-xl p-6 border-2 border-gray-200;
+  @apply transition-all duration-300 cursor-pointer;
+  width: 500px;
+  min-height: 400px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.meter-card.normal:hover {
+  @apply border-blue-300;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.meter-card.success {
+  @apply border-green-500;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  animation: successPulse 0.5s ease;
+}
+
+.meter-card.editing {
+  @apply border-yellow-500;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+@keyframes successPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* Card Header */
+.meter-header {
+  @apply flex items-center justify-between mb-4 pb-4 border-b border-gray-200;
+}
+
+.meter-type {
+  @apply flex items-center gap-3;
+}
+
+.meter-icon {
+  @apply w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.meter-info {
+  @apply flex flex-col;
+}
+
+.room-number {
+  @apply font-bold text-gray-800 text-lg;
+}
+
+.tenant-name {
+  @apply text-sm text-gray-600;
+}
+
+.settings-btn {
+  @apply w-10 h-10 flex items-center justify-center;
+  @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50;
+  @apply rounded-lg transition-all duration-200;
+  @apply border-none cursor-pointer;
+}
+
+/* Meter Details */
+.meter-details {
+  @apply mb-4 space-y-2;
+}
+
+.detail-row {
+  @apply flex gap-4;
+}
+
+.detail-item {
+  @apply flex flex-col gap-1 flex-1;
+}
+
+.detail-label {
+  @apply text-xs text-gray-500 font-medium;
+}
+
+.detail-value {
+  @apply text-sm font-semibold text-gray-800;
+}
+
+.detail-value.highlight {
+  @apply text-lg text-blue-600;
+}
+
+.detail-value.positive {
+  @apply text-red-600;
+}
+
+/* Completed Info */
+.completed-info {
+  @apply mb-4;
+}
+
+/* Input Section */
+.input-section {
+  @apply space-y-3;
+}
+
+.input-label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.required {
+  @apply text-red-500;
+}
+
+/* Input Group */
+.input-group {
+  @apply flex gap-2;
+}
+
+input[type="number"] {
+  @apply flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg;
+  @apply transition-all duration-200;
+}
+
+input:focus {
+  @apply outline-none border-blue-500;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+input.error {
+  @apply border-red-500;
+}
+
+input.error:focus {
+  @apply border-red-500;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+input.success {
+  @apply border-green-500 bg-green-50;
+}
+
+input:disabled {
+  @apply bg-gray-100 cursor-not-allowed;
+}
+
+/* Save Button */
+.save-btn {
+  @apply flex items-center gap-2 px-6 py-3;
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg;
+  @apply transition-all duration-200 border-none cursor-pointer;
+  white-space: nowrap;
+}
+
+.save-btn:disabled {
+  @apply bg-gray-400 cursor-not-allowed;
+}
+
+.save-btn.saving {
+  @apply bg-yellow-500;
+}
+
+.save-btn.success {
+  @apply bg-green-600;
+}
+
+.save-btn.secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
+}
+
+.save-btn i {
+  @apply text-lg;
+}
+
+/* Expected Range */
+.expected-range {
+  @apply flex items-center gap-2 text-xs text-gray-600;
+  @apply bg-blue-50 px-3 py-2 rounded-lg;
+}
+
+.expected-range.warning {
+  @apply bg-yellow-50 text-yellow-700;
+}
+
+.expected-range.warning i {
+  @apply text-yellow-600;
+}
+
+/* Error Message */
+.error-message {
+  @apply flex items-center gap-2 text-sm text-red-600;
+  @apply bg-red-50 px-3 py-2 rounded-lg;
+}
+
+/* Photo Section */
+.photo-section {
+  @apply mt-4 space-y-3;
+}
+
+.photo-label {
+  @apply font-medium text-sm text-gray-700;
+}
+
+.photo-grid {
+  @apply flex gap-3 flex-wrap;
+}
+
+.photo-item {
+  @apply relative w-24 h-24 rounded-lg overflow-hidden border-2 border-gray-200;
+}
+
+.photo-item img {
+  @apply w-full h-full object-cover;
+}
+
+.remove-photo {
+  @apply absolute top-1 right-1 w-6 h-6;
+  @apply bg-red-600 hover:bg-red-700 text-white rounded-full;
+  @apply flex items-center justify-center;
+  @apply border-none cursor-pointer;
+  @apply transition-all duration-200;
+}
+
+.photo-upload-btn {
+  @apply w-24 h-24 rounded-lg border-2 border-dashed border-gray-300;
+  @apply flex items-center justify-center;
+  @apply text-gray-400 hover:text-blue-600 hover:border-blue-600;
+  @apply transition-all duration-200;
+  @apply bg-gray-50 hover:bg-blue-50 cursor-pointer;
+}
+
+.photo-upload-btn.camera {
+  @apply bg-blue-900 text-white hover:bg-blue-800;
+  @apply border-solid border-blue-900;
+}
+
+.photo-upload-btn i {
+  @apply text-3xl;
+}
+
+/* Status Badge */
+.status-badge {
+  @apply absolute top-4 right-4;
+  @apply flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-badge.pending {
+  @apply bg-yellow-100 text-yellow-700;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .meter-card.compact {
+    width: 100%;
+  }
+
+  .meter-card.normal {
+    width: 100%;
+    min-height: 400px;
+  }
+
+  .input-group {
+    @apply flex-col;
+  }
+
+  .save-btn {
+    @apply w-full justify-center;
+  }
+
+  .detail-row {
+    @apply flex-col gap-2;
+  }
+}

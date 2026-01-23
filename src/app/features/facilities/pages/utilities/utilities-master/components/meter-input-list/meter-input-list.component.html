@@ -1,0 +1,121 @@
+<!-- meter-input-list.component.html - FINAL CORRECTED -->
+
+<div class="input-list-container">
+  <!-- Header Stats -->
+  <div class="header-stats">
+    <div class="stat-item">
+      <i class="pi pi-th-large"></i>
+      <div>
+        <div class="stat-value">{{ totalMeters() }}</div>
+        <div class="stat-label">Total Meters</div>
+      </div>
+    </div>
+
+    <div class="stat-item warning">
+      <i class="pi pi-clock"></i>
+      <div>
+        <div class="stat-value">{{ pendingMeters() }}</div>
+        <div class="stat-label">Pending Readings</div>
+      </div>
+    </div>
+
+    <div class="stat-item success">
+      <i class="pi pi-check-circle"></i>
+      <div>
+        <div class="stat-value">{{ savedCount() }}</div>
+        <div class="stat-label">Saved This Session</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Group Dropdown Filter -->
+  <div class="filter-section">
+    <h3 class="filter-title">Filter by Group</h3>
+    <p-select
+      [options]="groupDropdownOptions()"
+      (onChange)="onGroupChange($event)"
+      placeholder="All Groups"
+      [showClear]="true"
+      styleClass="w-full md:w-80"
+    ></p-select>
+  </div>
+
+  <!-- Meter Type Filter Buttons -->
+  <div class="filter-section">
+    <h3 class="filter-title">Filter by Meter Type</h3>
+    <div class="filter-buttons">
+      @for (option of filterOptions; track option.type) {
+        <button
+          class="filter-btn"
+          [class.active]="isFilterSelected(option.type)"
+          [style.border-color]="isFilterSelected(option.type) ? option.color : '#e5e7eb'"
+          (click)="selectFilter(option.type)"
+        >
+          <div
+            class="filter-icon"
+            [style.background-color]="option.color"
+          >
+            <i class="pi" [ngClass]="option.icon"></i>
+          </div>
+          <span>{{ option.label }}</span>
+          @if (option.type !== 'all') {
+            <span class="filter-count">
+              {{ getMeterCountByType(option.type) }}
+            </span>
+          }
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Meters Grid -->
+  <div class="meters-section">
+    <div class="section-header">
+      <h3 class="section-title">
+        {{ sectionTitle() }}
+        <span class="meter-count">({{ filteredMeters().length }})</span>
+      </h3>
+    </div>
+
+    @if (filteredMeters().length > 0) {
+      <div class="meters-grid">
+        @for (meter of filteredMeters(); track meter.id) {
+          <app-meter-input-card
+            [meter]="meter"
+            [isExpanded]="isCardExpanded(meter.id)"
+            (readingSaved)="onReadingSaved($event)"
+            (cardClicked)="onCardClicked($event)"
+            (backgroundClicked)="onCardBackgroundClicked($event)"
+          />
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <h3>No meters found</h3>
+        <p>Try selecting a different filter</p>
+      </div>
+    }
+  </div>
+
+  <!-- Bulk Actions -->
+  <div class="bulk-actions">
+    <h3 class="bulk-title">Bulk Actions</h3>
+    <div class="action-buttons">
+      <button class="action-btn primary" (click)="onImportCSV()">
+        <i class="pi pi-upload"></i>
+        <span>Import from CSV</span>
+      </button>
+
+      <button class="action-btn secondary" (click)="onExportData()">
+        <i class="pi pi-download"></i>
+        <span>Export Data</span>
+      </button>
+
+      <button class="action-btn secondary" (click)="onSendNotifications()">
+        <i class="pi pi-send"></i>
+        <span>Send Notifications</span>
+      </button>
+    </div>
+  </div>
+</div>

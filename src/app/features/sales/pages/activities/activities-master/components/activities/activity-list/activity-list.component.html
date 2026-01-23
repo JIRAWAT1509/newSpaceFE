@@ -1,0 +1,312 @@
+<!-- activity-list.component.html -->
+
+<div class="activity-list-container">
+
+  <!-- ==================== ACTIVITY ITEMS ==================== -->
+  @for (activity of activities; track activity.id) {
+    <div
+      class="activity-item"
+      [class.expanded]="isExpanded(activity.id)"
+      [class.selected]="isSelected(activity.id)"
+      [class.overdue]="isOverdue(activity)"
+      (click)="onActivityClick(activity.id)"
+    >
+
+      <!-- ========== COLLAPSED VIEW ========== -->
+      <div class="activity-header">
+        <!-- Left: Type Badge & Title -->
+        <div class="activity-main">
+          <div class="activity-badges">
+            <span
+              class="type-badge"
+              [class]="getTypeClass(activity.type)"
+            >
+              {{ getTypeText(activity.type) }}
+            </span>
+            <span
+              class="status-badge"
+              [class]="getStatusClass(activity.status)"
+            >
+              {{ getStatusText(activity.status) }}
+            </span>
+            @if (isOverdue(activity)) {
+              <span class="overdue-badge">
+                <i class="pi pi-exclamation-triangle"></i>
+                เกินกำหนด
+              </span>
+            }
+          </div>
+
+          <h3 class="activity-title">{{ activity.title }}</h3>
+
+          <div class="activity-meta">
+            <span class="meta-item">
+              <i class="pi pi-calendar"></i>
+              {{ getDateRangeText(activity) }}
+            </span>
+            @if (activity.type === 'assignment') {
+              <span class="meta-item">
+                <i class="pi pi-users"></i>
+                {{ getAssigneeText(activity) }}
+              </span>
+            }
+            @if (activity.files.length > 0) {
+              <span class="meta-item">
+                <i class="pi pi-paperclip"></i>
+                {{ activity.files.length }} ไฟล์
+              </span>
+            }
+          </div>
+        </div>
+
+        <!-- Right: Expand Icon -->
+        <div class="activity-toggle">
+          <i
+            class="pi"
+            [class.pi-chevron-down]="!isExpanded(activity.id)"
+            [class.pi-chevron-up]="isExpanded(activity.id)"
+          ></i>
+        </div>
+      </div>
+
+      <!-- ========== EXPANDED VIEW ========== -->
+      @if (isExpanded(activity.id)) {
+        <div class="activity-details">
+
+          <!-- Description -->
+          @if (activity.description) {
+            <div class="detail-section">
+              <h4 class="detail-title">รายละเอียด</h4>
+              <p class="detail-text">{{ activity.description }}</p>
+            </div>
+          }
+
+          <!-- Created By -->
+          <div class="detail-section">
+            <h4 class="detail-title">สร้างโดย</h4>
+            <div class="creator-info">
+              <span class="creator-name">{{ activity.createdByName }}</span>
+              <span class="creator-date">{{ DateTime.fromISO(activity.createdAt).toFormat('dd MMM yyyy HH:mm') }}</span>
+            </div>
+          </div>
+
+          <!-- Assignees (for assignments) -->
+          @if (activity.type === 'assignment' && (activity.assignedTo?.length || activity.assignedToRoles?.length)) {
+            <div class="detail-section">
+              <h4 class="detail-title">ผู้รับผิดชอบ</h4>
+              <div class="assignees-list">
+                @if (activity.assignedTo && activity.assignedTo.length > 0) {
+                  @for (userId of activity.assignedTo.slice(0, 5); track userId) {
+                    <div class="assignee-chip">
+                      <i class="pi pi-user"></i>
+                      <span>User {{ userId }}</span>
+                    </div>
+                  }
+                  @if (activity.assignedTo.length > 5) {
+                    <div class="assignee-chip more">
+                      +{{ activity.assignedTo.length - 5 }} more
+                    </div>
+                  }
+                }
+                @if (activity.assignedToRoles && activity.assignedToRoles.length > 0) {
+                  @for (roleId of activity.assignedToRoles; track roleId) {
+                    <div class="assignee-chip role">
+                      <i class="pi pi-users"></i>
+                      <span>Role {{ roleId }}</span>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Finish Requirement (for assignments) -->
+          @if (activity.type === 'assignment' && activity.finishRequirement && activity.finishRequirement.type !== 'none') {
+            <div class="detail-section">
+              <h4 class="detail-title">ข้อกำหนดการเสร็จสิ้น</h4>
+              <div class="requirement-box">
+                <i class="pi pi-info-circle"></i>
+                <div>
+                  <p class="requirement-type">{{ getFinishRequirementText(activity) }}</p>
+                  @if (activity.finishRequirement.description) {
+                    <p class="requirement-desc">{{ activity.finishRequirement.description }}</p>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Files -->
+          @if (activity.files.length > 0) {
+            <div class="detail-section">
+              <h4 class="detail-title">ไฟล์แนบ ({{ activity.files.length }})</h4>
+              <div class="files-list">
+                @for (file of activity.files; track file.id) {
+                  <div class="file-item">
+                    <i [class]="'pi ' + getFileIconClass(file.type)"></i>
+                    <div class="file-info">
+                      <span class="file-name">{{ file.name }}</span>
+                      <span class="file-size">{{ formatFileSize(file.size) }}</span>
+                    </div>
+                    <button class="btn-file-download">
+                      <i class="pi pi-download"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Comments -->
+          @if (activity.comments.length > 0) {
+            <div class="detail-section">
+              <h4 class="detail-title">ความคิดเห็น ({{ activity.comments.length }})</h4>
+              <div class="comments-list">
+                @for (comment of activity.comments; track comment.id) {
+                  <div class="comment-item">
+                    <div class="comment-header">
+                      <span class="comment-user">{{ comment.userName }}</span>
+                      <span class="comment-date">{{ DateTime.fromISO(comment.createdAt).toFormat('dd MMM HH:mm') }}</span>
+                    </div>
+                    <p class="comment-text">{{ comment.comment }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Action Buttons -->
+          <div class="activity-actions">
+
+            <!-- Status Actions (for assignees/creators) -->
+            @if (canUpdateStatus(activity)) {
+              <div class="action-group">
+
+                @if (activity.status === 'pending') {
+                  <button
+                    class="btn-action btn-start"
+                    (click)="onStatusChange(activity.id, 'in-progress', $event)"
+                  >
+                    <i class="pi pi-play"></i>
+                    <span>เริ่มทำงาน</span>
+                  </button>
+                }
+
+                @if (activity.status === 'in-progress') {
+                  <button
+                    class="btn-action btn-finish"
+                    (click)="onStatusChange(activity.id, 'finished', $event)"
+                  >
+                    <i class="pi pi-check"></i>
+                    <span>เสร็จสิ้น</span>
+                  </button>
+                }
+
+                @if (activity.status === 'pending' || activity.status === 'in-progress') {
+                  @if (activity.type === 'assignment' && isAssignee(activity) && !isCreator(activity)) {
+                    <button
+                      class="btn-action btn-return"
+                      (click)="onStatusChange(activity.id, 'returned', $event)"
+                    >
+                      <i class="pi pi-replay"></i>
+                      <span>ส่งคืน</span>
+                    </button>
+                  }
+
+                  <button
+                    class="btn-action btn-cancel"
+                    (click)="onStatusChange(activity.id, 'canceled', $event)"
+                  >
+                    <i class="pi pi-times"></i>
+                    <span>ยกเลิก</span>
+                  </button>
+                }
+              </div>
+            }
+
+            <!-- Edit/Delete Actions (for creators only) -->
+            <div class="action-group">
+              @if (canEdit(activity)) {
+                <button
+                  class="btn-action btn-edit"
+                  (click)="onEdit(activity, $event)"
+                >
+                  <i class="pi pi-pencil"></i>
+                  <span>แก้ไข</span>
+                </button>
+              }
+
+              @if (canDelete(activity)) {
+                <button
+                  class="btn-action btn-delete"
+                  (click)="onDelete(activity.id, $event)"
+                >
+                  <i class="pi pi-trash"></i>
+                  <span>ลบ</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- ==================== STATUS DIALOG ==================== -->
+@if (showStatusDialog()) {
+  <div class="dialog-overlay" (click)="closeStatusDialog()"></div>
+
+  <div class="dialog-container">
+    <div class="dialog-header">
+      <h3 class="dialog-title">
+        @if (statusDialogType() === 'cancel') {
+          ยกเลิกกิจกรรม
+        } @else if (statusDialogType() === 'return') {
+          ส่งคืนกิจกรรม
+        } @else {
+          เสร็จสิ้นกิจกรรม
+        }
+      </h3>
+      <button class="btn-dialog-close" (click)="closeStatusDialog()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <label class="dialog-label">
+        @if (statusDialogType() === 'cancel') {
+          เหตุผลในการยกเลิก <span class="required">*</span>
+        } @else if (statusDialogType() === 'return') {
+          เหตุผลในการส่งคืน <span class="required">*</span>
+        } @else {
+          บันทึกความคิดเห็น (ถ้ามี)
+        }
+      </label>
+      <textarea
+        class="dialog-textarea"
+        [value]="statusDialogReason()"
+        (input)="statusDialogReason.set($any($event.target).value)"
+        [placeholder]="statusDialogType() === 'finish' ? 'กรอกบันทึกความคิดเห็น...' : 'กรุณาระบุเหตุผล...'"
+        rows="4"
+      ></textarea>
+    </div>
+
+    <div class="dialog-footer">
+      <button
+        class="btn-dialog btn-dialog-cancel"
+        (click)="closeStatusDialog()"
+      >
+        ยกเลิก
+      </button>
+      <button
+        class="btn-dialog btn-dialog-confirm"
+        (click)="onStatusDialogSubmit()"
+        [disabled]="statusDialogType() !== 'finish' && !statusDialogReason()"
+      >
+        ยืนยัน
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,178 @@
+<!-- meter-create-form.component.html -->
+
+<div class="create-form-container">
+  <!-- Success Message -->
+  @if (showSuccessMessage()) {
+    <div class="success-alert">
+      <i class="pi pi-check-circle"></i>
+      <div>
+        <strong>Success!</strong> Meter has been registered successfully.
+      </div>
+    </div>
+  }
+
+  <!-- Form Header -->
+  <div class="form-header">
+    <h2 class="form-title">Register New Meter</h2>
+    <p class="form-subtitle">Fill in the details to register a new utility meter</p>
+  </div>
+
+  <!-- Meter Type Selection -->
+  <div class="section">
+    <h3 class="section-title">Select Meter Type *</h3>
+    <div class="meter-type-grid">
+      @for (option of meterTypeOptions; track option.type) {
+        <button
+          type="button"
+          class="meter-type-card"
+          [class.selected]="isTypeSelected(option.type)"
+          [style.border-color]="isTypeSelected(option.type) ? option.color : '#e5e7eb'"
+          (click)="selectMeterType(option.type)"
+        >
+          <div class="type-icon" [style.background-color]="option.color">
+            <i class="pi" [ngClass]="option.icon"></i>
+          </div>
+          <div class="type-label">{{ option.label }}</div>
+          <div class="type-unit">Unit: {{ option.unit }}</div>
+        </button>
+      }
+    </div>
+    @if (isFieldInvalid('meterType')) {
+      <div class="error-message">{{ getFieldError('meterType') }}</div>
+    }
+  </div>
+
+  <!-- Form Fields -->
+  <form [formGroup]="meterForm" (ngSubmit)="onSubmit()">
+
+    <!-- Basic Information Section -->
+    <div class="section">
+      <h3 class="section-title">Basic Information</h3>
+
+      <div class="form-grid">
+        <!-- Room Number -->
+        <div class="form-group">
+          <label class="form-label">
+            Room Number *
+          </label>
+          <input
+            type="text"
+            pInputText
+            formControlName="roomNumber"
+            placeholder="e.g., 101, A-205"
+            [class.error]="isFieldInvalid('roomNumber')"
+          />
+          @if (isFieldInvalid('roomNumber')) {
+            <div class="error-message">{{ getFieldError('roomNumber') }}</div>
+          }
+        </div>
+
+        <!-- Tenant Name -->
+        <div class="form-group">
+          <label class="form-label">
+            Tenant Name *
+          </label>
+          <input
+            type="text"
+            pInputText
+            formControlName="tenantName"
+            placeholder="Enter tenant name"
+            [class.error]="isFieldInvalid('tenantName')"
+          />
+          @if (isFieldInvalid('tenantName')) {
+            <div class="error-message">{{ getFieldError('tenantName') }}</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Meter Details Section -->
+    <div class="section">
+      <h3 class="section-title">Meter Details</h3>
+
+      <div class="form-grid">
+        <!-- Meter Number -->
+        <div class="form-group">
+          <label class="form-label">
+            Meter Number *
+          </label>
+          <input
+            type="text"
+            pInputText
+            formControlName="meterNumber"
+            placeholder="e.g., ELEC-2024-001"
+            [class.error]="isFieldInvalid('meterNumber')"
+          />
+          <small class="field-hint">Use format: TYPE-YEAR-NUMBER</small>
+          @if (isFieldInvalid('meterNumber')) {
+            <div class="error-message">{{ getFieldError('meterNumber') }}</div>
+          }
+        </div>
+
+        <!-- Installation Date -->
+        <div class="form-group">
+          <label class="form-label">
+            Installation Date *
+          </label>
+          <p-DatePicker
+            formControlName="installationDate"
+  iconDisplay="input"
+            dateFormat="dd/mm/yy"
+            placeholder="Select date"
+            [class.error]="isFieldInvalid('installationDate')"
+          ></p-DatePicker>
+          @if (isFieldInvalid('installationDate')) {
+            <div class="error-message">{{ getFieldError('installationDate') }}</div>
+          }
+        </div>
+
+        <!-- Initial Reading -->
+        <div class="form-group">
+          <label class="form-label">
+            Initial Reading *
+          </label>
+          <div class="input-with-unit">
+            <input
+              type="number"
+              pInputText
+              formControlName="initialReading"
+              placeholder="0"
+              min="0"
+              step="0.01"
+              [class.error]="isFieldInvalid('initialReading')"
+            />
+            @if (selectedMeterType()) {
+              <span class="unit-badge">
+                {{ meterForm.get('unit')?.value }}
+              </span>
+            }
+          </div>
+          @if (isFieldInvalid('initialReading')) {
+            <div class="error-message">{{ getFieldError('initialReading') }}</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="resetForm()"
+      >
+        <i class="pi pi-times"></i>
+        <span>Clear</span>
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="meterForm.invalid"
+      >
+        <i class="pi pi-check"></i>
+        <span>Register Meter</span>
+      </button>
+    </div>
+  </form>
+</div>

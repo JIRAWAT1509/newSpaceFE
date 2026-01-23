@@ -1,0 +1,318 @@
+<!-- revenue-tab.component.html -->
+
+<div class="revenue-wrapper">
+
+  <!-- Progress Indicator -->
+  <div class="progress-indicator">
+    <div class="progress-steps">
+      @for (section of sections; track section.id; let i = $index) {
+        <div
+          class="progress-step"
+          [class.completed]="isSectionCompleted(section.id)"
+          (click)="scrollToSection(section.id)"
+        >
+          <div class="step-circle">
+            @if (isSectionCompleted(section.id)) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span class="step-number">{{ i + 1 }}</span>
+            }
+          </div>
+          <div class="step-info">
+            <div class="step-name">{{ section.name }}</div>
+            <div class="step-progress">{{ getSectionProgress(section.id) }}%</div>
+          </div>
+          @if (i < sections.length - 1) {
+            <div class="step-arrow">→</div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Section 1: รหัสรายได้ -->
+  <div class="form-section" id="section-revenue-code">
+    <div class="section-header">
+      <h4>รหัสรายได้</h4>
+      <button type="button" class="btn-add" (click)="openRevenueCodeDrawer()">
+        <i class="pi pi-plus"></i>
+        <span>เพิ่ม</span>
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>รหัสรายได้</th>
+            <th>ชื่อรายได้</th>
+            <th>ลักษณะรายได้</th>
+            <th>Refer Status</th>
+            <th>กลุ่มรายได้</th>
+            <th>ประเภทรายได้</th>
+            <th>เรียกเก็บเงินก่อน</th>
+            <th class="w-20"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of revenueCodeList(); track $index) {
+            <tr>
+              <td>{{ item.code }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.characteristic }}</td>
+              <td>{{ item.referStatus }}</td>
+              <td>{{ item.group }}</td>
+              <td>{{ item.type }}</td>
+              <td>{{ item.collectBefore }}</td>
+              <td>
+                <button type="button" class="btn-icon-delete" (click)="removeRevenueCode($index)">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="text-center py-4 text-gray-500">No records to display.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 2: บันทึกรายได้อื่นๆ -->
+  <div class="form-section" id="section-other-revenue">
+    <div class="section-header">
+      <h4>บันทึกรายได้อื่นๆ</h4>
+      <button type="button" class="btn-add" (click)="openOtherRevenueDrawer()">
+        <i class="pi pi-plus"></i>
+        <span>เพิ่ม</span>
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>รหัสรายได้</th>
+            <th>ชื่อรายได้</th>
+            <th>ประเภทรายได้</th>
+            <th>จำนวนเงิน</th>
+            <th>ลักษณะการจ่าย</th>
+            <th class="w-20"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of otherRevenueList(); track $index) {
+            <tr>
+              <td>{{ item.code }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.type }}</td>
+              <td class="text-right">{{ item.amount | number:'1.2-2' }}</td>
+              <td>{{ item.paymentType }}</td>
+              <td>
+                <button type="button" class="btn-icon-delete" (click)="removeOtherRevenue($index)">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="text-center py-4 text-gray-500">No records to display.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 3: ค่าเช่า,ค่าบริการ,ค่าบริการส่วนกลาง -->
+  <div class="form-section" id="section-rent-service">
+    <div class="section-header">
+      <h4>ค่าเช่า,ค่าบริการ,ค่าบริการส่วนกลาง</h4>
+    </div>
+
+    <form [formGroup]="form">
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>ประเภทรายได้</label>
+          <p-select
+            formControlName="rentServiceType"
+            [options]="revenueTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="เลือกประเภท"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <div class="form-group">
+          <label>เลขที่ยูนิต</label>
+          <input type="text" pInputText formControlName="unitNumber" class="w-full" />
+        </div>
+
+        <div class="form-group">
+          <label>ค่าเช่าค่าบริการล่วงหน้า(เดือน)</label>
+          <input type="number" pInputText formControlName="advanceMonths" class="w-full" />
+        </div>
+
+        <div class="form-group">
+          <label>จำนวนเงิน(บาท)</label>
+          <input type="number" pInputText formControlName="amount" class="w-full" />
+        </div>
+
+        <div class="form-group">
+          <label>ชำระเงินภายในวันที่</label>
+          <p-datepicker
+            formControlName="paymentDueDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            styleClass="w-full"
+          ></p-datepicker>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Section 4: บันทึกภาษีโรงเรือน -->
+  <div class="form-section" id="section-building-tax">
+    <div class="section-header">
+      <h4>บันทึกภาษีโรงเรือน</h4>
+    </div>
+
+    <form [formGroup]="form">
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>วิธีคำนวน</label>
+          <p-select
+            formControlName="taxCalculationMethod"
+            [options]="taxCalculationOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="เลือกวิธีคำนวน"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <div class="form-group">
+          <label>งวดการเรียกเก็บ</label>
+          <p-select
+            formControlName="taxCollectionPeriod"
+            [options]="taxPeriodOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="เลือกงวด"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<!-- Right Panel Drawer for Revenue Code -->
+@if (showRevenueCodeDrawer()) {
+  <div class="drawer-backdrop" (click)="closeDrawer()">
+    <div class="drawer-panel" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <h3>เพิ่มรหัสรายได้</h3>
+        <button class="drawer-close" (click)="closeDrawer()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <form [formGroup]="revenueCodeForm">
+          <div class="form-group required">
+            <label>รหัสรายได้</label>
+            <input type="text" pInputText formControlName="code" class="w-full" />
+          </div>
+
+          <div class="form-group required">
+            <label>ชื่อรายได้</label>
+            <input type="text" pInputText formControlName="name" class="w-full" />
+          </div>
+
+          <div class="form-group">
+            <label>ลักษณะรายได้</label>
+            <input type="text" pInputText formControlName="characteristic" class="w-full" />
+          </div>
+
+          <div class="form-group">
+            <label>Refer Status</label>
+            <input type="text" pInputText formControlName="referStatus" class="w-full" />
+          </div>
+
+          <div class="form-group">
+            <label>กลุ่มรายได้</label>
+            <input type="text" pInputText formControlName="group" class="w-full" />
+          </div>
+
+          <div class="form-group">
+            <label>ประเภทรายได้</label>
+            <input type="text" pInputText formControlName="type" class="w-full" />
+          </div>
+
+          <div class="form-group">
+            <label>เรียกเก็บเงินก่อน</label>
+            <input type="text" pInputText formControlName="collectBefore" class="w-full" />
+          </div>
+        </form>
+      </div>
+
+      <div class="drawer-footer">
+        <button type="button" class="btn-secondary" (click)="closeDrawer()">ยกเลิก</button>
+        <button type="button" class="btn-primary" (click)="saveRevenueCode()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Right Panel Drawer for Other Revenue -->
+@if (showOtherRevenueDrawer()) {
+  <div class="drawer-backdrop" (click)="closeDrawer()">
+    <div class="drawer-panel" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <h3>เพิ่มรายได้อื่นๆ</h3>
+        <button class="drawer-close" (click)="closeDrawer()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <form [formGroup]="otherRevenueForm">
+          <div class="form-group required">
+            <label>รหัสรายได้</label>
+            <input type="text" pInputText formControlName="code" class="w-full" />
+          </div>
+
+          <div class="form-group required">
+            <label>ชื่อรายได้</label>
+            <input type="text" pInputText formControlName="name" class="w-full" />
+          </div>
+
+          <div class="form-group">
+            <label>ประเภทรายได้</label>
+            <input type="text" pInputText formControlName="type" class="w-full" />
+          </div>
+
+          <div class="form-group required">
+            <label>จำนวนเงิน</label>
+            <input type="number" pInputText formControlName="amount" class="w-full" />
+          </div>
+
+          <div class="form-group">
+            <label>ลักษณะการจ่าย</label>
+            <input type="text" pInputText formControlName="paymentType" class="w-full" />
+          </div>
+        </form>
+      </div>
+
+      <div class="drawer-footer">
+        <button type="button" class="btn-secondary" (click)="closeDrawer()">ยกเลิก</button>
+        <button type="button" class="btn-primary" (click)="saveOtherRevenue()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+}

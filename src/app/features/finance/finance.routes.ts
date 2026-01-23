@@ -26,5 +26,9 @@ export const FINANCE_ROUTES: Routes = [
   {
     path: 'credit/reports',
     loadComponent: () => import('./pages/credit/credit-reports/credit-reports.component').then(m => m.CreditReportsComponent)
+  },
+    {
+    path: 'master',
+    loadComponent: () => import('./pages/finance-master/finance-master.component').then(m => m.FinanceMasterComponent)
   }
 ];
