@@ -6,7 +6,7 @@ import { Floor, FloorPlanVersion } from '../../models/floor.model';
 import { Area, AreaStatus } from '../../models/area.model';
 import { getCompleteBuildingData } from '../../data/area-index';
 
-// Extended Building interface with floors
+// Extended Building interface with floors  
 export interface BuildingWithFloors extends Building {
   floors: FloorWithAreas[];
 }
