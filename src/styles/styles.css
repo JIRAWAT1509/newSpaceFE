@@ -1,18 +1,68 @@
-/* You can add global styles to this file, and also import other style files */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import table styles - same folder */
-@import './table.css';
+:root {
+  --bg: 248 250 252;
+  --fg: 15 23 42;
+  --muted: 100 116 139;
+  --border: 226 232 240;
+  --card: 255 255 255;
+  --input: 255 255 255;
+  --primary: 22 119 255;
+  --primary-fg: 255 255 255;
+  --secondary: 56 189 248;
+  --secondary-fg: 11 18 32;
+  --success: 34 197 94;
+  --success-fg: 5 46 22;
+  --warning: 245 158 11;
+  --warning-fg: 69 26 3;
+  --danger: 239 68 68;
+  --danger-fg: 69 10 10;
+  --info: 59 130 246;
+  --info-fg: 11 18 32;
+  --link: 22 119 255;
+  --ring: 22 119 255;
+  --shadow: 15 23 42;
+  --content-max: 1600px;
+  --content-padding: 1.5rem;
+  --primary-foreground: var(--primary-fg);
+  --secondary-foreground: var(--secondary-fg);
+  --success-foreground: var(--success-fg);
+  --warning-foreground: var(--warning-fg);
+  --danger-foreground: var(--danger-fg);
+  --info-foreground: var(--info-fg);
+}
 
-/* Import PrimeNG - use ~ for node_modules */
-@import '~primeng/resources/themes/lara-light-blue/theme.css';
-@import '~primeng/resources/primeng.min.css';
-@import '~primeicons/primeicons.css';
-
-/* Import PrimeNG overrides - same folder as this file */
-@import './primeng-overrides.css';
+[data-theme='dark'] {
+  --bg: 11 18 32;
+  --fg: 226 232 240;
+  --muted: 148 163 184;
+  --border: 31 42 68;
+  --card: 17 28 47;
+  --input: 17 28 47;
+  --primary: 59 130 246;
+  --primary-fg: 226 232 240;
+  --secondary: 56 189 248;
+  --secondary-fg: 11 18 32;
+  --success: 34 197 94;
+  --success-fg: 5 46 22;
+  --warning: 245 158 11;
+  --warning-fg: 69 26 3;
+  --danger: 248 113 113;
+  --danger-fg: 69 10 10;
+  --info: 96 165 250;
+  --info-fg: 11 18 32;
+  --link: 96 165 250;
+  --ring: 96 165 250;
+  --shadow: 2 6 23;
+  --primary-foreground: var(--primary-fg);
+  --secondary-foreground: var(--secondary-fg);
+  --success-foreground: var(--success-fg);
+  --warning-foreground: var(--warning-fg);
+  --danger-foreground: var(--danger-fg);
+  --info-foreground: var(--info-fg);
+}
 
 /* Global Reset */
 * {
@@ -25,6 +75,21 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
   font-size: 14px;
-  color: #1f2937;
-  background-color: #f8f9fa;
+  color: rgb(var(--fg));
+  background-color: rgb(var(--bg));
+}
+
+.content-container {
+  margin: 0 auto;
+  max-width: var(--content-max);
+  padding-left: var(--content-padding);
+  padding-right: var(--content-padding);
+}
+
+html[data-icon-style='solid'] .pi {
+  font-weight: 700;
+}
+
+html[data-icon-style='outline'] .pi {
+  font-weight: 400;
 }

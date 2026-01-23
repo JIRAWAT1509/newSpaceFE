@@ -200,23 +200,23 @@
 }
 
 .activity-status-dot.status-pending {
-  background-color: #d1d5db;
+  background-color: rgb(var(--muted));
 }
 
 .activity-status-dot.status-in-progress {
-  background-color: #fbbf24;
+  background-color: rgb(var(--warning));
 }
 
 .activity-status-dot.status-finished {
-  background-color: #10b981;
+  background-color: rgb(var(--success));
 }
 
 .activity-status-dot.status-canceled {
-  background-color: #ef4444;
+  background-color: rgb(var(--danger));
 }
 
 .activity-status-dot.status-returned {
-  background-color: #f97316;
+  background-color: rgb(var(--info));
 }
 
 /* More Activities Indicator */
@@ -449,23 +449,23 @@
 }
 
 .activity-status-badge.status-pending {
-  background-color: #d1d5db;
+  background-color: rgb(var(--muted));
 }
 
 .activity-status-badge.status-in-progress {
-  background-color: #fbbf24;
+  background-color: rgb(var(--warning));
 }
 
 .activity-status-badge.status-finished {
-  background-color: #10b981;
+  background-color: rgb(var(--success));
 }
 
 .activity-status-badge.status-canceled {
-  background-color: #ef4444;
+  background-color: rgb(var(--danger));
 }
 
 .activity-status-badge.status-returned {
-  background-color: #f97316;
+  background-color: rgb(var(--info));
 }
 
 .activity-time-week {

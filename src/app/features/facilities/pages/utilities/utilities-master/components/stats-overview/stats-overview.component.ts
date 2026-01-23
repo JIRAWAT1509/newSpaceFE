@@ -11,8 +11,7 @@ interface StatCard {
   unit?: string;
   change: number;
   changeLabel: string;
-  color: string;
-  bgGradient: string;
+  tone: 'primary' | 'warning' | 'info' | 'success';
 }
 
 @Component({
@@ -40,8 +39,7 @@ export class StatsOverviewComponent implements OnInit {
         value: statsData.totalActiveMeters,
         change: statsData.changePercent.meters,
         changeLabel: 'vs last month',
-        color: '#667eea',
-        bgGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        tone: 'primary'
       },
       {
         icon: 'pi-clock',
@@ -49,8 +47,7 @@ export class StatsOverviewComponent implements OnInit {
         value: statsData.pendingReadings,
         change: statsData.changePercent.pending,
         changeLabel: 'vs last month',
-        color: '#f093fb',
-        bgGradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+        tone: 'warning'
       },
       {
         icon: 'pi-chart-line',
@@ -59,8 +56,7 @@ export class StatsOverviewComponent implements OnInit {
         unit: statsData.lastMonthConsumptionUnit,
         change: statsData.changePercent.consumption,
         changeLabel: 'vs previous month',
-        color: '#4facfe',
-        bgGradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+        tone: 'info'
       },
       {
         icon: 'pi-dollar',
@@ -68,8 +64,7 @@ export class StatsOverviewComponent implements OnInit {
         value: `฿${statsData.costSavings.toLocaleString()}`,
         change: statsData.changePercent.savings,
         changeLabel: 'vs last month',
-        color: '#43e97b',
-        bgGradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
+        tone: 'success'
       }
     ];
 
@@ -82,9 +77,5 @@ export class StatsOverviewComponent implements OnInit {
 
   getChangeIcon(change: number): string {
     return change > 0 ? 'pi-arrow-up' : 'pi-arrow-down';
-  }
-
-  getChangeColor(change: number): string {
-    return change > 0 ? '#10B981' : '#EF4444';
   }
 }

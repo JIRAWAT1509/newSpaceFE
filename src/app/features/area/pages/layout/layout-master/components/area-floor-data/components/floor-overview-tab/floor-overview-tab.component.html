@@ -62,7 +62,7 @@
               >
                 <div
                   class="legend-color"
-                  [style.background-color]="typeVisibility()[type.TYPE] ? type.COLOR : '#E5E7EB'"
+                  [style.background-color]="typeVisibility()[type.TYPE] ? getTypeColor(type.TYPE) : 'rgb(var(--border))'"
                 ></div>
                 <div class="legend-text">
                   <span

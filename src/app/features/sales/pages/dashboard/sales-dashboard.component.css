@@ -1,7 +1,10 @@
-.page-container {
-  width: 100%;
-  min-height: 100vh;
-  padding: 1.5rem;
+/* sales-dashboard.component.css */
+
+/* ==================== CONTAINER ==================== */
+.sales-dashboard-container {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--content-padding);
   background-color: #f8f9fa;
 }
 
@@ -40,14 +43,18 @@
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 }
 
-.header-icon.budget {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+.card-badge {
+  padding: 0.25rem 0.75rem;
+  background-color: rgb(var(--warning) / 0.18);
+  color: rgb(var(--warning));
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
-.header-icon.pipeline {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+/* ==================== CARD BODY ==================== */
+.card-body {
+  flex: 1;
 }
 
 .header-title {

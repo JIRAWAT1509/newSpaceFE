@@ -4,8 +4,17 @@ import { Routes } from '@angular/router';
 export const REPORTS_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'budget/revenue-main',
-    pathMatch: 'full'
+    loadComponent: () =>
+      import('./pages/reports-home/reports-home.component').then(
+        (m) => m.ReportsHomeComponent
+      )
+  },
+  {
+    path: 'category/:category',
+    loadComponent: () =>
+      import('./pages/reports-home/reports-home.component').then(
+        (m) => m.ReportsHomeComponent
+      )
   },
 
   // Budget Reports

@@ -2,6 +2,7 @@
 import { Component, Input, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SourceAttribution } from '@core/data/sales-performance.mock';
+import { getChartPalette } from '@core/utils/chart-colors';
 
 interface DonutSegment {
   path: string;
@@ -187,12 +188,10 @@ export class SourceAttributionChartComponent implements OnInit {
 
   // Get color for each source
   getSourceColor(source: string): string {
-    const colors: { [key: string]: string } = {
-      'Inbound': '#3b82f6',   // Blue
-      'Outbound': '#10b981',  // Green
-      'Partner': '#8b5cf6'    // Purple
-    };
-    return colors[source] || '#6b7280';
+    const sources = this.attributionData();
+    const palette = getChartPalette(Math.max(sources.length, 1));
+    const index = sources.findIndex((item) => item.source === source);
+    return palette[Math.max(index, 0) % palette.length];
   }
 
   // Get icon for each source

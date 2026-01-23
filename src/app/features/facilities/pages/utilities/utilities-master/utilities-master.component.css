@@ -6,7 +6,7 @@
 
 /* Header */
 .utilities-header {
-  @apply mb-8 pb-6 border-b-2 border-gray-200;
+  @apply mb-8 pb-6 border-b-2 border-border;
 }
 
 .header-content {
@@ -15,38 +15,36 @@
 
 .header-icon {
   @apply w-16 h-16 rounded-xl flex items-center justify-center text-white text-3xl;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
+  box-shadow: 0 4px 15px rgb(var(--shadow) / 0.25);
 }
 
 .header-title {
-  @apply text-3xl font-bold text-gray-800;
+  @apply text-3xl font-bold text-fg;
 }
 
 .header-subtitle {
-  @apply text-gray-500 mt-1;
+  @apply text-muted mt-1;
 }
 
 /* Tab Navigation */
 .tab-navigation {
-  @apply flex gap-3 mb-8 p-3 bg-gray-100 rounded-xl;
+  @apply flex gap-3 mb-8 p-3 bg-card rounded-xl border border-border;
 }
 
 .tab-btn {
   @apply flex items-center gap-2 px-6 py-3 rounded-lg;
-  @apply text-gray-600 font-medium transition-all duration-300;
+  @apply text-muted font-medium transition-all duration-300;
   @apply border-none bg-transparent cursor-pointer;
 }
 
 .tab-btn:hover {
-  @apply bg-white bg-opacity-50;
+  @apply bg-bg;
 }
 
 .tab-btn.active {
-  @apply bg-white text-blue-600 shadow-md;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  @apply bg-primary text-primary-foreground shadow-md;
+  box-shadow: 0 4px 15px rgb(var(--shadow) / 0.25);
 }
 
 .tab-btn i {
@@ -77,8 +75,8 @@
 .placeholder-content,
 .coming-soon-section {
   @apply flex flex-col items-center justify-center;
-  @apply py-20 text-center bg-white rounded-xl;
-  @apply border-2 border-dashed border-gray-200;
+  @apply py-20 text-center bg-card rounded-xl;
+  @apply border-2 border-dashed border-border;
 }
 
 .coming-soon-section {
@@ -87,12 +85,12 @@
 
 .placeholder-content h3,
 .coming-soon-section h3 {
-  @apply text-2xl font-bold text-gray-700 mt-4 mb-2;
+  @apply text-2xl font-bold text-fg mt-4 mb-2;
 }
 
 .placeholder-content p,
 .coming-soon-section p {
-  @apply text-gray-500;
+  @apply text-muted;
 }
 
 /* Responsive */

@@ -1,38 +1,47 @@
 <aside
-  class="bg-sidebar-main text-white-primary h-full flex flex-col transition-all duration-[300ms] ease-in-out"
+  class="bg-gradient-to-b from-primary via-primary to-secondary text-primary-foreground h-full flex flex-col transition-all duration-[300ms] ease-in-out"
   [class.w-72]="isExpanded() || isHovering"
   [class.w-20]="!isExpanded() && !isHovering"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
 >
-  <nav class="flex-grow pt-4">
+  <nav class="flex-grow pt-6">
     <ul>
-      <li *ngFor="let item of currentSecondaryNav" class="mb-1">
+      <li *ngFor="let item of currentSecondaryNav" class="mb-2 px-3">
   <!-- ✅ ถ้ามี route ให้ถือว่าเป็นลิงก์ก่อนเลย แม้จะมี sub -->
   <ng-container *ngIf="item.route; else accordionBlock">
     <a
       [routerLink]="item.route"
       (click)="handleDirectLinkClick()"
-      class="group flex items-center p-4 cursor-pointer hover:bg-sidebar-hover relative"
+      class="group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/10 relative"
       [class.border-r-4]="!isExpanded() && !isHovering && isItemActive(item)"
-      [class.border-sidebar-accent]="!isExpanded() && !isHovering && isItemActive(item)"
+      [class.border-secondary]="!isExpanded() && !isHovering && isItemActive(item)"
+      [class.bg-white/15]="isItemHighlighted(item)"
+      [class.shadow-md]="isItemHighlighted(item)"
     >
-      <img
-        [src]="item.icon"
-        alt=""
-        class="w-6 h-6 ml-3 flex-shrink-0 transition-colors duration-200"
+      <div
+        class="sidebar-icon"
         [ngClass]="{
-          'brightness-0 invert drop-shadow-md': isItemActive(item),
-          'opacity-60 group-hover:brightness-0 group-hover:invert': !isItemActive(item)
+          'sidebar-icon-active': isItemHighlighted(item) || isItemActive(item)
         }"
-      />
+      >
+        <img
+          [src]="item.icon"
+          alt=""
+          class="w-5 h-5 flex-shrink-0 transition-all duration-200"
+          [ngClass]="{
+            'brightness-0 invert drop-shadow-md': isItemActive(item),
+            'opacity-70 group-hover:brightness-0 group-hover:invert': !isItemActive(item)
+          }"
+        />
+      </div>
 
-      <div *ngIf="isExpanded() || isHovering" [@fadeInOut] class="w-full ml-4">
+      <div *ngIf="isExpanded() || isHovering" [@fadeInOut] class="w-full ml-1">
         <span
           class="font-medium text-sm whitespace-nowrap transition-colors duration-200 drop-shadow-md"
           [ngClass]="{
-            'text-white-primary': isItemHighlighted(item),
-            'text-text-secondary group-hover:text-white-primary': !isItemHighlighted(item)
+            'text-primary-foreground': isItemHighlighted(item),
+            'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)
           }"
         >
           {{ translate(item.name) }}
@@ -44,27 +53,36 @@
   <!-- ⬇️ fallback: ถ้าไม่มี route ค่อยเป็น accordion -->
   <ng-template #accordionBlock>
     <div
-      class="group flex items-center p-4 cursor-pointer hover:bg-sidebar-hover relative"
+      class="group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/10 relative"
       [class.border-r-4]="!isExpanded() && !isHovering && isItemActive(item)"
-      [class.border-sidebar-accent]="!isExpanded() && !isHovering && isItemActive(item)"
+      [class.border-secondary]="!isExpanded() && !isHovering && isItemActive(item)"
+      [class.bg-white/15]="isItemHighlighted(item)"
+      [class.shadow-md]="isItemHighlighted(item)"
       (click)="handleItemClick(item.name)"
     >
-      <img
-        [src]="item.icon"
-        alt=""
-        class="w-6 h-6 flex-shrink-0 ml-3 transition-colors duration-200"
+      <div
+        class="sidebar-icon"
         [ngClass]="{
-          'brightness-0 invert drop-shadow-md': isItemActive(item),
-          'opacity-60 group-hover:brightness-0 group-hover:invert': !isItemActive(item)
+          'sidebar-icon-active': isItemHighlighted(item) || isItemActive(item)
         }"
-      />
+      >
+        <img
+          [src]="item.icon"
+          alt=""
+          class="w-5 h-5 flex-shrink-0 transition-all duration-200"
+          [ngClass]="{
+            'brightness-0 invert drop-shadow-md': isItemActive(item),
+            'opacity-70 group-hover:brightness-0 group-hover:invert': !isItemActive(item)
+          }"
+        />
+      </div>
 
-      <div *ngIf="isExpanded() || isHovering" class="flex justify-between items-center w-full ml-4" [@fadeInOut]>
+      <div *ngIf="isExpanded() || isHovering" class="flex justify-between items-center w-full ml-1" [@fadeInOut]>
         <span
           class="font-medium text-sm whitespace-nowrap transition-colors duration-200 drop-shadow-md"
           [ngClass]="{
-            'text-white-primary': isItemHighlighted(item),
-            'text-text-secondary group-hover:text-white-primary': !isItemHighlighted(item)
+            'text-primary-foreground': isItemHighlighted(item),
+            'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)
           }"
         >
           {{ translate(item.name) }}
@@ -83,15 +101,14 @@
     </div>
 
     <div *ngIf="(isExpanded() || isHovering) && openAccordion === item.name" [@slideInOut]>
-      <ul class="pl-10 pr-2 py-2 bg-sidebar-sub">
-        <li *ngFor="let subItem of item.sub" class="mt-1">
+      <ul class="pl-12 pr-3 py-2 space-y-1">
+        <li *ngFor="let subItem of item.sub">
           <a
             [routerLink]="subItem.route"
             (click)="onSubItemClick(subItem)"
-            class="block py-2 px-4 rounded-md text-sm font-medium transition-colors duration-150 bg-sidebar-sub hover:bg-sidebar-hover hover:text-white-primary"
+            class="block py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-150 text-primary-foreground/80 hover:bg-white/10 hover:text-primary-foreground"
             [ngClass]="{
-              'bg-sidebar-active-bg text-sidebar-active-text': activeSubRoute() === subItem.route,
-              'text-sidebar-sub-text': activeSubRoute() !== subItem.route
+              'bg-white/15 text-primary-foreground shadow-md': activeSubRoute() === subItem.route
             }"
           >
             {{ translate(subItem.name) }}

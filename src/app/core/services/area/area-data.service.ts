@@ -6,7 +6,7 @@ import { Floor, FloorPlanVersion } from '../../models/floor.model';
 import { Area, AreaStatus } from '../../models/area.model';
 import { getCompleteBuildingData } from '../../data/area-index';
 
-// Extended Building interface with floors
+// Extended Building interface with floors  
 export interface BuildingWithFloors extends Building {
   floors: FloorWithAreas[];
 }
@@ -308,7 +308,7 @@ export class AreaDataService {
         count: statusCounts.get('unallocated')!.count,
         percentage: total > 0 ? (statusCounts.get('unallocated')!.count / total) * 100 : 0,
         warningCount: statusCounts.get('unallocated')!.warningCount,
-        color: '#FF6384'
+        color: 'rgb(var(--danger))'
       },
       {
         id: 'quotation',
@@ -317,7 +317,7 @@ export class AreaDataService {
         count: statusCounts.get('quotation')!.count,
         percentage: total > 0 ? (statusCounts.get('quotation')!.count / total) * 100 : 0,
         warningCount: statusCounts.get('quotation')!.warningCount,
-        color: '#4CA3FF'
+        color: 'rgb(var(--info))'
       },
       {
         id: 'leased',
@@ -326,7 +326,7 @@ export class AreaDataService {
         count: statusCounts.get('leased')!.count,
         percentage: total > 0 ? (statusCounts.get('leased')!.count / total) * 100 : 0,
         warningCount: statusCounts.get('leased')!.warningCount,
-        color: '#FFD05F'
+        color: 'rgb(var(--warning))'
       },
       {
         id: 'vacant',
@@ -335,7 +335,7 @@ export class AreaDataService {
         count: statusCounts.get('vacant')!.count,
         percentage: total > 0 ? (statusCounts.get('vacant')!.count / total) * 100 : 0,
         warningCount: statusCounts.get('vacant')!.warningCount,
-        color: '#80E08E'
+        color: 'rgb(var(--success))'
       }
     ];
 

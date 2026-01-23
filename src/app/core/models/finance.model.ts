@@ -39,7 +39,7 @@ export interface Receipt {
 }
 
 export const DEBT_STATUS_CONFIG = {
-  new: { color: '#10B981', icon: 'pi-circle-fill', label: 'NEW' },
-  warning: { color: '#F59E0B', icon: 'pi-exclamation-circle', label: '1-3 เดือน' },
-  critical: { color: '#EF4444', icon: 'pi-times-circle', label: 'เกิน 3 เดือน' }
+  new: { color: 'rgb(var(--success))', icon: 'pi-circle-fill', label: 'NEW' },
+  warning: { color: 'rgb(var(--warning))', icon: 'pi-exclamation-circle', label: '1-3 เดือน' },
+  critical: { color: 'rgb(var(--danger))', icon: 'pi-times-circle', label: 'เกิน 3 เดือน' }
 };

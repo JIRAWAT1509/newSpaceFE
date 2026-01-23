@@ -282,13 +282,13 @@
 }
 
 .change-badge.positive {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgb(var(--success) / 0.18);
+  color: rgb(var(--success));
 }
 
 .change-badge.negative {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgb(var(--danger) / 0.18);
+  color: rgb(var(--danger));
 }
 
 .change-badge i {
@@ -308,23 +308,23 @@
 }
 
 .status-badge.excellent {
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-  color: #065f46;
+  background: rgb(var(--success) / 0.18);
+  color: rgb(var(--success));
 }
 
 .status-badge.good {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  color: #1e40af;
+  background: rgb(var(--info) / 0.18);
+  color: rgb(var(--info));
 }
 
 .status-badge.fair {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  color: #92400e;
+  background: rgb(var(--warning) / 0.18);
+  color: rgb(var(--warning));
 }
 
 .status-badge.poor {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  color: #991b1b;
+  background: rgb(var(--danger) / 0.18);
+  color: rgb(var(--danger));
 }
 
 /* Occupancy Bar */
