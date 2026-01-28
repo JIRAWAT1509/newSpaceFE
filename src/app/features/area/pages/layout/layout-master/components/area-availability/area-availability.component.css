@@ -35,10 +35,31 @@
   @apply w-14 h-14 rounded-xl flex items-center justify-center;
   @apply flex-shrink-0;
   @apply shadow-sm;
+  position: relative;
 }
 
 .icon-circle i {
   @apply text-white text-2xl;
+  font-family: 'primeicons' !important;
+  font-size: 1.5rem;
+  line-height: 1;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+  aspect-ratio: 1 / 1 !important;
+  flex-shrink: 0 !important;
+}
+
+.icon-circle .status-icon-image {
+  @apply w-8 h-8 object-contain;
+  filter: brightness(0) invert(1);
+  display: block !important;
+  margin: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  flex-shrink: 0 !important;
 }
 
 /* Card Content */

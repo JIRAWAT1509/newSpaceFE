@@ -1,0 +1,188 @@
+/* contract-info-tab.component.css */
+
+.contract-info-wrapper {
+  @apply space-y-6;
+}
+
+/* Progress Indicator - same as general-detail-tab */
+.progress-indicator {
+  @apply mb-6 p-4 bg-white rounded-lg;
+}
+
+.progress-steps {
+  @apply flex items-center justify-between gap-2;
+}
+
+.progress-step {
+  @apply flex items-center gap-3 cursor-pointer transition-all flex-shrink-0;
+}
+
+.step-circle {
+  @apply w-16 h-16 rounded-full flex items-center justify-center;
+  @apply bg-gray-300 text-white font-bold text-lg transition-all;
+}
+
+.progress-step.completed .step-circle {
+  @apply bg-green-600;
+}
+
+.step-info {
+  @apply flex flex-col;
+}
+
+.step-name {
+  @apply text-sm font-semibold text-gray-700 whitespace-nowrap;
+}
+
+.step-progress {
+  @apply text-xs text-gray-500;
+}
+
+.step-arrow {
+  @apply text-2xl text-gray-400 mx-2;
+}
+
+.step-number {
+  @apply text-xl;
+}
+
+/* Form Sections */
+.form-section {
+  @apply bg-white border border-gray-200 rounded-lg p-6 space-y-4;
+}
+
+.section-title {
+  @apply text-lg font-bold text-gray-900 mb-4;
+  @apply flex items-center gap-2;
+}
+
+.section-title::before {
+  content: '';
+  @apply w-1 h-6 bg-blue-600 rounded;
+}
+
+.form-grid-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.form-group.full-width {
+  @apply col-span-full;
+}
+
+.section-header {
+  @apply flex items-center justify-between mb-4 pb-2 border-b-2 border-blue-600;
+}
+
+.section-header h4 {
+  @apply text-lg font-bold text-gray-900;
+}
+
+.header-actions {
+  @apply flex items-center gap-3;
+}
+
+/* Form Grid */
+.form-grid-3 {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.form-group.span-2 {
+  @apply md:col-span-2;
+}
+
+.form-group.span-3 {
+  @apply md:col-span-3;
+}
+
+.form-group label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.form-group.required label::after {
+  content: ' *';
+  @apply text-red-600;
+}
+
+/* Special Inputs */
+.duration-inputs,
+.ratio-inputs,
+.adjustment-inputs {
+  @apply flex items-center gap-2;
+}
+
+.duration-field {
+  @apply flex items-center gap-2 flex-1;
+}
+
+.duration-field input {
+  @apply flex-1;
+}
+
+.input-with-suffix {
+  @apply flex items-center gap-2;
+}
+
+.input-with-suffix input {
+  flex: 1 1 0%;
+}
+
+.ratio-inputs input {
+  flex: 1 1 0%;
+}
+
+.adjustment-inputs input {
+  flex: 1 1 0%;
+}
+
+/* Buttons */
+.btn-add {
+  @apply flex items-center gap-2 px-4 py-2;
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+  @apply rounded font-medium text-sm transition-colors;
+}
+
+.btn-icon-delete {
+  @apply w-8 h-8 flex items-center justify-center;
+  @apply text-red-600 hover:bg-red-50 rounded transition-colors;
+}
+
+.checkbox-label {
+  @apply flex items-center gap-2 cursor-pointer;
+}
+
+.checkbox-label input {
+  @apply w-4 h-4;
+}
+
+/* Table */
+.table-wrapper {
+  @apply overflow-x-auto border border-gray-200 rounded;
+}
+
+.data-table {
+  @apply w-full;
+}
+
+.data-table thead {
+  @apply bg-blue-600 text-white;
+}
+
+.data-table th {
+  @apply px-4 py-3 text-left text-sm font-semibold;
+}
+
+.data-table td {
+  @apply px-4 py-2 border-b border-gray-200;
+}
+
+.data-table tbody tr:hover {
+  @apply bg-gray-50;
+}
+
+.w-20 {
+  width: 5rem;
+}

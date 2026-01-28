@@ -1,19 +1,21 @@
 <!-- user-form-drawer.component.html -->
 
-<!-- Backdrop -->
+<!-- Backdrop - Higher z-index to cover header (z-50) and prevent header clicks -->
 <div
   *ngIf="isOpen"
-  class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+  class="fixed inset-0 bg-black bg-opacity-50 z-[60] transition-opacity duration-300"
   (click)="onClose()"
+  style="pointer-events: auto;"
 ></div>
 
 <!-- Drawer (Desktop: Right side, Mobile: Centered) -->
 <div
   *ngIf="isOpen"
-  class="fixed z-50 bg-white shadow-2xl transition-all duration-300 ease-in-out overflow-hidden
+  class="fixed z-[70] bg-white shadow-2xl transition-all duration-300 ease-in-out overflow-hidden
          md:top-0 md:right-0 md:h-full md:w-[600px]
          max-md:top-1/2 max-md:left-1/2 max-md:transform max-md:-translate-x-1/2 max-md:-translate-y-1/2
          max-md:rounded-lg max-md:w-[95%] max-md:max-w-[500px] max-md:max-h-[90vh]"
+  style="pointer-events: auto;"
 >
   <!-- Header -->
   <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
@@ -282,7 +284,7 @@
   <!-- Footer Actions -->
   <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3">
     <p-button
-      label="Cancel"
+      label="ยกเลิก"
       icon="pi pi-times"
       [outlined]="true"
       severity="secondary"
@@ -291,7 +293,7 @@
     ></p-button>
 
     <p-button
-      [label]="mode === 'create' ? 'Create User' : 'Save Changes'"
+      [label]="mode === 'create' ? 'สร้างผู้ใช้' : 'บันทึกการเปลี่ยนแปลง'"
       icon="pi pi-check"
       severity="primary"
       (onClick)="onSubmit()"

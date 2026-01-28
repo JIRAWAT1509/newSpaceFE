@@ -1,0 +1,200 @@
+<!-- meter-group-create-form.component.html -->
+
+<div class="group-management-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">กลุ่มมิเตอร์ (Meter Groups)</h2>
+      <p class="page-subtitle">จัดการกลุ่มมิเตอร์และเพิ่มมิเตอร์ใหม่</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="openCreateMeterDrawer()">
+        <i class="pi pi-plus"></i>
+        <span>เพิ่มมิเตอร์</span>
+      </button>
+
+      <button class="btn btn-primary" (click)="openCreateGroupDrawer()">
+        <i class="pi pi-sitemap"></i>
+        <span>สร้างกลุ่มใหม่</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Groups Table -->
+  <div class="table-container">
+    <table class="groups-table">
+      <thead>
+        <tr>
+          <th>ชื่อกลุ่ม</th>
+          <th>คำอธิบาย</th>
+          <th>จำนวนมิเตอร์</th>
+          <th>วันที่สร้าง</th>
+          <th>อัพเดทล่าสุด</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (group of groups(); track group.id) {
+          <tr>
+            <td>
+              <div class="group-name">
+                <i class="pi pi-sitemap text-blue-600"></i>
+                <span>{{ group.name }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="group-description">{{ group.description }}</div>
+            </td>
+            <td>
+              <div class="meter-count">
+                <span class="count-badge">{{ getMeterCount(group) }}</span>
+                <span class="count-label">meters</span>
+              </div>
+            </td>
+            <td>
+              <div class="date">{{ group.createdDate }}</div>
+            </td>
+            <td>
+              <div class="date">{{ group.updatedDate }}</div>
+            </td>
+            <td>
+              <div class="row-actions">
+                <button
+                  class="action-btn"
+                  title="แก้ไข"
+                  (click)="openEditGroupDrawer(group)"
+                >
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button
+                  class="action-btn danger"
+                  title="ลบ"
+                  (click)="deleteGroup(group)"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (groups().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <h3>ยังไม่มีกลุ่มมิเตอร์</h3>
+        <p>เริ่มต้นสร้างกลุ่มมิเตอร์เพื่อจัดการได้ง่ายขึ้น</p>
+        <button class="btn btn-primary" (click)="openCreateGroupDrawer()">
+          <i class="pi pi-plus"></i>
+          <span>สร้างกลุ่มแรก</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Group Create/Edit Drawer -->
+@if (showGroupDrawer()) {
+  <div class="drawer-overlay" (click)="closeGroupDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <h3>{{ editingGroup() ? 'แก้ไขกลุ่มมิเตอร์' : 'สร้างกลุ่มมิเตอร์ใหม่' }}</h3>
+      <button class="close-btn" (click)="closeGroupDrawer()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="drawer-content">
+      <!-- Group Name -->
+      <div class="form-group">
+        <label class="form-label">ชื่อกลุ่ม *</label>
+        <input
+          type="text"
+          class="form-input"
+          placeholder="เช่น Building A - Floor 1 Electric"
+          [value]="groupName()"
+          (input)="groupName.set($any($event.target).value)"
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label">คำอธิบาย</label>
+        <textarea
+          class="form-textarea"
+          rows="3"
+          placeholder="อธิบายรายละเอียดของกลุ่มนี้"
+          [value]="groupDescription()"
+          (input)="groupDescription.set($any($event.target).value)"
+        ></textarea>
+      </div>
+
+      <!-- Meter Selection -->
+      <div class="form-group">
+        <label class="form-label">
+          เลือกมิเตอร์
+          <span class="selected-count">(เลือกแล้ว {{ selectedMeterIds().size }} รายการ)</span>
+        </label>
+
+        <div class="meter-selection-list">
+          @for (meter of allMeters(); track meter.id) {
+            <div
+              class="meter-selection-item"
+              [class.selected]="isMeterSelected(meter.id)"
+              (click)="toggleMeterSelection(meter.id)"
+            >
+              <input
+                type="checkbox"
+                [checked]="isMeterSelected(meter.id)"
+                (click)="$event.stopPropagation()"
+              />
+              <div class="meter-info">
+                <div class="meter-name">
+                  <i class="pi" [ngClass]="'pi-bolt'"></i>
+                  <span>{{ meter.roomNumber }} - {{ meter.meterNumber }}</span>
+                </div>
+                <div class="meter-details">
+                  {{ meter.tenantName }} | {{ meter.meterType }}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" (click)="closeGroupDrawer()">
+        ยกเลิก
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="saveGroup()"
+        [disabled]="!groupName() || selectedMeterIds().size === 0"
+      >
+        <i class="pi pi-check"></i>
+        <span>{{ editingGroup() ? 'อัพเดท' : 'สร้างกลุ่ม' }}</span>
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Meter Create Drawer -->
+@if (showCreateMeterDrawer()) {
+  <div class="drawer-overlay" (click)="closeCreateMeterDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <h3>เพิ่มมิเตอร์ใหม่</h3>
+      <button class="close-btn" (click)="closeCreateMeterDrawer()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="drawer-content">
+      <!-- Include meter create form component here -->
+      <app-meter-create-form />
+    </div>
+  </div>
+}

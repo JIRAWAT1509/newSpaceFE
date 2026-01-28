@@ -1,0 +1,169 @@
+/* analytics-charts.component.css */
+
+.analytics-container {
+  @apply space-y-6;
+}
+
+/* Filter Panel */
+.filter-panel {
+  @apply bg-white p-6 rounded-xl border border-gray-200;
+  @apply space-y-6;
+}
+
+.filter-group {
+  @apply space-y-3;
+}
+
+.filter-title {
+  @apply flex items-center gap-2 text-lg font-bold text-gray-800;
+}
+
+.filter-title i {
+  @apply text-blue-600;
+}
+
+/* Filter Options */
+.filter-options {
+  @apply flex flex-wrap gap-3;
+}
+
+.filter-chip {
+  @apply px-4 py-2 rounded-lg border-2;
+  @apply transition-all duration-200 cursor-pointer;
+  @apply bg-white text-gray-700 font-medium;
+  white-space: nowrap;
+}
+
+.filter-chip:hover {
+  @apply shadow-md -translate-y-0.5;
+}
+
+.filter-chip.active {
+  @apply bg-blue-600 text-white border-blue-600;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Type Chip with Icon */
+.type-chip {
+  @apply flex items-center gap-2;
+}
+
+.chip-icon {
+  @apply w-8 h-8 rounded-lg flex items-center justify-center text-white;
+}
+
+.type-chip.active .chip-icon {
+  @apply bg-white;
+}
+
+.type-chip.active .chip-icon i {
+  @apply text-blue-600;
+}
+
+/* Custom Date Range */
+.custom-date-range {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4 mt-4;
+  @apply p-4 bg-blue-50 rounded-lg border border-blue-200;
+}
+
+.date-input-group {
+  @apply flex flex-col gap-2;
+}
+
+.date-input-group label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+/* Charts Grid */
+.charts-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Chart Card */
+.chart-card {
+  @apply bg-white p-6 rounded-xl border border-gray-200;
+  @apply transition-all duration-300;
+}
+
+.chart-card:hover {
+  @apply shadow-xl;
+}
+
+.chart-card.large {
+  @apply col-span-2;
+}
+
+/* Chart Wrapper */
+.chart-wrapper {
+  @apply relative;
+  height: 350px;
+}
+
+.chart-card.large .chart-wrapper {
+  height: 400px;
+}
+
+/* Calendar Override */
+::ng-deep .p-datepicker {
+  @apply w-full;
+}
+
+::ng-deep .p-datepicker .p-inputtext {
+  @apply w-full px-4 py-2 border-2 border-gray-300 rounded-lg;
+}
+
+::ng-deep .p-datepicker .p-inputtext:focus {
+  @apply outline-none border-blue-500;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card.large {
+    @apply col-span-1;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-options {
+    @apply flex-col;
+  }
+
+  .filter-chip {
+    @apply w-full justify-center;
+  }
+
+  .custom-date-range {
+    @apply grid-cols-1;
+  }
+
+  .chart-wrapper {
+    height: 300px;
+  }
+}
+
+/* Loading Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chart-card {
+  animation: fadeIn 0.5s ease;
+}
+
+.chart-card:nth-child(1) { animation-delay: 0s; }
+.chart-card:nth-child(2) { animation-delay: 0.1s; }
+.chart-card:nth-child(3) { animation-delay: 0.2s; }
+.chart-card:nth-child(4) { animation-delay: 0.3s; }

@@ -1,1 +1,64 @@
-<p>utilities-master works!</p>
+<!-- utilities-master.component.html - FINAL -->
+
+<div class="utilities-container">
+  <!-- Header -->
+  <div class="utilities-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="pi pi-bolt"></i>
+      </div>
+      <div>
+        <h1 class="header-title">Utilities Management</h1>
+        <p class="header-subtitle">Manage meters and utility readings</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    @for (tab of tabs; track tab.id) {
+      <button
+        class="tab-btn"
+        [class.active]="isActiveTab(tab.id)"
+        (click)="setActiveTab(tab.id)"
+      >
+        <i class="pi" [ngClass]="tab.icon"></i>
+        <span>{{ tab.label }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Dashboard Tab -->
+    @if (isActiveTab('dashboard')) {
+      <div class="tab-panel">
+        <app-stats-overview />
+
+        <!-- Analytics & Charts -->
+        <app-analytics-charts />
+      </div>
+    }
+
+    <!-- Meter Groups Tab -->
+    @if (isActiveTab('groups')) {
+      <div class="tab-panel">
+        <app-meter-group-create-form />
+      </div>
+    }
+
+    <!-- Fill Readings Tab -->
+    @if (isActiveTab('fill')) {
+      <div class="tab-panel">
+        <app-meter-input-list />
+      </div>
+    }
+
+    <!-- Meter List Tab (NEW) -->
+    @if (isActiveTab('list')) {
+      <div class="tab-panel">
+        <app-meter-list />
+      </div>
+    }
+  </div>
+</div>

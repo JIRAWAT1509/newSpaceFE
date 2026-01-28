@@ -1,0 +1,231 @@
+/* conditions-tab.component.css */
+
+.conditions-wrapper {
+  @apply space-y-6;
+}
+
+/* ==================== PROGRESS INDICATOR ==================== */
+.progress-indicator {
+  @apply mb-6 p-4 bg-white rounded-lg;
+}
+
+.progress-steps {
+  @apply flex items-center justify-between gap-2;
+}
+
+.progress-step {
+  @apply flex items-center gap-3 cursor-pointer transition-all flex-shrink-0;
+}
+
+.step-circle {
+  @apply w-16 h-16 rounded-full flex items-center justify-center;
+  @apply bg-gray-300 text-white font-bold text-lg transition-all;
+}
+
+.progress-step.completed .step-circle {
+  @apply bg-green-600;
+}
+
+.step-info {
+  @apply flex flex-col;
+}
+
+.step-name {
+  @apply text-sm font-semibold text-gray-700 whitespace-nowrap;
+}
+
+.step-progress {
+  @apply text-xs text-gray-500;
+}
+
+.step-arrow {
+  @apply text-2xl text-gray-400 mx-2;
+}
+
+.step-number {
+  @apply text-xl;
+}
+
+/* ==================== FORM SECTIONS ==================== */
+.form-section {
+  @apply bg-white border border-gray-200 rounded-lg p-6 space-y-4;
+}
+
+.section-header {
+  @apply flex items-center justify-between mb-4 pb-2 border-b-2 border-blue-600;
+}
+
+.section-header h4 {
+  @apply text-lg font-bold text-gray-900;
+}
+
+/* ==================== FORM GROUP ==================== */
+.form-grid-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.form-group.full-width {
+  @apply col-span-full;
+}
+
+.form-group label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.form-group.required label::after {
+  content: ' *';
+  @apply text-red-600;
+}
+
+.section-title {
+  @apply text-lg font-bold text-gray-900 mb-4;
+  @apply flex items-center gap-2;
+}
+
+.section-title::before {
+  content: '';
+  @apply w-1 h-6 bg-blue-600 rounded;
+}
+
+/* Duration Inputs */
+.duration-inputs {
+  @apply flex items-center gap-2;
+}
+
+.duration-field {
+  @apply flex items-center gap-2 flex-1;
+}
+
+.duration-field input {
+  @apply flex-1;
+}
+
+.duration-field span {
+  @apply text-sm text-gray-600 whitespace-nowrap;
+}
+
+/* ==================== TABLE ==================== */
+.table-wrapper {
+  @apply overflow-x-auto border border-gray-200 rounded;
+}
+
+.data-table {
+  @apply w-full;
+}
+
+.data-table thead {
+  @apply bg-blue-600 text-white;
+}
+
+.data-table th {
+  @apply px-4 py-3 text-left text-sm font-semibold;
+}
+
+.data-table td {
+  @apply px-4 py-3 border-b border-gray-200;
+}
+
+.data-table tbody tr:hover {
+  @apply bg-gray-50;
+}
+
+.content-preview {
+  @apply text-sm text-gray-700 line-clamp-2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.action-buttons {
+  @apply flex items-center justify-center gap-2;
+}
+
+/* ==================== BUTTONS ==================== */
+.btn-add {
+  @apply flex items-center gap-2 px-4 py-2;
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+  @apply rounded font-medium text-sm transition-colors;
+}
+
+.btn-icon-edit {
+  @apply w-8 h-8 flex items-center justify-center;
+  @apply text-blue-600 hover:bg-blue-50 rounded transition-colors;
+}
+
+.btn-icon-delete {
+  @apply w-8 h-8 flex items-center justify-center;
+  @apply text-red-600 hover:bg-red-50 rounded transition-colors;
+}
+
+.btn-secondary {
+  @apply px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700;
+  @apply rounded font-medium text-sm transition-colors;
+}
+
+.btn-primary {
+  @apply px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white;
+  @apply rounded font-medium text-sm transition-colors;
+}
+
+/* ==================== DRAWER ==================== */
+.drawer-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-[70];
+  @apply flex items-center justify-end;
+}
+
+.drawer-panel {
+  @apply bg-white h-full w-full md:w-[600px];
+  @apply flex flex-col shadow-2xl;
+  @apply animate-slide-in-right;
+}
+
+.drawer-header {
+  @apply flex items-center justify-between px-6 py-4;
+  @apply border-b border-gray-200 bg-gray-50;
+}
+
+.drawer-header h3 {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.drawer-close {
+  @apply w-10 h-10 rounded-full;
+  @apply flex items-center justify-center;
+  @apply text-gray-500 hover:text-gray-700 hover:bg-gray-200;
+  @apply transition-colors;
+}
+
+.drawer-body {
+  @apply flex-1 overflow-auto px-6 py-6 space-y-4;
+}
+
+.drawer-footer {
+  @apply flex items-center justify-end gap-3 px-6 py-4;
+  @apply border-t border-gray-200 bg-gray-50;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .drawer-panel {
+    @apply w-full;
+  }
+}

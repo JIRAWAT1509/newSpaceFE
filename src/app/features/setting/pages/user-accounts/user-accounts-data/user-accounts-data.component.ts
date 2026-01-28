@@ -191,17 +191,40 @@ this.userManagementService.getUsers({
     this.drawerMode = 'create';
     this.selectedUser = null;
     this.isDrawerOpen = true;
+    // Disable body scroll and prevent header clicks
+    document.body.style.overflow = 'hidden';
+    // Add class to disable header interactions
+    const header = document.querySelector('header');
+    if (header) {
+      header.style.pointerEvents = 'none';
+      header.style.userSelect = 'none';
+    }
   }
 
   openEditDrawer(user: User): void {
     this.drawerMode = 'edit';
     this.selectedUser = user;
     this.isDrawerOpen = true;
+    // Disable body scroll and prevent header clicks
+    document.body.style.overflow = 'hidden';
+    // Add class to disable header interactions
+    const header = document.querySelector('header');
+    if (header) {
+      header.style.pointerEvents = 'none';
+      header.style.userSelect = 'none';
+    }
   }
 
   closeDrawer(): void {
     this.isDrawerOpen = false;
     this.selectedUser = null;
+    // Re-enable body scroll and header interactions
+    document.body.style.overflow = '';
+    const header = document.querySelector('header');
+    if (header) {
+      header.style.pointerEvents = '';
+      header.style.userSelect = '';
+    }
   }
 
   onSaveUser(formData: UserFormData): void {

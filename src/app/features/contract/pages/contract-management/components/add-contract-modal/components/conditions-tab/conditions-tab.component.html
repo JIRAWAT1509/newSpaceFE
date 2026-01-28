@@ -1,0 +1,371 @@
+<!-- conditions-tab.component.html -->
+
+<div class="conditions-wrapper">
+
+  <!-- Progress Indicator -->
+  <div class="progress-indicator">
+    <div class="progress-steps">
+      @for (section of sections; track section.id; let i = $index) {
+        <div
+          class="progress-step"
+          [class.completed]="isSectionCompleted(section.id)"
+          (click)="scrollToSection(section.id)"
+        >
+          <div class="step-circle">
+            @if (isSectionCompleted(section.id)) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span class="step-number">{{ i + 1 }}</span>
+            }
+          </div>
+          <div class="step-info">
+            <div class="step-name">{{ section.name }}</div>
+            <div class="step-progress">{{ getSectionProgress(section.id) }}%</div>
+          </div>
+          @if (i < sections.length - 1) {
+            <div class="step-arrow">→</div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <form [formGroup]="form()!">
+
+    <!-- Section 1: ระยะเวลา & การต่อสัญญา -->
+    <div class="form-section" id="section-duration">
+      <h4 class="section-title">1. ระยะเวลา & การต่อสัญญา</h4>
+      <div class="form-grid-2">
+        <div class="form-group required">
+          <label>ระยะเวลาสัญญา (ปี / เดือน / วัน)</label>
+          <div class="duration-inputs">
+            <div class="duration-field">
+              <input type="number" pInputText formControlName="durationYears" class="w-full" min="0" placeholder="ปี" />
+              <span>ปี</span>
+            </div>
+            <div class="duration-field">
+              <input type="number" pInputText formControlName="durationMonths" class="w-full" min="0" max="11" placeholder="เดือน" />
+              <span>เดือน</span>
+            </div>
+            <div class="duration-field">
+              <input type="number" pInputText formControlName="durationDays" class="w-full" min="0" max="30" placeholder="วัน" />
+              <span>วัน</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group required">
+          <label>วันที่เริ่มต้นสัญญา</label>
+          <p-datepicker
+            formControlName="contractStartDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
+            styleClass="w-full"
+          ></p-datepicker>
+        </div>
+
+        <div class="form-group required">
+          <label>วันที่สิ้นสุดสัญญา</label>
+          <p-datepicker
+            formControlName="contractEndDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
+            styleClass="w-full"
+          ></p-datepicker>
+        </div>
+
+        <div class="form-group full-width">
+          <label>เงื่อนไขต่ออายุสัญญา</label>
+          <textarea
+            pInputTextarea
+            formControlName="renewalCondition"
+            rows="3"
+            placeholder="กรอกเงื่อนไขต่ออายุสัญญา"
+            class="w-full"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>จำนวนครั้งที่ต่ออายุ</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="renewalCount"
+            placeholder="0"
+            class="w-full"
+            min="0"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: เงื่อนไขทางการเงิน -->
+    <div class="form-section" id="section-financial">
+      <h4 class="section-title">2. เงื่อนไขทางการเงิน</h4>
+      <div class="form-grid-2">
+        <div class="form-group required">
+          <label>อัตราค่าเช่า</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="rentRate"
+            placeholder="0.00"
+            class="w-full"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>อัตราค่าบริการ</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="serviceRate"
+            placeholder="0.00"
+            class="w-full"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group required">
+          <label>Credit Term (Rent / Service)</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="creditTermRent"
+            placeholder="0"
+            class="w-full"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group required">
+          <label>Credit Term (Utility)</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="creditTermUtility"
+            placeholder="0"
+            class="w-full"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label>การชำระเงิน (รายเดือน / งวด)</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="paymentFrequency"
+            placeholder="กรอกการชำระเงิน"
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>การปรับอัตราค่าเช่ารายปี (%)</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="rentAdjustmentPercent"
+            placeholder="0"
+            class="w-full"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>เงินประกันค่าเช่า / ค่าบริการ / ส่วนกลาง</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="depositAmount"
+            placeholder="0.00"
+            class="w-full"
+            step="0.01"
+            min="0"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: เงื่อนไขพิเศษ -->
+    <div class="form-section" id="section-special">
+      <h4 class="section-title">3. เงื่อนไขพิเศษ</h4>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>การแจ้งล่วงหน้า (วัน)</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="advanceNoticeDays"
+            placeholder="0"
+            class="w-full"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>ค่าปรับกรณีหยุดกิจการ</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="closurePenalty"
+            placeholder="0.00"
+            class="w-full"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label>สินค้ายกเว้นการคิดยอดรายได้</label>
+          <textarea
+            pInputTextarea
+            formControlName="excludedProducts"
+            rows="3"
+            placeholder="กรอกสินค้ายกเว้นการคิดยอดรายได้"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: บันทึกแนบท้ายสัญญา -->
+    <div class="form-section" id="section-addendum">
+      <h4 class="section-title">4. บันทึกแนบท้ายสัญญา</h4>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>มีบันทึกแนบท้ายสัญญา</label>
+          <p-select
+            formControlName="hasAddendum"
+            [options]="yesNoOptions"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <div class="form-group full-width">
+          <label>บันทึกแนบท้ายสัญญา</label>
+          <textarea
+            pInputTextarea
+            formControlName="addendumNotes"
+            rows="4"
+            placeholder="กรอกบันทึกแนบท้ายสัญญา"
+            class="w-full"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: เงื่อนไขเพิ่มเติม -->
+    <div class="form-section" id="section-additional">
+      <div class="section-header">
+        <h4>5. เงื่อนไขเพิ่มเติม</h4>
+        <button type="button" class="btn-add" (click)="openConditionDrawer()">
+          <i class="pi pi-plus"></i>
+          <span>เพิ่ม</span>
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 80px;">ข้อที่</th>
+              <th style="width: 250px;">หัวข้อ</th>
+              <th>เนื้อหา</th>
+              <th style="width: 100px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (condition of conditionList(); track $index) {
+              <tr>
+                <td class="text-center">{{ condition.itemNumber }}</td>
+                <td>{{ condition.title }}</td>
+                <td>
+                  <div class="content-preview">{{ condition.content }}</div>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button type="button" class="btn-icon-edit" (click)="editCondition($index)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button type="button" class="btn-icon-delete" (click)="removeCondition($index)">
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="text-center py-4 text-gray-500">No records to display.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- Condition Drawer (Add/Edit) -->
+@if (showConditionDrawer()) {
+  <div class="drawer-backdrop" (click)="closeDrawer()">
+    <div class="drawer-panel" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <h3>{{ editingIndex() !== null ? 'แก้ไขเงื่อนไข' : 'เพิ่มเงื่อนไข' }}</h3>
+        <button class="drawer-close" (click)="closeDrawer()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <form [formGroup]="conditionForm">
+          <div class="form-group required">
+            <label>ข้อที่</label>
+            <input
+              type="number"
+              pInputText
+              formControlName="itemNumber"
+              class="w-full"
+              min="1"
+            />
+          </div>
+
+          <div class="form-group required">
+            <label>หัวข้อ</label>
+            <input
+              type="text"
+              pInputText
+              formControlName="title"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-group required">
+            <label>เนื้อหา</label>
+            <textarea
+              pInputTextarea
+              formControlName="content"
+              rows="10"
+              class="w-full"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="drawer-footer">
+        <button type="button" class="btn-secondary" (click)="closeDrawer()">ยกเลิก</button>
+        <button type="button" class="btn-primary" (click)="saveCondition()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+}

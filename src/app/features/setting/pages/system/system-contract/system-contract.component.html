@@ -165,7 +165,7 @@
               label="เพิ่ม"
               icon="pi pi-plus"
               (onClick)="openAddDrawer()"
-              styleClass="p-button-primary"
+              severity="primary"
             ></p-button>
           </div>
         </div>
@@ -361,7 +361,7 @@
               label="เพิ่ม"
               icon="pi pi-plus"
               (onClick)="openAddContractModal()"
-              styleClass="p-button-primary"
+              severity="primary"
             ></p-button>
           </div>
         </div>
@@ -464,7 +464,7 @@
               label="เพิ่ม"
               icon="pi pi-plus"
               (onClick)="openAddSignerDrawer()"
-              styleClass="p-button-primary"
+              severity="primary"
             ></p-button>
           </div>
         </div>
@@ -560,7 +560,7 @@
               label="เพิ่ม"
               icon="pi pi-plus"
               (onClick)="openAddCostCenterDrawer()"
-              styleClass="p-button-primary"
+              severity="primary"
             ></p-button>
           </div>
         </div>
@@ -668,13 +668,14 @@
         label="ยกเลิก"
         icon="pi pi-times"
         (onClick)="profitCenterModalVisible = false"
-        styleClass="p-button-text"
+        [outlined]="true"
+        severity="secondary"
       ></p-button>
       <p-button
         label="บันทึก"
         icon="pi pi-check"
         (onClick)="saveProfitCenter()"
-        styleClass="p-button-primary"
+        severity="primary"
       ></p-button>
     </div>
   </ng-template>
@@ -718,13 +719,14 @@
         label="ยกเลิก"
         icon="pi pi-times"
         (onClick)="mainBusinessModalVisible = false"
-        styleClass="p-button-text"
+        [outlined]="true"
+        severity="secondary"
       ></p-button>
       <p-button
         label="บันทึก"
         icon="pi pi-check"
         (onClick)="saveMainBusiness()"
-        styleClass="p-button-primary"
+        severity="primary"
       ></p-button>
     </div>
   </ng-template>
@@ -792,13 +794,14 @@
         label="ยกเลิก"
         icon="pi pi-times"
         (onClick)="subBusinessModalVisible = false"
-        styleClass="p-button-text"
+        [outlined]="true"
+        severity="secondary"
       ></p-button>
       <p-button
         label="บันทึก"
         icon="pi pi-check"
         (onClick)="saveSubBusiness()"
-        styleClass="p-button-primary"
+        severity="primary"
       ></p-button>
     </div>
   </ng-template>
@@ -906,13 +909,14 @@
         label="ยกเลิก"
         icon="pi pi-times"
         (onClick)="contractTypeModalVisible = false"
-        styleClass="p-button-text"
+        [outlined]="true"
+        severity="secondary"
       ></p-button>
       <p-button
         label="บันทึก"
         icon="pi pi-check"
         (onClick)="saveContractType()"
-        styleClass="p-button-primary"
+        severity="primary"
       ></p-button>
     </div>
   </ng-template>
@@ -985,13 +989,14 @@
         label="ยกเลิก"
         icon="pi pi-times"
         (onClick)="signerModalVisible = false"
-        styleClass="p-button-text"
+        [outlined]="true"
+        severity="secondary"
       ></p-button>
       <p-button
         label="บันทึก"
         icon="pi pi-check"
         (onClick)="saveSigner()"
-        styleClass="p-button-primary"
+        severity="primary"
       ></p-button>
     </div>
   </ng-template>
@@ -1077,13 +1082,14 @@
         label="ยกเลิก"
         icon="pi pi-times"
         (onClick)="costCenterModalVisible = false"
-        styleClass="p-button-text"
+        [outlined]="true"
+        severity="secondary"
       ></p-button>
       <p-button
         label="บันทึก"
         icon="pi pi-check"
         (onClick)="saveCostCenter()"
-        styleClass="p-button-primary"
+        severity="primary"
       ></p-button>
     </div>
   </ng-template>

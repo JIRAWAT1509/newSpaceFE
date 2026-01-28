@@ -1,0 +1,312 @@
+/* add-contract-modal.component.css */
+
+/* ==================== Modal Backdrop ==================== */
+.modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-50;
+  @apply flex items-center justify-center p-4;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-2xl;
+  @apply w-full max-w-5xl max-h-[90vh];
+  @apply flex flex-col;
+}
+
+/* ==================== Header ==================== */
+.modal-header {
+  @apply flex items-center justify-between px-6 py-4;
+  @apply border-b border-gray-200 bg-gray-50;
+}
+
+.modal-title {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+.modal-close-btn {
+  @apply w-10 h-10 rounded-full;
+  @apply flex items-center justify-center;
+  @apply text-gray-500 hover:text-gray-700 hover:bg-gray-200;
+  @apply transition-colors;
+}
+
+/* ==================== Tab Navigation ==================== */
+.tab-navigation {
+  @apply flex border-b border-gray-200 bg-white;
+  @apply px-6;
+}
+
+.tab-btn {
+  @apply flex items-center gap-2 px-6 py-4;
+  @apply border-b-2 border-transparent;
+  @apply text-gray-600 hover:text-gray-900;
+  @apply transition-all duration-200;
+  @apply disabled:opacity-40 disabled:cursor-not-allowed;
+  @apply relative;
+}
+
+.tab-btn.active {
+  @apply border-blue-600 text-blue-600 bg-blue-50;
+}
+
+.tab-btn.completed {
+  @apply text-green-600;
+}
+
+.tab-number {
+  @apply w-8 h-8 rounded-full;
+  @apply flex items-center justify-center;
+  @apply bg-gray-200 text-gray-700 font-semibold text-sm;
+}
+
+.tab-btn.active .tab-number {
+  @apply bg-blue-600 text-white;
+}
+
+.tab-btn.completed .tab-number {
+  @apply bg-green-600 text-white;
+}
+
+.tab-label {
+  @apply font-medium text-sm;
+}
+
+.tab-check {
+  @apply text-green-600 text-xs;
+}
+
+/* ==================== Modal Body ==================== */
+.modal-body {
+  @apply flex-1 overflow-auto px-6 py-6;
+}
+
+/* ==================== Form Sections ==================== */
+.form-section {
+  @apply space-y-6;
+}
+
+.section-title {
+  @apply text-xl font-bold text-gray-900 mb-4;
+  @apply pb-2 border-b-2 border-blue-600;
+}
+
+.subsection {
+  @apply mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200;
+}
+
+.subsection-title {
+  @apply text-lg font-semibold text-gray-800 mb-4;
+  @apply flex items-center gap-2;
+}
+
+.subsection-title::before {
+  content: '';
+  @apply w-1 h-6 bg-blue-600 rounded;
+}
+
+/* ==================== Form Layout ==================== */
+.form-row {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.form-group.full-width {
+  @apply col-span-full;
+}
+
+.form-group.required label::after {
+  content: ' *';
+  @apply text-red-600;
+}
+
+.form-group label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.required-mark {
+  @apply text-red-600;
+}
+
+.error-msg {
+  @apply text-red-600 text-xs mt-1;
+}
+
+/* ==================== Input Styles ==================== */
+::ng-deep .p-inputtext,
+::ng-deep .p-select,
+::ng-deep .p-datepicker,
+::ng-deep .p-textarea {
+  @apply w-full;
+}
+
+::ng-deep .p-inputtext:focus,
+::ng-deep .p-select:focus,
+::ng-deep .p-datepicker:focus,
+::ng-deep .p-textarea:focus {
+  @apply ring-2 ring-blue-500 border-blue-500;
+}
+
+::ng-deep .p-inputtext.ng-invalid.ng-touched,
+::ng-deep .p-select.ng-invalid.ng-touched,
+::ng-deep .p-datepicker.ng-invalid.ng-touched,
+::ng-deep .p-textarea.ng-invalid.ng-touched {
+  @apply border-red-500;
+}
+
+.input-with-button {
+  @apply flex gap-2;
+}
+
+.input-with-button input {
+  @apply flex-1;
+}
+
+.lookup-btn {
+  @apply w-10 h-10 flex-shrink-0;
+  @apply flex items-center justify-center;
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
+  @apply border border-gray-300 rounded;
+  @apply transition-colors;
+}
+
+/* ==================== Placeholder ==================== */
+.placeholder-text {
+  @apply text-center py-12 text-gray-500 italic;
+}
+
+/* ==================== Footer ==================== */
+.modal-footer {
+  @apply flex items-center justify-between px-6 py-4;
+  @apply border-t border-gray-200 bg-gray-50;
+}
+
+.footer-left,
+.footer-right {
+  @apply flex items-center gap-3;
+}
+
+.btn-secondary {
+  @apply flex items-center gap-2 px-5 py-2;
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
+  @apply rounded-lg font-medium text-sm;
+  @apply transition-colors;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply flex items-center gap-2 px-5 py-2;
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+  @apply rounded-lg font-medium text-sm;
+  @apply transition-colors;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-success {
+  @apply flex items-center gap-2 px-6 py-2;
+  @apply bg-green-600 hover:bg-green-700 text-white;
+  @apply rounded-lg font-semibold text-sm;
+  @apply shadow-sm hover:shadow;
+  @apply transition-all;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* ==================== SUMMARY SECTION ==================== */
+.summary-section {
+  @apply space-y-6;
+}
+
+.step-title {
+  @apply text-xl font-bold text-gray-900 mb-4;
+  @apply pb-2 border-b-2 border-blue-600;
+}
+
+.summary-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.summary-group {
+  @apply bg-gray-50 rounded-lg p-6;
+  @apply border border-gray-200;
+}
+
+.summary-group-title {
+  @apply text-base font-semibold text-gray-900 mb-4;
+  @apply pb-2 border-b-2 border-gray-300;
+}
+
+.summary-item {
+  @apply flex flex-col gap-1;
+  @apply py-3 border-b border-gray-200;
+}
+
+.summary-item:last-child {
+  @apply border-b-0;
+}
+
+.summary-label {
+  @apply text-xs font-semibold text-gray-600;
+  @apply uppercase tracking-wide;
+}
+
+.summary-value {
+  @apply text-sm text-gray-900 font-medium;
+}
+
+.summary-value-container {
+  @apply flex flex-col gap-2;
+}
+
+.previous-value {
+  @apply text-xs text-gray-600 italic;
+  @apply py-1 px-2 bg-gray-100 rounded;
+  @apply border-l-4 border-gray-400;
+}
+
+.summary-item.changed {
+  @apply bg-yellow-50 py-3 px-3 rounded;
+  @apply border border-yellow-200;
+}
+
+.changes-notice {
+  @apply flex items-center gap-2;
+  @apply py-3 px-4 bg-yellow-50 border border-yellow-200 rounded-lg;
+  @apply mb-6 text-yellow-800 text-sm;
+}
+
+.changes-notice i {
+  @apply text-yellow-600 text-lg;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px) {
+  .modal-content {
+    @apply max-w-full h-full max-h-full rounded-none;
+  }
+
+  .tab-navigation {
+    @apply overflow-x-auto;
+  }
+
+  .tab-btn {
+    @apply px-4 py-3 flex-shrink-0;
+  }
+
+  .tab-label {
+    @apply hidden;
+  }
+
+  .form-row {
+    @apply grid-cols-1;
+  }
+
+  .modal-footer {
+    @apply flex-col items-stretch gap-3;
+  }
+
+  .footer-left,
+  .footer-right {
+    @apply w-full justify-between;
+  }
+}

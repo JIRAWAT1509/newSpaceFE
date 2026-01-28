@@ -17,13 +17,13 @@
 }
 
 .step-circle.step-active {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
-  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
 }
 
 .step-circle.step-completed {
-  background-color: #8b5cf6;
+  background-color: #3b82f6;
   color: white;
 }
 
@@ -84,8 +84,8 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .form-input:disabled {
@@ -126,8 +126,8 @@ textarea.form-input {
 
 .file-input:focus {
   outline: none;
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .file-input::file-selector-button {
@@ -217,11 +217,11 @@ textarea.form-input {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #8b5cf6;
+  accent-color: #3b82f6;
 }
 
 .radio-label:hover {
-  color: #8b5cf6;
+  color: #3b82f6;
 }
 
 /* ==================== TOGGLE SWITCH ==================== */
@@ -264,7 +264,7 @@ textarea.form-input {
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background-color: #8b5cf6;
+  background-color: #3b82f6;
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
@@ -281,7 +281,7 @@ textarea.form-input {
 }
 
 .toggle-switch input:checked + .toggle-slider:hover {
-  background-color: #7c3aed;
+  background-color: #2563eb;
 }
 
 /* ==================== CONDITIONS TABLE ==================== */
@@ -413,13 +413,13 @@ textarea.form-input {
 }
 
 ::ng-deep .p-button-primary {
-  background-color: #8b5cf6 !important;
-  border-color: #8b5cf6 !important;
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
 }
 
 ::ng-deep .p-button-primary:hover:not(:disabled) {
-  background-color: #7c3aed !important;
-  border-color: #7c3aed !important;
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
 }
 
 ::ng-deep .p-button-secondary {

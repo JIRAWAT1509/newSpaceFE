@@ -1,0 +1,176 @@
+/* meter-list.component.css - FINAL CORRECTED */
+
+.meter-list-container {
+  @apply space-y-8;
+}
+
+/* Header Stats */
+.header-stats {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.stat-item {
+  @apply flex items-center gap-4 p-4 bg-white rounded-xl border-2 border-gray-200;
+  @apply transition-all duration-300;
+}
+
+.stat-item:hover {
+  @apply shadow-lg -translate-y-1;
+}
+
+.stat-item.success {
+  @apply border-green-200 bg-green-50;
+}
+
+.stat-item.primary {
+  @apply border-blue-200 bg-blue-50;
+}
+
+.stat-item i {
+  @apply text-3xl text-gray-600;
+}
+
+.stat-item.success i {
+  @apply text-green-600;
+}
+
+.stat-item.primary i {
+  @apply text-blue-600;
+}
+
+.stat-value {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+.stat-label {
+  @apply text-sm text-gray-600;
+}
+
+/* Filter Section */
+.filter-section {
+  @apply bg-white p-6 rounded-xl border border-gray-200;
+}
+
+.filter-title {
+  @apply text-lg font-bold text-gray-800 mb-4;
+}
+
+/* Dropdown Override */
+::ng-deep .p-select {
+  @apply w-full;
+}
+
+::ng-deep .p-select .p-select-label {
+  @apply px-4 py-3;
+}
+
+/* Filter Buttons */
+.filter-buttons {
+  @apply flex flex-wrap gap-3;
+}
+
+.filter-btn {
+  @apply flex items-center gap-3 px-4 py-3;
+  @apply bg-white border-2 rounded-lg;
+  @apply transition-all duration-300 cursor-pointer;
+}
+
+.filter-btn:hover {
+  @apply shadow-md -translate-y-0.5;
+}
+
+.filter-btn.active {
+  @apply shadow-lg;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.filter-icon {
+  @apply w-10 h-10 rounded-lg flex items-center justify-center text-white;
+}
+
+.filter-count {
+  @apply ml-auto px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold;
+}
+
+.filter-btn.active .filter-count {
+  @apply bg-blue-100 text-blue-700;
+}
+
+/* Meters Section */
+.meters-section {
+  @apply bg-white p-6 rounded-xl border border-gray-200;
+}
+
+.section-header {
+  @apply mb-6 pb-4 border-b border-gray-200;
+  @apply flex items-center justify-between;
+}
+
+.section-title {
+  @apply text-xl font-bold text-gray-800;
+}
+
+.meter-count {
+  @apply text-gray-500 font-normal;
+}
+
+.export-btn {
+  @apply flex items-center gap-2 px-4 py-2;
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg;
+  @apply transition-all duration-200 border-none cursor-pointer;
+}
+
+.export-btn i {
+  @apply text-lg;
+}
+
+/* Meters Grid - ALWAYS Compact by Default */
+.meters-grid {
+  @apply grid gap-4;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 250px));
+  justify-content: start;
+}
+
+/* Empty State */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-16 text-center;
+}
+
+.empty-state i {
+  @apply text-6xl text-gray-300 mb-4;
+}
+
+.empty-state h3 {
+  @apply text-xl font-bold text-gray-700 mb-2;
+}
+
+.empty-state p {
+  @apply text-gray-500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-stats {
+    @apply grid-cols-1;
+  }
+
+  .filter-buttons {
+    @apply flex-col;
+  }
+
+  .filter-btn {
+    @apply w-full;
+  }
+
+  .section-header {
+    @apply flex-col items-start gap-4;
+  }
+
+  .export-btn {
+    @apply w-full justify-center;
+  }
+
+  .meters-grid {
+    grid-template-columns: 1fr;
+  }
+}

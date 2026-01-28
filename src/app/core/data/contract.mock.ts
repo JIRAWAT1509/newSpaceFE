@@ -1,434 +1,592 @@
-// contract.mock.v3.ts - Updated with all required fields
+// contract.mock.ts - Full mock data for testing (UPDATED)
 
-import { Contract, ContractFile } from '@core/models/contract.model';
-import { toDateString } from '@core/utils/date-utils';
+import {
+  Contract,
+  RenewalAgreement,
+  AreaDetail,
+  RevenueCode,
+  OtherRevenue,
+  GuaranteeDocument,
+  ReceiptTransfer,
+  Installment,
+  PaymentTransfer,
+  PaymentCheck,
+  ContractCondition,
+  ContractFile
+} from '@core/models/contract.model';
 
-// Helper function to generate contract files
-function createContractFiles(contractId: string, count: number, includeImages: boolean = false): ContractFile[] {
-  const files: ContractFile[] = [];
+export const MOCK_CONTRACT_FULL: Contract = {
+  // ==================== BASIC INFO ====================
+  CONTRACT_ID: 'CNT-2024-001',
+  OU_CODE: 'OU001',
+  AREA_ID: 'AREA-A-1-101',
+  CONTRACT_NUMBER: 'CNT-2024-001',
+  CONTRACT_TYPE: 'LEASE_AGREEMENT',
+  STATUS: 'ACTIVE',
+  STATUS_NAME: 'ใช้งานอยู่',
 
-  // Main contract PDF
-  files.push({
-    FILE_ID: `${contractId}-F001`,
-    CONTRACT_ID: contractId,
-    FILE_NAME: `contract-${contractId}.pdf`,
-    FILE_TYPE: 'PDF',
-    FILE_URL: `/assets/contracts/${contractId}/main-contract.pdf`,
-    FILE_SIZE_MB: 1.2,
-    MIME_TYPE: 'application/pdf',
-    UPLOADED_AT: toDateString(new Date()),
-    IS_MAIN_CONTRACT: 'Y',
-    PAGE_COUNT: 8,
-    THUMBNAIL_URL: `/assets/contracts/${contractId}/thumbnail.jpg`
-  });
+  // Legacy fields
+  RENTAL_HISTORY_ID: 'RH-2024-001',
+  CONTRACT_TOPIC: 'สัญญาเช่าพื้นที่เพื่อประกอบกิจการร้านกาแฟและเบเกอรี่ ณ ศูนย์การค้าเซ็นทรัลเวิลด์',
+  CONTRACT_TOPIC_TH: 'สัญญาเช่าพื้นที่เพื่อประกอบกิจการร้านกาแฟและเบเกอรี่',
+  CONTRACT_TOPIC_EN: 'Lease Agreement for Coffee and Bakery Shop Space',
+  TENANT_NAME: 'บริษัท กาแฟดีดี จำกัด',
+  TENANT_NAME_TH: 'บริษัท กาแฟดีดี จำกัด',
+  TENANT_NAME_EN: 'DD Coffee Company Limited',
+  LANDLORD_NAME: 'บริษัท เซ็นทรัล พัฒนา จำกัด (มหาชน)',
+  ISSUE_DATE: '/Date(1705276800000)/',  // 2024-01-15
+  EXPIRY_DATE: '/Date(1817356800000)/', // 2027-08-16
+  SIGNED_DATE: '/Date(1705363200000)/',  // 2024-01-16
+  MONTHLY_RENT: 150000,
+  DEPOSIT_AMOUNT: 450000,
+  TOTAL_VALUE: 6300000,  // 35 months × 150,000 + deposit
+  NOTES: 'ลูกค้ามีประวัติการชำระเงินตรงเวลา ไม่เคยค้างชำระ',
+  TAGS: 'renewal,negotiated,high-value',
+  BOOKING_NUMBER: 'BOOK-2024-010',
+  QUOTATION_NUMBER: 'QUOT-2024-045',
+  BUILDING_CODE: 'A',
 
-  if (count > 1) {
-    files.push({
-      FILE_ID: `${contractId}-F002`,
-      CONTRACT_ID: contractId,
-      FILE_NAME: `addendum-${contractId}.pdf`,
+  // ==================== TAB 1: GENERAL DETAILS ====================
+
+  // Header Section (10 fields)
+  BRANCH_CODE: 'BRANCH-BKK-01',
+  CONTRACT_TYPE_CODE: 'LEASE_001',
+  CONTRACT_NUMBER_MAIN: 'QUOT-2024-045',
+  CONTRACT_NUMBER_SUB: 'QUOT-2024-045-SUB',
+  QUOTATION_STATUS: 'APPROVED',
+  CONTRACT_DATE: '2024-01-15',
+  RECORD_DATE: '2024-01-10',
+  APPROVAL_DATE: '2024-01-14',
+  INTENTION_LETTER: 'INT-2024-001',
+  TRANSFER_TO_BOOKING: 'BOOK-2024-010',
+
+  // Provider Section (6 fields)
+  CONTRACT_LOCATION: 'สำนักงานใหญ่ เซ็นทรัลเวิลด์',
+  HEAD_OFFICE_ADDRESS: '999/9 ถนนพระราม 1 แขวงปทุมวัน เขตปทุมวัน กรุงเทพฯ 10330',
+  REPRESENTATIVE: 'นายสมชาย ใจดี',
+  BRANCH_ADDRESS: '123/45 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110',
+  CONTACT_PERSON: 'นางสาวสมหญิง รักงาน',
+  CONTACT_ADDRESS_TYPE: 'headOffice',
+  CONTACT_ADDRESS: '999/9 ถนนพระราม 1 แขวงปทุมวัน เขตปทุมวัน กรุงเทพฯ 10330',
+
+  // Customer Section (10 fields)
+  CUSTOMER_ID: 'CUST-2024-078',
+  DOCUMENT_ADDRESS: '456 ถนนเพชรบุรี แขวงมักกะสัน เขตราชเทวี กรุงเทพฯ 10400',
+  BILLING_ADDRESS: '789 ถนนสีลม แขวงสีลม เขตบางรัก กรุงเทพฯ 10500',
+  COMPANY_NAME: 'บริษัท กาแฟดีดี จำกัด',
+  AUTHORIZED_PERSON_1: 'นายวิชัย ธุรกิจดี',
+  PHONE_1: '0812345678',
+  POSITION_1: 'กรรมการผู้จัดการ',
+  AUTHORIZED_PERSON_2: 'นางสาวปรียา ช่วยงาน',
+  PHONE_2: '0898765432',
+  POSITION_2: 'ผู้จัดการทั่วไป',
+
+  // Products Section (11 fields)
+  SUB_CATEGORY: 'FOOD_BEVERAGE',
+  CATEGORY: 'RESTAURANT',
+  PROFIT_CENTER: 'PC-001',
+  BUSINESS_NAME: 'DD Coffee & Bakery',
+  PRODUCT_CATEGORY: 'อาหารและเครื่องดื่ม',
+  PRODUCT_TYPE_1: 'กาแฟ',
+  PRODUCT_TYPE_2: 'เบเกอรี่',
+  PRODUCT_TYPE_3: 'อาหารว่าง',
+  PRODUCT_TYPE_4: 'เครื่องดื่ม',
+  PRODUCT_TYPE_5: 'ขนมหวาน',
+  PRODUCT_TYPE_6: 'อาหารจานด่วน',
+
+  // Signatories Section (7 fields)
+  PROVIDER_1: 'นายประสิทธิ์ ผู้ให้เช่า',
+  PROVIDER_POSITION_1: 'กรรมการผู้มีอำนาจ',
+  PROVIDER_2: 'นางสาวสุดา ผู้ช่วย',
+  PROVIDER_POSITION_2: 'กรรมการ',
+  WITNESS_1: 'นายสมศักดิ์ พยาน',
+  WITNESS_2: 'นางสาววิไล พยาน',
+  CONTRACT_CREATOR: 'SPACE',
+
+  // ==================== TAB 2: CONTRACT DETAILS ====================
+
+  // Contract Info Sub-Tab
+  DURATION_YEARS: 3,
+  DURATION_MONTHS: 6,
+  DURATION_DAYS: 15,
+  START_DATE: '2024-02-01',
+  END_DATE: '2027-08-16',
+  RENT_RATIO: 60,
+  SERVICE_RATIO: 40,
+  RENT_START_DATE: '2024-02-01',
+  RENEWAL_NOTICE_DAYS: 90,
+  CREDIT_TERM_RENT: 30,
+  CREDIT_TERM_UTILITY: 15,
+  PAYMENT_DAY: 5,
+  CLOSURE_PENALTY: 5000,
+  PAYMENT_METHOD: 'monthly',
+  REVENUE_COLLECTION: 'with_cashier',
+  HAS_ADDENDUM: true,
+  ADJUSTMENT_YEARS: 1,
+  ADJUSTMENT_PERCENT: 5,
+  EXCLUDED_PRODUCTS: 'บุหรี่, เครื่องดื่มแอลกอฮอล์, สลากกินแบ่งรัฐบาล',
+
+  // Renewal Agreements
+  RENEWAL_AGREEMENTS: [
+    {
+      START_DATE: '2025-02-01',
+      END_DATE: '2026-01-31',
+      RATE: 5
+    },
+    {
+      START_DATE: '2026-02-01',
+      END_DATE: '2027-01-31',
+      RATE: 7
+    },
+    {
+      START_DATE: '2027-02-01',
+      END_DATE: '2027-08-16',
+      RATE: 10
+    }
+  ],
+
+  // Area Details
+  AREA_DETAILS: [
+    {
+      BUILDING: 'A',
+      FLOOR: '1',
+      UNIT_NUMBER: '101',
+      STATUS: 'Active',
+      ZONE: 'North',
+      WIDTH: 10,
+      LENGTH: 15,
+      TOTAL_AREA: 150
+    },
+    {
+      BUILDING: 'A',
+      FLOOR: '1',
+      UNIT_NUMBER: '102',
+      STATUS: 'Active',
+      ZONE: 'North',
+      WIDTH: 8,
+      LENGTH: 12,
+      TOTAL_AREA: 96
+    },
+    {
+      BUILDING: 'A',
+      FLOOR: '2',
+      UNIT_NUMBER: '201',
+      STATUS: 'Active',
+      ZONE: 'South',
+      WIDTH: 12,
+      LENGTH: 18,
+      TOTAL_AREA: 216
+    }
+  ],
+  REQUEST_AREA_MEASUREMENT: false,
+
+  // Revenue Sub-Tab
+  REVENUE_CODES: [
+    {
+      CODE: 'REV-001',
+      NAME: 'ค่าเช่าพื้นที่',
+      CHARACTERISTIC: 'รายเดือน',
+      REFER_STATUS: 'Active',
+      GROUP: 'Rental',
+      TYPE: 'Fixed',
+      COLLECT_BEFORE: 'วันที่ 1 ของเดือน'
+    },
+    {
+      CODE: 'REV-002',
+      NAME: 'ค่าบริการส่วนกลาง',
+      CHARACTERISTIC: 'รายเดือน',
+      REFER_STATUS: 'Active',
+      GROUP: 'Service',
+      TYPE: 'Fixed',
+      COLLECT_BEFORE: 'วันที่ 1 ของเดือน'
+    },
+    {
+      CODE: 'REV-003',
+      NAME: 'ค่าไฟฟ้า',
+      CHARACTERISTIC: 'รายเดือน',
+      REFER_STATUS: 'Active',
+      GROUP: 'Utility',
+      TYPE: 'Variable',
+      COLLECT_BEFORE: 'วันที่ 5 ของเดือน'
+    }
+  ],
+
+  OTHER_REVENUES: [
+    {
+      CODE: 'OTHER-001',
+      NAME: 'ค่าประกันความเสียหาย',
+      TYPE: 'Deposit',
+      AMOUNT: 50000,
+      PAYMENT_TYPE: 'ครั้งเดียว'
+    },
+    {
+      CODE: 'OTHER-002',
+      NAME: 'ค่าธรรมเนียมการโอน',
+      TYPE: 'Fee',
+      AMOUNT: 5000,
+      PAYMENT_TYPE: 'ครั้งเดียว'
+    }
+  ],
+
+  RENT_SERVICE_TYPE: 'rent',
+  UNIT_NUMBER: '101-102',
+  ADVANCE_MONTHS: 3,
+  AMOUNT: 150000,
+  PAYMENT_DUE_DATE: '2024-01-25',
+  TAX_CALCULATION_METHOD: 'by_area',
+  TAX_COLLECTION_PERIOD: 'monthly',
+
+  // ==================== TAB 3: INSURANCE (เงินประกัน) ====================
+
+  VAT_RATE: 7,
+
+  // Deposit Configuration
+  DEPOSIT_PERIOD: 3,
+  RENT_DEPOSIT_RATE: 50000,
+  SERVICE_DEPOSIT_RATE: 30000,
+  COMMON_DEPOSIT_RATE: 20000,
+  TOTAL_DEPOSIT_RATE: 100000,
+
+  // Guarantees
+  GUARANTEES: [
+    {
+      DOCUMENT_NUMBER: 'BG-2024-001',
+      AMOUNT: 500000,
+      BANK: 'ธนาคารกสิกรไทย',
+      BRANCH: 'สาขาสีลม',
+      COMPANY: 'บริษัท ประกันภัย AAA จำกัด'
+    },
+    {
+      DOCUMENT_NUMBER: 'BG-2024-002',
+      AMOUNT: 300000,
+      BANK: 'ธนาคารกรุงเทพ',
+      BRANCH: 'สาขาสุขุมวิท',
+      COMPANY: 'บริษัท ประกันภัย BBB จำกัด'
+    }
+  ],
+
+  // Payment Details
+  RECEIPT_TRANSFERS: [
+    {
+      RECEIPT_NUMBER: 'REC-2024-001',
+      DATE: '2024-01-15',
+      AMOUNT: 100000,
+      COMPANY: 'บริษัท กาแฟดีดี จำกัด'
+    },
+    {
+      RECEIPT_NUMBER: 'REC-2024-002',
+      DATE: '2024-01-20',
+      AMOUNT: 50000,
+      COMPANY: 'บริษัท กาแฟดีดี จำกัด'
+    }
+  ],
+
+  INSTALLMENTS: [
+    {
+      DUE_DATE: '2024-02-01',
+      AMOUNT: 50000,
+      RENT_DEPOSIT: 20000,
+      SERVICE_DEPOSIT: 15000,
+      COMMON_DEPOSIT: 10000,
+      TOTAL_WITH_VAT: 101650,
+      CASH_PAYMENT: 50000,
+      TRANSFERS: [
+        {
+          DATE: '2024-01-28',
+          AMOUNT: 30000,
+          BANK: 'ธนาคารกสิกรไทย',
+          BRANCH: 'สาขาสีลม',
+          COMPANY: 'บริษัท กาแฟดีดี จำกัด'
+        }
+      ],
+      CHECKS: [
+        {
+          CHECK_NUMBER: 'CHK-001',
+          DATE: '2024-02-01',
+          AMOUNT: 21650,
+          BANK: 'ธนาคารกรุงเทพ',
+          BRANCH: 'สาขาสุขุมวิท',
+          COMPANY: 'บริษัท กาแฟดีดี จำกัด'
+        }
+      ]
+    },
+    {
+      DUE_DATE: '2024-03-01',
+      AMOUNT: 50000,
+      RENT_DEPOSIT: 20000,
+      SERVICE_DEPOSIT: 15000,
+      COMMON_DEPOSIT: 10000,
+      TOTAL_WITH_VAT: 101650,
+      CASH_PAYMENT: 101650,
+      TRANSFERS: [],
+      CHECKS: []
+    },
+    {
+      DUE_DATE: '2024-04-01',
+      AMOUNT: 50000,
+      RENT_DEPOSIT: 20000,
+      SERVICE_DEPOSIT: 15000,
+      COMMON_DEPOSIT: 10000,
+      TOTAL_WITH_VAT: 101650,
+      CASH_PAYMENT: 0,
+      TRANSFERS: [
+        {
+          DATE: '2024-03-29',
+          AMOUNT: 101650,
+          BANK: 'ธนาคารไทยพาณิชย์',
+          BRANCH: 'สาขาพระราม 4',
+          COMPANY: 'บริษัท กาแฟดีดี จำกัด'
+        }
+      ],
+      CHECKS: []
+    }
+  ],
+
+  // Meter/Phone Deposit
+  METER_DUE_DATE: '2024-02-15',
+  METER_AMOUNT: 10000,
+  METER_CASH_PAYMENT: 5000,
+  METER_TRANSFERS: [
+    {
+      DATE: '2024-02-10',
+      AMOUNT: 5000,
+      BANK: 'ธนาคารกสิกรไทย',
+      BRANCH: 'สาขาสีลม',
+      COMPANY: 'บริษัท กาแฟดีดี จำกัด'
+    }
+  ],
+  METER_CHECKS: [
+    {
+      CHECK_NUMBER: 'CHK-METER-001',
+      DATE: '2024-02-15',
+      AMOUNT: 700,
+      BANK: 'ธนาคารกรุงเทพ',
+      BRANCH: 'สาขาสุขุมวิท',
+      COMPANY: 'บริษัท กาแฟดีดี จำกัด'
+    }
+  ],
+
+  // Decoration Deposit
+  DECORATION_DEPOSIT_DUE_DATE: '2024-01-31',
+  DECORATION_DEPOSIT_AMOUNT: 30000,
+  DECORATION_DEPOSIT_CASH: 15000,
+  DECORATION_DEPOSIT_TRANSFERS: [
+    {
+      DATE: '2024-01-25',
+      AMOUNT: 15000,
+      BANK: 'ธนาคารกสิกรไทย',
+      BRANCH: 'สาขาสีลม',
+      COMPANY: 'บริษัท กาแฟดีดี จำกัด'
+    }
+  ],
+  DECORATION_DEPOSIT_CHECKS: [
+    {
+      CHECK_NUMBER: 'CHK-DECO-001',
+      DATE: '2024-01-31',
+      AMOUNT: 2100,
+      BANK: 'ธนาคารกรุงไทย',
+      BRANCH: 'สาขาอโศก',
+      COMPANY: 'บริษัท กาแฟดีดี จำกัด'
+    }
+  ],
+
+  // ==================== TAB 4: DECORATION (การตกแต่งสถานที่) ====================
+
+  NO_DECORATION: false,
+  DECORATION_START_DATE: '2024-01-20',
+  DECORATION_END_DATE: '2024-01-31',
+  DECORATION_DAYS: 12,
+  PRICE_PER_SQM_PER_DAY: 50,
+  DECORATION_TOTAL_PRICE: 27720, // 12 days × 50 ฿/sqm/day × 462 sqm
+
+  // Store Details
+  OPEN_TIME: '09:00',
+  CLOSE_TIME: '22:00',
+  SALES_AMOUNT_VAT: 'include',
+  PHONE_NUMBER_COUNT: 2,
+  ATM_COUNT: 1,
+  VENDING_COUNT: 2,
+  SIGNAL_INSTALLATION_POINTS: 3,
+  SERVICE_CONTRACT_TYPE: 'signal_distribution',
+
+  // ==================== TAB 5: CONDITIONS (เงื่อนไขอื่นๆ) ====================
+
+  SUBJECT: 'สัญญาเช่าพื้นที่เพื่อประกอบกิจการร้านกาแฟและเบเกอรี่ ณ ศูนย์การค้าเซ็นทรัลเวิลด์',
+
+  CONTRACT_CONDITIONS: [
+    {
+      ITEM_NUMBER: 1,
+      TITLE: 'ระยะเวลาการเช่า',
+      CONTENT: 'ผู้เช่าตกลงเช่าพื้นที่ดังกล่าวเป็นระยะเวลา 3 ปี 6 เดือน 15 วัน นับตั้งแต่วันที่ 1 กุมภาพันธ์ 2567 ถึงวันที่ 16 สิงหาคม 2570 โดยผู้เช่ามีสิทธิต่ออายุสัญญาได้ภายใต้เงื่อนไขที่กำหนดในสัญญาฉบับนี้'
+    },
+    {
+      ITEM_NUMBER: 2,
+      TITLE: 'ค่าเช่าและค่าบริการ',
+      CONTENT: 'ผู้เช่าตกลงชำระค่าเช่าเป็นรายเดือน โดยแบ่งเป็นค่าเช่าพื้นที่ 60% และค่าบริการส่วนกลาง 40% ทั้งนี้ค่าเช่าจะมีการปรับขึ้นร้อยละ 5 ทุกๆ 1 ปี ตามสัญญาที่ตกลงกัน การชำระเงินจะต้องชำระภายในวันที่ 5 ของทุกเดือน'
+    },
+    {
+      ITEM_NUMBER: 3,
+      TITLE: 'การใช้พื้นที่',
+      CONTENT: 'ผู้เช่าสามารถใช้พื้นที่เพื่อประกอบกิจการร้านกาแฟและเบเกอรี่เท่านั้น ห้ามประกอบกิจการอื่นใดที่ไม่ได้รับอนุญาตจากผู้ให้เช่า ห้ามขายสินค้าต้องห้ามตามที่ระบุในสัญญา ได้แก่ บุหรี่ เครื่องดื่มแอลกอฮอล์ และสลากกินแบ่งรัฐบาล'
+    },
+    {
+      ITEM_NUMBER: 4,
+      TITLE: 'เวลาทำการ',
+      CONTENT: 'ผู้เช่าต้องเปิดทำการตามเวลาที่กำหนด คือ 09:00 - 22:00 น. ทุกวัน หากมีความจำเป็นต้องปิดทำการ ต้องแจ้งให้ผู้ให้เช่าทราบล่วงหน้าอย่างน้อย 7 วัน มิฉะนั้นจะมีค่าปรับวันละ 5,000 บาท'
+    },
+    {
+      ITEM_NUMBER: 5,
+      TITLE: 'การตกแต่งและติดตั้ง',
+      CONTENT: 'ผู้เช่าได้รับอนุญาตให้ตกแต่งพื้นที่ตั้งแต่วันที่ 20 มกราคม 2567 ถึงวันที่ 31 มกราคม 2567 เป็นเวลา 12 วัน โดยเสียค่าใช้จ่ายในอัตรา 50 บาทต่อตารางเมตรต่อวัน การตกแต่งต้องเป็นไปตามแบบที่ผู้ให้เช่าอนุมัติ'
+    },
+    {
+      ITEM_NUMBER: 6,
+      TITLE: 'เงินประกัน',
+      CONTENT: 'ผู้เช่าต้องวางเงินประกันเท่ากับค่าเช่า 3 เดือน แบ่งเป็น เงินประกันค่าเช่า 50,000 บาท เงินประกันค่าบริการ 30,000 บาท และเงินประกันส่วนกลาง 20,000 บาท รวมเป็นเงิน 100,000 บาท โดยจะคืนให้เมื่อสิ้นสุดสัญญาและไม่มีหนี้ค้างชำระ'
+    },
+    {
+      ITEM_NUMBER: 7,
+      TITLE: 'การต่ออายุสัญญา',
+      CONTENT: 'หากผู้เช่าประสงค์จะต่ออายุสัญญา ต้องแจ้งความจำนงเป็นลายลักษณ์อักษรล่วงหน้าอย่างน้อย 90 วัน ก่อนสัญญาสิ้นสุด โดยเงื่อนไขการต่ออายุจะมีการปรับค่าเช่าตามข้อตกลง'
+    }
+  ],
+
+  INTERNAL_NOTES: `หมายเหตุภายใน:
+- ลูกค้ามีประวัติการชำระเงินตรงเวลา ไม่เคยค้างชำระ
+- มีการต่อรองลดค่าเช่าในปีที่ 1 จาก 5% เหลือ 3%
+- ตกลงให้ติดตั้ง ATM และตู้ Vending โดยไม่คิดค่าใช้จ่ายเพิ่มเติม
+- อนุมัติให้ติดตั้งจุดกระจายสัญญาณ 3 จุด
+- แนบหนังสือค้ำประกัน 2 ฉบับ รวมมูลค่า 800,000 บาท
+- ผู้เช่ามีแผนขยายสาขาในอนาคต อาจเช่าพื้นที่เพิ่มในชั้น 2
+- ทีมงานประเมินว่าลูกค้ามีศักยภาพดี แนะนำให้ต่ออายุสัญญา`,
+
+  // ==================== FILES & AUDIT ====================
+
+  FILES: [
+    {
+      FILE_ID: 'FILE-001',
+      CONTRACT_ID: 'CNT-2024-001',
+      FILE_NAME: 'สัญญาเช่า_DD_Coffee.pdf',
       FILE_TYPE: 'PDF',
-      FILE_URL: `/assets/contracts/${contractId}/addendum.pdf`,
-      FILE_SIZE_MB: 0.5,
+      FILE_URL: '/files/contracts/CNT-2024-001-main.pdf',
+      FILE_SIZE_MB: 2.5,
       MIME_TYPE: 'application/pdf',
-      UPLOADED_AT: toDateString(new Date()),
+      UPLOADED_AT: '2024-01-15T10:30:00',
+      UPLOADED_BY: 'admin@space.com',
+      IS_MAIN_CONTRACT: 'Y',
+      PAGE_COUNT: 15,
+      THUMBNAIL_URL: '/files/thumbnails/CNT-2024-001-thumb.jpg'
+    },
+    {
+      FILE_ID: 'FILE-002',
+      CONTRACT_ID: 'CNT-2024-001',
+      FILE_NAME: 'แบบแปลนร้าน.pdf',
+      FILE_TYPE: 'PDF',
+      FILE_URL: '/files/contracts/CNT-2024-001-plan.pdf',
+      FILE_SIZE_MB: 5.2,
+      MIME_TYPE: 'application/pdf',
+      UPLOADED_AT: '2024-01-15T11:00:00',
+      UPLOADED_BY: 'admin@space.com',
       IS_MAIN_CONTRACT: 'N',
-      PAGE_COUNT: 2,
-      THUMBNAIL_URL: `/assets/contracts/${contractId}/addendum-thumb.jpg`
-    });
-  }
-
-  if (includeImages) {
-    files.push({
-      FILE_ID: `${contractId}-F003`,
-      CONTRACT_ID: contractId,
-      FILE_NAME: 'signed-page-1.jpg',
-      FILE_TYPE: 'IMAGE',
-      FILE_URL: `/assets/contracts/${contractId}/signed-1.jpg`,
-      FILE_SIZE_MB: 2.1,
-      MIME_TYPE: 'image/jpeg',
-      UPLOADED_AT: toDateString(new Date()),
+      PAGE_COUNT: 3,
+      THUMBNAIL_URL: '/files/thumbnails/CNT-2024-001-plan-thumb.jpg'
+    },
+    {
+      FILE_ID: 'FILE-003',
+      CONTRACT_ID: 'CNT-2024-001',
+      FILE_NAME: 'หนังสือค้ำประกัน.pdf',
+      FILE_TYPE: 'PDF',
+      FILE_URL: '/files/contracts/CNT-2024-001-guarantee.pdf',
+      FILE_SIZE_MB: 1.8,
+      MIME_TYPE: 'application/pdf',
+      UPLOADED_AT: '2024-01-15T14:20:00',
+      UPLOADED_BY: 'admin@space.com',
       IS_MAIN_CONTRACT: 'N',
-      THUMBNAIL_URL: `/assets/contracts/${contractId}/signed-1-thumb.jpg`
-    });
-  }
+      PAGE_COUNT: 4,
+      THUMBNAIL_URL: '/files/thumbnails/CNT-2024-001-guarantee-thumb.jpg'
+    }
+  ],
 
-  return files;
-}
+  CREATE_BY: 'admin@space.com',
+  CREATE_DATE: '2024-01-10T09:00:00',
+  UPD_BY: 'manager@space.com',
+  UPD_DATE: '2024-01-15T16:30:00'
+};
 
+// Additional mock contracts for table testing
 export const MOCK_CONTRACTS: Contract[] = [
-  // ========== QUOTATION_AGREEMENT (ใบเสนอราคา) ==========
+  MOCK_CONTRACT_FULL,
+
+  // Contract 2 - Simpler version
   {
-    CONTRACT_ID: 'QT-001',
-    OU_CODE: '001',
-    AREA_ID: 'area-005',
-    CONTRACT_NUMBER: 'COWBP125070001',
-    CONTRACT_TYPE: 'QUOTATION_AGREEMENT',
-    CONTRACT_TOPIC: 'Quotation - Premium Retail Space',
-    CONTRACT_TOPIC_TH: 'ใบเสนอราคา - พื้นที่ร้านค้าพรีเมียม',
-    CONTRACT_TOPIC_EN: 'Quotation - Premium Retail Space',
-    ISSUE_DATE: toDateString(new Date('2025-07-15')),
-    START_DATE: toDateString(new Date('2025-08-01')),
-    END_DATE: toDateString(new Date('2027-07-31')),
-    EXPIRY_DATE: toDateString(new Date('2025-08-15')), // Quotation expires soon
-    TENANT_NAME: 'Premium Fashion Co.',
-    TENANT_NAME_TH: 'บริษัท Premium Fashion จำกัด',
-    TENANT_NAME_EN: 'Premium Fashion Co., Ltd.',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2025-001',
-    QUOTATION_NUMBER: 'COWBP125070001',
-    BUILDING_CODE: 'A',
-    MONTHLY_RENT: 50000,
-    DEPOSIT_AMOUNT: 150000,
-    TOTAL_VALUE: 1200000,
+    ...MOCK_CONTRACT_FULL,
+    CONTRACT_ID: 'CNT-2024-002',
+    CONTRACT_NUMBER: 'CNT-2024-002',
+    CUSTOMER_ID: 'CUST-2024-089',
+    COMPANY_NAME: 'ร้านอาหารญี่ปุ่น ซูชิโอะ',
+    BUSINESS_NAME: 'Sushi O',
     STATUS: 'PENDING',
-    STATUS_NAME: 'รอลงนาม',
-    FILES: createContractFiles('QT-001', 1, false),
-    TAGS: 'pending,fashion,retail',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2025-07-15')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2025-07-15'))
-  },
-  {
-    CONTRACT_ID: 'QT-002',
-    OU_CODE: '001',
-    AREA_ID: 'area-006',
-    CONTRACT_NUMBER: 'COWBP125070002',
-    CONTRACT_TYPE: 'QUOTATION_AGREEMENT',
-    CONTRACT_TOPIC: 'Quotation - Tech Store',
-    CONTRACT_TOPIC_TH: 'ใบเสนอราคา - ร้านเทคโนโลยี',
-    CONTRACT_TOPIC_EN: 'Quotation - Tech Store',
-    ISSUE_DATE: toDateString(new Date('2025-07-20')),
-    START_DATE: toDateString(new Date('2025-09-01')),
-    END_DATE: toDateString(new Date('2027-08-31')),
-    EXPIRY_DATE: toDateString(new Date('2025-08-20')),
-    TENANT_NAME: 'TechZone',
-    TENANT_NAME_TH: 'บริษัท TechZone จำกัด',
-    TENANT_NAME_EN: 'TechZone Co., Ltd.',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2025-002',
-    QUOTATION_NUMBER: 'COWBP125070002',
-    BUILDING_CODE: 'B',
-    MONTHLY_RENT: 38000,
-    DEPOSIT_AMOUNT: 114000,
-    TOTAL_VALUE: 912000,
-    STATUS: 'DRAFT',
-    STATUS_NAME: 'ร่าง',
-    FILES: createContractFiles('QT-002', 1, false),
-    TAGS: 'draft,electronics',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2025-07-20')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2025-07-20'))
+    DEPOSIT_PERIOD: 2,
+    DURATION_YEARS: 2,
+    DURATION_MONTHS: 0,
+    DURATION_DAYS: 0,
+    NO_DECORATION: true,
+    DECORATION_START_DATE: undefined,
+    DECORATION_END_DATE: undefined,
+    AREA_DETAILS: [
+      {
+        BUILDING: 'B',
+        FLOOR: '3',
+        UNIT_NUMBER: '305',
+        STATUS: 'Active',
+        ZONE: 'East',
+        WIDTH: 15,
+        LENGTH: 20,
+        TOTAL_AREA: 300
+      }
+    ],
+    INSTALLMENTS: [],
+    GUARANTEES: [],
+    CONTRACT_CONDITIONS: [
+      {
+        ITEM_NUMBER: 1,
+        TITLE: 'ระยะเวลาการเช่า',
+        CONTENT: 'สัญญาเช่า 2 ปี'
+      }
+    ]
   },
 
-  // ========== DEPOSIT_AGREEMENT (สัญญาจอง) ==========
+  // Contract 3 - Expired
   {
-    CONTRACT_ID: 'BK-001',
-    OU_CODE: '001',
-    AREA_ID: 'area-007',
-    CONTRACT_NUMBER: 'RSWBP125070001',
-    CONTRACT_TYPE: 'DEPOSIT_AGREEMENT',
-    CONTRACT_TOPIC: 'Booking Agreement - Coffee Shop',
-    CONTRACT_TOPIC_TH: 'สัญญาจอง - ร้านกาแฟ',
-    CONTRACT_TOPIC_EN: 'Booking Agreement - Coffee Shop',
-    ISSUE_DATE: toDateString(new Date('2025-06-01')),
-    START_DATE: toDateString(new Date('2025-07-01')),
-    END_DATE: toDateString(new Date('2027-06-30')),
-    EXPIRY_DATE: toDateString(new Date('2027-06-30')),
-    SIGNED_DATE: toDateString(new Date('2025-06-05')),
-    TENANT_NAME: 'Cafe Aroma',
-    TENANT_NAME_TH: 'ร้าน Cafe Aroma',
-    TENANT_NAME_EN: 'Cafe Aroma',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2025-003',
-    BOOKING_NUMBER: 'RSWBP125070001',
-    QUOTATION_NUMBER: 'COWBP125060001', // Reference to quotation
-    BUILDING_CODE: 'A',
-    MONTHLY_RENT: 30000,
-    DEPOSIT_AMOUNT: 90000,
-    TOTAL_VALUE: 720000,
-    STATUS: 'ACTIVE',
-    STATUS_NAME: 'ใช้งานอยู่',
-    FILES: createContractFiles('BK-001', 1, false),
-    TAGS: 'active,food-beverage',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2025-06-01')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2025-06-05'))
-  },
-  {
-    CONTRACT_ID: 'BK-002',
-    OU_CODE: '001',
-    AREA_ID: 'area-008',
-    CONTRACT_NUMBER: 'RSWBP125070002',
-    CONTRACT_TYPE: 'DEPOSIT_AGREEMENT',
-    CONTRACT_TOPIC: 'Booking Agreement - Bookstore',
-    CONTRACT_TOPIC_TH: 'สัญญาจอง - ร้านหนังสือ',
-    CONTRACT_TOPIC_EN: 'Booking Agreement - Bookstore',
-    ISSUE_DATE: toDateString(new Date('2025-05-15')),
-    START_DATE: toDateString(new Date('2025-06-15')),
-    END_DATE: toDateString(new Date('2027-06-14')),
-    EXPIRY_DATE: toDateString(new Date('2027-06-14')),
-    TENANT_NAME: 'BookHaven',
-    TENANT_NAME_TH: 'ร้าน BookHaven',
-    TENANT_NAME_EN: 'BookHaven Store',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2025-004',
-    BOOKING_NUMBER: 'RSWBP125070002',
-    QUOTATION_NUMBER: 'COWBP125050001',
-    BUILDING_CODE: 'C',
-    MONTHLY_RENT: 25000,
-    DEPOSIT_AMOUNT: 75000,
-    TOTAL_VALUE: 600000,
-    STATUS: 'PENDING',
-    STATUS_NAME: 'รอลงนาม',
-    FILES: createContractFiles('BK-002', 1, false),
-    TAGS: 'pending,retail',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2025-05-15')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2025-05-15'))
-  },
-
-  // ========== LEASE_AGREEMENT (สัญญาเช่า) ==========
-  {
-    CONTRACT_ID: 'CNT-001',
-    OU_CODE: '001',
-    AREA_ID: 'area-001',
-    RENTAL_HISTORY_ID: 'RH-001',
-    CONTRACT_NUMBER: 'CNT-2023-001',
-    CONTRACT_TYPE: 'LEASE_AGREEMENT',
-    CONTRACT_TOPIC: 'Lease Agreement - ABC Electronics',
-    CONTRACT_TOPIC_TH: 'สัญญาเช่า - ABC Electronics',
-    CONTRACT_TOPIC_EN: 'Lease Agreement - ABC Electronics',
-    ISSUE_DATE: toDateString(new Date('2023-05-15')),
-    START_DATE: toDateString(new Date('2023-06-01')),
-    END_DATE: toDateString(new Date('2024-12-31')),
-    EXPIRY_DATE: toDateString(new Date('2024-12-31')),
-    SIGNED_DATE: toDateString(new Date('2023-05-20')),
-    TENANT_NAME: 'ABC Electronics',
-    TENANT_NAME_TH: 'บริษัท ABC Electronics จำกัด',
-    TENANT_NAME_EN: 'ABC Electronics Co., Ltd.',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2023-001',
-    BOOKING_NUMBER: 'RSWBP123050001',
-    QUOTATION_NUMBER: 'COWBP123040001',
-    BUILDING_CODE: 'A',
-    MONTHLY_RENT: 40000,
-    DEPOSIT_AMOUNT: 120000,
-    TOTAL_VALUE: 760000,
-    STATUS: 'COMPLETED',
-    STATUS_NAME: 'เสร็จสิ้น',
-    FILES: createContractFiles('CNT-001', 2, true),
-    TAGS: 'completed,electronics',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2023-05-15')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2024-12-31'))
-  },
-  {
-    CONTRACT_ID: 'CNT-002',
-    OU_CODE: '001',
-    AREA_ID: 'area-001',
-    CONTRACT_NUMBER: 'CNT-2025-045',
-    CONTRACT_TYPE: 'LEASE_AGREEMENT',
-    CONTRACT_TOPIC: 'New Lease Agreement - TechStart Hub',
-    CONTRACT_TOPIC_TH: 'สัญญาเช่าใหม่ - TechStart Hub',
-    CONTRACT_TOPIC_EN: 'New Lease Agreement - TechStart Hub',
-    ISSUE_DATE: toDateString(new Date('2025-01-05')),
-    START_DATE: toDateString(new Date('2025-02-01')),
-    END_DATE: toDateString(new Date('2027-01-31')),
-    EXPIRY_DATE: toDateString(new Date('2027-01-31')),
-    SIGNED_DATE: toDateString(new Date('2025-01-10')),
-    TENANT_NAME: 'TechStart Hub',
-    TENANT_NAME_TH: 'บริษัท TechStart Hub จำกัด',
-    TENANT_NAME_EN: 'TechStart Hub Co., Ltd.',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2024-012',
-    BOOKING_NUMBER: 'RSWBP124120001',
-    QUOTATION_NUMBER: 'COWBP124110001',
-    BUILDING_CODE: 'A',
-    MONTHLY_RENT: 45000,
-    DEPOSIT_AMOUNT: 135000,
-    TOTAL_VALUE: 1080000,
-    STATUS: 'ACTIVE',
-    STATUS_NAME: 'ใช้งานอยู่',
-    FILES: createContractFiles('CNT-002', 1, false),
-    TAGS: 'active,tech-startup',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2025-01-05')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2025-01-10'))
-  },
-  {
-    CONTRACT_ID: 'CNT-003',
-    OU_CODE: '001',
-    AREA_ID: 'area-002',
-    CONTRACT_NUMBER: 'CNT-2024-089',
-    CONTRACT_TYPE: 'LEASE_AGREEMENT',
-    CONTRACT_TOPIC: 'Lease Agreement - Fashion Hub',
-    CONTRACT_TOPIC_TH: 'สัญญาเช่า - Fashion Hub',
-    CONTRACT_TOPIC_EN: 'Lease Agreement - Fashion Hub',
-    ISSUE_DATE: toDateString(new Date('2024-10-10')),
-    START_DATE: toDateString(new Date('2024-11-01')),
-    END_DATE: toDateString(new Date('2026-10-31')),
-    EXPIRY_DATE: toDateString(new Date('2026-10-31')),
-    SIGNED_DATE: toDateString(new Date('2024-10-15')),
-    TENANT_NAME: 'Fashion Hub',
-    TENANT_NAME_TH: 'ร้าน Fashion Hub',
-    TENANT_NAME_EN: 'Fashion Hub Store',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2024-008',
-    BOOKING_NUMBER: 'RSWBP124090001',
-    QUOTATION_NUMBER: 'COWBP124080001',
-    BUILDING_CODE: 'B',
-    MONTHLY_RENT: 32000,
-    DEPOSIT_AMOUNT: 96000,
-    TOTAL_VALUE: 768000,
-    STATUS: 'ACTIVE',
-    STATUS_NAME: 'ใช้งานอยู่',
-    FILES: createContractFiles('CNT-003', 2, true),
-    TAGS: 'active,fashion,retail',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2024-10-10')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2024-10-15'))
-  },
-  {
-    CONTRACT_ID: 'CNT-004',
-    OU_CODE: '001',
-    AREA_ID: 'area-002',
-    CONTRACT_NUMBER: 'CNT-2025-012',
-    CONTRACT_TYPE: 'LEASE_AMENDMENT',
-    CONTRACT_TOPIC: 'Amendment - Rent Adjustment',
-    CONTRACT_TOPIC_TH: 'แก้ไขสัญญา - ปรับค่าเช่า',
-    CONTRACT_TOPIC_EN: 'Amendment - Rent Adjustment',
-    ISSUE_DATE: toDateString(new Date('2025-06-01')),
-    START_DATE: toDateString(new Date('2025-07-01')),
-    END_DATE: toDateString(new Date('2026-10-31')),
-    EXPIRY_DATE: toDateString(new Date('2026-10-31')),
-    TENANT_NAME: 'Fashion Hub',
-    TENANT_NAME_TH: 'ร้าน Fashion Hub',
-    TENANT_NAME_EN: 'Fashion Hub Store',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2024-008',
-    BOOKING_NUMBER: 'RSWBP124090001',
-    BUILDING_CODE: 'B',
-    MONTHLY_RENT: 34000,
-    STATUS: 'ACTIVE',
-    STATUS_NAME: 'ใช้งานอยู่',
-    FILES: createContractFiles('CNT-004', 1, false),
-    TAGS: 'active,amendment',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2025-06-01')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2025-06-01'))
-  },
-  {
-    CONTRACT_ID: 'CNT-005',
-    OU_CODE: '001',
-    AREA_ID: 'area-003',
-    CONTRACT_NUMBER: 'CNT-2024-156',
-    CONTRACT_TYPE: 'LEASE_AGREEMENT',
-    CONTRACT_TOPIC: 'Lease Agreement - Coffee Corner',
-    CONTRACT_TOPIC_TH: 'สัญญาเช่า - Coffee Corner',
-    CONTRACT_TOPIC_EN: 'Lease Agreement - Coffee Corner',
-    ISSUE_DATE: toDateString(new Date('2024-11-15')),
-    START_DATE: toDateString(new Date('2024-12-01')),
-    END_DATE: toDateString(new Date('2026-11-30')),
-    EXPIRY_DATE: toDateString(new Date('2026-11-30')),
-    SIGNED_DATE: toDateString(new Date('2024-11-20')),
-    TENANT_NAME: 'Coffee Corner',
-    TENANT_NAME_TH: 'ร้าน Coffee Corner',
-    TENANT_NAME_EN: 'Coffee Corner Cafe',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2024-011',
-    BOOKING_NUMBER: 'RSWBP124100001',
-    QUOTATION_NUMBER: 'COWBP124090002',
-    BUILDING_CODE: 'C',
-    MONTHLY_RENT: 28000,
-    DEPOSIT_AMOUNT: 84000,
-    TOTAL_VALUE: 672000,
-    STATUS: 'ACTIVE',
-    STATUS_NAME: 'ใช้งานอยู่',
-    FILES: createContractFiles('CNT-005', 2, false),
-    TAGS: 'active,food-beverage',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2024-11-15')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2024-11-20'))
-  },
-  {
-    CONTRACT_ID: 'CNT-006',
-    OU_CODE: '001',
-    AREA_ID: 'area-004',
-    RENTAL_HISTORY_ID: 'RH-002',
-    CONTRACT_NUMBER: 'CNT-2024-034',
-    CONTRACT_TYPE: 'LEASE_AGREEMENT',
-    CONTRACT_TOPIC: 'Lease Agreement - Delicious Restaurant',
-    CONTRACT_TOPIC_TH: 'สัญญาเช่า - ร้านอาหาร Delicious',
-    CONTRACT_TOPIC_EN: 'Lease Agreement - Delicious Restaurant',
-    ISSUE_DATE: toDateString(new Date('2024-02-15')),
-    START_DATE: toDateString(new Date('2024-03-01')),
-    END_DATE: toDateString(new Date('2024-10-31')),
-    EXPIRY_DATE: toDateString(new Date('2024-10-31')),
-    SIGNED_DATE: toDateString(new Date('2024-02-20')),
-    TENANT_NAME: 'Delicious Restaurant',
-    TENANT_NAME_TH: 'ร้านอาหาร Delicious',
-    TENANT_NAME_EN: 'Delicious Restaurant',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2024-002',
-    BOOKING_NUMBER: 'RSWBP124010001',
-    QUOTATION_NUMBER: 'COWBP123120001',
-    BUILDING_CODE: 'A',
-    MONTHLY_RENT: 22000,
-    DEPOSIT_AMOUNT: 66000,
-    TOTAL_VALUE: 176000,
-    STATUS: 'TERMINATED',
-    STATUS_NAME: 'ยกเลิก',
-    FILES: createContractFiles('CNT-006', 2, true),
-    NOTES: 'Terminated early due to business closure',
-    TAGS: 'terminated,food-beverage',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2024-02-15')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2024-10-31'))
-  },
-  {
-    CONTRACT_ID: 'CNT-007',
-    OU_CODE: '001',
-    AREA_ID: 'area-004',
-    CONTRACT_NUMBER: 'CNT-2024-167',
-    CONTRACT_TYPE: 'LEASE_TERMINATION',
-    CONTRACT_TOPIC: 'Early Termination Agreement',
-    CONTRACT_TOPIC_TH: 'สัญญายกเลิกก่อนกำหนด',
-    CONTRACT_TOPIC_EN: 'Early Termination Agreement',
-    ISSUE_DATE: toDateString(new Date('2024-10-15')),
-    START_DATE: toDateString(new Date('2024-10-31')),
-    END_DATE: toDateString(new Date('2024-10-31')),
-    EXPIRY_DATE: toDateString(new Date('2024-10-31')),
-    SIGNED_DATE: toDateString(new Date('2024-10-20')),
-    TENANT_NAME: 'Delicious Restaurant',
-    TENANT_NAME_TH: 'ร้านอาหาร Delicious',
-    TENANT_NAME_EN: 'Delicious Restaurant',
-    LANDLORD_NAME: 'Imperial Tower Management',
-    CUSTOMER_ID: 'CUST-2024-002',
-    BOOKING_NUMBER: 'RSWBP124010001',
-    BUILDING_CODE: 'A',
-    STATUS: 'COMPLETED',
-    STATUS_NAME: 'เสร็จสิ้น',
-    FILES: createContractFiles('CNT-007', 1, false),
-    TAGS: 'completed,termination',
-    CREATE_BY: 'SPACE',
-    CREATE_DATE: toDateString(new Date('2024-10-15')),
-    UPD_BY: 'SPACE',
-    UPD_DATE: toDateString(new Date('2024-10-31'))
+    ...MOCK_CONTRACT_FULL,
+    CONTRACT_ID: 'CNT-2023-150',
+    CONTRACT_NUMBER: 'CNT-2023-150',
+    CUSTOMER_ID: 'CUST-2023-045',
+    COMPANY_NAME: 'บริษัท แฟชั่นโมเดิร์น จำกัด',
+    BUSINESS_NAME: 'Fashion Modern',
+    STATUS: 'EXPIRED',
+    START_DATE: '2023-01-01',
+    END_DATE: '2024-12-31',
+    DEPOSIT_PERIOD: 6,
+    AREA_DETAILS: [
+      {
+        BUILDING: 'C',
+        FLOOR: '2',
+        UNIT_NUMBER: '210',
+        STATUS: 'Inactive',
+        ZONE: 'West',
+        WIDTH: 20,
+        LENGTH: 25,
+        TOTAL_AREA: 500
+      }
+    ]
   }
 ];
 
-// Helper functions
+export default MOCK_CONTRACT_FULL;
+
+// ==================== HELPER FUNCTIONS ====================
+
 export function getContractsByAreaId(areaId: string): Contract[] {
   return MOCK_CONTRACTS
     .filter(c => c.AREA_ID === areaId)
@@ -464,8 +622,7 @@ export const CONTRACT_STATISTICS = {
     PENDING: MOCK_CONTRACTS.filter(c => c.STATUS === 'PENDING').length,
     COMPLETED: MOCK_CONTRACTS.filter(c => c.STATUS === 'COMPLETED').length,
     EXPIRED: MOCK_CONTRACTS.filter(c => c.STATUS === 'EXPIRED').length,
-    TERMINATED: MOCK_CONTRACTS.filter(c => c.STATUS === 'TERMINATED').length,
-    DRAFT: MOCK_CONTRACTS.filter(c => c.STATUS === 'DRAFT').length
+    TERMINATED: MOCK_CONTRACTS.filter(c => c.STATUS === 'TERMINATED').length
   },
   BY_TYPE: {
     QUOTATION: MOCK_CONTRACTS.filter(c => c.CONTRACT_TYPE === 'QUOTATION_AGREEMENT').length,

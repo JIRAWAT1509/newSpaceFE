@@ -1,436 +1,854 @@
-<div class="min-h-screen bg-bg text-fg">
-  <div class="max-w-6xl mx-auto px-6 py-6 space-y-6">
+<div class="interface-settings-page">
+  <!-- Toast and Confirm Dialog -->
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <!-- Loading Overlay -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="loading-spinner">
+        <i class="pi pi-spin pi-spinner"></i>
+        <p>กำลังโหลด...</p>
+      </div>
+    </div>
+  }
+  
+  <!-- Header -->
+  <div class="page-header">
     <div>
-      <h1 class="text-2xl font-semibold text-fg">Interface Change</h1>
-      <p class="text-sm text-muted">
-        ปรับธีม สีหลัก และรูปแบบไอคอนของระบบ (บันทึกและใช้งานได้ทันที)
-      </p>
+      <h1 class="page-title">Interface Settings</h1>
+      <p class="page-subtitle">ปรับแต่งธีม สี และการแสดงผลของระบบ</p>
     </div>
-
-    <div class="grid lg:grid-cols-[380px,1fr] gap-6">
-      <div class="space-y-6">
-        <div class="bg-card border border-border rounded-xl p-4 space-y-5">
-          <div>
-            <p class="text-sm font-semibold text-fg">Theme Mode</p>
-            <div class="mt-3 flex flex-wrap gap-4 text-sm">
-              <label class="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="theme"
-                  value="light"
-                  [(ngModel)]="config.themeMode"
-                  (change)="onSettingsChange()"
-                />
-                Light
-              </label>
-              <label class="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="theme"
-                  value="dark"
-                  [(ngModel)]="config.themeMode"
-                  (change)="onSettingsChange()"
-                />
-                Dark
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <p class="text-sm font-semibold text-fg">Color</p>
-          </div>
-
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <p class="text-sm font-semibold text-fg">Palette Presets</p>
-              <span class="text-xs text-muted">เลือกเพื่อใช้ทันที</span>
-            </div>
-            <div class="grid grid-cols-4 gap-3">
-              <button
-                *ngFor="let preset of presets"
-                class="relative h-12 rounded-lg border border-border overflow-hidden"
-                [ngClass]="{
-                  'ring-2 ring-primary': config.activePresetId === preset.id && config.paletteMode === 'preset'
-                }"
-                (click)="selectPreset(preset)"
-                [title]="preset.name"
-              >
-                <span
-                  class="absolute inset-0"
-                  [style.backgroundColor]="preset.light.primary"
-                ></span>
-                <span
-                  *ngIf="config.activePresetId === preset.id && config.paletteMode === 'preset'"
-                  class="absolute top-1 right-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-card text-primary text-xs"
-                >
-                  ✓
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <p class="text-sm font-semibold text-fg">Status Presets</p>
-              <span class="text-xs text-muted">เลือกธีมสำเร็จ</span>
-            </div>
-            <div class="grid grid-cols-4 gap-3">
-              <button
-                *ngFor="let preset of statusPresets"
-                class="relative h-10 rounded-lg border border-border overflow-hidden"
-                [ngClass]="{
-                  'ring-2 ring-primary':
-                    config.activeStatusPresetId === preset.id && config.statusMode === 'preset'
-                }"
-                (click)="selectStatusPreset(preset)"
-                [title]="preset.name"
-              >
-                <span class="absolute inset-0 grid grid-cols-2 grid-rows-2">
-                  <span [style.background]="preset.tokens.success"></span>
-                  <span [style.background]="preset.tokens.warning"></span>
-                  <span [style.background]="preset.tokens.danger"></span>
-                  <span [style.background]="preset.tokens.info"></span>
-                </span>
-                <span
-                  *ngIf="
-                    config.activeStatusPresetId === preset.id && config.statusMode === 'preset'
-                  "
-                  class="absolute top-1 right-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-card text-primary text-xs"
-                >
-                  ✓
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div class="space-y-3">
-            <div class="grid grid-cols-2 gap-2 text-sm"></div>
-          </div>
+    <div class="header-actions">
+      @if (saveStatus) {
+        <div class="save-status">
+          <i class="pi pi-check-circle"></i>
+          <span>{{ saveStatus }}</span>
         </div>
-
-        <div class="bg-card border border-border rounded-xl p-4 space-y-6">
-          <div>
-            <p class="text-sm font-semibold text-fg">Custom Colors</p>
-            <p class="text-xs text-muted">เลือกสีหลักของระบบและสีสถานะ</p>
-          </div>
-
-          <div class="space-y-3">
-            <p class="text-xs font-semibold text-muted uppercase tracking-wider">Surface & Text</p>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Background (หน้า)</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.bg" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.bg }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Text (ตัวอักษร)</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.fg" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.fg }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Card (กล่อง)</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.card" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.card }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Border (เส้นแบ่ง)</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.border" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.border }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Input (ช่องกรอก)</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.input" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.input }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Muted (ข้อความรอง)</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.muted" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.muted }}</span>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div class="space-y-3">
-            <p class="text-xs font-semibold text-muted uppercase tracking-wider">Brand</p>
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Primary (ปุ่มหลัก)</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.primary" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.primary }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Primary Text</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.primaryFg" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.primaryFg }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Secondary (accent)</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.secondary" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.secondary }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Secondary Text</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.secondaryFg" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.secondaryFg }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Link</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.link" (input)="onTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.link }}</span>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div class="space-y-3">
-            <div class="grid grid-cols-2 gap-4 text-sm">
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Success</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.success" (input)="onStatusTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.success }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Success Text</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.successFg" (input)="onStatusTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.successFg }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Warning</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.warning" (input)="onStatusTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.warning }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Warning Text</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.warningFg" (input)="onStatusTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.warningFg }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Danger</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.danger" (input)="onStatusTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.danger }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Danger Text</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.dangerFg" (input)="onStatusTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.dangerFg }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Info</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.info" (input)="onStatusTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.info }}</span>
-                </div>
-              </label>
-              <label class="space-y-1">
-                <span class="text-xs text-muted">Info Text</span>
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="config.tokens.infoFg" (input)="onStatusTokenChange()"
-                    class="h-10 w-12 rounded-md border border-border bg-bg" />
-                  <span class="text-xs text-muted">{{ config.tokens.infoFg }}</span>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <label class="space-y-1">
-              <span class="text-xs text-muted">Icon Style</span>
-              <select
-                [(ngModel)]="config.iconStyle"
-                (change)="onSettingsChange()"
-                class="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg"
-              >
-                <option value="outline">Outline</option>
-                <option value="solid">Solid</option>
-              </select>
-            </label>
-            <label class="space-y-1">
-              <span class="text-xs text-muted">Navigation Labels</span>
-              <input
-                type="text"
-                [(ngModel)]="config.labels['sales']"
-                (input)="onSettingsChange()"
-                placeholder="Sales"
-                class="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg"
-              />
-            </label>
-          </div>
-
-          <div class="grid grid-cols-2 gap-3 text-xs text-muted">
-            <input
-              type="text"
-              [(ngModel)]="config.labels['area']"
-              (input)="onSettingsChange()"
-              placeholder="Area"
-              class="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg"
-            />
-            <input
-              type="text"
-              [(ngModel)]="config.labels['contract']"
-              (input)="onSettingsChange()"
-              placeholder="Contract"
-              class="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg"
-            />
-            <input
-              type="text"
-              [(ngModel)]="config.labels['collection_finance']"
-              (input)="onSettingsChange()"
-              placeholder="collection_finance"
-              class="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg"
-            />
-            <input
-              type="text"
-              [(ngModel)]="config.labels['facilities']"
-              (input)="onSettingsChange()"
-              placeholder="facilities"
-              class="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg"
-            />
-            <input
-              type="text"
-              [(ngModel)]="config.labels['report']"
-              (input)="onSettingsChange()"
-              placeholder="Report"
-              class="w-full rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg"
-            />
-          </div>
-
-          <div class="flex flex-wrap gap-2 pt-2">
-            <button
-              class="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold"
-              (click)="onSettingsChange()"
-            >
-              Apply / Save
-            </button>
-            <button
-              class="px-4 py-2 rounded-md border border-border text-sm text-fg"
-              (click)="resetToDefault()"
-            >
-              Reset to Default
-            </button>
-            <span
-              *ngIf="saveStatus"
-              class="self-center text-xs font-medium text-success"
-            >
-              {{ saveStatus }}
-            </span>
-          </div>
+      }
+      @if (hasUnsavedChanges()) {
+        <div class="unsaved-changes-indicator">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก</span>
         </div>
-      </div>
-
-      <div class="bg-card border border-border rounded-xl p-6 space-y-6">
-        <div>
-          <h2 class="text-sm font-semibold text-fg">Live Preview</h2>
-          <p class="text-xs text-muted">ตัวอย่างองค์ประกอบที่อัปเดตตามธีม</p>
-        </div>
-
-        <div class="rounded-xl border border-border overflow-hidden">
-          <div class="bg-gradient-to-r from-primary to-secondary px-4 py-3 text-primary-foreground text-sm font-semibold">
-            SPACE Preview Header
-          </div>
-          <div class="bg-bg p-4 space-y-4">
-            <div class="flex flex-wrap gap-2">
-              <button class="px-3 py-2 rounded-md bg-primary text-primary-foreground text-sm font-medium">
-                Primary
-              </button>
-              <button class="px-3 py-2 rounded-md bg-secondary text-secondary-foreground text-sm font-medium">
-                Secondary
-              </button>
-              <button class="px-3 py-2 rounded-md bg-danger text-danger-foreground text-sm font-medium">
-                Danger
-              </button>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-4">
-              <div class="bg-card border border-border rounded-lg p-4 space-y-2">
-                <p class="text-sm font-semibold text-fg">Interface Card</p>
-                <p class="text-xs text-muted">ตัวอย่างเนื้อหาใน card</p>
-                <a class="text-sm text-link font-medium" href="#">Primary link</a>
-              </div>
-              <div class="space-y-2">
-                <div class="flex flex-wrap gap-2 text-xs font-semibold">
-                  <span class="px-2 py-1 rounded-full bg-success text-success-foreground">Success</span>
-                  <span class="px-2 py-1 rounded-full bg-warning text-warning-foreground">Warning</span>
-                  <span class="px-2 py-1 rounded-full bg-danger text-danger-foreground">Danger</span>
-                  <span class="px-2 py-1 rounded-full bg-info text-info-foreground">Info</span>
-                </div>
-                <input
-                  class="w-full rounded-md border border-border bg-input px-3 py-2 text-sm text-fg placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="Input preview"
-                />
-              </div>
-            </div>
-
-            <div class="border border-border rounded-lg overflow-hidden text-sm">
-              <div class="grid grid-cols-3 bg-card text-fg font-semibold">
-                <div class="px-3 py-2">Name</div>
-                <div class="px-3 py-2">Status</div>
-                <div class="px-3 py-2 text-right">Amount</div>
-              </div>
-              <div class="grid grid-cols-3 border-t border-border text-fg">
-                <div class="px-3 py-2">Invoice #1024</div>
-                <div class="px-3 py-2 text-success">Completed</div>
-                <div class="px-3 py-2 text-right">฿12,500</div>
-              </div>
-              <div class="grid grid-cols-3 border-t border-border text-fg">
-                <div class="px-3 py-2">Invoice #1025</div>
-                <div class="px-3 py-2 text-warning">Pending</div>
-                <div class="px-3 py-2 text-right">฿6,200</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      }
     </div>
+  </div>
+
+  <!-- Main Content: Split Layout -->
+  <div class="settings-layout">
+    <!-- Left Sidebar: Module Selector -->
+    <aside class="settings-sidebar">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">
+          <i class="pi pi-sliders-h"></i>
+          <span>เลือกหน้าที่ต้องการตั้งค่า</span>
+        </h3>
+        <nav class="module-nav">
+          <!-- Global Settings -->
+          <button
+            class="module-nav-item"
+            [class.active]="selectedModule === 'global'"
+            (click)="selectedModule = 'global'; onModuleChange()"
+            [attr.aria-label]="'เลือกธีมและสีหลัก'"
+          >
+            <i class="pi pi-palette"></i>
+            <span>ธีมและสีหลัก</span>
+          </button>
+
+          <!-- Module Options -->
+          <button
+            class="module-nav-item"
+            [class.active]="selectedModule === 'areaAvailability'"
+            (click)="selectedModule = 'areaAvailability'; onModuleChange()"
+            [attr.aria-label]="'เลือก Area Availability'"
+          >
+            <i class="pi pi-map"></i>
+            <span>Area Availability</span>
+          </button>
+
+          <button
+            class="module-nav-item"
+            [class.active]="selectedModule === 'facilitiesUtilities'"
+            (click)="selectedModule = 'facilitiesUtilities'; onModuleChange()"
+            [attr.aria-label]="'เลือก Facilities (Utilities)'"
+          >
+            <i class="pi pi-cog"></i>
+            <span>Facilities (Utilities)</span>
+          </button>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Right Content: Settings Panel -->
+    <main class="settings-content">
+      <!-- Global Settings -->
+      @if (selectedModule === 'global') {
+        <div class="settings-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">ธีมและสีหลัก</h2>
+              <p class="panel-subtitle">ปรับแต่งธีม สี และการแสดงผลของระบบ</p>
+            </div>
+          </div>
+
+          <!-- Theme Mode -->
+          <div class="settings-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="pi pi-moon"></i>
+                <span>โหมดธีม</span>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="theme-mode-selector">
+                <button
+                  class="theme-mode-btn"
+                  [class.active]="(globalChanges.themeMode || config.themeMode) === 'light'"
+                  (click)="onThemeModeChange('light')"
+                  type="button"
+                  [attr.aria-pressed]="(globalChanges.themeMode || config.themeMode) === 'light'"
+                  title="โหมดสว่าง"
+                >
+                  <i class="pi pi-sun"></i>
+                  <span>Light</span>
+                </button>
+                <button
+                  class="theme-mode-btn"
+                  [class.active]="(globalChanges.themeMode || config.themeMode) === 'dark'"
+                  (click)="onThemeModeChange('dark')"
+                  type="button"
+                  [attr.aria-pressed]="(globalChanges.themeMode || config.themeMode) === 'dark'"
+                  title="โหมดมืด"
+                >
+                  <i class="pi pi-moon"></i>
+                  <span>Dark</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Palette Presets -->
+          <div class="settings-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="pi pi-palette"></i>
+                <span>ชุดสีหลัก</span>
+              </div>
+              <p class="card-description">เลือกชุดสีที่ต้องการใช้</p>
+            </div>
+            <div class="card-content">
+              <div class="preset-grid">
+                @for (preset of presets; track preset.id) {
+                  <button
+                    class="preset-card"
+                    [class.active]="config.activePresetId === preset.id && config.paletteMode === 'preset'"
+                    (click)="selectPreset(preset)"
+                    type="button"
+                    [title]="'เลือกชุดสี ' + preset.name"
+                  >
+                    <div class="preset-preview" [style.background]="preset.light.primary"></div>
+                    <div class="preset-name">{{ preset.name }}</div>
+                    @if (config.activePresetId === preset.id && config.paletteMode === 'preset') {
+                      <div class="preset-check">
+                        <i class="pi pi-check"></i>
+                      </div>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+              <!-- Status Color Presets -->
+          <div class="settings-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="pi pi-circle-fill"></i>
+                <span>ชุดสีสถานะ</span>
+              </div>
+              <p class="card-description">เลือกชุดสีสำหรับสถานะต่างๆ (Success, Warning, Danger, Info) - สีจะเปลี่ยนทันทีเมื่อเลือก</p>
+            </div>
+            <div class="card-content">
+              <div class="preset-grid">
+                @for (preset of statusPresets; track preset.id) {
+                  <button
+                    class="preset-card status-preset"
+                    [class.active]="(globalChanges.activeStatusPresetId !== undefined ? globalChanges.activeStatusPresetId : config.activeStatusPresetId) === preset.id && (globalChanges.statusMode !== undefined ? globalChanges.statusMode : config.statusMode) === 'preset'"
+                    (click)="selectStatusPreset(preset)"
+                    type="button"
+                    [title]="'เลือกชุดสีสถานะ ' + preset.name"
+                  >
+                    <div class="status-preset-preview">
+                      <span [style.background]="preset.tokens.success" title="Success"></span>
+                      <span [style.background]="preset.tokens.warning" title="Warning"></span>
+                      <span [style.background]="preset.tokens.danger" title="Danger"></span>
+                      <span [style.background]="preset.tokens.info" title="Info"></span>
+                    </div>
+                    <div class="preset-name">{{ preset.name }}</div>
+                    @if ((globalChanges.activeStatusPresetId !== undefined ? globalChanges.activeStatusPresetId : config.activeStatusPresetId) === preset.id && (globalChanges.statusMode !== undefined ? globalChanges.statusMode : config.statusMode) === 'preset') {
+                      <div class="preset-check">
+                        <i class="pi pi-check"></i>
+                      </div>
+                    }
+                  </button>
+                }
+              </div>
+              
+              <!-- Status Colors Preview -->
+              <div class="status-colors-preview">
+                <h4 class="preview-title">ตัวอย่างสีสถานะ (จะเปลี่ยนทันทีเมื่อเลือก):</h4>
+                <div class="status-preview-badges">
+                  <div class="status-badge-preview success">
+                    <span class="badge-dot"></span>
+                    <span>Success</span>
+                    <span class="badge-color-code">{{ getCurrentStatusColor('success') }}</span>
+                  </div>
+                  <div class="status-badge-preview warning">
+                    <span class="badge-dot"></span>
+                    <span>Warning</span>
+                    <span class="badge-color-code">{{ getCurrentStatusColor('warning') }}</span>
+                  </div>
+                  <div class="status-badge-preview danger">
+                    <span class="badge-dot"></span>
+                    <span>Danger</span>
+                    <span class="badge-color-code">{{ getCurrentStatusColor('danger') }}</span>
+                  </div>
+                  <div class="status-badge-preview info">
+                    <span class="badge-dot"></span>
+                    <span>Info</span>
+                    <span class="badge-color-code">{{ getCurrentStatusColor('info') }}</span>
+                  </div>
+                </div>
+                <div class="status-preview-examples">
+                  <div class="example-item">
+                    <span class="example-label">Badges:</span>
+                    <span class="badge badge-success">Active</span>
+                    <span class="badge badge-warning">Pending</span>
+                    <span class="badge badge-danger">Inactive</span>
+                    <span class="badge badge-info">New</span>
+                  </div>
+                  <div class="example-item">
+                    <span class="example-label">Buttons:</span>
+                    <button class="btn-example btn-success" disabled>Success</button>
+                    <button class="btn-example btn-warning" disabled>Warning</button>
+                    <button class="btn-example btn-danger" disabled>Danger</button>
+                    <button class="btn-example btn-info" disabled>Info</button>
+                  </div>
+                </div>
+                <p class="preview-hint">
+                  <i class="pi pi-info-circle"></i>
+                  สีเหล่านี้จะถูกใช้ใน badges, buttons, status indicators, และ charts ทั่วทั้งระบบ
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Icon Style -->
+          <div class="settings-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="pi pi-image"></i>
+                <span>รูปแบบไอคอน</span>
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="icon-style-selector">
+                <button
+                  class="icon-style-btn"
+                  [class.active]="(globalChanges.iconStyle || config.iconStyle) === 'outline'"
+                  (click)="onIconStyleChange('outline')"
+                  type="button"
+                  [attr.aria-pressed]="(globalChanges.iconStyle || config.iconStyle) === 'outline'"
+                  title="ไอคอนแบบเส้นขอบ"
+                >
+                  <i class="pi pi-circle"></i>
+                  <span>Outline</span>
+                </button>
+                <button
+                  class="icon-style-btn"
+                  [class.active]="(globalChanges.iconStyle || config.iconStyle) === 'solid'"
+                  (click)="onIconStyleChange('solid')"
+                  type="button"
+                  [attr.aria-pressed]="(globalChanges.iconStyle || config.iconStyle) === 'solid'"
+                  title="ไอคอนแบบทึบ"
+                >
+                  <i class="pi pi-circle-fill"></i>
+                  <span>Solid</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Actions Footer -->
+          <div class="panel-actions-footer">
+            <button 
+              class="btn-primary" 
+              (click)="saveGlobalConfig()"
+              [disabled]="isSaving() || !hasGlobalChanges()"
+            >
+              <i [class.pi-spin]="isSaving()" [class.pi-spinner]="isSaving()" [class.pi-save]="!isSaving()"></i>
+              <span>{{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}</span>
+            </button>
+            <button 
+              class="btn-secondary" 
+              (click)="resetGlobalConfigToDefault()"
+              [disabled]="isSaving()"
+            >
+              <i class="pi pi-refresh"></i>
+              <span>รีเซ็ตเป็นค่าเริ่มต้น</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Area Availability Settings -->
+      @if (selectedModule === 'areaAvailability') {
+        <div class="settings-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Area Availability</h2>
+              <p class="panel-subtitle">ตั้งค่าสี ชื่อ และไอคอนสำหรับสถานะต่างๆ</p>
+            </div>
+          </div>
+
+          <!-- Status Configuration -->
+          <div class="settings-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="pi pi-palette"></i>
+                <span>สถานะและสี</span>
+              </div>
+              <p class="card-description">ตั้งค่าสี ชื่อ และไอคอนสำหรับแต่ละสถานะ</p>
+            </div>
+            <div class="card-content">
+              <div class="status-config-list">
+                @for (status of ['unallocated', 'quotation', 'leased', 'vacant']; track status) {
+                  <div class="status-config-row">
+                    <div class="status-config-main">
+                        <div class="status-preview">
+                        <div class="status-color-badge" [style.background]="getAreaColor(status)" [title]="'สี: ' + getAreaColor(status)"></div>
+                        <div class="status-info">
+                          <div class="status-label-display">
+                            {{ getAreaLabel(status) }}
+                            @if (getAreaLabelEn(status) && getAreaLabelEn(status) !== status) {
+                              <span class="label-en-badge">({{ getAreaLabelEn(status) }})</span>
+                            }
+                          </div>
+                          <div class="status-key-text">{{ status }}</div>
+                        </div>
+                        @if (getAreaIcon(status)) {
+                          <div class="status-icon-preview">
+                            @if (getAreaIconType(status) === 'library') {
+                              <i [ngClass]="getAreaIcon(status)"></i>
+                            } @else {
+                              <img [src]="getAreaIcon(status)" alt="Icon" />
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="status-config-form">
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-palette"></i>
+                            <span>สี *</span>
+                          </label>
+                          <div class="color-input-row">
+                            <input
+                              type="color"
+                              [ngModel]="getAreaColor(status)"
+                              (input)="onAreaColorChange(status, $event)"
+                              class="color-picker-input"
+                              title="เลือกสี"
+                            />
+                            <input
+                              type="text"
+                              [ngModel]="getAreaColor(status)"
+                              (input)="onAreaColorChange(status, $event)"
+                              class="color-hex-input"
+                              placeholder="#000000"
+                              pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                              maxlength="7"
+                            />
+                          </div>
+                          <small class="form-hint">คลิกที่ช่องสีเพื่อเลือก หรือกรอกโค้ดสี (เช่น #FF5733)</small>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-tag"></i>
+                            <span>ชื่อ (ไทย) *</span>
+                          </label>
+                          <input
+                            type="text"
+                            [ngModel]="getAreaLabel(status)"
+                            (input)="onAreaLabelChange(status, $event)"
+                            class="text-input"
+                            [placeholder]="getAreaLabel(status)"
+                            required
+                            maxlength="50"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-tag"></i>
+                            <span>ชื่อ (อังกฤษ)</span>
+                          </label>
+                          <input
+                            type="text"
+                            [ngModel]="getAreaLabelEn(status)"
+                            (input)="onAreaLabelEnChange(status, $event)"
+                            class="text-input"
+                            [placeholder]="getAreaLabelEn(status)"
+                            maxlength="50"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-image"></i>
+                            <span>ไอคอน</span>
+                          </label>
+                          <div class="icon-actions-row">
+                            <button
+                              class="btn-icon-library"
+                              (click)="openAreaIconLibrary(status)"
+                              title="เลือกไอคอนจากไลบรารี"
+                              type="button"
+                            >
+                              <i class="pi pi-th-large"></i>
+                              <span>เลือก</span>
+                            </button>
+                            <label class="file-upload-button" title="อัปโหลดไฟล์ PNG หรือ SVG">
+                              <input
+                                type="file"
+                                accept="image/png,image/svg+xml"
+                                (change)="onAreaIconUpload(status, $event)"
+                                class="file-input-hidden"
+                              />
+                              <i class="pi pi-upload"></i>
+                              <span>อัปโหลด</span>
+                            </label>
+                            @if (getAreaIcon(status)) {
+                              @if (getAreaIconType(status) === 'library') {
+                                <div class="icon-preview" [title]="'ไอคอน: ' + getAreaIcon(status)">
+                                  <i [ngClass]="getAreaIcon(status)"></i>
+                                </div>
+                              } @else {
+                                <div class="icon-preview" title="ไอคอนที่อัปโหลด">
+                                  <img [src]="getAreaIcon(status)" alt="Icon" />
+                                </div>
+                              }
+                            } @else {
+                              <div class="icon-preview-empty" title="ยังไม่ได้เลือกไอคอน">
+                                <i class="pi pi-image"></i>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Actions Footer -->
+          <div class="panel-actions-footer">
+            <button 
+              class="btn-primary" 
+              (click)="saveAreaConfig()"
+              [disabled]="isSaving() || !hasAreaChanges()"
+            >
+              <i [class.pi-spin]="isSaving()" [class.pi-spinner]="isSaving()" [class.pi-save]="!isSaving()"></i>
+              <span>{{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}</span>
+            </button>
+            <button 
+              class="btn-secondary" 
+              (click)="resetAreaConfigToDefault()"
+              [disabled]="isSaving()"
+            >
+              <i class="pi pi-refresh"></i>
+              <span>รีเซ็ตเป็นค่าเริ่มต้น</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Facilities Utilities Settings -->
+      @if (selectedModule === 'facilitiesUtilities') {
+        <div class="settings-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Facilities (Utilities)</h2>
+              <p class="panel-subtitle">ตั้งค่าสี ชื่อ และไอคอนสำหรับประเภทมิเตอร์</p>
+            </div>
+          </div>
+
+          <!-- Meter Types Configuration -->
+          <div class="settings-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="pi pi-palette"></i>
+                <span>ประเภทมิเตอร์</span>
+              </div>
+              <p class="card-description">ตั้งค่าสี ชื่อ และไอคอนสำหรับแต่ละประเภท</p>
+            </div>
+            <div class="card-content">
+              <div class="status-config-list">
+                @for (type of ['electricity', 'water', 'gas', 'ac']; track type) {
+                  <div class="status-config-row">
+                    <div class="status-config-main">
+                      <div class="status-preview">
+                        <div class="status-color-badge" [style.background]="getFacilitiesColor(type)" [title]="'สี: ' + getFacilitiesColor(type)"></div>
+                        <div class="status-info">
+                          <div class="status-label-display">
+                            {{ getFacilitiesLabel(type) }}
+                            @if (getFacilitiesLabelEn(type) && getFacilitiesLabelEn(type) !== type) {
+                              <span class="label-en-badge">({{ getFacilitiesLabelEn(type) }})</span>
+                            }
+                          </div>
+                          <div class="status-key-text">{{ type }}</div>
+                        </div>
+                        @if (getFacilitiesIcon(type)) {
+                          <div class="status-icon-preview">
+                            @if (getFacilitiesIconType(type) === 'library') {
+                              <i [ngClass]="getFacilitiesIcon(type)"></i>
+                            } @else {
+                              <img [src]="getFacilitiesIcon(type)" alt="Icon" />
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="status-config-form">
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-palette"></i>
+                            <span>สี *</span>
+                          </label>
+                          <div class="color-input-row">
+                            <input
+                              type="color"
+                              [ngModel]="getFacilitiesColor(type)"
+                              (input)="onFacilitiesColorChange(type, $event)"
+                              class="color-picker-input"
+                              title="เลือกสี"
+                            />
+                            <input
+                              type="text"
+                              [ngModel]="getFacilitiesColor(type)"
+                              (input)="onFacilitiesColorChange(type, $event)"
+                              class="color-hex-input"
+                              placeholder="#000000"
+                              pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                              maxlength="7"
+                            />
+                          </div>
+                          <small class="form-hint">คลิกที่ช่องสีเพื่อเลือก หรือกรอกโค้ดสี (เช่น #FF5733)</small>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-tag"></i>
+                            <span>ชื่อ (ไทย) *</span>
+                          </label>
+                          <input
+                            type="text"
+                            [ngModel]="getFacilitiesLabel(type)"
+                            (input)="onFacilitiesLabelChange(type, $event)"
+                            class="text-input"
+                            [placeholder]="getFacilitiesLabel(type)"
+                            required
+                            maxlength="50"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-tag"></i>
+                            <span>ชื่อ (อังกฤษ)</span>
+                          </label>
+                          <input
+                            type="text"
+                            [ngModel]="getFacilitiesLabelEn(type)"
+                            (input)="onFacilitiesLabelEnChange(type, $event)"
+                            class="text-input"
+                            [placeholder]="getFacilitiesLabelEn(type)"
+                            maxlength="50"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-image"></i>
+                            <span>ไอคอน</span>
+                          </label>
+                          <div class="icon-actions-row">
+                            <button
+                              class="btn-icon-library"
+                              (click)="openFacilitiesIconLibrary(type)"
+                              title="เลือกไอคอนจากไลบรารี"
+                              type="button"
+                            >
+                              <i class="pi pi-th-large"></i>
+                              <span>เลือก</span>
+                            </button>
+                            <label class="file-upload-button" title="อัปโหลดไฟล์ PNG หรือ SVG">
+                              <input
+                                type="file"
+                                accept="image/png,image/svg+xml"
+                                (change)="onFacilitiesIconUpload(type, $event)"
+                                class="file-input-hidden"
+                              />
+                              <i class="pi pi-upload"></i>
+                              <span>อัปโหลด</span>
+                            </label>
+                            @if (getFacilitiesIcon(type)) {
+                              @if (getFacilitiesIconType(type) === 'library') {
+                                <div class="icon-preview" [title]="'ไอคอน: ' + getFacilitiesIcon(type)">
+                                  <i [ngClass]="getFacilitiesIcon(type)"></i>
+                                </div>
+                              } @else {
+                                <div class="icon-preview" title="ไอคอนที่อัปโหลด">
+                                  <img [src]="getFacilitiesIcon(type)" alt="Icon" />
+                                </div>
+                              }
+                            } @else {
+                              <div class="icon-preview-empty" title="ยังไม่ได้เลือกไอคอน">
+                                <i class="pi pi-image"></i>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Rentable Items -->
+          <div class="settings-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="pi pi-list"></i>
+                <span>สิ่งที่จะเช่าได้</span>
+              </div>
+              <div class="card-actions">
+                <button 
+                  class="btn-primary" 
+                  (click)="addRentableItem()"
+                  title="เพิ่มรายการสิ่งที่จะเช่าได้ใหม่"
+                >
+                  <i class="pi pi-plus"></i>
+                  <span>เพิ่มรายการ</span>
+                </button>
+              </div>
+            </div>
+            <div class="card-content">
+              @if (rentableItems().length === 0) {
+                <div class="empty-state">
+                  <i class="pi pi-inbox"></i>
+                  <p>ยังไม่มีรายการ</p>
+                  <button class="btn-link" (click)="addRentableItem()">เพิ่มรายการแรก</button>
+                </div>
+              } @else {
+                <div class="rentable-items-list">
+                  @for (item of rentableItems(); track item.id) {
+                    <div class="rentable-item-row">
+                      <div class="rentable-item-preview">
+                        <div class="item-icon-display" [style.background]="item.color" [title]="item.nameTh || 'Preview'">
+                          @if (item.iconType === 'upload' && item.icon) {
+                            <img [src]="item.icon" alt="Icon" />
+                          } @else if (item.icon) {
+                            <i [ngClass]="item.icon"></i>
+                          } @else {
+                            <i class="pi pi-box"></i>
+                          }
+                        </div>
+                        @if (!item.enabled) {
+                          <div class="item-disabled-badge">
+                            <i class="pi pi-ban"></i>
+                          </div>
+                        }
+                      </div>
+                      <div class="rentable-item-controls">
+                        <input
+                          type="text"
+                          [(ngModel)]="item.nameTh"
+                          placeholder="ชื่อ (ไทย) *"
+                          class="text-input"
+                          required
+                          maxlength="50"
+                        />
+                        <input
+                          type="text"
+                          [(ngModel)]="item.name"
+                          placeholder="ชื่อ (อังกฤษ)"
+                          class="text-input"
+                          maxlength="50"
+                        />
+                        <div class="rentable-item-actions">
+                          <button
+                            class="btn-icon-library"
+                            (click)="openIconLibrary(item.id)"
+                            title="เลือกไอคอนจากไลบรารี"
+                          >
+                            <i class="pi pi-th-large"></i>
+                          </button>
+                          <label class="file-upload-button-small">
+                            <input
+                              type="file"
+                              accept="image/png,image/svg+xml"
+                              (change)="onRentableItemIconUpload(item.id, $event)"
+                              class="file-input-hidden"
+                            />
+                            <i class="pi pi-upload"></i>
+                          </label>
+                          <input
+                            type="color"
+                            [(ngModel)]="item.color"
+                            class="color-picker-small"
+                          />
+                          <label class="toggle-switch" [title]="item.enabled ? 'ปิดการใช้งาน' : 'เปิดการใช้งาน'">
+                            <input
+                              type="checkbox"
+                              [(ngModel)]="item.enabled"
+                            />
+                            <span class="toggle-slider"></span>
+                          </label>
+                          <button
+                            class="btn-danger-small"
+                            (click)="removeRentableItem(item.id)"
+                            title="ลบ"
+                          >
+                            <i class="pi pi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+                <div class="rentable-items-actions">
+                  <button 
+                    class="btn-primary" 
+                    (click)="saveRentableItems()"
+                    [disabled]="isSaving()"
+                  >
+                    <i [class.pi-spin]="isSaving()" [class.pi-spinner]="isSaving()" [class.pi-save]="!isSaving()"></i>
+                    <span>{{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}</span>
+                  </button>
+                  <button 
+                    class="btn-secondary" 
+                    (click)="resetRentableItemsToDefault()"
+                    [disabled]="isSaving() || rentableItems().length === 0"
+                  >
+                    <i class="pi pi-refresh"></i>
+                    <span>รีเซ็ตเป็นค่าเริ่มต้น</span>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Panel Actions Footer -->
+          <div class="panel-actions-footer">
+            <button 
+              class="btn-primary" 
+              (click)="saveFacilitiesConfig()"
+              [disabled]="isSaving() || (!hasFacilitiesChanges() && rentableItems().length === (facilitiesConfig.rentableItems?.length || 0))"
+            >
+              <i [class.pi-spin]="isSaving()" [class.pi-spinner]="isSaving()" [class.pi-save]="!isSaving()"></i>
+              <span>{{ isSaving() ? 'กำลังบันทึก...' : 'บันทึก' }}</span>
+            </button>
+            <button 
+              class="btn-secondary" 
+              (click)="resetFacilitiesConfigToDefault()"
+              [disabled]="isSaving()"
+            >
+              <i class="pi pi-refresh"></i>
+              <span>รีเซ็ตเป็นค่าเริ่มต้น</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Icon Library Modal -->
+      @if (showIconLibrary()) {
+        <div class="modal-overlay" (click)="showIconLibrary.set(false)">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <div>
+                <h3 class="modal-title">เลือกไอคอน</h3>
+                <p class="modal-subtitle">คลิกเพื่อเลือกไอคอน หรือค้นหาไอคอนที่ต้องการ</p>
+              </div>
+              <button 
+                class="modal-close" 
+                (click)="showIconLibrary.set(false)"
+                aria-label="ปิด"
+              >
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="icon-library-search">
+                <i class="pi pi-search search-icon"></i>
+                <input
+                  type="text"
+                  [(ngModel)]="iconSearchQuery"
+                  placeholder="ค้นหาไอคอน... (เช่น: home, user, settings)"
+                  class="icon-search-input"
+                  autofocus
+                />
+                @if (iconSearchQuery) {
+                  <button 
+                    class="clear-search-btn"
+                    (click)="iconSearchQuery = ''"
+                    aria-label="ล้างการค้นหา"
+                  >
+                    <i class="pi pi-times"></i>
+                  </button>
+                }
+              </div>
+              <div class="icon-library-info">
+                <span class="icon-count">{{ filteredIcons().length }} ไอคอน</span>
+                @if (iconSearchQuery) {
+                  <span class="search-results">ผลลัพธ์สำหรับ "{{ iconSearchQuery }}"</span>
+                }
+              </div>
+              <div class="icon-library-grid">
+                @for (icon of filteredIcons(); track icon) {
+                  <button
+                    class="icon-library-item"
+                    (click)="selectIconFromLibrary(icon)"
+                    [title]="icon"
+                    [attr.aria-label]="'เลือกไอคอน ' + icon"
+                  >
+                    <i [ngClass]="icon"></i>
+                    <span class="icon-name">{{ icon.replace('pi-', '') }}</span>
+                  </button>
+                }
+              </div>
+              @if (filteredIcons().length === 0) {
+                <div class="icon-library-empty">
+                  <i class="pi pi-search"></i>
+                  <p>ไม่พบไอคอนที่ค้นหา</p>
+                  <button class="btn-link" (click)="iconSearchQuery = ''">
+                    ล้างการค้นหา
+                  </button>
+                </div>
+              }
+            </div>
+            <div class="modal-footer">
+              <button class="btn-secondary" (click)="showIconLibrary.set(false)">
+                <i class="pi pi-times"></i>
+                <span>ยกเลิก</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </main>
   </div>
 </div>

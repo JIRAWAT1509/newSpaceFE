@@ -1,0 +1,382 @@
+<!-- general-detail-tab.component.html -->
+
+<div class="tab-content-wrapper">
+
+  <!-- Progress Indicator -->
+  <div class="progress-indicator">
+    <div class="progress-steps">
+      @for (section of sections; track section.id; let i = $index) {
+        <div
+          class="progress-step"
+          [class.completed]="isSectionCompleted(section.id)"
+          (click)="scrollToSection(section.id)"
+        >
+          <div class="step-circle">
+            @if (isSectionCompleted(section.id)) {
+              <i class="pi pi-check"></i>
+            } @else {
+              <span class="step-letter">{{ section.letter }}</span>
+            }
+          </div>
+          <div class="step-info">
+            <div class="step-name">{{ section.name }}</div>
+            <div class="step-progress">{{ getSectionProgress(section.id) }}%</div>
+          </div>
+          @if (i < sections.length - 1) {
+            <div class="step-arrow">→</div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <form [formGroup]="form()">
+
+    <!-- Section A: ข้อมูลอ้างอิงเอกสาร -->
+    <div class="form-section header-section" id="section-header">
+      <h4 class="section-title">A. ข้อมูลอ้างอิงเอกสาร</h4>
+      <div class="form-grid-2">
+        <!-- Row 1 -->
+        <div class="form-group required">
+          <label>สาขา</label>
+          <div class="selector-field" (click)="openSelector('branch')">
+            <input
+              type="text"
+              pInputText
+              formControlName="branch"
+              placeholder="เลือกสาขา"
+              readonly
+              class="w-full"
+            />
+            <i class="pi pi-search selector-icon"></i>
+          </div>
+          @if (isFieldInvalid('branch')) {
+            <small class="error-msg">กรุณาเลือกสาขา</small>
+          }
+        </div>
+
+        <div class="form-group required">
+          <label>ประเภทสัญญา</label>
+          <div class="selector-field" (click)="openSelector('contractType')">
+            <input
+              type="text"
+              pInputText
+              formControlName="contractType"
+              placeholder="เลือกประเภทสัญญา"
+              readonly
+              class="w-full"
+            />
+            <i class="pi pi-search selector-icon"></i>
+          </div>
+          @if (isFieldInvalid('contractType')) {
+            <small class="error-msg">กรุณาเลือกประเภทสัญญา</small>
+          }
+        </div>
+
+        <!-- Row 2 -->
+        <div class="form-group required">
+          <label>เลขที่ใบเสนอราคา (น.หลัก)</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="contractNumberMain"
+            placeholder="AUTO"
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>เลขที่ใบเสนอราคา (น.ร่วม)</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="contractNumberSub"
+            placeholder="AUTO"
+            class="w-full"
+          />
+        </div>
+
+        <!-- Row 3 -->
+        <div class="form-group">
+          <label>สถานะใบเสนอราคา</label>
+          <div class="input-with-button">
+            <input
+              type="text"
+              pInputText
+              formControlName="quotationStatus"
+              readonly
+              class="flex-1"
+            />
+            <button type="button" class="action-btn" (click)="openDeclineInfo()">
+              ข้อมูลการ Decline
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>วันที่ระดับ Quotation</label>
+          <p-datepicker
+            formControlName="quotationLevelDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
+            styleClass="w-full"
+          ></p-datepicker>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="form-group required">
+          <label>วันที่ใบเสนอราคา</label>
+          <p-datepicker
+            formControlName="quotationDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
+            styleClass="w-full"
+          ></p-datepicker>
+          @if (isFieldInvalid('quotationDate')) {
+            <small class="error-msg">กรุณาเลือกวันที่ใบเสนอราคา</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>วันที่อนุมัติใบเสนอราคา</label>
+          <p-datepicker
+            formControlName="approvalDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
+            styleClass="w-full"
+          ></p-datepicker>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="form-group">
+          <label>วันที่บันทึกใบเสนอราคา</label>
+          <p-datepicker
+            formControlName="recordDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
+            styleClass="w-full"
+          ></p-datepicker>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section B: ข้อมูลสินค้า/บริการ (ต้นทาง) -->
+    <div class="form-section subsection" id="section-products">
+      <h4 class="section-title">B. ข้อมูลสินค้า/บริการ (ต้นทาง)</h4>
+
+      <div class="form-grid-2">
+        <div class="form-group required">
+          <label>Sub Catagory</label>
+          <div class="selector-field" (click)="openSelector('subCategory')">
+            <input
+              type="text"
+              pInputText
+              formControlName="subCategory"
+              placeholder="เลือก Sub Category"
+              readonly
+              class="w-full"
+            />
+            <i class="pi pi-search selector-icon"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Catagory</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="category"
+            readonly
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Profit Center</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="profitCenter"
+            readonly
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label>ชื่อกิจการ/ชื่อร้าน</label>
+          <textarea
+            pInputTextarea
+            formControlName="businessName"
+            rows="2"
+            class="w-full"
+          ></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <label>สินค้า/บริการหลัก</label>
+          <textarea
+            pInputTextarea
+            formControlName="businessName"
+            rows="2"
+            class="w-full"
+            placeholder="กรอกสินค้า/บริการหลัก"
+          ></textarea>
+        </div>
+
+        <!-- Product Types 1-6 -->
+        <div class="form-group">
+          <label>ประเภทสินค้า/บริการ 1</label>
+          <input type="text" pInputText formControlName="productType1" class="w-full" />
+        </div>
+
+        <div class="form-group">
+          <label>ประเภทสินค้า/บริการ 2</label>
+          <input type="text" pInputText formControlName="productType2" class="w-full" />
+        </div>
+
+        <div class="form-group">
+          <label>ประเภทสินค้า/บริการ 3</label>
+          <input type="text" pInputText formControlName="productType3" class="w-full" />
+        </div>
+
+        <div class="form-group">
+          <label>ประเภทสินค้า/บริการ 4</label>
+          <input type="text" pInputText formControlName="productType4" class="w-full" />
+        </div>
+
+        <div class="form-group">
+          <label>ประเภทสินค้า/บริการ 5</label>
+          <input type="text" pInputText formControlName="productType5" class="w-full" />
+        </div>
+
+        <div class="form-group">
+          <label>ประเภทสินค้า/บริการ 6</label>
+          <input type="text" pInputText formControlName="productType6" class="w-full" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Section C: ข้อมูลพื้นที่ (จากใบเสนอราคา) -->
+    <div class="form-section subsection" id="section-area">
+      <h4 class="section-title">C. ข้อมูลพื้นที่ (จากใบเสนอราคา)</h4>
+
+      <div class="form-grid-2">
+        <div class="form-group required">
+          <label>อาคาร</label>
+          <div class="selector-field" (click)="openSelector('areaBuilding')">
+            <input
+              type="text"
+              pInputText
+              formControlName="areaBuilding"
+              placeholder="เลือกอาคาร"
+              readonly
+              class="w-full"
+            />
+            <i class="pi pi-search selector-icon"></i>
+          </div>
+          @if (isFieldInvalid('areaBuilding')) {
+            <small class="error-msg">กรุณาเลือกอาคาร</small>
+          }
+        </div>
+
+        <div class="form-group required">
+          <label>ชั้น</label>
+          <div class="selector-field" (click)="openSelector('areaFloor')">
+            <input
+              type="text"
+              pInputText
+              formControlName="areaFloor"
+              placeholder="เลือกชั้น"
+              readonly
+              class="w-full"
+            />
+            <i class="pi pi-search selector-icon"></i>
+          </div>
+          @if (isFieldInvalid('areaFloor')) {
+            <small class="error-msg">กรุณาเลือกชั้น</small>
+          }
+        </div>
+
+        <div class="form-group required">
+          <label>เลขที่ยูนิต / ห้อง</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="areaUnitNumber"
+            placeholder="กรอกเลขที่ยูนิต/ห้อง"
+            class="w-full"
+          />
+          @if (isFieldInvalid('areaUnitNumber')) {
+            <small class="error-msg">กรุณากรอกเลขที่ยูนิต/ห้อง</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>พื้นที่รวม (ตร.ม.)</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="areaTotal"
+            placeholder="0.00"
+            class="w-full"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label>ประเภทพื้นที่ (Retail / Kiosk / ฯลฯ)</label>
+          <div class="selector-field" (click)="openSelector('areaType')">
+            <input
+              type="text"
+              pInputText
+              formControlName="areaType"
+              placeholder="เลือกประเภทพื้นที่"
+              readonly
+              class="w-full"
+            />
+            <i class="pi pi-search selector-icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- Selector Modal -->
+@if (showSelectorModal()) {
+  <div class="selector-modal-backdrop" (click)="closeSelectorModal()">
+    <div class="selector-modal-content" (click)="$event.stopPropagation()">
+      <div class="selector-header">
+        <h3>{{ getSelectorTitle() }}</h3>
+        <button class="modal-close-btn" (click)="closeSelectorModal()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="selector-search">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="selectorSearchText"
+          placeholder="ค้นหา..."
+          class="w-full"
+        />
+      </div>
+      <div class="selector-list">
+        @for (item of getFilteredSelectorOptions(); track item.value) {
+          <div class="selector-item" (click)="selectSelectorItem(item)">
+            {{ item.label }}
+          </div>
+        } @empty {
+          <div class="selector-empty">ไม่พบข้อมูล</div>
+        }
+      </div>
+    </div>
+  </div>
+}

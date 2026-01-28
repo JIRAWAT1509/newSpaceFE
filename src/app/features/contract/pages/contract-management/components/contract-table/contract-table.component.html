@@ -1,4 +1,4 @@
-<!-- contract-table.component.html -->
+<!-- contract-table.component.html - WITH EDIT MODE INTEGRATED -->
 
 <div class="contract-table-container">
   <!-- Search Section -->
@@ -32,13 +32,15 @@
       <div class="bookmarks">
         @for (bookmark of savedSearches(); track bookmark.id) {
           <button class="bookmark-chip" (click)="applyBookmark(bookmark)">
-            {{ bookmark.name }}
-            <i class="pi pi-times-circle"></i>
+            <i class="pi pi-bookmark"></i>
+            <span>{{ bookmark.name }}</span>
+            <i 
+              class="pi pi-times-circle" 
+              (click)="deleteBookmark(bookmark.id, $event)"
+              title="ลบการค้นหาที่บันทึกไว้"
+            ></i>
           </button>
         }
-        <button class="add-bookmark-btn">
-          <i class="pi pi-plus-circle"></i>
-        </button>
       </div>
     }
 
@@ -206,27 +208,17 @@
   <app-advance-search-modal
     [filters]="activeFilters()"
     (filtersChange)="onFiltersChange($event)"
+    (savedSearchChange)="onSavedSearchChange($event)"
     (close)="closeAdvanceSearch()"
   />
 }
 
-<!-- Add Contract Modal (Placeholder) -->
+<!-- Add/Edit Contract Modal - UPDATED WITH EDIT MODE SUPPORT -->
 @if (showAddModal()) {
-  <div class="modal-backdrop" (click)="closeAddModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Add New Contract</h3>
-        <button class="modal-close" (click)="closeAddModal()">
-          <i class="pi pi-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Form fields will be added here...</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" (click)="closeAddModal()">Cancel</button>
-        <button class="btn-primary" (click)="saveNewContract()">Save</button>
-      </div>
-    </div>
-  </div>
+  <app-add-contract-modal
+    [mode]="modalMode()"
+    [contractData]="selectedContract()"
+    (close)="closeAddModal()"
+    (save)="saveNewContract($event)"
+  />
 }

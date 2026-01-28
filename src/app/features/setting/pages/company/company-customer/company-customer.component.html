@@ -15,9 +15,9 @@
 
       <div class="header-actions">
         <p-button
-          label="Add Customer"
+          label="เพิ่ม"
           icon="pi pi-plus"
-          severity="success"
+          severity="primary"
           (onClick)="openAddDialog()"
         ></p-button>
 
@@ -238,24 +238,28 @@
 
 <ng-template pTemplate="footer">
   <div class="dialog-footer">
-    <p-button
-      label="Close"
-      icon="pi pi-times"
-      severity="secondary"
-      [outlined]="true"
-      (onClick)="closeDetailsModal()"
-    ></p-button>
+      <p-button
+        label="ปิด"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeDetailsModal()"
+      ></p-button>
     <div class="action-buttons-group">
       <p-button
-        label="Edit"
         icon="pi pi-pencil"
+        [rounded]="true"
+        [text]="true"
         severity="info"
+        size="small"
         (onClick)="editFromDetails()"
       ></p-button>
       <p-button
-        label="Delete"
         icon="pi pi-trash"
+        [rounded]="true"
+        [text]="true"
         severity="danger"
+        size="small"
         (onClick)="deleteFromDetails()"
       ></p-button>
     </div>
@@ -437,7 +441,7 @@
           </div>
 
           <div class="form-field full-width">
-            <label class="form-label">Shop Name</label>
+            <label class="form-label required">Shop Name</label>
             <input
               type="text"
               pInputText
@@ -710,7 +714,7 @@
     *ngIf="currentStep === steps.length"
     label="Save Customer"
     icon="pi pi-check"
-    severity="success"
+    severity="primary"
     [loading]="isSaving"
     (onClick)="saveCustomer()"
   ></p-button>

@@ -1,0 +1,45 @@
+<!-- finance-master.component.html -->
+
+<div class="finance-container">
+  <!-- Header -->
+  <div class="finance-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="pi pi-wallet"></i>
+      </div>
+      <div>
+        <h1 class="header-title">Finance Management</h1>
+        <p class="header-subtitle">จัดการใบแจ้งหนี้และใบเสร็จรับเงิน</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    @for (tab of tabs; track tab.id) {
+      <button
+        class="tab-btn"
+        [class.active]="isActiveTab(tab.id)"
+        (click)="setActiveTab(tab.id)"
+      >
+        <i class="pi" [ngClass]="tab.icon"></i>
+        <span>{{ tab.label }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    @if (isActiveTab('dashboard')) {
+      <app-finance-dashboard />
+    }
+
+    @if (isActiveTab('invoices')) {
+      <app-invoice-management />
+    }
+
+    @if (isActiveTab('receipts')) {
+      <app-receipt-management />
+    }
+  </div>
+</div>

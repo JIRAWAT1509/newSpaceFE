@@ -11,23 +11,7 @@
       </div>
 
       <div class="header-actions">
-        <p-button
-          label="Cancel"
-          icon="pi pi-times"
-          severity="secondary"
-          [outlined]="true"
-          [disabled]="!hasChanges || isSaving"
-          (onClick)="cancelChanges()"
-        ></p-button>
-
-        <p-button
-          label="Save Changes"
-          icon="pi pi-check"
-          severity="success"
-          [disabled]="!hasChanges || isSaving"
-          [loading]="isSaving"
-          (onClick)="savePermissions()"
-        ></p-button>
+        <!-- Buttons moved to bottom of page -->
       </div>
     </div>
 
@@ -173,7 +157,7 @@
       <p-button
         label="Enable All"
         icon="pi pi-check"
-        severity="success"
+        severity="primary"
         [outlined]="true"
         size="small"
         (onClick)="enableAllInTab()"
@@ -280,6 +264,27 @@
     </div>
   </div>
 
+  <!-- Footer Actions -->
+  <div class="page-footer-actions">
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="!hasChanges || isSaving"
+      (onClick)="cancelChanges()"
+    ></p-button>
+
+    <p-button
+      label="บันทึกการเปลี่ยนแปลง"
+      icon="pi pi-check"
+      severity="primary"
+      [disabled]="!hasChanges || isSaving"
+      [loading]="isSaving"
+      (onClick)="savePermissions()"
+    ></p-button>
+  </div>
+
 </div>
 
 <!-- Copy from Role Modal -->
@@ -293,11 +298,14 @@
   header="Copy Permissions from Another Role"
 >
   <div class="modal-content-body">
-    <p class="modal-description">
-      This will copy all permissions from the selected role to
-      <strong *ngIf="selectedRole">{{ getRoleLabel(selectedRole) }}</strong>.
-      Your current permissions will be replaced.
-    </p>
+    <div class="warning-message">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>
+        This will copy all permissions from the selected role to
+        <strong *ngIf="selectedRole">{{ getRoleLabel(selectedRole) }}</strong>.
+        <strong>Your current permissions will be replaced.</strong>
+      </p>
+    </div>
 
     <div class="modal-field">
       <label class="modal-label">Select Source Role</label>
@@ -307,7 +315,9 @@
         optionLabel="label"
         optionValue="value"
         placeholder="Choose a role to copy from..."
-        styleClass="w-full"
+        styleClass="w-full copy-role-select"
+        [appendTo]="null"
+        [panelStyleClass]="'copy-role-dropdown-panel'"
       ></p-select>
     </div>
   </div>
@@ -318,13 +328,13 @@
         label="Cancel"
         severity="secondary"
         [outlined]="true"
-        (onClick)="showCopyModal = false"
+        (onClick)="cancelCopyModal()"
       ></p-button>
       <p-button
-        label="Copy Permissions"
+        label="Apply / Copy Permissions"
         icon="pi pi-copy"
         severity="primary"
-        [disabled]="!copyFromRole"
+        [disabled]="!copyFromRole || copyFromRole === selectedRole"
         (onClick)="copyFromOtherRole()"
       ></p-button>
     </div>
@@ -342,32 +352,37 @@
   header="Apply Permission Template"
 >
   <div class="modal-content-body">
-    <p class="modal-description">
-      Choose a pre-configured template to quickly set up permissions.
-    </p>
+    <div class="warning-message">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>
+        <strong>Applying a template will replace current permissions.</strong>
+        Choose a pre-configured template to quickly set up permissions.
+      </p>
+    </div>
 
-    <div class="template-grid">
+    <div class="template-radio-list">
       <div
         *ngFor="let template of templates"
-        class="template-card"
+        class="template-radio-item"
         [class.selected]="selectedTemplate === template.id"
-        (click)="selectedTemplate = template.id"
+        (click)="onTemplateSelect(template.id)"
       >
-        <div class="template-icon">
-          <i [class]="template.icon"></i>
-        </div>
-        <div class="template-info">
-          <h4>{{ template.name }}</h4>
-          <p>{{ template.description }}</p>
-        </div>
-        <div class="template-radio">
-          <input
-            type="radio"
-            name="template"
-            [value]="template.id"
-            [checked]="selectedTemplate === template.id"
-            (change)="selectedTemplate = template.id"
-          />
+        <input
+          type="radio"
+          name="template"
+          [value]="template.id"
+          [checked]="selectedTemplate === template.id"
+          (change)="onTemplateSelect(template.id)"
+          class="template-radio-input"
+        />
+        <div class="template-radio-content">
+          <div class="template-radio-icon">
+            <i [class]="template.icon"></i>
+          </div>
+          <div class="template-radio-info">
+            <h4>{{ template.name }}</h4>
+            <p>{{ template.description }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -379,13 +394,13 @@
         label="Cancel"
         severity="secondary"
         [outlined]="true"
-        (onClick)="showTemplateModal = false"
+        (onClick)="cancelTemplateModal()"
       ></p-button>
       <p-button
         label="Apply Template"
-        icon="pi pi-bolt"
+        icon="pi pi-check"
         severity="primary"
-        [disabled]="!selectedTemplate"
+        [disabled]="!selectedTemplate || selectedTemplate === ''"
         (onClick)="applyTemplate()"
       ></p-button>
     </div>

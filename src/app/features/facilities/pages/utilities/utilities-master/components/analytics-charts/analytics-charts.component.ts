@@ -1,11 +1,13 @@
 // analytics-charts.component.ts
-import { Component, OnInit, ViewChild, ElementRef, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, signal, computed, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
-import { MeterType, METER_TYPE_LABELS } from '@core/models/meter.model';
+import { MeterType, getMeterTypeLabel } from '@core/models/meter.model';
 import { getChartPalette, getChartPaletteWithAlpha } from '@core/utils/chart-colors';
+import { getFacilitiesUtilitiesConfig } from '@core/services/ui-settings';
+import { interval, Subscription } from 'rxjs';
 
 Chart.register(...registerables);
 
@@ -27,7 +29,7 @@ interface ChartData {
   templateUrl: './analytics-charts.component.html',
   styleUrl: './analytics-charts.component.css'
 })
-export class AnalyticsChartsComponent implements OnInit {
+export class AnalyticsChartsComponent implements OnInit, OnDestroy {
   @ViewChild('consumptionChart') consumptionChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('typeDistributionChart') typeDistributionChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('topConsumersChart') topConsumersChartRef!: ElementRef<HTMLCanvasElement>;
@@ -46,6 +48,10 @@ export class AnalyticsChartsComponent implements OnInit {
   customEndDate = signal<Date | null>(null);
   showCustomDatePicker = signal<boolean>(false);
 
+  // Config tracking
+  private configCheckInterval?: Subscription;
+  private configVersion = signal<number>(0);
+
   // Time range options
   timeRanges: TimeRange[] = [
     { id: 'month', label: 'This Month', months: 1 },
@@ -55,17 +61,31 @@ export class AnalyticsChartsComponent implements OnInit {
     { id: 'custom', label: 'Custom Range', months: 0 }
   ];
 
-  // Meter type filters
-  meterTypeFilters: Array<{ type: MeterType | 'all'; label: string; icon: string; color: string }> =
-    [];
+  // Meter type filters - computed to be reactive to config changes
+  meterTypeFilters = computed(() => {
+    this.configVersion(); // Access to make reactive
+    const electricityInfo = getMeterTypeLabel('electricity');
+    const waterInfo = getMeterTypeLabel('water');
+    const gasInfo = getMeterTypeLabel('gas');
+    const acInfo = getMeterTypeLabel('ac');
+    
+    return [
+      { type: 'all' as const, label: 'All Types', icon: 'pi-th-large', color: '#667eea' },
+      { type: 'electricity' as const, label: electricityInfo.EN, icon: electricityInfo.icon, color: electricityInfo.color },
+      { type: 'water' as const, label: waterInfo.EN, icon: waterInfo.icon, color: waterInfo.color },
+      { type: 'gas' as const, label: gasInfo.EN, icon: gasInfo.icon, color: gasInfo.color },
+      { type: 'ac' as const, label: acInfo.EN, icon: acInfo.icon, color: acInfo.color }
+    ];
+  });
 
-  constructor() {
+  constructor(private cdr: ChangeDetectorRef) {
     // Rebuild charts when filters change
     effect(() => {
       this.selectedTimeRange();
       this.selectedMeterType();
       this.customStartDate();
       this.customEndDate();
+      this.configVersion(); // Also react to config changes
 
       if (this.consumptionChart) {
         this.updateCharts();
@@ -74,14 +94,31 @@ export class AnalyticsChartsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const palette = getChartPalette(4);
-    this.meterTypeFilters = [
-      { type: 'all', label: 'All Types', icon: 'pi-th-large', color: palette[0] || '#667eea' },
-      { type: 'electricity', label: 'Electricity', icon: 'pi-bolt', color: palette[0] || '#FFD700' },
-      { type: 'water', label: 'Water', icon: 'pi-droplet', color: palette[1] || '#4CA3FF' },
-      { type: 'gas', label: 'Gas', icon: 'pi-fire', color: palette[2] || '#FF6384' },
-      { type: 'ac', label: 'AC', icon: 'pi-sun', color: palette[3] || '#80E08E' }
-    ];
+    // Track last config hash to detect changes
+    let lastConfigHash = '';
+    
+    // Check for config changes every 1 second
+    this.configCheckInterval = interval(1000).subscribe(() => {
+      const config = getFacilitiesUtilitiesConfig();
+      const configHash = JSON.stringify({
+        colors: config.colors,
+        labels: config.labels,
+        labelsEn: config.labelsEn,
+        icons: config.icons,
+        iconTypes: config.iconTypes
+      });
+      
+      // If config changed, update version to trigger recomputation
+      if (configHash !== lastConfigHash) {
+        lastConfigHash = configHash;
+        this.configVersion.update(v => v + 1);
+        this.cdr.markForCheck();
+        // Update charts if they're already initialized
+        if (this.consumptionChart) {
+          this.updateCharts();
+        }
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -91,6 +128,9 @@ export class AnalyticsChartsComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
+    if (this.configCheckInterval) {
+      this.configCheckInterval.unsubscribe();
+    }
     this.destroyCharts();
   }
 
@@ -204,7 +244,7 @@ export class AnalyticsChartsComponent implements OnInit {
       ac: 3
     };
 
-    const typeInfo = METER_TYPE_LABELS[meterType];
+    const typeInfo = getMeterTypeLabel(meterType);
     const typeIndex = meterTypeIndexMap[meterType];
     return {
       labels: months,

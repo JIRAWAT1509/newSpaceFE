@@ -363,3 +363,22 @@
   (close)="onRevenueDrawerClose()"
   (save)="onRevenueDrawerSave($event)"
 ></app-revenue-form-drawer>
+
+<!-- Revenue Type Form Drawer -->
+<app-revenue-type-form-drawer
+  [isOpen]="revenueTypeDrawerOpen"
+  [mode]="revenueTypeDrawerMode"
+  [revenueType]="selectedRevenueType"
+  (close)="onRevenueTypeDrawerClose()"
+  (save)="onRevenueTypeDrawerSave($event)"
+></app-revenue-type-form-drawer>
+
+<!-- Business Revenue Form Drawer -->
+<app-business-revenue-form-drawer
+  [isOpen]="businessRevenueDrawerOpen"
+  [mode]="businessRevenueDrawerMode"
+  [businessRevenue]="selectedBusinessRevenue"
+  [revenues]="revenues"
+  (close)="onBusinessRevenueDrawerClose()"
+  (save)="onBusinessRevenueDrawerSave($event)"
+></app-business-revenue-form-drawer>

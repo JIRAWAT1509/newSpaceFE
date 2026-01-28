@@ -1,0 +1,214 @@
+/* meter-create-form.component.css */
+
+.create-form-container {
+  @apply max-w-5xl mx-auto;
+}
+
+/* Success Alert */
+.success-alert {
+  @apply flex items-center gap-3 p-4 mb-6;
+  @apply bg-green-50 border border-green-200 rounded-lg;
+  @apply text-green-800;
+  animation: slideDown 0.3s ease;
+}
+
+.success-alert i {
+  @apply text-2xl text-green-600;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Form Header */
+.form-header {
+  @apply mb-8;
+}
+
+.form-title {
+  @apply text-3xl font-bold text-gray-800 mb-2;
+}
+
+.form-subtitle {
+  @apply text-gray-600;
+}
+
+/* Section */
+.section {
+  @apply mb-8 p-6 bg-white rounded-xl border border-gray-200;
+}
+
+.section-title {
+  @apply text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-600;
+}
+
+/* Meter Type Grid */
+.meter-type-grid {
+  @apply grid grid-cols-2 md:grid-cols-4 gap-4 mb-2;
+}
+
+.meter-type-card {
+  @apply flex flex-col items-center gap-3 p-6;
+  @apply bg-white border-2 rounded-xl;
+  @apply transition-all duration-300 cursor-pointer;
+}
+
+.meter-type-card:hover {
+  @apply shadow-lg -translate-y-1;
+}
+
+.meter-type-card.selected {
+  @apply shadow-xl;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.type-icon {
+  @apply w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl;
+}
+
+.type-label {
+  @apply font-semibold text-gray-800;
+}
+
+.type-unit {
+  @apply text-sm text-gray-500;
+}
+
+/* Form Grid */
+.form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.form-grid.triple {
+  @apply md:grid-cols-3;
+}
+
+/* Form Group */
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.form-label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+/* Input Styles */
+input[type="text"],
+input[type="number"] {
+  @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg;
+  @apply transition-all duration-200;
+}
+
+input:focus {
+  @apply outline-none border-blue-500;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+input.error {
+  @apply border-red-500;
+}
+
+input.error:focus {
+  @apply border-red-500;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Input with Unit */
+.input-with-unit {
+  @apply relative;
+}
+
+.unit-badge {
+  @apply absolute right-3 top-1/2 -translate-y-1/2;
+  @apply px-3 py-1 bg-blue-100 text-blue-700 rounded-md text-sm font-semibold;
+}
+
+.input-with-unit input {
+  @apply pr-20;
+}
+
+/* Field Hint */
+.field-hint {
+  @apply text-xs text-gray-500;
+}
+
+/* Error Message */
+.error-message {
+  @apply text-sm text-red-600 mt-1;
+}
+
+/* Form Actions */
+.form-actions {
+  @apply flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200;
+}
+
+/* Buttons */
+.btn {
+  @apply flex items-center gap-2 px-6 py-3;
+  @apply font-semibold rounded-lg transition-all duration-200;
+  @apply border-none cursor-pointer;
+}
+
+.btn:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.btn-primary:disabled {
+  @apply bg-blue-400;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
+}
+
+.btn i {
+  @apply text-lg;
+}
+
+/* Calendar Override */
+::ng-deep .p-calendar {
+  @apply w-full;
+}
+
+::ng-deep .p-calendar .p-inputtext {
+  @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg;
+}
+
+::ng-deep .p-calendar .p-inputtext:focus {
+  @apply outline-none border-blue-500;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+::ng-deep .p-calendar.error .p-inputtext {
+  @apply border-red-500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .meter-type-grid {
+    @apply grid-cols-2;
+  }
+
+  .form-grid {
+    @apply grid-cols-1;
+  }
+
+  .form-actions {
+    @apply flex-col;
+  }
+
+  .btn {
+    @apply w-full justify-center;
+  }
+}
