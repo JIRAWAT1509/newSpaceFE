@@ -16,7 +16,7 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
   { id: 'area', name: 'Area', description: 'รายงานพื้นที่ให้เช่า' },
   { id: 'contract', name: 'Contract', description: 'รายงานสัญญาและลูกค้า' },
   { id: 'service', name: 'Service', description: 'รายงานงานบริการ' },
-  { id: 'collection', name: 'Collective', description: 'รายงานเรียกเก็บ/ยอดขาย' },
+  { id: 'collection', name: 'Collection', description: 'รายงานเรียกเก็บ/ยอดขาย' },
   { id: 'finance', name: 'Finance', description: 'รายงานการเงิน' },
   { id: 'budget', name: 'Budget', description: 'รายงานงบประมาณ' },
 ];
@@ -31,7 +31,7 @@ export const REPORT_ITEMS: ReportItem[] = [
   {
     id: 'area_current_layout',
     title: 'รายงานผังพื้นที่ให้เช่าปัจจุบัน',
-    description: 'แสดงพื้นที่ทั้งหมดที่มีให้เช่าพร้อมสาถนะพื้นที่ปัจจุบัน',
+    description: 'แสดงพื้นที่ทั้งหมดที่มีให้เช่าพร้อมสถานะพื้นที่ปัจจุบัน',
     category: 'area',
   },
   {
@@ -151,7 +151,7 @@ export const REPORT_ITEMS: ReportItem[] = [
   {
     id: 'contract_print_deposit_refund',
     title: 'พิมพ์ใบแจ้งขอคืนเงินค้ำประกันความเสียหาย',
-    description: 'พิมพ์เอกสารใบแจ้งขอคืนเงินค้ำประกันความเสียหายของพื้นที่โปรโมชั้น',
+    description: 'พิมพ์เอกสารใบแจ้งขอคืนเงินค้ำประกันความเสียหายของพื้นที่โปรโมชั่น',
     category: 'contract',
   },
   {
@@ -205,7 +205,7 @@ export const REPORT_ITEMS: ReportItem[] = [
   {
     id: 'collection_invoice_incomplete',
     title: 'รายงานสรุปสัญญาที่ออกใบแจ้งหนี้ไม่ครบ',
-    description: 'แสดงข้อมูลของรหัสรายได้ในต่ละสัญญาที่ออกใบแจ้งหนี้ไปแล้วและยังไม่ได้ออก',
+    description: 'แสดงข้อมูลของรหัสรายได้ในแต่ละสัญญาที่ออกใบแจ้งหนี้ไปแล้วและยังไม่ได้ออก',
     category: 'collection',
   },
   {
@@ -331,7 +331,7 @@ export const REPORT_ITEMS: ReportItem[] = [
   {
     id: 'collection_invoice_receipt_credit',
     title: 'รายงานใบแจ้งหนี้ ,ใบเสร็จ และใบลดหนี้',
-    description: 'แสดงข้อมูลรายการใบแจ้งหนี้ ,ใบเสร็จ และใบลดหนี้ตามระยะเวลาที้ต้องการ',
+    description: 'แสดงข้อมูลรายการใบแจ้งหนี้ ,ใบเสร็จ และใบลดหนี้ตามระยะเวลาที่ต้องการ',
     category: 'collection',
   },
   {
@@ -439,7 +439,7 @@ export const REPORT_ITEMS: ReportItem[] = [
   {
     id: 'finance_receipt_summary',
     title: 'รายงานสรุปใบเสร็จรับเงิน',
-    description: 'แสดงข้อมูลสรุปใบเสร็จรับเงินแสดงประเภทการชำระและผุ้รับเงิน',
+    description: 'แสดงข้อมูลสรุปใบเสร็จรับเงินแสดงประเภทการชำระและผู้รับเงิน',
     category: 'finance',
   },
   {
@@ -457,7 +457,7 @@ export const REPORT_ITEMS: ReportItem[] = [
   {
     id: 'finance_bounced_check',
     title: 'รายงานเช็คคืน',
-    description: 'แสดงข้อมูลรายงานยอดหนี้เช็คคืนใบจากใบเสร็จรับเงิน',
+    description: 'แสดงข้อมูลรายงานยอดหนี้เช็คคืนจากใบเสร็จรับเงิน',
     category: 'finance',
   },
   {
@@ -499,7 +499,7 @@ export const REPORT_ITEMS: ReportItem[] = [
   {
     id: 'finance_receipt_actual',
     title: 'รายงานสรุปใบเสร็จรับเงิน (Actual)',
-    description: 'แสดงข้อมูลสรุปใบเสร็จรับเงินแสดงประเภทการชำระและผุ้รับเงิน',
+    description: 'แสดงข้อมูลสรุปใบเสร็จรับเงินแสดงประเภทการชำระและผู้รับเงิน',
     category: 'finance',
   },
   {
@@ -535,7 +535,7 @@ export const REPORT_ITEMS: ReportItem[] = [
   {
     id: 'finance_receipt_by_service_code',
     title: 'Receipt Detail of Revenue by Service Code',
-    description: 'แสดงข้อมูลการรับ้เงินตามรหัสรายได่',
+    description: 'แสดงข้อมูลการรับเงินตามรหัสรายได้',
     category: 'finance',
   },
   {
@@ -582,7 +582,7 @@ export const REPORT_ITEMS: ReportItem[] = [
   {
     id: 'budget_vs_income',
     title: 'รายงานสรุปรายได้เปรียบเทียบงบประมาณ (Income)',
-    description: 'แสดงข้อมูลรายงานสรุปรายได้จากใบ้สร็จรับเงินเปรียบเทียบงบประมาณ',
+    description: 'แสดงข้อมูลรายงานสรุปรายได้จากใบเสร็จรับเงินเปรียบเทียบงบประมาณ',
     category: 'budget',
     route: '/reports/budget/vs-budget-income',
   },

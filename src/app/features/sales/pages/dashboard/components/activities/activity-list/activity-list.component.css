@@ -492,25 +492,32 @@
   color: white;
 }
 
-/* Edit/Delete Actions */
-.btn-edit {
-  border-color: #6b7280;
-  color: #374151;
+/* Edit/Delete Actions - Now use global styles from styles.css */
+/* Override for activity list specific styling */
+.btn-action.btn-edit {
+  background-color: transparent !important;
+  border: none !important;
+  color: #374151 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 6px !important;
 }
 
-.btn-edit:hover {
-  background: #6b7280;
-  color: white;
+.btn-action.btn-edit:hover {
+  background-color: #f3f4f6 !important;
+  color: #1f2937 !important;
 }
 
-.btn-delete {
-  border-color: #ef4444;
-  color: #991b1b;
+.btn-action.btn-delete {
+  background-color: #ef4444 !important;
+  border: none !important;
+  color: #ffffff !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 6px !important;
 }
 
-.btn-delete:hover {
-  background: #ef4444;
-  color: white;
+.btn-action.btn-delete:hover {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
 }
 
 /* ==================== STATUS DIALOG ==================== */

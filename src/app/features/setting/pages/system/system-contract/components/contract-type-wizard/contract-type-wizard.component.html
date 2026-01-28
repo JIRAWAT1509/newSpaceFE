@@ -16,7 +16,7 @@
            w-[95%] max-w-[1200px] max-h-[90vh] overflow-hidden"
   >
     <!-- Header -->
-    <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4 flex items-center justify-between">
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
       <h2 class="text-xl font-bold text-white">
         {{ mode === 'create' ? 'เพิ่มประเภทสัญญา' : 'แก้ไขประเภทสัญญา' }}
       </h2>
@@ -47,13 +47,13 @@
             }
           </div>
           <div class="ml-2 hidden sm:block">
-            <p class="text-xs font-medium" [class.text-purple-600]="currentStep === 1">
+            <p class="text-xs font-medium" [class.text-blue-600]="currentStep === 1">
               ข้อมูลทั่วไป
             </p>
           </div>
         </div>
 
-        <div class="flex-none w-12 h-0.5 bg-gray-300" [class.bg-purple-600]="currentStep > 1"></div>
+        <div class="flex-none w-12 h-0.5 bg-gray-300" [class.bg-blue-600]="currentStep > 1"></div>
 
         <!-- Step 2 -->
         <div class="flex items-center flex-1">
@@ -69,13 +69,13 @@
             }
           </div>
           <div class="ml-2 hidden sm:block">
-            <p class="text-xs font-medium" [class.text-purple-600]="currentStep === 2">
+            <p class="text-xs font-medium" [class.text-blue-600]="currentStep === 2">
               ไฟล์
             </p>
           </div>
         </div>
 
-        <div class="flex-none w-12 h-0.5 bg-gray-300" [class.bg-purple-600]="currentStep > 2"></div>
+        <div class="flex-none w-12 h-0.5 bg-gray-300" [class.bg-blue-600]="currentStep > 2"></div>
 
         <!-- Step 3 -->
         <div class="flex items-center flex-1">
@@ -91,13 +91,13 @@
             }
           </div>
           <div class="ml-2 hidden sm:block">
-            <p class="text-xs font-medium" [class.text-purple-600]="currentStep === 3">
+            <p class="text-xs font-medium" [class.text-blue-600]="currentStep === 3">
               เงื่อนไข
             </p>
           </div>
         </div>
 
-        <div class="flex-none w-12 h-0.5 bg-gray-300" [class.bg-purple-600]="currentStep > 3"></div>
+        <div class="flex-none w-12 h-0.5 bg-gray-300" [class.bg-blue-600]="currentStep > 3"></div>
 
         <!-- Step 4 -->
         <div class="flex items-center flex-1">
@@ -113,7 +113,7 @@
             }
           </div>
           <div class="ml-2 hidden sm:block">
-            <p class="text-xs font-medium" [class.text-purple-600]="currentStep === 4">
+            <p class="text-xs font-medium" [class.text-blue-600]="currentStep === 4">
               สรุป
             </p>
           </div>

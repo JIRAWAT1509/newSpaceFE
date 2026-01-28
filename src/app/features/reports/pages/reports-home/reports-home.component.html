@@ -1,22 +1,4 @@
 <div class="report-page">
-  <div class="report-toolbar">
-    <div class="report-search">
-      <i class="pi pi-search"></i>
-      <input
-        type="text"
-        placeholder="ค้นหา"
-        [(ngModel)]="searchQuery"
-      />
-    </div>
-    <button class="favorite-toggle" (click)="toggleFavoriteFilter()">
-      <i
-        class="pi"
-        [ngClass]="favoritesOnly ? 'pi-bookmark-fill' : 'pi-bookmark'"
-      ></i>
-      favorite
-    </button>
-  </div>
-
   <div class="report-filters">
     <div class="filter-group">
       <span class="filter-label">รายงาน</span>

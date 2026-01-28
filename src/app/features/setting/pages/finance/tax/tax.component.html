@@ -313,18 +313,19 @@
 
   <ng-template pTemplate="footer">
     <div class="modal-footer">
-      <button
-        pButton
-        type="button"
+      <p-button
         label="ยกเลิก"
-        class="p-button-secondary p-button-outlined"
-        (click)="closeVATModal()"></button>
-      <button
-        pButton
-        type="button"
+        icon="pi pi-times"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="closeVATModal()"
+      ></p-button>
+      <p-button
         label="บันทึก"
-        class="p-button-primary"
-        (click)="saveVAT()"></button>
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="saveVAT()"
+      ></p-button>
     </div>
   </ng-template>
 </p-dialog>
@@ -427,18 +428,19 @@
 
   <ng-template pTemplate="footer">
     <div class="modal-footer">
-      <button
-        pButton
-        type="button"
+      <p-button
         label="ยกเลิก"
-        class="p-button-secondary p-button-outlined"
-        (click)="closeWithholdingModal()"></button>
-      <button
-        pButton
-        type="button"
+        icon="pi pi-times"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="closeWithholdingModal()"
+      ></p-button>
+      <p-button
         label="บันทึก"
-        class="p-button-primary"
-        (click)="saveWithholding()"></button>
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="saveWithholding()"
+      ></p-button>
     </div>
   </ng-template>
 </p-dialog>

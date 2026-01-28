@@ -1,10 +1,12 @@
 // meter-create-form.component.ts
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { DatePicker } from 'primeng/datepicker';
-import { MeterType, METER_TYPE_LABELS } from '@core/models/meter.model';
+import { MeterType, getMeterTypeLabel } from '@core/models/meter.model';
+import { getFacilitiesUtilitiesConfig } from '@core/services/ui-settings';
+import { interval, Subscription } from 'rxjs';
 
 interface MeterTypeOption {
   type: MeterType;
@@ -26,41 +28,78 @@ interface MeterTypeOption {
   templateUrl: './meter-create-form.component.html',
   styleUrl: './meter-create-form.component.css'
 })
-export class MeterCreateFormComponent {
+export class MeterCreateFormComponent implements OnInit, OnDestroy {
   meterForm!: FormGroup;
   selectedMeterType = signal<MeterType | null>(null);
   showSuccessMessage = signal<boolean>(false);
 
-  meterTypeOptions: MeterTypeOption[] = [
-    {
-      type: 'electricity',
-      label: METER_TYPE_LABELS.electricity.TH,
-      icon: METER_TYPE_LABELS.electricity.icon,
-      color: METER_TYPE_LABELS.electricity.color,
-      unit: 'kWh'
-    },
-    {
-      type: 'water',
-      label: METER_TYPE_LABELS.water.TH,
-      icon: METER_TYPE_LABELS.water.icon,
-      color: METER_TYPE_LABELS.water.color,
-      unit: 'm³'
-    },
-    {
-      type: 'gas',
-      label: METER_TYPE_LABELS.gas.TH,
-      icon: METER_TYPE_LABELS.gas.icon,
-      color: METER_TYPE_LABELS.gas.color,
-      unit: 'm³'
-    },
-    {
-      type: 'ac',
-      label: METER_TYPE_LABELS.ac.TH,
-      icon: METER_TYPE_LABELS.ac.icon,
-      color: METER_TYPE_LABELS.ac.color,
-      unit: 'kWh'
+  private configCheckInterval?: Subscription;
+  private configVersion = signal<number>(0);
+
+  // Use computed signal instead of getter for reactivity
+  meterTypeOptions = computed(() => {
+    // Access configVersion to make this reactive
+    this.configVersion();
+    
+    return [
+      {
+        type: 'electricity' as MeterType,
+        label: getMeterTypeLabel('electricity').TH,
+        icon: getMeterTypeLabel('electricity').icon,
+        color: getMeterTypeLabel('electricity').color,
+        unit: 'kWh'
+      },
+      {
+        type: 'water' as MeterType,
+        label: getMeterTypeLabel('water').TH,
+        icon: getMeterTypeLabel('water').icon,
+        color: getMeterTypeLabel('water').color,
+        unit: 'm³'
+      },
+      {
+        type: 'gas' as MeterType,
+        label: getMeterTypeLabel('gas').TH,
+        icon: getMeterTypeLabel('gas').icon,
+        color: getMeterTypeLabel('gas').color,
+        unit: 'm³'
+      },
+      {
+        type: 'ac' as MeterType,
+        label: getMeterTypeLabel('ac').TH,
+        icon: getMeterTypeLabel('ac').icon,
+        color: getMeterTypeLabel('ac').color,
+        unit: 'kWh'
+      }
+    ];
+  });
+
+  ngOnInit(): void {
+    // Track last config hash to detect changes
+    let lastConfigHash = '';
+    
+    // Check for config changes every 1 second
+    this.configCheckInterval = interval(1000).subscribe(() => {
+      const config = getFacilitiesUtilitiesConfig();
+      const configHash = JSON.stringify({
+        colors: config.colors,
+        labels: config.labels,
+        labelsEn: config.labelsEn,
+        icons: config.icons,
+        iconTypes: config.iconTypes
+      });
+      
+      if (configHash !== lastConfigHash) {
+        lastConfigHash = configHash;
+        this.configVersion.update(v => v + 1);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.configCheckInterval) {
+      this.configCheckInterval.unsubscribe();
     }
-  ];
+  }
 
   constructor(private fb: FormBuilder) {
     this.initForm();
@@ -80,7 +119,7 @@ export class MeterCreateFormComponent {
 
   selectMeterType(type: MeterType): void {
     this.selectedMeterType.set(type);
-    const selectedOption = this.meterTypeOptions.find(opt => opt.type === type);
+      const selectedOption = this.meterTypeOptions().find((opt: MeterTypeOption) => opt.type === type);
 
     this.meterForm.patchValue({
       meterType: type,

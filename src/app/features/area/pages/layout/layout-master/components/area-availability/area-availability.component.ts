@@ -1,7 +1,9 @@
-import { Component, OnInit, output, signal, computed, input } from '@angular/core';
+import { Component, OnInit, output, signal, computed, input, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AreaDataService, StatusDistribution } from '@core/services/area/area-data.service';
 import { AreaStatus } from '@core/models/area.model';
+import { getAreaAvailabilityConfig, applyModuleScopedColors, getAreaStatusIcon, getAreaStatusIconType } from '@core/services/ui-settings';
+import { interval, Subscription } from 'rxjs';
 
 export interface FilterChangeEvent {
   selectedStatuses: AreaStatus[];
@@ -14,7 +16,7 @@ export interface FilterChangeEvent {
   templateUrl: './area-availability.component.html',
   styleUrl: './area-availability.component.css'
 })
-export class AreaAvailabilityComponent implements OnInit {
+export class AreaAvailabilityComponent implements OnInit, AfterViewInit, OnDestroy {
   mode = input<'per-building' | 'per-floor'>('per-building');
 
   statusDistribution = signal<StatusDistribution[]>([]);
@@ -29,10 +31,63 @@ export class AreaAvailabilityComponent implements OnInit {
 
   filterChanged = output<FilterChangeEvent>();
 
-  constructor(private areaDataService: AreaDataService) {}
+  private configCheckInterval?: Subscription;
+  private lastConfigHash: string = '';
+
+  constructor(
+    private areaDataService: AreaDataService,
+    private elementRef: ElementRef,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadStatusDistribution();
+    // Check for config changes every 1 second (lightweight polling)
+    this.configCheckInterval = interval(1000).subscribe(() => {
+      this.checkAndApplyConfigChanges();
+    });
+  }
+
+  ngAfterViewInit(): void {
+    // Apply scoped CSS variables for Area Availability module
+    this.applyScopedColors();
+  }
+
+  ngOnDestroy(): void {
+    if (this.configCheckInterval) {
+      this.configCheckInterval.unsubscribe();
+    }
+  }
+
+  private checkAndApplyConfigChanges(): void {
+    const areaConfig = getAreaAvailabilityConfig();
+    // Create a hash of the config to detect changes (including icons)
+    const configHash = JSON.stringify({
+      colors: areaConfig.colors,
+      labels: areaConfig.labels,
+      labelsEn: areaConfig.labelsEn,
+      statusIcons: areaConfig.statusIcons,
+      statusIconTypes: areaConfig.statusIconTypes
+    });
+    
+    if (configHash !== this.lastConfigHash) {
+      this.lastConfigHash = configHash;
+      this.applyScopedColors();
+      // Reload status distribution to get updated labels and colors
+      this.loadStatusDistribution();
+      // Trigger change detection to update the view
+      this.cdr.markForCheck();
+    }
+  }
+
+  private applyScopedColors(): void {
+    const areaConfig = getAreaAvailabilityConfig();
+    const container = this.elementRef.nativeElement.querySelector('.area-availability-container');
+    
+    if (container && areaConfig.colors) {
+      // Apply scoped colors to the container element
+      applyModuleScopedColors(container, 'areaAvailability', areaConfig.colors);
+    }
   }
 
   private loadStatusDistribution(): void {
@@ -96,5 +151,13 @@ export class AreaAvailabilityComponent implements OnInit {
 
   formatPercentage(percentage: number): string {
     return `${percentage.toFixed(0)}%`;
+  }
+
+  getStatusIcon(statusId: AreaStatus): string {
+    return getAreaStatusIcon(statusId, 'pi-building');
+  }
+
+  getStatusIconType(statusId: AreaStatus): 'library' | 'upload' {
+    return getAreaStatusIconType(statusId);
   }
 }

@@ -16,9 +16,9 @@
 
       <div class="header-actions">
         <p-button
-          label="Add Bank"
+          label="เพิ่ม"
           icon="pi pi-plus"
-          severity="success"
+          severity="primary"
           (onClick)="openAddBankModal()"
         ></p-button>
       </div>
@@ -120,10 +120,10 @@
               class="search-input"
             />
           </div>
-          <p-button
-            label="Add Branch"
+            <p-button
+            label="เพิ่ม"
             icon="pi pi-plus"
-            severity="success"
+            severity="primary"
             [outlined]="true"
             (onClick)="openAddBranchModal()"
           ></p-button>
@@ -239,7 +239,7 @@
   <ng-template pTemplate="footer">
     <div class="modal-footer">
       <p-button
-        label="Cancel"
+        label="ยกเลิก"
         icon="pi pi-times"
         severity="secondary"
         [outlined]="true"
@@ -247,7 +247,7 @@
         [disabled]="isSaving"
       ></p-button>
       <p-button
-        [label]="isEditMode ? 'Save Changes' : 'Create Bank'"
+        [label]="isEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างธนาคาร'"
         icon="pi pi-check"
         severity="primary"
         (onClick)="saveBankModal()"
@@ -331,7 +331,7 @@
   <ng-template pTemplate="footer">
     <div class="modal-footer">
       <p-button
-        label="Cancel"
+        label="ยกเลิก"
         icon="pi pi-times"
         severity="secondary"
         [outlined]="true"
@@ -339,7 +339,7 @@
         [disabled]="isSaving"
       ></p-button>
       <p-button
-        [label]="isEditMode ? 'Save Changes' : 'Create Branch'"
+        [label]="isEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างสาขา'"
         icon="pi pi-check"
         severity="primary"
         (onClick)="saveBranchModal()"
@@ -401,10 +401,10 @@
           <i class="pi pi-wallet"></i>
           Account Information
         </h3>
-        <p-button
-          label="Add Account"
+          <p-button
+          label="เพิ่ม"
           icon="pi pi-plus"
-          severity="success"
+          severity="primary"
           size="small"
           [outlined]="true"
           (onClick)="openAddAccountModal()"
@@ -464,7 +464,7 @@
   <ng-template pTemplate="footer">
     <div class="dialog-footer">
       <p-button
-        label="Close"
+        label="ปิด"
         icon="pi pi-times"
         severity="secondary"
         [outlined]="true"
@@ -472,14 +472,16 @@
       ></p-button>
       <div class="action-buttons-group">
         <p-button
-          label="Edit Branch"
           icon="pi pi-pencil"
+          [text]="true"
+          [rounded]="true"
           severity="info"
           (onClick)="editBranchFromDetails()"
         ></p-button>
         <p-button
-          label="Delete Branch"
           icon="pi pi-trash"
+          [text]="true"
+          [rounded]="true"
           severity="danger"
           (onClick)="deleteBranchFromDetails()"
         ></p-button>
@@ -661,7 +663,7 @@
     </div>
     <div class="right-actions">
       <p-button
-        label="Cancel"
+        label="ยกเลิก"
         icon="pi pi-times"
         severity="secondary"
         [outlined]="true"
@@ -669,7 +671,7 @@
         [disabled]="isSaving"
       ></p-button>
       <p-button
-        [label]="isAccountEditMode ? 'Save Changes' : 'Create Account'"
+        [label]="isAccountEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างบัญชี'"
         icon="pi pi-check"
         severity="primary"
         (onClick)="saveAccountModal()"

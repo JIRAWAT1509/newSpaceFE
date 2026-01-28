@@ -32,13 +32,15 @@
       <div class="bookmarks">
         @for (bookmark of savedSearches(); track bookmark.id) {
           <button class="bookmark-chip" (click)="applyBookmark(bookmark)">
-            {{ bookmark.name }}
-            <i class="pi pi-times-circle"></i>
+            <i class="pi pi-bookmark"></i>
+            <span>{{ bookmark.name }}</span>
+            <i 
+              class="pi pi-times-circle" 
+              (click)="deleteBookmark(bookmark.id, $event)"
+              title="ลบการค้นหาที่บันทึกไว้"
+            ></i>
           </button>
         }
-        <button class="add-bookmark-btn">
-          <i class="pi pi-plus-circle"></i>
-        </button>
       </div>
     }
 
@@ -206,6 +208,7 @@
   <app-advance-search-modal
     [filters]="activeFilters()"
     (filtersChange)="onFiltersChange($event)"
+    (savedSearchChange)="onSavedSearchChange($event)"
     (close)="closeAdvanceSearch()"
   />
 }

@@ -88,16 +88,64 @@
 
     <!-- Footer -->
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="onCancel()">
-        Cancel
-      </button>
-      <button
-        class="btn-primary"
+      <button 
+        class="btn-bookmark"
         [disabled]="!hasValidFilters()"
-        (click)="onSearch()"
+        (click)="openSaveDialog()"
+        title="บันทึกการค้นหา"
       >
-        Search
+        <i class="pi pi-bookmark"></i>
+        <span>บันทึกการค้นหา</span>
       </button>
+      <div class="footer-actions">
+        <button class="btn-secondary" (click)="onCancel()">
+          Cancel
+        </button>
+        <button
+          class="btn-primary"
+          [disabled]="!hasValidFilters()"
+          (click)="onSearch()"
+        >
+          Search
+        </button>
+      </div>
     </div>
   </div>
 </div>
+
+<!-- Save Bookmark Dialog -->
+@if (showSaveDialog()) {
+  <div class="dialog-backdrop" (click)="closeSaveDialog()">
+    <div class="dialog-content" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h4>บันทึกการค้นหา</h4>
+        <button class="dialog-close" (click)="closeSaveDialog()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <label class="dialog-label">ชื่อการค้นหา:</label>
+        <input
+          type="text"
+          class="dialog-input"
+          [(ngModel)]="bookmarkName"
+          placeholder="กรุณากรอกชื่อการค้นหา..."
+          (keyup.enter)="saveBookmark()"
+          autofocus
+        />
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-secondary" (click)="closeSaveDialog()">
+          ยกเลิก
+        </button>
+        <button
+          class="btn-primary"
+          [disabled]="!bookmarkName().trim()"
+          (click)="saveBookmark()"
+        >
+          บันทึก
+        </button>
+      </div>
+    </div>
+  </div>
+}

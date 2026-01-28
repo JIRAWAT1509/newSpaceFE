@@ -49,14 +49,11 @@ export class ContractInfoTabComponent implements OnInit {
   form!: FormGroup;
 
   sections: Section[] = [
-    { id: 'basic', name: 'ข้อมูลพื้นฐาน' },
-    { id: 'renewal', name: 'ข้อตกลงต่ออายุ' },
-    { id: 'area', name: 'พื้นที่' }
+    { id: 'booking', name: 'ข้อมูลใบจอง' },
+    { id: 'tenant', name: 'ข้อมูลผู้เช่า (ฉบับยืนยัน)' }
   ];
 
-  // Table data
-  renewalAgreements = signal<RenewalAgreement[]>([]);
-  areaDetails = signal<AreaDetail[]>([]);
+  // Removed - no longer needed for R structure
 
   // Dropdown options
   paymentMethodOptions = [
@@ -85,37 +82,23 @@ export class ContractInfoTabComponent implements OnInit {
 
   initForm(): void {
     this.form = this.fb.group({
-      // Duration
-      durationYears: [0, Validators.required],
-      durationMonths: [0],
-      durationDays: [0],
+      // Section: ข้อมูลใบจอง
+      bookingNumber: [''],
+      bookingDate: [''],
+      bookingStatus: [''],
+      bookingStartDate: [''],
+      bookingEndDate: [''],
+      bookingDuration: [''],
+      transferBookingContract: [''],
 
-      // Dates
-      startDate: ['', Validators.required],
-      endDate: ['', Validators.required],
-      rentStartDate: ['', Validators.required],
-
-      // Ratios and terms
-      rentRatio: [0],
-      serviceRatio: [0],
-      renewalNoticeDays: [0],
-      creditTermRent: [0, Validators.required],
-      creditTermUtility: [0, Validators.required],
-      paymentDay: [1],
-      closurePenalty: [0],
-
-      // Dropdowns
-      paymentMethod: ['', Validators.required],
-      revenueCollection: [''],
-      hasAddendum: [false],
-
-      // Adjustments
-      adjustmentYears: [0],
-      adjustmentPercent: [0],
-      excludedProducts: [''],
-
-      // Area
-      requestAreaMeasurement: [false]
+      // Section: ข้อมูลผู้เช่า (ฉบับยืนยัน)
+      contractMaker: [''],
+      legalEntityName: [''],
+      registeredAddress: [''],
+      documentDeliveryAddress: [''],
+      phone: [''],
+      email: [''],
+      contactPerson: ['']
     });
   }
 
@@ -142,12 +125,10 @@ export class ContractInfoTabComponent implements OnInit {
 
   getRequiredFieldsBySection(sectionId: string): string[] {
     switch (sectionId) {
-      case 'basic':
-        return ['durationYears', 'startDate', 'endDate', 'rentStartDate', 'creditTermRent', 'creditTermUtility', 'paymentMethod'];
-      case 'renewal':
+      case 'booking':
         return [];
-      case 'area':
-        return [];
+      case 'tenant':
+        return ['contractMaker', 'legalEntityName', 'registeredAddress', 'phone', 'email'];
       default:
         return [];
     }
@@ -160,44 +141,9 @@ export class ContractInfoTabComponent implements OnInit {
     }
   }
 
-  // Renewal Table Actions
-  addRenewalRow(): void {
-    this.renewalAgreements.update(rows => [...rows, {
-      startDate: null,
-      endDate: null,
-      rate: null
-    }]);
-  }
-
-  removeRenewalRow(index: number): void {
-    this.renewalAgreements.update(rows => rows.filter((_, i) => i !== index));
-  }
-
-  // Area Table Actions
-  addAreaRow(): void {
-    this.areaDetails.update(rows => [...rows, {
-      building: '',
-      floor: '',
-      unitNumber: '',
-      status: '',
-      zone: '',
-      width: null,
-      length: null,
-      totalArea: null
-    }]);
-  }
-
-  removeAreaRow(index: number): void {
-    this.areaDetails.update(rows => rows.filter((_, i) => i !== index));
-  }
-
-  calculateArea(index: number): void {
-    this.areaDetails.update(rows => {
-      const row = rows[index];
-      if (row.width && row.length) {
-        row.totalArea = row.width * row.length;
-      }
-      return [...rows];
-    });
+  // Validation helpers
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.form.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
   }
 }

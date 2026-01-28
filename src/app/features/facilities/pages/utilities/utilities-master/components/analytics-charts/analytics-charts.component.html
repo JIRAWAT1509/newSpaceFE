@@ -55,7 +55,7 @@
         <span>Meter Type</span>
       </h3>
       <div class="filter-options">
-        @for (filter of meterTypeFilters; track filter.type) {
+        @for (filter of meterTypeFilters(); track filter.type) {
           <button
             class="filter-chip type-chip"
             [class.active]="isMeterTypeSelected(filter.type)"

@@ -7,6 +7,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { DrawerModule } from 'primeng/drawer';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 interface BranchRow {
   branch: string;
@@ -30,12 +32,19 @@ interface DropdownOption {
     InputNumberModule,
     DrawerModule,
     FormsModule,
-    SelectModule
+    SelectModule,
+    ConfirmDialogModule
   ],
   templateUrl: './branch-master.component.html',
-  styleUrls: ['./branch-master.component.css']
+  styleUrls: ['./branch-master.component.css'],
+  providers: [ConfirmationService, MessageService]
 })
 export class BranchMasterComponent {
+  constructor(
+    private confirmService: ConfirmationService,
+    private messageService: MessageService
+  ) {}
+
   // Inputs from parent
   @Input() isLoadingBranch = false;
   @Input() branchMaster: BranchRow[] = [];
@@ -43,8 +52,8 @@ export class BranchMasterComponent {
   // search
   searchKeyword = '';
 
-  // Drawer state
-  sideVisible = false;
+  // Form visibility state
+  showBranchForm = false;
   isEdit = false;
 
   // Generate branch options from branchMaster
@@ -127,7 +136,7 @@ export class BranchMasterComponent {
   openAddPanel() {
     this.isEdit = false;
     this.branchForm = this.createEmptyForm();
-    this.sideVisible = true;
+    this.showBranchForm = true;
   }
 
   // Open for edit
@@ -147,17 +156,37 @@ export class BranchMasterComponent {
       contractMonthFrom: 1,
       costCenter: 'CC001'
     };
-    this.sideVisible = true;
+    this.showBranchForm = true;
   }
 
   saveBranch() {
     console.log('Saving branch form:', this.branchForm);
     // TODO: emit to parent or call service
-    this.sideVisible = false;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'บันทึกสำเร็จ',
+      detail: 'บันทึกข้อมูลสาขาเรียบร้อยแล้ว',
+    });
+    this.showBranchForm = false;
   }
 
   cancelPanel() {
-    this.sideVisible = false;
+    this.showBranchForm = false;
+    this.isEdit = false;
+  }
+
+  deleteBranch(row: BranchRow) {
+    this.confirmService.confirm({
+      message: `ยืนยันการลบข้อมูลสาขา ${row.branch}?`,
+      accept: () => {
+        // TODO: Implement delete logic
+        this.messageService.add({
+          severity: 'success',
+          summary: 'ลบสำเร็จ',
+          detail: 'ลบข้อมูลสาขาเรียบร้อยแล้ว',
+        });
+      },
+    });
   }
 
   private createEmptyForm() {

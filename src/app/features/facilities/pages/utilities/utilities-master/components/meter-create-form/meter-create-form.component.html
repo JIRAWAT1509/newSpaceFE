@@ -21,7 +21,7 @@
   <div class="section">
     <h3 class="section-title">Select Meter Type *</h3>
     <div class="meter-type-grid">
-      @for (option of meterTypeOptions; track option.type) {
+      @for (option of meterTypeOptions(); track option.type) {
         <button
           type="button"
           class="meter-type-card"

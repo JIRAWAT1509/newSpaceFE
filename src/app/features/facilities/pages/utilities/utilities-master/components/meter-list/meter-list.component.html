@@ -44,7 +44,7 @@
   <div class="filter-section">
     <h3 class="filter-title">Filter by Meter Type</h3>
     <div class="filter-buttons">
-      @for (option of filterOptions; track option.type) {
+      @for (option of filterOptions(); track option.type) {
         <button
           class="filter-btn"
           [class.active]="isFilterSelected(option.type)"

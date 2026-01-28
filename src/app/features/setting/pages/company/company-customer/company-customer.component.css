@@ -449,7 +449,10 @@
 
 .form-label.required::after {
   content: ' *';
-  color: #dc2626;
+  color: #dc2626 !important;
+  margin-left: 2px;
+  font-weight: 600;
+  display: inline-block;
 }
 
 .form-grid input,

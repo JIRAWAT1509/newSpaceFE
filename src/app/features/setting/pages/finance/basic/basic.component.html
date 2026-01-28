@@ -127,20 +127,75 @@
     </div>
 
     <!-- 1) Base master -->
-<div *ngIf="selectedFeature === 'master'" class="basic-form-wrapper">
-  <div class="basic-form-header">
-    <h3>ข้อมูลพื้นฐาน</h3>
-    <div class="actions">
-      <p-button label="Save" icon="pi pi-save" (onClick)="saveBaseForm()"></p-button>
+<div *ngIf="selectedFeature === 'master'">
+  <!-- Show data table first -->
+  <div *ngIf="!showBaseForm" class="data-table-wrapper">
+    <div *ngIf="isLoadingBase" class="loading-state">
+      <i class="pi pi-spin pi-spinner loading-icon"></i>
+      <p>Loading base master data...</p>
+    </div>
+
+    <p-table
+      *ngIf="!isLoadingBase && filterData(baseMaster).length"
+      [value]="filterData(baseMaster)"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Tax ID</th>
+          <th>Company Name (TH)</th>
+          <th>Company Name (EN)</th>
+          <th>Address</th>
+          <th style="width: 4rem">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{ row.taxId || '-' }}</td>
+          <td>{{ row.compThai || '-' }}</td>
+          <td>{{ row.compEng || '-' }}</td>
+          <td>{{ row.addrThai1 || '-' }}</td>
+          <td class="actions-column">
+            <div class="flex items-center justify-center gap-2">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                size="small"
+                (onClick)="editBaseMaster(row)"
+              ></p-button>
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="deleteBaseMaster(row)"
+              ></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <div *ngIf="!isLoadingBase && !filterData(baseMaster).length" class="empty-state">
+      <i class="pi pi-inbox empty-icon"></i>
+      <p>No base master data found</p>
     </div>
   </div>
+
+  <!-- Show form when adding/editing -->
+  <div *ngIf="showBaseForm" class="basic-form-wrapper">
+    <div class="basic-form-header">
+      <h3>{{ isEditBaseMode ? 'แก้ไขข้อมูลพื้นฐาน' : 'เพิ่มข้อมูลพื้นฐาน' }}</h3>
+    </div>
 
     <p-tabs [(value)]="activeTab" class="w-full">
     <p-tablist>
       <p-tab value="company">Company</p-tab>
-      <p-tab value="misc1">เบ็ดเตล็ด 1</p-tab>
-      <p-tab value="misc2">เบ็ดเตล็ด 2</p-tab>
-      <p-tab value="misc3">เบ็ดเตล็ด 3</p-tab>
+      <p-tab value="misc1">ภาษีและค่าธรรมเนียม</p-tab>
+      <p-tab value="misc2">เอกสารและใบแจ้งหนี้</p-tab>
+      <p-tab value="misc3">การตั้งค่าเพิ่มเติม</p-tab>
     </p-tablist>
 
     <p-tabpanels>
@@ -202,7 +257,7 @@
         </div>
       </p-tabpanel>
 
-      <!-- TAB 2: เบ็ดเตล็ด 1 -->
+      <!-- TAB 2: ภาษีและค่าธรรมเนียม -->
 <p-tabpanel value="misc1">
   <div class="space-y-6">
 
@@ -485,13 +540,30 @@
 </p-tabpanel>
 
 
-      <!-- TAB 4: เบ็ดเตล็ด 3 -->
+      <!-- TAB 4: การตั้งค่าเพิ่มเติม -->
       <p-tabpanel value="misc3">
         <div class="text-slate-400 text-sm">ยังไม่ได้กำหนดฟิลด์เพิ่มเติมในแท็บนี้</div>
       </p-tabpanel>
     </p-tabpanels>
   </p-tabs>
 
+    <!-- Footer Actions -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3 mt-4">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="cancelBaseForm()"
+      ></p-button>
+      <p-button
+        label="บันทึก"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="saveBaseForm()"
+      ></p-button>
+    </div>
+  </div>
 </div>
 
 
@@ -544,135 +616,364 @@
 </app-branch-master>
 
     <!-- 3) Currency -->
-    <div *ngIf="selectedFeature === 'currency'" class="data-table-wrapper">
-      <div *ngIf="isLoadingCurrency" class="loading-state">
-        <i class="pi pi-spin pi-spinner loading-icon"></i>
-        <p>Loading currencies...</p>
+    <div *ngIf="selectedFeature === 'currency'">
+      <!-- Show data table first -->
+      <div *ngIf="!showCurrencyForm" class="data-table-wrapper">
+        <div *ngIf="isLoadingCurrency" class="loading-state">
+          <i class="pi pi-spin pi-spinner loading-icon"></i>
+          <p>Loading currencies...</p>
+        </div>
+
+        <p-table
+          *ngIf="!isLoadingCurrency && filterData(currencies).length"
+          [value]="filterData(currencies)"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Rate</th>
+              <th>Active</th>
+              <th style="width: 4rem">Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.code }}</td>
+              <td>{{ row.name }}</td>
+              <td>{{ row.rate }}</td>
+              <td>
+                <span class="badge" [class.badge-success]="row.active" [class.badge-secondary]="!row.active">
+                  {{ row.active ? 'Yes' : 'No' }}
+                </span>
+              </td>
+              <td class="actions-column">
+                <div class="flex items-center justify-center gap-2">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="info"
+                    size="small"
+                    (onClick)="editCurrency(row)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="danger"
+                    size="small"
+                    (onClick)="confirmDelete(row)"
+                  ></p-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <div *ngIf="!isLoadingCurrency && !filterData(currencies).length" class="empty-state">
+          <i class="pi pi-inbox empty-icon"></i>
+          <p>No currencies</p>
+        </div>
       </div>
 
-      <p-table
-        *ngIf="!isLoadingCurrency && filterData(currencies).length"
-        [value]="filterData(currencies)"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Rate</th>
-            <th>Active</th>
-            <th style="width: 4rem">Actions</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-row>
-          <tr>
-            <td>{{ row.code }}</td>
-            <td>{{ row.name }}</td>
-            <td>{{ row.rate }}</td>
-            <td>
-              <span class="badge" [class.badge-success]="row.active" [class.badge-secondary]="!row.active">
-                {{ row.active ? 'Yes' : 'No' }}
-              </span>
-            </td>
-            <td class="actions-column">
-              <p-button
-                icon="pi pi-trash"
-                [text]="true"
-                severity="danger"
-                size="small"
-                (onClick)="confirmDelete(row)"
-              ></p-button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <!-- Show form when adding/editing -->
+      <div *ngIf="showCurrencyForm" class="basic-form-wrapper">
+        <div class="basic-form-header">
+          <h3>{{ isEditCurrencyMode ? 'แก้ไขสกุลเงิน' : 'เพิ่มสกุลเงิน' }}</h3>
+        </div>
 
-      <div *ngIf="!isLoadingCurrency && !filterData(currencies).length" class="empty-state">
-        <i class="pi pi-inbox empty-icon"></i>
-        <p>No currencies</p>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="form-field md:col-span-2">
+            <label class="form-label">* Code</label>
+            <input
+              pInputText
+              [(ngModel)]="currencyForm.code"
+              [disabled]="isEditCurrencyMode"
+              maxlength="10"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-field md:col-span-2">
+            <label class="form-label">* Name</label>
+            <input
+              pInputText
+              [(ngModel)]="currencyForm.name"
+              maxlength="100"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">* Rate</label>
+            <input
+              pInputText
+              type="number"
+              [(ngModel)]="currencyForm.rate"
+              step="0.01"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Active</label>
+            <div class="flex items-center gap-4 mt-2">
+              <div class="flex items-center gap-2">
+                <p-radioButton
+                  name="currencyActive"
+                  [value]="true"
+                  [(ngModel)]="currencyForm.active"
+                  [inputId]="'active-yes'"
+                ></p-radioButton>
+                <label [for]="'active-yes'">Yes</label>
+              </div>
+              <div class="flex items-center gap-2">
+                <p-radioButton
+                  name="currencyActive"
+                  [value]="false"
+                  [(ngModel)]="currencyForm.active"
+                  [inputId]="'active-no'"
+                ></p-radioButton>
+                <label [for]="'active-no'">No</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3 mt-4">
+          <p-button
+            label="ยกเลิก"
+            icon="pi pi-times"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="cancelCurrencyForm()"
+          ></p-button>
+          <p-button
+            label="บันทึก"
+            icon="pi pi-check"
+            severity="primary"
+            (onClick)="saveCurrencyForm()"
+          ></p-button>
+        </div>
       </div>
     </div>
 
     <!-- 4) Credit note reasons -->
-    <div *ngIf="selectedFeature === 'credit-note-reason'" class="data-table-wrapper">
-      <div *ngIf="isLoadingCreditReason" class="loading-state">
-        <i class="pi pi-spin pi-spinner loading-icon"></i>
-        <p>Loading credit note reasons...</p>
+    <div *ngIf="selectedFeature === 'credit-note-reason'">
+      <!-- Show data table first -->
+      <div *ngIf="!showCreditNoteReasonForm" class="data-table-wrapper">
+        <div *ngIf="isLoadingCreditReason" class="loading-state">
+          <i class="pi pi-spin pi-spinner loading-icon"></i>
+          <p>Loading credit note reasons...</p>
+        </div>
+
+        <p-table
+          *ngIf="!isLoadingCreditReason && filterData(creditNoteReasons).length"
+          [value]="filterData(creditNoteReasons)"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Code</th>
+              <th>Description</th>
+              <th style="width: 4rem">Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.code }}</td>
+              <td>{{ row.description }}</td>
+              <td class="actions-column">
+                <div class="flex items-center justify-center gap-2">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="info"
+                    size="small"
+                    (onClick)="editCreditNoteReason(row)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="danger"
+                    size="small"
+                    (onClick)="confirmDelete(row)"
+                  ></p-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <div *ngIf="!isLoadingCreditReason && !filterData(creditNoteReasons).length" class="empty-state">
+          <i class="pi pi-inbox empty-icon"></i>
+          <p>No credit note reasons</p>
+        </div>
       </div>
 
-      <p-table
-        *ngIf="!isLoadingCreditReason && filterData(creditNoteReasons).length"
-        [value]="filterData(creditNoteReasons)"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Code</th>
-            <th>Description</th>
-            <th style="width: 4rem">Actions</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-row>
-          <tr>
-            <td>{{ row.code }}</td>
-            <td>{{ row.description }}</td>
-            <td class="actions-column">
-              <p-button
-                icon="pi pi-trash"
-                [text]="true"
-                severity="danger"
-                size="small"
-                (onClick)="confirmDelete(row)"
-              ></p-button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <!-- Show form when adding/editing -->
+      <div *ngIf="showCreditNoteReasonForm" class="basic-form-wrapper">
+        <div class="basic-form-header">
+          <h3>{{ isEditCreditNoteReasonMode ? 'แก้ไขสาเหตุการลดหนี้' : 'เพิ่มสาเหตุการลดหนี้' }}</h3>
+        </div>
 
-      <div *ngIf="!isLoadingCreditReason && !filterData(creditNoteReasons).length" class="empty-state">
-        <i class="pi pi-inbox empty-icon"></i>
-        <p>No credit note reasons</p>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="form-field md:col-span-2">
+            <label class="form-label">* Code</label>
+            <input
+              pInputText
+              [(ngModel)]="creditNoteReasonForm.code"
+              [disabled]="isEditCreditNoteReasonMode"
+              maxlength="20"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-field md:col-span-2">
+            <label class="form-label">* Description</label>
+            <input
+              pInputText
+              [(ngModel)]="creditNoteReasonForm.description"
+              maxlength="200"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3 mt-4">
+          <p-button
+            label="ยกเลิก"
+            icon="pi pi-times"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="cancelCreditNoteReasonForm()"
+          ></p-button>
+          <p-button
+            label="บันทึก"
+            icon="pi pi-check"
+            severity="primary"
+            (onClick)="saveCreditNoteReasonForm()"
+          ></p-button>
+        </div>
       </div>
     </div>
 
     <!-- 5) Credit terms -->
-    <div *ngIf="selectedFeature === 'credit-term'" class="data-table-wrapper">
-      <div *ngIf="isLoadingCreditTerm" class="loading-state">
-        <i class="pi pi-spin pi-spinner loading-icon"></i>
-        <p>Loading credit terms...</p>
+    <div *ngIf="selectedFeature === 'credit-term'">
+      <!-- Show data table first -->
+      <div *ngIf="!showCreditTermForm" class="data-table-wrapper">
+        <div *ngIf="isLoadingCreditTerm" class="loading-state">
+          <i class="pi pi-spin pi-spinner loading-icon"></i>
+          <p>Loading credit terms...</p>
+        </div>
+
+        <p-table
+          *ngIf="!isLoadingCreditTerm && filterData(creditTerms).length"
+          [value]="filterData(creditTerms)"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Code</th>
+              <th>Description</th>
+              <th>Days</th>
+              <th style="width: 4rem">Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-row>
+            <tr>
+              <td>{{ row.code }}</td>
+              <td>{{ row.description }}</td>
+              <td>{{ row.days }}</td>
+              <td class="actions-column">
+                <div class="flex items-center justify-center gap-2">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="info"
+                    size="small"
+                    (onClick)="editCreditTerm(row)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="danger"
+                    size="small"
+                    (onClick)="confirmDelete(row)"
+                  ></p-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <div *ngIf="!isLoadingCreditTerm && !filterData(creditTerms).length" class="empty-state">
+          <i class="pi pi-inbox empty-icon"></i>
+          <p>No credit terms</p>
+        </div>
       </div>
 
-      <p-table
-        *ngIf="!isLoadingCreditTerm && filterData(creditTerms).length"
-        [value]="filterData(creditTerms)"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Code</th>
-            <th>Description</th>
-            <th>Days</th>
-            <th style="width: 4rem">Actions</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-row>
-          <tr>
-            <td>{{ row.code }}</td>
-            <td>{{ row.description }}</td>
-            <td>{{ row.days }}</td>
-            <td class="actions-column">
-              <p-button
-                icon="pi pi-trash"
-                [text]="true"
-                severity="danger"
-                size="small"
-                (onClick)="confirmDelete(row)"
-              ></p-button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+      <!-- Show form when adding/editing -->
+      <div *ngIf="showCreditTermForm" class="basic-form-wrapper">
+        <div class="basic-form-header">
+          <h3>{{ isEditCreditTermMode ? 'แก้ไข Credit Term' : 'เพิ่ม Credit Term' }}</h3>
+        </div>
 
-      <div *ngIf="!isLoadingCreditTerm && !filterData(creditTerms).length" class="empty-state">
-        <i class="pi pi-inbox empty-icon"></i>
-        <p>No credit terms</p>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="form-field md:col-span-2">
+            <label class="form-label">* Code</label>
+            <input
+              pInputText
+              [(ngModel)]="creditTermForm.code"
+              [disabled]="isEditCreditTermMode"
+              maxlength="20"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-field md:col-span-2">
+            <label class="form-label">* Description</label>
+            <input
+              pInputText
+              [(ngModel)]="creditTermForm.description"
+              maxlength="200"
+              class="w-full"
+            />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">* Days</label>
+            <input
+              pInputText
+              type="number"
+              [(ngModel)]="creditTermForm.days"
+              min="0"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3 mt-4">
+          <p-button
+            label="ยกเลิก"
+            icon="pi pi-times"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="cancelCreditTermForm()"
+          ></p-button>
+          <p-button
+            label="บันทึก"
+            icon="pi pi-check"
+            severity="primary"
+            (onClick)="saveCreditTermForm()"
+          ></p-button>
+        </div>
       </div>
     </div>
   </div>

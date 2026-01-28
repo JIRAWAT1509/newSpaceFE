@@ -195,7 +195,7 @@
 
 .basic-form-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
   margin-bottom: 1rem;
   align-items: center;
@@ -204,6 +204,14 @@
 .basic-form-header h3 {
   font-weight: 700;
   font-size: 1.05rem;
+  margin: 0;
+}
+
+.basic-form-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
 }
 
 .form-field {

@@ -1,4 +1,4 @@
-<div class="area-availability-container">
+<div class="area-availability-container" data-module="areaAvailability">
   <div class="section-header">
     <h2 class="section-title">Area Availability</h2>
   </div>
@@ -12,7 +12,11 @@
       >
         <!-- Icon Circle -->
         <div class="icon-circle" [style.backgroundColor]="status.color">
-          <i class="pi pi-building"></i>
+          @if (getStatusIconType(status.id) === 'library') {
+            <i [ngClass]="getStatusIcon(status.id)"></i>
+          } @else {
+            <img [src]="getStatusIcon(status.id)" alt="Status icon" class="status-icon-image" />
+          }
         </div>
 
         <!-- Content -->

@@ -42,13 +42,11 @@ export class GeneralDetailTabComponent implements OnInit {
   // Outputs
   selectorOpen = output<{ field: string; options: SelectorOption[] }>();
 
-  // Sections for progress indicator
+  // Sections for progress indicator - Updated for Q structure
   sections: Section[] = [
-    { id: 'header', name: 'ข้อมูลหัว', letter: 'A' },
-    { id: 'provider', name: 'ผู้ให้บริการ', letter: 'B' },
-    { id: 'customer', name: 'ผู้รับบริการ', letter: 'C' },
-    { id: 'products', name: 'สินค้า/บริการ', letter: 'D' },
-    { id: 'signatories', name: 'ผู้ลงนาม/อนุมัติ', letter: 'E' }
+    { id: 'header', name: 'ข้อมูลอ้างอิงเอกสาร', letter: 'A' },
+    { id: 'products', name: 'ข้อมูลสินค้า/บริการ (ต้นทาง)', letter: 'B' },
+    { id: 'area', name: 'ข้อมูลพื้นที่ (จากใบเสนอราคา)', letter: 'C' }
   ];
 
   // Selector modal state
@@ -104,15 +102,11 @@ export class GeneralDetailTabComponent implements OnInit {
   getRequiredFieldsBySection(sectionId: string): string[] {
     switch (sectionId) {
       case 'header':
-        return ['branch', 'contractType', 'contractNumberMain', 'contractDate'];
-      case 'provider':
-        return ['contractLocation', 'headOfficeAddress', 'representative'];
-      case 'customer':
-        return ['customerId', 'authorizedPerson1', 'phone1', 'position1'];
+        return ['branch', 'contractType', 'contractNumberMain', 'quotationDate'];
       case 'products':
         return ['subCategory'];
-      case 'signatories':
-        return [];
+      case 'area':
+        return ['areaBuilding', 'areaFloor', 'areaUnitNumber'];
       default:
         return [];
     }
@@ -168,6 +162,24 @@ export class GeneralDetailTabComponent implements OnInit {
           { label: 'อาหารและเครื่องดื่ม', value: 'CAT001' },
           { label: 'เครื่องใช้ไฟฟ้า', value: 'CAT002' }
         ];
+      case 'areaBuilding':
+        return [
+          { label: 'อาคาร A', value: 'BLD001' },
+          { label: 'อาคาร B', value: 'BLD002' },
+          { label: 'อาคาร C', value: 'BLD003' }
+        ];
+      case 'areaFloor':
+        return [
+          { label: 'ชั้น 1', value: 'FLR001' },
+          { label: 'ชั้น 2', value: 'FLR002' },
+          { label: 'ชั้น 3', value: 'FLR003' }
+        ];
+      case 'areaType':
+        return [
+          { label: 'Retail', value: 'retail' },
+          { label: 'Kiosk', value: 'kiosk' },
+          { label: 'Food Court', value: 'foodcourt' }
+        ];
       default:
         return [];
     }
@@ -184,10 +196,9 @@ export class GeneralDetailTabComponent implements OnInit {
       billingAddress: 'เลือกที่อยู่ออกใบแจ้งหนี้',
       subCategory: 'เลือก Sub Category',
       productCategory: 'เลือกหมวดสินค้า/บริการ',
-      provider1: 'เลือกผู้ให้บริการ 1',
-      provider2: 'เลือกผู้ให้บริการ 2',
-      witness1: 'เลือกพยาน 1',
-      witness2: 'เลือกพยาน 2'
+      areaBuilding: 'เลือกอาคาร',
+      areaFloor: 'เลือกชั้น',
+      areaType: 'เลือกประเภทพื้นที่'
     };
     return titles[field] || 'เลือก';
   }

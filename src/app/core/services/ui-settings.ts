@@ -36,6 +36,73 @@ export interface UiStatusTokens {
   infoFg: string;
 }
 
+// Module-specific configuration types
+export type ModuleId = 'areaAvailability' | 'facilitiesUtilities';
+
+export interface ModuleStatusConfig {
+  // Domain-specific labels (not Success/Warning/Danger/Info)
+  labels: {
+    [key: string]: string; // e.g., "ไฟฟ้า", "น้ำ", "แก๊ส", "แอร์" for Facilities (Thai)
+  };
+  // English labels
+  labelsEn?: {
+    [key: string]: string; // e.g., "Electricity", "Water", "Gas", "AC"
+  };
+  // Color overrides (hex colors)
+  colors: {
+    [key: string]: string; // e.g., "electricity": "#FFD700"
+  };
+  // Icon overrides (dataURL, path, or PrimeIcon class)
+  icons: {
+    [key: string]: string; // e.g., "electricity": "data:image/svg+xml;base64,..." or "pi-bolt"
+  };
+  // Icon types (library or upload)
+  iconTypes?: {
+    [key: string]: 'library' | 'upload'; // Track if icon is from library or uploaded
+  };
+  // Order/sequence
+  order?: string[];
+}
+
+export interface AreaAvailabilityConfig extends ModuleStatusConfig {
+  // Status icon overrides
+  statusIcons?: {
+    [key: string]: string; // e.g., "vacant": "data:image/svg+xml;base64,..." or "pi-building"
+  };
+  // Status icon types
+  statusIconTypes?: {
+    [key: string]: 'library' | 'upload';
+  };
+}
+
+export interface FacilitiesUtilitiesConfig extends ModuleStatusConfig {
+  // Meter type configurations
+  meterTypes?: {
+    [key: string]: {
+      label: string;
+      labelTh: string;
+      color: string;
+      icon: string;
+    };
+  };
+  // Rentable items (things that can be rented)
+  rentableItems?: Array<{
+    id: string;
+    name: string;
+    nameTh: string;
+    icon: string;
+    iconType?: 'library' | 'upload';
+    color: string;
+    enabled: boolean;
+    order: number;
+  }>;
+}
+
+export interface ModuleOverrides {
+  areaAvailability?: AreaAvailabilityConfig;
+  facilitiesUtilities?: FacilitiesUtilitiesConfig;
+}
+
 export interface UiConfig {
   themeMode: UiThemeMode;
   paletteMode: UiPaletteMode;
@@ -45,6 +112,8 @@ export interface UiConfig {
   tokens: UiTokens;
   iconStyle: UiIconStyle;
   labels: Record<string, string>;
+  // NEW: Module-specific overrides
+  moduleOverrides?: ModuleOverrides;
 }
 
 export interface UiPreset {
@@ -429,6 +498,94 @@ export const UI_STATUS_PRESETS: UiStatusPreset[] = [
   },
 ];
 
+// Default module configurations
+export const DEFAULT_AREA_AVAILABILITY_CONFIG: AreaAvailabilityConfig = {
+  labels: {
+    unallocated: 'ยังไม่พร้อม',
+    quotation: 'คำใบเสนอราคา',
+    leased: 'เช่า',
+    vacant: 'ว่าง',
+  },
+  labelsEn: {
+    unallocated: 'Unallocated',
+    quotation: 'Quotation',
+    leased: 'Leased',
+    vacant: 'Vacant',
+  },
+  colors: {
+    unallocated: '#EF4444', // danger
+    quotation: '#3B82F6', // info
+    leased: '#F59E0B', // warning
+    vacant: '#22C55E', // success
+  },
+  icons: {},
+  iconTypes: {},
+  order: ['unallocated', 'quotation', 'leased', 'vacant'],
+  statusIcons: {
+    unallocated: 'pi-ban', // ห้าม/ไม่พร้อม
+    quotation: 'pi-file-edit', // เอกสาร/ใบเสนอราคา
+    leased: 'pi-key', // กุญแจ/เช่า
+    vacant: 'pi-check-circle', // ว่าง/พร้อม
+  },
+  statusIconTypes: {
+    unallocated: 'library',
+    quotation: 'library',
+    leased: 'library',
+    vacant: 'library',
+  },
+};
+
+export const DEFAULT_FACILITIES_UTILITIES_CONFIG: FacilitiesUtilitiesConfig = {
+  labels: {
+    electricity: 'ไฟฟ้า',
+    water: 'น้ำ',
+    gas: 'แก๊ส',
+    ac: 'แอร์',
+  },
+  labelsEn: {
+    electricity: 'Electricity',
+    water: 'Water',
+    gas: 'Gas',
+    ac: 'Air Conditioning',
+  },
+  colors: {
+    electricity: '#FFD700',
+    water: '#4CA3FF',
+    gas: '#FF6384',
+    ac: '#80E08E',
+  },
+  icons: {},
+  iconTypes: {},
+  order: ['electricity', 'water', 'gas', 'ac'],
+  meterTypes: {
+    electricity: {
+      label: 'Electricity',
+      labelTh: 'ไฟฟ้า',
+      color: '#FFD700',
+      icon: 'pi-bolt',
+    },
+    water: {
+      label: 'Water',
+      labelTh: 'น้ำ',
+      color: '#4CA3FF',
+      icon: 'pi-droplet',
+    },
+    gas: {
+      label: 'Gas',
+      labelTh: 'แก๊ส',
+      color: '#FF6384',
+      icon: 'pi-fire',
+    },
+    ac: {
+      label: 'Air Conditioning',
+      labelTh: 'แอร์',
+      color: '#80E08E',
+      icon: 'pi-sun',
+    },
+  },
+  rentableItems: [],
+};
+
 export const DEFAULT_UI_CONFIG: UiConfig = {
   themeMode: 'light',
   paletteMode: 'preset',
@@ -445,6 +602,10 @@ export const DEFAULT_UI_CONFIG: UiConfig = {
     facilities: 'facilities',
     report: 'Report',
     report_dashboard: 'Report',
+  },
+  moduleOverrides: {
+    areaAvailability: DEFAULT_AREA_AVAILABILITY_CONFIG,
+    facilitiesUtilities: DEFAULT_FACILITIES_UTILITIES_CONFIG,
   },
 };
 
@@ -478,6 +639,72 @@ export const loadUiConfig = (): UiConfig => {
     };
     const paletteMode = parsed.paletteMode ?? DEFAULT_UI_CONFIG.paletteMode;
     const statusMode = parsed.statusMode ?? DEFAULT_UI_CONFIG.statusMode;
+    
+    // Merge module overrides with deep merge
+    const mergedModuleOverrides: ModuleOverrides = {
+      areaAvailability: {
+        ...DEFAULT_AREA_AVAILABILITY_CONFIG,
+        ...(parsed.moduleOverrides?.areaAvailability || {}),
+        labels: {
+          ...DEFAULT_AREA_AVAILABILITY_CONFIG.labels,
+          ...(parsed.moduleOverrides?.areaAvailability?.labels || {}),
+        },
+        labelsEn: {
+          ...(DEFAULT_AREA_AVAILABILITY_CONFIG.labelsEn || {}),
+          ...(parsed.moduleOverrides?.areaAvailability?.labelsEn || {}),
+        },
+        colors: {
+          ...DEFAULT_AREA_AVAILABILITY_CONFIG.colors,
+          ...(parsed.moduleOverrides?.areaAvailability?.colors || {}),
+        },
+        icons: {
+          ...DEFAULT_AREA_AVAILABILITY_CONFIG.icons,
+          ...(parsed.moduleOverrides?.areaAvailability?.icons || {}),
+        },
+        iconTypes: {
+          ...(DEFAULT_AREA_AVAILABILITY_CONFIG.iconTypes || {}),
+          ...(parsed.moduleOverrides?.areaAvailability?.iconTypes || {}),
+        },
+        statusIcons: {
+          ...(DEFAULT_AREA_AVAILABILITY_CONFIG.statusIcons || {}),
+          ...(parsed.moduleOverrides?.areaAvailability?.statusIcons || {}),
+        },
+        statusIconTypes: {
+          ...(DEFAULT_AREA_AVAILABILITY_CONFIG.statusIconTypes || {}),
+          ...(parsed.moduleOverrides?.areaAvailability?.statusIconTypes || {}),
+        },
+      },
+      facilitiesUtilities: {
+        ...DEFAULT_FACILITIES_UTILITIES_CONFIG,
+        ...(parsed.moduleOverrides?.facilitiesUtilities || {}),
+        labels: {
+          ...DEFAULT_FACILITIES_UTILITIES_CONFIG.labels,
+          ...(parsed.moduleOverrides?.facilitiesUtilities?.labels || {}),
+        },
+        labelsEn: {
+          ...(DEFAULT_FACILITIES_UTILITIES_CONFIG.labelsEn || {}),
+          ...(parsed.moduleOverrides?.facilitiesUtilities?.labelsEn || {}),
+        },
+        colors: {
+          ...DEFAULT_FACILITIES_UTILITIES_CONFIG.colors,
+          ...(parsed.moduleOverrides?.facilitiesUtilities?.colors || {}),
+        },
+        icons: {
+          ...DEFAULT_FACILITIES_UTILITIES_CONFIG.icons,
+          ...(parsed.moduleOverrides?.facilitiesUtilities?.icons || {}),
+        },
+        iconTypes: {
+          ...(DEFAULT_FACILITIES_UTILITIES_CONFIG.iconTypes || {}),
+          ...(parsed.moduleOverrides?.facilitiesUtilities?.iconTypes || {}),
+        },
+        meterTypes: {
+          ...(DEFAULT_FACILITIES_UTILITIES_CONFIG.meterTypes || {}),
+          ...(parsed.moduleOverrides?.facilitiesUtilities?.meterTypes || {}),
+        },
+        rentableItems: parsed.moduleOverrides?.facilitiesUtilities?.rentableItems || DEFAULT_FACILITIES_UTILITIES_CONFIG.rentableItems,
+      },
+    };
+    
     return {
       ...DEFAULT_UI_CONFIG,
       ...parsed,
@@ -486,6 +713,7 @@ export const loadUiConfig = (): UiConfig => {
         ...DEFAULT_UI_CONFIG.labels,
         ...(parsed.labels || {}),
       },
+      moduleOverrides: mergedModuleOverrides,
       paletteMode,
       activePresetId: paletteMode === 'preset' ? resolvedPresetId : null,
       statusMode,
@@ -599,4 +827,198 @@ const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
     return { r, g, b };
   }
   return null;
+};
+
+// ============================================
+// Module-scoped Configuration Helpers
+// ============================================
+
+/**
+ * Get module configuration with fallback to defaults
+ */
+export const getModuleConfig = (moduleId: ModuleId): ModuleStatusConfig => {
+  const config = loadUiConfig();
+  const override = config.moduleOverrides?.[moduleId];
+  
+  if (moduleId === 'areaAvailability') {
+    return override as AreaAvailabilityConfig || DEFAULT_AREA_AVAILABILITY_CONFIG;
+  }
+  if (moduleId === 'facilitiesUtilities') {
+    return override as FacilitiesUtilitiesConfig || DEFAULT_FACILITIES_UTILITIES_CONFIG;
+  }
+  
+  return DEFAULT_AREA_AVAILABILITY_CONFIG; // fallback
+};
+
+/**
+ * Get Area Availability configuration
+ */
+export const getAreaAvailabilityConfig = (): AreaAvailabilityConfig => {
+  return getModuleConfig('areaAvailability') as AreaAvailabilityConfig;
+};
+
+/**
+ * Get Facilities Utilities configuration
+ */
+export const getFacilitiesUtilitiesConfig = (): FacilitiesUtilitiesConfig => {
+  return getModuleConfig('facilitiesUtilities') as FacilitiesUtilitiesConfig;
+};
+
+/**
+ * Apply scoped CSS variables to a specific element (for module-specific styling)
+ * This sets CSS variables on the element itself, not on :root
+ */
+export const applyModuleScopedColors = (
+  element: HTMLElement,
+  moduleId: ModuleId,
+  colorMap: Record<string, string>
+): void => {
+  if (!element) return;
+  
+  Object.entries(colorMap).forEach(([key, hexColor]) => {
+    const rgb = hexToRgb(hexColor);
+    if (rgb) {
+      // Set scoped variable: --module-{moduleId}-{key}
+      const varName = `--module-${moduleId}-${key}`;
+      element.style.setProperty(varName, `${rgb.r} ${rgb.g} ${rgb.b}`);
+    }
+  });
+};
+
+/**
+ * Get color for a specific module and key with fallback
+ */
+export const getModuleColor = (moduleId: ModuleId, key: string, fallback?: string): string => {
+  const config = getModuleConfig(moduleId);
+  return config.colors?.[key] || fallback || '#000000';
+};
+
+/**
+ * Get label for a specific module and key with fallback
+ */
+export const getModuleLabel = (moduleId: ModuleId, key: string, fallback?: string): string => {
+  const config = getModuleConfig(moduleId);
+  return config.labels?.[key] || fallback || key;
+};
+
+/**
+ * Get English label for a specific module and key with fallback
+ */
+export const getModuleLabelEn = (moduleId: ModuleId, key: string, fallback?: string): string => {
+  const config = getModuleConfig(moduleId);
+  return config.labelsEn?.[key] || fallback || key;
+};
+
+/**
+ * Get icon for a specific module and key with fallback
+ */
+export const getModuleIcon = (moduleId: ModuleId, key: string, fallback?: string): string => {
+  const config = getModuleConfig(moduleId);
+  return config.icons?.[key] || fallback || '';
+};
+
+/**
+ * Get icon type for a specific module and key
+ */
+export const getModuleIconType = (moduleId: ModuleId, key: string): 'library' | 'upload' => {
+  const config = getModuleConfig(moduleId);
+  return config.iconTypes?.[key] || (config.icons?.[key]?.startsWith('data:') ? 'upload' : 'library');
+};
+
+/**
+ * Get status icon for Area Availability module
+ */
+export const getAreaStatusIcon = (statusId: string, fallback?: string): string => {
+  const config = getAreaAvailabilityConfig();
+  // Check config first, then fallback, then default from DEFAULT_AREA_AVAILABILITY_CONFIG
+  const icon = config.statusIcons?.[statusId] || 
+               fallback || 
+               DEFAULT_AREA_AVAILABILITY_CONFIG.statusIcons?.[statusId] || 
+               'pi-building';
+  return icon;
+};
+
+/**
+ * Get status icon type for Area Availability module
+ */
+export const getAreaStatusIconType = (statusId: string): 'library' | 'upload' => {
+  const config = getAreaAvailabilityConfig();
+  return config.statusIconTypes?.[statusId] || 
+         (config.statusIcons?.[statusId]?.startsWith('data:') ? 'upload' : 'library');
+};
+
+/**
+ * Convert file to dataURL (for icon upload)
+ */
+export const fileToDataURL = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
+/**
+ * Update module configuration (merges with existing)
+ */
+export const updateModuleConfig = (
+  moduleId: ModuleId,
+  updates: Partial<ModuleStatusConfig>
+): void => {
+  const config = loadUiConfig();
+  
+  // Get current config with proper typing
+  let current: ModuleStatusConfig;
+  if (moduleId === 'areaAvailability') {
+    current = config.moduleOverrides?.areaAvailability || DEFAULT_AREA_AVAILABILITY_CONFIG;
+  } else if (moduleId === 'facilitiesUtilities') {
+    current = config.moduleOverrides?.facilitiesUtilities || DEFAULT_FACILITIES_UTILITIES_CONFIG;
+  } else {
+    current = DEFAULT_AREA_AVAILABILITY_CONFIG;
+  }
+  
+  // Ensure current has required properties
+  const currentLabels = (current as ModuleStatusConfig).labels || {};
+  const currentColors = (current as ModuleStatusConfig).colors || {};
+  const currentIcons = (current as ModuleStatusConfig).icons || {};
+  
+  // Handle Area Availability specific fields (statusIcons, statusIconTypes)
+  let updated: any = {
+    ...current,
+    ...updates,
+    labels: {
+      ...currentLabels,
+      ...(updates.labels || {}),
+    },
+    colors: {
+      ...currentColors,
+      ...(updates.colors || {}),
+    },
+    icons: {
+      ...currentIcons,
+      ...(updates.icons || {}),
+    },
+  };
+  
+  // Merge statusIcons and statusIconTypes for Area Availability
+  if (moduleId === 'areaAvailability') {
+    const areaConfig = current as AreaAvailabilityConfig;
+    const areaUpdates = updates as Partial<AreaAvailabilityConfig>;
+    updated.statusIcons = {
+      ...(areaConfig.statusIcons || {}),
+      ...(areaUpdates.statusIcons || {}),
+    };
+    updated.statusIconTypes = {
+      ...(areaConfig.statusIconTypes || {}),
+      ...(areaUpdates.statusIconTypes || {}),
+    };
+  }
+  
+  if (!config.moduleOverrides) {
+    config.moduleOverrides = {};
+  }
+  
+  config.moduleOverrides[moduleId] = updated as any;
+  saveUiConfig(config);
 };

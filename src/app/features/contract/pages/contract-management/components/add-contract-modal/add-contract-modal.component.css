@@ -212,6 +212,73 @@
   @apply disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
+/* ==================== SUMMARY SECTION ==================== */
+.summary-section {
+  @apply space-y-6;
+}
+
+.step-title {
+  @apply text-xl font-bold text-gray-900 mb-4;
+  @apply pb-2 border-b-2 border-blue-600;
+}
+
+.summary-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.summary-group {
+  @apply bg-gray-50 rounded-lg p-6;
+  @apply border border-gray-200;
+}
+
+.summary-group-title {
+  @apply text-base font-semibold text-gray-900 mb-4;
+  @apply pb-2 border-b-2 border-gray-300;
+}
+
+.summary-item {
+  @apply flex flex-col gap-1;
+  @apply py-3 border-b border-gray-200;
+}
+
+.summary-item:last-child {
+  @apply border-b-0;
+}
+
+.summary-label {
+  @apply text-xs font-semibold text-gray-600;
+  @apply uppercase tracking-wide;
+}
+
+.summary-value {
+  @apply text-sm text-gray-900 font-medium;
+}
+
+.summary-value-container {
+  @apply flex flex-col gap-2;
+}
+
+.previous-value {
+  @apply text-xs text-gray-600 italic;
+  @apply py-1 px-2 bg-gray-100 rounded;
+  @apply border-l-4 border-gray-400;
+}
+
+.summary-item.changed {
+  @apply bg-yellow-50 py-3 px-3 rounded;
+  @apply border border-yellow-200;
+}
+
+.changes-notice {
+  @apply flex items-center gap-2;
+  @apply py-3 px-4 bg-yellow-50 border border-yellow-200 rounded-lg;
+  @apply mb-6 text-yellow-800 text-sm;
+}
+
+.changes-notice i {
+  @apply text-yellow-600 text-lg;
+}
+
 /* ==================== Responsive ==================== */
 @media (max-width: 768px) {
   .modal-content {

@@ -1,5 +1,5 @@
 // contract-detail-tab.component.ts
-import { Component, signal } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ContractInfoTabComponent } from './components/contract-info-tab/contract-info-tab.component';
@@ -28,6 +28,8 @@ interface SubTab {
 })
 export class ContractDetailTabComponent {
   // No form input needed - sub-components manage their own forms
+
+  @ViewChild(ContractInfoTabComponent) contractInfoTab?: ContractInfoTabComponent;
 
   activeSubTabIndex = signal<number>(0);
 

@@ -8,6 +8,38 @@ img.text-white-primary {
     filter: brightness(0) invert(1); /* white */
 }
 
+/* Ensure sidebar container clips overflow */
+aside {
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Ensure nav container clips overflow */
+nav {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Ensure list items don't overflow */
+ul {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+li {
+    position: relative;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Ensure sidebar items are contained within bounds */
+a, div[class*="group"] {
+    position: relative;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
 .sidebar-icon {
     align-items: center;
     background: rgb(var(--primary-fg) / 0.12);
@@ -17,6 +49,7 @@ img.text-white-primary {
     height: 36px;
     justify-content: center;
     width: 36px;
+    flex-shrink: 0;
 }
 
 .sidebar-icon-active {

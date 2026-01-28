@@ -1,5 +1,5 @@
 // add-contract-modal.component.ts - WITH EDIT MODE SUPPORT
-import { Component, output, signal, input, OnInit, effect } from '@angular/core';
+import { Component, output, signal, input, OnInit, effect, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Contract } from '@core/models/contract.model';
@@ -42,13 +42,17 @@ export class AddContractModalComponent implements OnInit {
   conditionsForm!: FormGroup;
   documentForm!: FormGroup;
 
+  // ViewChild for accessing contract detail form
+  @ViewChild(ContractDetailTabComponent) contractDetailTab?: ContractDetailTabComponent;
+
   // Tab state
   activeTabIndex = signal<number>(0);
   tabs: Tab[] = [
     { id: 'general', label: 'รายละเอียดทั่วไป', completed: false },
     { id: 'contract', label: 'รายละเอียดสัญญา', completed: false },
     { id: 'conditions', label: 'เงื่อนไขอื่นๆ', completed: false },
-    { id: 'attachments', label: 'เอกสารแนบ', completed: false }
+    { id: 'attachments', label: 'เอกสารแนบ', completed: false },
+    { id: 'summary', label: 'สรุป', completed: false }
   ];
 
   // Modal title based on mode
@@ -74,47 +78,24 @@ export class AddContractModalComponent implements OnInit {
   }
 
   initForms(): void {
-    // Tab 1: General Details (44 fields)
+    // Tab 1: General Details (Q) - Updated structure
     this.generalDetailForm = this.fb.group({
-      // Header section
+      // Section A: ข้อมูลอ้างอิงเอกสาร
       branch: ['', Validators.required],
       contractType: ['', Validators.required],
       contractNumberMain: [''],
       contractNumberSub: [''],
       quotationStatus: [''],
-      contractDate: ['', Validators.required],
-      recordDate: [''],
+      quotationLevelDate: [''],
+      quotationDate: ['', Validators.required],
       approvalDate: [''],
-      intentionLetter: [''],
-      transferToBooking: [''],
+      recordDate: [''],
 
-      // Section 1: Provider
-      contractLocation: ['', Validators.required],
-      headOfficeAddress: ['', Validators.required],
-      representative: ['', Validators.required],
-      branchAddress: [''],
-      contactPerson: [''],
-      contactAddressType: ['headOffice'],
-      contactAddress: [''],
-
-      // Section 2: Customer
-      customerId: ['', Validators.required],
-      documentAddress: [''],
-      billingAddress: [''],
-      companyName: [''],
-      authorizedPerson1: ['', Validators.required],
-      phone1: ['', [Validators.required, Validators.pattern(/^[0-9]{9,10}$/)]],
-      position1: ['', Validators.required],
-      authorizedPerson2: [''],
-      phone2: ['', Validators.pattern(/^[0-9]{9,10}$/)],
-      position2: [''],
-
-      // Section 3: Products
+      // Section B: ข้อมูลสินค้า/บริการ (ต้นทาง)
       subCategory: ['', Validators.required],
       category: [''],
       profitCenter: [''],
       businessName: [''],
-      productCategory: [''],
       productType1: [''],
       productType2: [''],
       productType3: [''],
@@ -122,18 +103,43 @@ export class AddContractModalComponent implements OnInit {
       productType5: [''],
       productType6: [''],
 
-      // Section 4: Signatories
-      provider1: [''],
-      providerPosition1: [''],
-      provider2: [''],
-      providerPosition2: [''],
-      witness1: [''],
-      witness2: [''],
-      contractCreator: ['SPACE']
+      // Section C: ข้อมูลพื้นที่ (จากใบเสนอราคา)
+      areaBuilding: ['', Validators.required],
+      areaFloor: ['', Validators.required],
+      areaUnitNumber: ['', Validators.required],
+      areaTotal: [''],
+      areaType: ['']
     });
 
-    // Tab 3: Conditions (placeholder)
-    this.conditionsForm = this.fb.group({});
+    // Tab 3: Conditions (C) - Updated structure
+    this.conditionsForm = this.fb.group({
+      // Section 1: ระยะเวลา & การต่อสัญญา
+      durationYears: [0, Validators.required],
+      durationMonths: [0],
+      durationDays: [0],
+      contractStartDate: ['', Validators.required],
+      contractEndDate: ['', Validators.required],
+      renewalCondition: [''],
+      renewalCount: [0],
+
+      // Section 2: เงื่อนไขทางการเงิน
+      rentRate: [0, Validators.required],
+      serviceRate: [0],
+      creditTermRent: [0, Validators.required],
+      creditTermUtility: [0, Validators.required],
+      paymentFrequency: [''],
+      rentAdjustmentPercent: [0],
+      depositAmount: [0],
+
+      // Section 3: เงื่อนไขพิเศษ
+      advanceNoticeDays: [0],
+      closurePenalty: [0],
+      excludedProducts: [''],
+
+      // Section 4: บันทึกแนบท้ายสัญญา
+      hasAddendum: [false],
+      addendumNotes: ['']
+    });
 
     // Tab 4: Documents (placeholder)
     this.documentForm = this.fb.group({});
@@ -242,6 +248,7 @@ export class AddContractModalComponent implements OnInit {
       case 0: return this.generalDetailForm.valid;
       case 2: return this.conditionsForm.valid || true; // Placeholder always valid
       case 3: return this.documentForm.valid || true; // Placeholder always valid
+      case 4: return true; // Summary tab is always valid (read-only)
       default: return false;
     }
   }
@@ -288,5 +295,35 @@ export class AddContractModalComponent implements OnInit {
     Object.keys(this.generalDetailForm.controls).forEach(key => {
       this.generalDetailForm.get(key)?.markAsTouched();
     });
+  }
+
+  // ==================== SUMMARY HELPERS ====================
+
+  getFormValue(fieldName: string): any {
+    const control = this.generalDetailForm.get(fieldName);
+    return control ? control.value : null;
+  }
+
+  getConditionsValue(fieldName: string): any {
+    const control = this.conditionsForm.get(fieldName);
+    return control ? control.value : null;
+  }
+
+  getContractDetailValue(fieldName: string): any {
+    if (!this.contractDetailTab || !this.contractDetailTab.contractInfoTab || !this.contractDetailTab.contractInfoTab.form) return null;
+    const control = this.contractDetailTab.contractInfoTab.form.get(fieldName);
+    return control ? control.value : null;
+  }
+
+  formatDate(date: any): string {
+    if (!date) return '';
+    if (typeof date === 'string') return date;
+    if (date instanceof Date) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+    return '';
   }
 }

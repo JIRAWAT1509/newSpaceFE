@@ -5,48 +5,7 @@
   padding: 20px 24px;
 }
 
-.report-toolbar {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
 
-.report-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgb(var(--input));
-  border: 1px solid rgb(var(--border));
-  border-radius: 8px;
-  padding: 8px 12px;
-  box-shadow: 0 2px 6px rgba(var(--shadow), 0.08);
-  min-width: 320px;
-}
-
-.report-search i {
-  color: rgb(var(--muted));
-}
-
-.report-search input {
-  border: none;
-  outline: none;
-  font-size: 14px;
-  width: 100%;
-}
-
-.favorite-toggle {
-  border: 1px solid rgb(var(--border));
-  background: rgb(var(--card));
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 13px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
 
 .report-filters {
   display: flex;

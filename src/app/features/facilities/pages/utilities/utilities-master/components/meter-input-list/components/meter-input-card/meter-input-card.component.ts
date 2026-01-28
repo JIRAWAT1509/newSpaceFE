@@ -1,9 +1,11 @@
 // meter-input-card.component.ts - FINAL CORRECTED
-import { Component, input, output, signal, computed, effect } from '@angular/core';
+import { Component, input, output, signal, computed, effect, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
-import { Meter, METER_TYPE_LABELS } from '@core/models/meter.model';
+import { Meter, getMeterTypeLabel } from '@core/models/meter.model';
+import { getFacilitiesUtilitiesConfig } from '@core/services/ui-settings';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-meter-input-card',
@@ -12,7 +14,7 @@ import { Meter, METER_TYPE_LABELS } from '@core/models/meter.model';
   templateUrl: './meter-input-card.component.html',
   styleUrl: './meter-input-card.component.css'
 })
-export class MeterInputCardComponent {
+export class MeterInputCardComponent implements OnInit, OnDestroy {
   // Inputs
   meter = input.required<Meter>();
   isExpanded = input<boolean>(false); // Controlled by parent
@@ -32,22 +34,62 @@ export class MeterInputCardComponent {
   errorMessage = signal<string>('');
   isEditing = signal<boolean>(false);
 
+  // Config tracking
+  private configCheckInterval?: Subscription;
+  private configVersion = signal<number>(0);
+
   // Computed
   canAttachMorePhotos = computed(() => this.attachedPhotos().length < 3);
 
-  getMeterIcon(): string {
+  // Computed meter type info (reactive to config changes)
+  meterTypeInfo = computed(() => {
+    this.configVersion(); // Access to make reactive
     const type = this.meter().meterType;
-    return METER_TYPE_LABELS[type]?.icon || 'pi-bolt';
+    return getMeterTypeLabel(type);
+  });
+
+  constructor(private cdr: ChangeDetectorRef) {}
+
+  ngOnInit(): void {
+    // Track last config hash to detect changes
+    let lastConfigHash = '';
+    
+    // Check for config changes every 1 second
+    this.configCheckInterval = interval(1000).subscribe(() => {
+      const config = getFacilitiesUtilitiesConfig();
+      const configHash = JSON.stringify({
+        colors: config.colors,
+        labels: config.labels,
+        labelsEn: config.labelsEn,
+        icons: config.icons,
+        iconTypes: config.iconTypes
+      });
+      
+      // If config changed, update version to trigger recomputation
+      if (configHash !== lastConfigHash) {
+        lastConfigHash = configHash;
+        this.configVersion.update(v => v + 1);
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.configCheckInterval) {
+      this.configCheckInterval.unsubscribe();
+    }
+  }
+
+  getMeterIcon(): string {
+    return this.meterTypeInfo()?.icon || 'pi-bolt';
   }
 
   getMeterColor(): string {
-    const type = this.meter().meterType;
-    return METER_TYPE_LABELS[type]?.color || '#667eea';
+    return this.meterTypeInfo()?.color || '#667eea';
   }
 
   getMeterLabel(): string {
-    const type = this.meter().meterType;
-    return METER_TYPE_LABELS[type]?.EN || 'Electricity';
+    return this.meterTypeInfo()?.EN || 'Electricity';
   }
 
   getExpectedRange(): string {
