@@ -37,7 +37,9 @@
         <h3 class="step-title">Basic Information</h3>
 
         <div class="form-group">
-          <label class="form-label">Room Number <span class="required">*</span></label>
+          <label class="form-label"
+            >Room Number <span class="required">*</span></label
+          >
           <input
             type="text"
             class="form-input"
@@ -50,36 +52,30 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Area Type <span class="required">*</span></label>
-          <div class="type-buttons">
-            <button
-              type="button"
-              class="type-button"
-              [class.active]="formData.type === 'log'"
-              (click)="formData.type = 'log'"
-            >
-              <i class="pi pi-building"></i>
-              Log
-            </button>
-            <button
-              type="button"
-              class="type-button"
-              [class.active]="formData.type === 'kiosk'"
-              (click)="formData.type = 'kiosk'"
-            >
-              <i class="pi pi-shop"></i>
-              Kiosk
-            </button>
-            <button
-              type="button"
-              class="type-button"
-              [class.active]="formData.type === 'open-plan'"
-              (click)="formData.type = 'open-plan'"
-            >
-              <i class="pi pi-th-large"></i>
-              Open Plan
-            </button>
-          </div>
+          <label class="form-label">
+            Area Type <span class="required">*</span>
+          </label>
+
+          <select
+            [(ngModel)]="formData.type"
+            style="
+              width: 100%;
+              padding: 10px 12px;
+              background-color: #ffffff;
+              color: #000000;
+              border: 1px solid #d1d5db;
+              border-radius: 6px;
+              font-size: 14px;
+              appearance: auto;
+              -webkit-appearance: auto;
+              -moz-appearance: auto;
+            "
+          >
+            <option value="" disabled selected>Select area type</option>
+            <option value="log">Log</option>
+            <option value="kiosk">Kiosk</option>
+            <option value="open-plan">Open Plan</option>
+          </select>
         </div>
       </div>
     }
@@ -90,7 +86,9 @@
         <h3 class="step-title">Size & Rental Information</h3>
 
         <div class="form-group">
-          <label class="form-label">Size (sqm) <span class="required">*</span></label>
+          <label class="form-label"
+            >Size (sqm) <span class="required">*</span></label
+          >
           <input
             type="number"
             class="form-input"
@@ -113,7 +111,9 @@
             placeholder="e.g., 15000"
             min="0"
           />
-          <span class="form-hint">Optional - Leave empty if not yet determined</span>
+          <span class="form-hint"
+            >Optional - Leave empty if not yet determined</span
+          >
         </div>
       </div>
     }
@@ -122,7 +122,9 @@
     @if (currentStep() === 3) {
       <div class="wizard-step">
         <h3 class="step-title">Room Pictures (Optional)</h3>
-        <p class="step-description">Upload 3-5 pictures of the room for reference</p>
+        <p class="step-description">
+          Upload 3-5 pictures of the room for reference
+        </p>
 
         <div class="upload-area">
           <label class="upload-label">
@@ -136,7 +138,9 @@
             <div class="upload-placeholder">
               <i class="pi pi-cloud-upload"></i>
               <p>Click to upload pictures</p>
-              <span class="upload-hint">PNG, JPG up to 5MB each (3-5 pictures)</span>
+              <span class="upload-hint"
+                >PNG, JPG up to 5MB each (3-5 pictures)</span
+              >
             </div>
           </label>
 
@@ -181,12 +185,18 @@
           <div class="summary-row">
             <span class="summary-label">Monthly Rent:</span>
             <span class="summary-value">
-              {{ formData.monthlyRent ? '฿' + formData.monthlyRent.toLocaleString() : 'Not set' }}
+              {{
+                formData.monthlyRent
+                  ? "฿" + formData.monthlyRent.toLocaleString()
+                  : "Not set"
+              }}
             </span>
           </div>
           <div class="summary-row">
             <span class="summary-label">Pictures:</span>
-            <span class="summary-value">{{ formData.pictures.length }} uploaded</span>
+            <span class="summary-value"
+              >{{ formData.pictures.length }} uploaded</span
+            >
           </div>
           <div class="summary-row">
             <span class="summary-label">Initial Status:</span>
@@ -198,7 +208,10 @@
 
         <div class="info-box">
           <i class="pi pi-info-circle"></i>
-          <p>The area will be created as <strong>inactive</strong> and added to the inactive list. You can drag it to the map to activate it later.</p>
+          <p>
+            The area will be created as <strong>inactive</strong> and added to
+            the inactive list. You can drag it to the map to activate it later.
+          </p>
         </div>
       </div>
     }
@@ -207,43 +220,27 @@
   <!-- Footer -->
   <ng-template pTemplate="footer">
     <div class="wizard-footer">
-      <button
-        type="button"
-        class="btn-cancel"
-        (click)="onCancel()"
-      >
+      <button type="button" class="btn-cancel" (click)="onCancel()">
         <i class="pi pi-times"></i>
         Cancel
       </button>
 
       @if (currentStep() > 1) {
-        <button
-          type="button"
-          class="btn-back"
-          (click)="previousStep()"
-        >
+        <button type="button" class="btn-back" (click)="previousStep()">
           <i class="pi pi-arrow-left"></i>
           Back
         </button>
       }
 
       @if (currentStep() < 4) {
-        <button
-          type="button"
-          class="btn-next"
-          (click)="nextStep()"
-        >
+        <button type="button" class="btn-next" (click)="nextStep()">
           Next
           <i class="pi pi-arrow-right"></i>
         </button>
       }
 
       @if (currentStep() === 4) {
-        <button
-          type="button"
-          class="btn-save"
-          (click)="onSave()"
-        >
+        <button type="button" class="btn-save" (click)="onSave()">
           <i class="pi pi-check"></i>
           Create Area
         </button>
@@ -264,7 +261,11 @@
     Are you sure you want to cancel? All entered information will be lost.
   </p>
   <ng-template pTemplate="footer">
-    <button type="button" class="btn-secondary" (click)="showCloseWarning = false">
+    <button
+      type="button"
+      class="btn-secondary"
+      (click)="showCloseWarning = false"
+    >
       Continue Editing
     </button>
     <button type="button" class="btn-danger" (click)="confirmCancel()">
