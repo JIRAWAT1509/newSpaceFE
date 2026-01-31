@@ -639,7 +639,7 @@ export const loadUiConfig = (): UiConfig => {
     };
     const paletteMode = parsed.paletteMode ?? DEFAULT_UI_CONFIG.paletteMode;
     const statusMode = parsed.statusMode ?? DEFAULT_UI_CONFIG.statusMode;
-    
+
     // Merge module overrides with deep merge
     const mergedModuleOverrides: ModuleOverrides = {
       areaAvailability: {
@@ -704,7 +704,7 @@ export const loadUiConfig = (): UiConfig => {
         rentableItems: parsed.moduleOverrides?.facilitiesUtilities?.rentableItems || DEFAULT_FACILITIES_UTILITIES_CONFIG.rentableItems,
       },
     };
-    
+
     return {
       ...DEFAULT_UI_CONFIG,
       ...parsed,
@@ -839,14 +839,14 @@ const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
 export const getModuleConfig = (moduleId: ModuleId): ModuleStatusConfig => {
   const config = loadUiConfig();
   const override = config.moduleOverrides?.[moduleId];
-  
+
   if (moduleId === 'areaAvailability') {
     return override as AreaAvailabilityConfig || DEFAULT_AREA_AVAILABILITY_CONFIG;
   }
   if (moduleId === 'facilitiesUtilities') {
     return override as FacilitiesUtilitiesConfig || DEFAULT_FACILITIES_UTILITIES_CONFIG;
   }
-  
+
   return DEFAULT_AREA_AVAILABILITY_CONFIG; // fallback
 };
 
@@ -874,7 +874,7 @@ export const applyModuleScopedColors = (
   colorMap: Record<string, string>
 ): void => {
   if (!element) return;
-  
+
   Object.entries(colorMap).forEach(([key, hexColor]) => {
     const rgb = hexToRgb(hexColor);
     if (rgb) {
@@ -931,9 +931,9 @@ export const getModuleIconType = (moduleId: ModuleId, key: string): 'library' | 
 export const getAreaStatusIcon = (statusId: string, fallback?: string): string => {
   const config = getAreaAvailabilityConfig();
   // Check config first, then fallback, then default from DEFAULT_AREA_AVAILABILITY_CONFIG
-  const icon = config.statusIcons?.[statusId] || 
-               fallback || 
-               DEFAULT_AREA_AVAILABILITY_CONFIG.statusIcons?.[statusId] || 
+  const icon = config.statusIcons?.[statusId] ||
+               fallback ||
+               DEFAULT_AREA_AVAILABILITY_CONFIG.statusIcons?.[statusId] ||
                'pi-building';
   return icon;
 };
@@ -943,7 +943,7 @@ export const getAreaStatusIcon = (statusId: string, fallback?: string): string =
  */
 export const getAreaStatusIconType = (statusId: string): 'library' | 'upload' => {
   const config = getAreaAvailabilityConfig();
-  return config.statusIconTypes?.[statusId] || 
+  return config.statusIconTypes?.[statusId] ||
          (config.statusIcons?.[statusId]?.startsWith('data:') ? 'upload' : 'library');
 };
 
@@ -967,7 +967,7 @@ export const updateModuleConfig = (
   updates: Partial<ModuleStatusConfig>
 ): void => {
   const config = loadUiConfig();
-  
+
   // Get current config with proper typing
   let current: ModuleStatusConfig;
   if (moduleId === 'areaAvailability') {
@@ -977,12 +977,12 @@ export const updateModuleConfig = (
   } else {
     current = DEFAULT_AREA_AVAILABILITY_CONFIG;
   }
-  
+
   // Ensure current has required properties
   const currentLabels = (current as ModuleStatusConfig).labels || {};
   const currentColors = (current as ModuleStatusConfig).colors || {};
   const currentIcons = (current as ModuleStatusConfig).icons || {};
-  
+
   // Handle Area Availability specific fields (statusIcons, statusIconTypes)
   let updated: any = {
     ...current,
@@ -1000,7 +1000,7 @@ export const updateModuleConfig = (
       ...(updates.icons || {}),
     },
   };
-  
+
   // Merge statusIcons and statusIconTypes for Area Availability
   if (moduleId === 'areaAvailability') {
     const areaConfig = current as AreaAvailabilityConfig;
@@ -1028,7 +1028,7 @@ export const updateModuleConfig = (
   if (!config.moduleOverrides) {
     config.moduleOverrides = {};
   }
-  
+
   config.moduleOverrides[moduleId] = updated as any;
   saveUiConfig(config);
 };
