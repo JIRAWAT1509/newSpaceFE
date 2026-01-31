@@ -456,7 +456,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   // ============================================
   // 6. REPORT AND DASHBOARD
   // ============================================
-  {
+  /* //{
     primary_content: 'report_dashboard',
     secondary_content: [
       {
@@ -493,6 +493,45 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
         name: 'report_collection',
         icon: 'assets/icons/clipboard-outline.svg',
         route: '/reports/category/collection',
+      },
+    ],
+  }, */
+  {
+    primary_content: 'report_dashboard',
+    secondary_content: [
+      {
+        name: 'report_all',
+        icon: 'assets/icons/clipboard-outline.svg',
+        sub: [
+          {
+            name: 'view all',
+            route: '/reports',
+          },
+          {
+            name: 'report_area',
+            route: '/reports/category/area',
+          },
+          {
+            name: 'report_service',
+            route: '/reports/category/service',
+          },
+          {
+            name: 'report_contract',
+            route: '/reports/category/contract',
+          },
+          {
+            name: 'report_budget',
+            route: '/reports/category/budget',
+          },
+          {
+            name: 'report_finance',
+            route: '/reports/category/finance',
+          },
+          {
+            name: 'report_collection',
+            route: '/reports/category/collection',
+          },
+        ],
       },
     ],
   },
@@ -543,7 +582,6 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             hasDeeper: true,
             deeperNote: 'Contains: Banks, Bank branches, Deposit codes',
           },
-          // ⛔ finance_revenue ถูกลบตามที่ขอ
           {
             name: 'customer_info',
             route: '/setting/company/customer',
