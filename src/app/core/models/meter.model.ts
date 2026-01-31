@@ -91,24 +91,24 @@ export const getMeterTypeLabel = (type: MeterType): { TH: string; EN: string; ic
   try {
     const config = getFacilitiesUtilitiesConfig();
     const defaultLabel = DEFAULT_METER_TYPE_LABELS[type];
-
-    // Get from config with fallback - prioritize labelsEn for English
+    
+    // Get from user-saved config first (Interface settings), then default
     const labelTh = getModuleLabel('facilitiesUtilities', type) || defaultLabel.TH;
     const labelEn = getModuleLabelEn('facilitiesUtilities', type) || defaultLabel.EN;
     const color = getModuleColor('facilitiesUtilities', type) || defaultLabel.color;
     const icon = getModuleIcon('facilitiesUtilities', type) || defaultLabel.icon;
-
-    // Check if config has meterTypes override (legacy support)
+    
+    // User-saved values take priority; only use meterTypes as fallback when saved config is missing
     const meterTypeConfig = config.meterTypes?.[type];
-    const finalLabelEn = meterTypeConfig?.label || labelEn;
-    const finalIcon = meterTypeConfig?.icon || icon;
-    const finalColor = meterTypeConfig?.color || color;
-
+    const finalLabelEn = labelEn || meterTypeConfig?.label;
+    const finalIcon = icon || meterTypeConfig?.icon;
+    const finalColor = color || meterTypeConfig?.color;
+    
     return {
       TH: labelTh,
-      EN: finalLabelEn,
-      icon: finalIcon,
-      color: finalColor,
+      EN: finalLabelEn ?? defaultLabel.EN,
+      icon: finalIcon ?? defaultLabel.icon,
+      color: finalColor ?? defaultLabel.color,
     };
   } catch (error) {
     // Fallback to defaults on any error

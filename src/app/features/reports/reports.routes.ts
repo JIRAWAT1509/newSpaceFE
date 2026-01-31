@@ -41,15 +41,5 @@ export const REPORTS_ROUTES: Routes = [
   {
     path: 'budget/vs-budget-income',
     loadComponent: () => import('./pages/budget/budget-vs-budget-income/budget-vs-budget-income.component').then(m => m.BudgetVsBudgetIncomeComponent)
-  },
-
-  // Interface Reports
-  {
-    path: 'interface/monthly-billing',
-    loadComponent: () => import('./pages/interface/interface-monthly-billing/interface-monthly-billing.component').then(m => m.InterfaceMonthlyBillingComponent)
-  },
-  {
-    path: 'interface/logs',
-    loadComponent: () => import('./pages/interface/interface-logs/interface-logs.component').then(m => m.InterfaceLogsComponent)
   }
 ];

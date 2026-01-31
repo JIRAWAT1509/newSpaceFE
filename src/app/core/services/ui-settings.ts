@@ -1014,7 +1014,17 @@ export const updateModuleConfig = (
       ...(areaUpdates.statusIconTypes || {}),
     };
   }
-  
+
+  // Merge iconTypes for Facilities Utilities
+  if (moduleId === 'facilitiesUtilities') {
+    const facConfig = current as FacilitiesUtilitiesConfig;
+    const facUpdates = updates as Partial<FacilitiesUtilitiesConfig>;
+    updated.iconTypes = {
+      ...(facConfig.iconTypes || {}),
+      ...(facUpdates.iconTypes || {}),
+    };
+  }
+
   if (!config.moduleOverrides) {
     config.moduleOverrides = {};
   }
