@@ -43,7 +43,7 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
 
   // Filters
   selectedTimeRange = signal<string>('3months');
-  selectedMeterType = signal<MeterType | 'all'>('all');
+  selectedMeterType = signal<MeterType | 'all' | string>('all');
   customStartDate = signal<Date | null>(null);
   customEndDate = signal<Date | null>(null);
   showCustomDatePicker = signal<boolean>(false);
@@ -61,21 +61,35 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
     { id: 'custom', label: 'Custom Range', months: 0 }
   ];
 
-  // Meter type filters - computed to be reactive to config changes
+  // Meter type filters - computed to include rentable items and be reactive to config changes
   meterTypeFilters = computed(() => {
     this.configVersion(); // Access to make reactive
     const electricityInfo = getMeterTypeLabel('electricity');
     const waterInfo = getMeterTypeLabel('water');
     const gasInfo = getMeterTypeLabel('gas');
     const acInfo = getMeterTypeLabel('ac');
-    
-    return [
+
+    const baseOptions = [
       { type: 'all' as const, label: 'All Types', icon: 'pi-th-large', color: '#667eea' },
       { type: 'electricity' as const, label: electricityInfo.EN, icon: electricityInfo.icon, color: electricityInfo.color },
       { type: 'water' as const, label: waterInfo.EN, icon: waterInfo.icon, color: waterInfo.color },
       { type: 'gas' as const, label: gasInfo.EN, icon: gasInfo.icon, color: gasInfo.color },
       { type: 'ac' as const, label: acInfo.EN, icon: acInfo.icon, color: acInfo.color }
     ];
+
+    const config = getFacilitiesUtilitiesConfig();
+    const rentableItems = config.rentableItems || [];
+    const rentableOptions = rentableItems
+      .filter(item => item.enabled)
+      .sort((a, b) => a.order - b.order)
+      .map(item => ({
+        type: `rentable_${item.id}` as const,
+        label: item.nameTh || item.name,
+        icon: item.icon || 'pi-box',
+        color: item.color || '#667eea'
+      }));
+
+    return [...baseOptions, ...rentableOptions];
   });
 
   constructor(private cdr: ChangeDetectorRef) {
@@ -105,7 +119,8 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
         labels: config.labels,
         labelsEn: config.labelsEn,
         icons: config.icons,
-        iconTypes: config.iconTypes
+        iconTypes: config.iconTypes,
+        rentableItems: config.rentableItems
       });
       
       // If config changed, update version to trigger recomputation
@@ -201,7 +216,8 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
     const palette = getChartPalette(4);
     const paletteAlpha = getChartPaletteWithAlpha(4, 0.1);
 
-    if (meterType === 'all') {
+    const showAllTypes = meterType === 'all' || (typeof meterType === 'string' && meterType.startsWith('rentable_'));
+    if (showAllTypes) {
       return {
         labels: months,
         datasets: [
@@ -244,8 +260,9 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
       ac: 3
     };
 
-    const typeInfo = getMeterTypeLabel(meterType);
-    const typeIndex = meterTypeIndexMap[meterType];
+    const typeKey = meterType as MeterType;
+    const typeInfo = getMeterTypeLabel(typeKey);
+    const typeIndex = meterTypeIndexMap[typeKey];
     return {
       labels: months,
       datasets: [{
@@ -426,7 +443,7 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectMeterType(type: MeterType | 'all'): void {
+  selectMeterType(type: MeterType | 'all' | string): void {
     this.selectedMeterType.set(type);
   }
 
@@ -434,7 +451,7 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
     return this.selectedTimeRange() === rangeId;
   }
 
-  isMeterTypeSelected(type: MeterType | 'all'): boolean {
+  isMeterTypeSelected(type: MeterType | 'all' | string): boolean {
     return this.selectedMeterType() === type;
   }
 

@@ -39,7 +39,6 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_budget: 'Budget',
     report_finance: 'Finance',
     report_collection: 'Collection',
-    report_interface: 'Interface',
 
     // --- Sub-menu Items ---
     view_all_areas: 'View All Areas',
@@ -222,7 +221,6 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_budget: 'งบประมาณ',
     report_finance: 'การเงิน',
     report_collection: 'การจัดเก็บ',
-    report_interface: 'อินเทอร์เฟซ',
 
     // --- Sub-menu Items ---
     view_all_areas: 'ดูพื้นที่ทั้งหมด',
@@ -405,7 +403,6 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_budget: '预算',
     report_finance: '财务',
     report_collection: '收款',
-    report_interface: '接口',
 
     // --- Sub-menu Items ---
     view_all_areas: '查看所有区域',

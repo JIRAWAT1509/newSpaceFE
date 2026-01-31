@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -34,15 +34,13 @@ import {
   styleUrl: './system-interface.component.css',
   providers: [MessageService, ConfirmationService],
 })
-export class SystemInterfaceComponent implements OnInit {
+export class SystemInterfaceComponent implements OnInit, OnDestroy {
   config: UiConfig = { ...DEFAULT_UI_CONFIG };
   presets: UiPreset[] = UI_PRESETS;
   statusPresets: UiStatusPreset[] = UI_STATUS_PRESETS;
   selectedElement: string = 'Background';
   private lastSavedConfig: UiConfig = cloneConfig(DEFAULT_UI_CONFIG);
-  saveStatus: string = '';
-  private saveStatusTimer: ReturnType<typeof setTimeout> | null = null;
-  
+
   // Loading states
   isSaving = signal<boolean>(false);
   isLoading = signal<boolean>(false);
@@ -67,6 +65,10 @@ export class SystemInterfaceComponent implements OnInit {
     enabled: boolean;
     order: number;
   }>>([]);
+  /** Snapshot of rentable items when last loaded/saved (for dirty check) */
+  private rentableItemsSnapshot: string = '[]';
+  private rentableSaveDebounce: ReturnType<typeof setTimeout> | null = null;
+  private readonly RENTABLE_SAVE_DEBOUNCE_MS = 1200;
 
   // Icon library modal
   showIconLibrary = signal<boolean>(false);
@@ -151,7 +153,7 @@ export class SystemInterfaceComponent implements OnInit {
       
       // Load selected module from localStorage
       const savedModule = localStorage.getItem('interface_selected_module');
-      if (savedModule === 'areaAvailability' || savedModule === 'facilitiesUtilities') {
+      if (savedModule === 'global' || savedModule === 'areaAvailability' || savedModule === 'facilitiesUtilities') {
         this.selectedModule = savedModule;
       }
     } catch (error) {
@@ -159,6 +161,13 @@ export class SystemInterfaceComponent implements OnInit {
       this.showError('เกิดข้อผิดพลาดในการโหลดการตั้งค่า');
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.rentableSaveDebounce) {
+      clearTimeout(this.rentableSaveDebounce);
+      this.rentableSaveDebounce = null;
     }
   }
 
@@ -181,11 +190,11 @@ export class SystemInterfaceComponent implements OnInit {
   selectPreset(preset: UiPreset): void {
     this.globalChanges.paletteMode = 'preset';
     this.globalChanges.activePresetId = preset.id;
-    // Apply preview immediately
     this.config.paletteMode = 'preset';
     this.config.activePresetId = preset.id;
     this.config.tokens = resolveTokens(this.config);
     applyUiConfig(this.config);
+    this.persistGlobalConfig();
   }
 
   onTokenChange(): void {
@@ -209,14 +218,11 @@ export class SystemInterfaceComponent implements OnInit {
   selectStatusPreset(preset: UiStatusPreset): void {
     this.globalChanges.statusMode = 'preset';
     this.globalChanges.activeStatusPresetId = preset.id;
-    // Apply preview immediately
     this.config.statusMode = 'preset';
     this.config.activeStatusPresetId = preset.id;
-    // Resolve tokens to get the correct merged tokens (this will merge status preset tokens)
     this.config.tokens = resolveTokens(this.config);
-    // Apply the config to update CSS variables immediately
     applyUiConfig(this.config);
-    this.showSuccess('เลือกชุดสีสถานะ', `เลือก "${preset.name}" แล้ว สีจะเปลี่ยนทันทีใน badges, buttons, และ status indicators ทั่วทั้งระบบ กรุณากดบันทึกเพื่อบันทึกการเปลี่ยนแปลง`);
+    this.persistGlobalConfig();
   }
   
   getCurrentStatusColor(type: 'success' | 'warning' | 'danger' | 'info'): string {
@@ -236,63 +242,44 @@ export class SystemInterfaceComponent implements OnInit {
     this.globalChanges.themeMode = mode;
     this.config.themeMode = mode;
     applyUiConfig(this.config);
+    this.persistGlobalConfig();
   }
 
   onIconStyleChange(style: 'outline' | 'solid'): void {
     this.globalChanges.iconStyle = style;
     this.config.iconStyle = style;
     applyUiConfig(this.config);
+    this.persistGlobalConfig();
   }
 
-  saveGlobalConfig(): void {
-    if (!this.hasGlobalChanges()) {
-      this.showInfo('ไม่มีข้อมูลที่ต้องบันทึก');
-      return;
-    }
-    
+  /** Persist global config when user clicks Save. */
+  private persistGlobalConfig(): void {
+    if (!this.hasGlobalChanges()) return;
     this.isSaving.set(true);
     try {
-      // Apply all global changes
-      if (this.globalChanges.themeMode !== undefined) {
-        this.config.themeMode = this.globalChanges.themeMode;
-      }
-      if (this.globalChanges.paletteMode !== undefined) {
-        this.config.paletteMode = this.globalChanges.paletteMode;
-      }
-      if (this.globalChanges.activePresetId !== undefined) {
-        this.config.activePresetId = this.globalChanges.activePresetId;
-      }
-      if (this.globalChanges.statusMode !== undefined) {
-        this.config.statusMode = this.globalChanges.statusMode;
-      }
-      if (this.globalChanges.activeStatusPresetId !== undefined) {
-        this.config.activeStatusPresetId = this.globalChanges.activeStatusPresetId;
-      }
-      if (this.globalChanges.iconStyle !== undefined) {
-        this.config.iconStyle = this.globalChanges.iconStyle;
-      }
-      if (this.globalChanges.tokens) {
-        this.config.tokens = { ...this.config.tokens, ...this.globalChanges.tokens };
-      }
-
-      // Resolve tokens if needed (after applying all changes)
-      if (this.config.paletteMode === 'preset') {
-        this.config.tokens = resolveTokens(this.config);
-      }
-
-      // Save to storage
+      if (this.globalChanges.themeMode !== undefined) this.config.themeMode = this.globalChanges.themeMode;
+      if (this.globalChanges.paletteMode !== undefined) this.config.paletteMode = this.globalChanges.paletteMode;
+      if (this.globalChanges.activePresetId !== undefined) this.config.activePresetId = this.globalChanges.activePresetId;
+      if (this.globalChanges.statusMode !== undefined) this.config.statusMode = this.globalChanges.statusMode;
+      if (this.globalChanges.activeStatusPresetId !== undefined) this.config.activeStatusPresetId = this.globalChanges.activeStatusPresetId;
+      if (this.globalChanges.iconStyle !== undefined) this.config.iconStyle = this.globalChanges.iconStyle;
+      if (this.globalChanges.tokens) this.config.tokens = { ...this.config.tokens, ...this.globalChanges.tokens };
+      if (this.config.paletteMode === 'preset') this.config.tokens = resolveTokens(this.config);
       saveUiConfig(this.config);
       applyUiConfig(this.config);
       this.lastSavedConfig = cloneConfig(this.config);
       this.globalChanges = {};
       this.showSuccess('บันทึกสำเร็จ', 'การตั้งค่าได้รับการบันทึกแล้ว');
-      this.showSaveStatus('บันทึกสำเร็จ');
     } catch (error) {
       console.error('Error saving global config:', error);
       this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกการตั้งค่าได้');
     } finally {
       this.isSaving.set(false);
     }
+  }
+
+  saveGlobalConfig(): void {
+    this.persistGlobalConfig();
   }
 
   hasGlobalChanges(): boolean {
@@ -321,7 +308,6 @@ export class SystemInterfaceComponent implements OnInit {
           this.lastSavedConfig = cloneConfig(this.config);
           this.globalChanges = {};
           this.showSuccess('รีเซ็ตสำเร็จ', 'การตั้งค่าถูกรีเซ็ตเป็นค่าเริ่มต้นแล้ว');
-          this.showSaveStatus('รีเซ็ตเป็นค่าเริ่มต้นแล้ว');
         } catch (error) {
           console.error('Error resetting config:', error);
           this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถรีเซ็ตการตั้งค่าได้');
@@ -350,16 +336,6 @@ export class SystemInterfaceComponent implements OnInit {
     }
   }
 
-  private showSaveStatus(message: string): void {
-    this.saveStatus = message;
-    if (this.saveStatusTimer) {
-      clearTimeout(this.saveStatusTimer);
-    }
-    this.saveStatusTimer = setTimeout(() => {
-      this.saveStatus = '';
-    }, 2000);
-  }
-  
   private showSuccess(message: string, detail?: string): void {
     this.messageService.add({
       severity: 'success',
@@ -390,48 +366,39 @@ export class SystemInterfaceComponent implements OnInit {
   // ============================================
   // Module Selection
   // ============================================
-  onModuleChange(): void {
-    // Check for unsaved changes before switching
-    if (this.hasUnsavedChanges()) {
-      this.confirmationService.confirm({
-        message: 'คุณมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก ต้องการเปลี่ยนหน้าหรือไม่?',
-        header: 'ยืนยันการเปลี่ยนหน้า',
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'เปลี่ยนหน้า',
-        rejectLabel: 'ยกเลิก',
-        accept: () => {
-          this.switchModule();
-        }
-      });
-    } else {
-      this.switchModule();
+  onModuleChange(newModule: ModuleId | 'global'): void {
+    const current = this.selectedModule;
+    if (current === 'global' && this.hasGlobalChanges()) this.persistGlobalConfig();
+    if (current === 'areaAvailability' && this.hasAreaChanges()) this.persistAreaConfig();
+    if (current === 'facilitiesUtilities') {
+      if (this.hasFacilitiesChanges()) this.persistFacilitiesConfig();
+      if (this.hasRentableItemsChanges()) this.flushRentableSaveDebounce();
     }
+    this.selectedModule = newModule;
+    this.switchModule();
   }
-  
+
   private switchModule(): void {
     localStorage.setItem('interface_selected_module', this.selectedModule);
-    // Reload configs when switching modules
     this.areaConfig = getAreaAvailabilityConfig();
     this.facilitiesConfig = getFacilitiesUtilitiesConfig();
-    // Load rentable items from Facilities config
     this.loadRentableItems();
-    // Clear any unsaved changes
     this.globalChanges = {};
     this.areaChanges = {};
     this.facilitiesChanges = {};
   }
 
   private loadRentableItems(): void {
-    if (this.facilitiesConfig.rentableItems) {
-      // Ensure iconType has default value
+    if (this.facilitiesConfig.rentableItems && this.facilitiesConfig.rentableItems.length > 0) {
       const items = this.facilitiesConfig.rentableItems.map(item => ({
         ...item,
-        iconType: item.iconType || (item.icon?.startsWith('data:') ? 'upload' : 'library')
+        iconType: (item.iconType || (item.icon?.startsWith('data:') ? 'upload' : 'library')) as 'library' | 'upload'
       }));
       this.rentableItems.set(items);
     } else {
       this.rentableItems.set([]);
     }
+    this.rentableItemsSnapshot = JSON.stringify(this.rentableItems());
   }
 
   // ============================================
@@ -477,20 +444,28 @@ export class SystemInterfaceComponent implements OnInit {
 
   onAreaColorChange(key: string, event: Event): void {
     const input = event.target as HTMLInputElement;
+    const value = input.value;
+    const hex = this.normalizeHexColor(value);
     if (!this.areaChanges.colors) this.areaChanges.colors = {};
-    this.areaChanges.colors[key] = input.value;
+    this.areaChanges.colors[key] = hex || value;
+    if (hex && input.type === 'text') {
+      input.value = hex;
+    }
+    this.persistAreaConfig();
   }
 
   onAreaLabelChange(key: string, event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!this.areaChanges.labels) this.areaChanges.labels = {};
     this.areaChanges.labels[key] = input.value;
+    this.persistAreaConfig();
   }
 
   onAreaLabelEnChange(key: string, event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!this.areaChanges.labelsEn) this.areaChanges.labelsEn = {};
     this.areaChanges.labelsEn[key] = input.value;
+    this.persistAreaConfig();
   }
 
   openAreaIconLibrary(key: string): void {
@@ -524,11 +499,37 @@ export class SystemInterfaceComponent implements OnInit {
       if (!this.areaChanges.statusIconTypes) this.areaChanges.statusIconTypes = {};
       this.areaChanges.statusIcons[key] = dataURL;
       this.areaChanges.statusIconTypes[key] = 'upload';
-      this.showInfo('อัปโหลดสำเร็จ', 'กรุณากดบันทึกเพื่อบันทึกการเปลี่ยนแปลง');
+      input.value = ''; // allow selecting same file again
+      this.persistAreaConfig();
     } catch (error) {
       console.error('Error uploading icon:', error);
       this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถอัปโหลดไอคอนได้');
       input.value = '';
+    }
+  }
+
+  /** Persist area config (auto-save). */
+  private persistAreaConfig(): void {
+    if (!this.hasAreaChanges()) return;
+    this.isSaving.set(true);
+    try {
+      const updates: any = {};
+      if (this.areaChanges.colors) updates.colors = { ...this.areaConfig.colors, ...this.areaChanges.colors };
+      if (this.areaChanges.labels) updates.labels = { ...this.areaConfig.labels, ...this.areaChanges.labels };
+      if (this.areaChanges.labelsEn) updates.labelsEn = { ...(this.areaConfig.labelsEn || {}), ...this.areaChanges.labelsEn };
+      if (this.areaChanges.statusIcons) updates.statusIcons = { ...(this.areaConfig.statusIcons || {}), ...this.areaChanges.statusIcons };
+      if (this.areaChanges.statusIconTypes) updates.statusIconTypes = { ...(this.areaConfig.statusIconTypes || {}), ...this.areaChanges.statusIconTypes };
+      if (Object.keys(updates).length > 0) {
+        updateModuleConfig('areaAvailability', updates);
+        this.areaConfig = getAreaAvailabilityConfig();
+        this.areaChanges = {};
+        this.showSuccess('บันทึกสำเร็จ', 'การตั้งค่า Area Availability ได้รับการบันทึกแล้ว');
+      }
+    } catch (error) {
+      console.error('Error saving area config:', error);
+      this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกการตั้งค่าได้');
+    } finally {
+      this.isSaving.set(false);
     }
   }
 
@@ -537,41 +538,7 @@ export class SystemInterfaceComponent implements OnInit {
       this.showInfo('ไม่มีข้อมูลที่ต้องบันทึก');
       return;
     }
-    
-    this.isSaving.set(true);
-    try {
-      const updates: any = {};
-      if (this.areaChanges.colors) {
-        updates.colors = { ...this.areaConfig.colors, ...this.areaChanges.colors };
-      }
-      if (this.areaChanges.labels) {
-        updates.labels = { ...this.areaConfig.labels, ...this.areaChanges.labels };
-      }
-      if (this.areaChanges.labelsEn) {
-        updates.labelsEn = { ...(this.areaConfig.labelsEn || {}), ...this.areaChanges.labelsEn };
-      }
-      if (this.areaChanges.statusIcons) {
-        updates.statusIcons = { ...(this.areaConfig.statusIcons || {}), ...this.areaChanges.statusIcons };
-      }
-      if (this.areaChanges.statusIconTypes) {
-        updates.statusIconTypes = { ...(this.areaConfig.statusIconTypes || {}), ...this.areaChanges.statusIconTypes };
-      }
-
-      if (Object.keys(updates).length > 0) {
-        updateModuleConfig('areaAvailability', updates);
-        this.areaConfig = getAreaAvailabilityConfig();
-        this.areaChanges = {};
-        this.showSuccess('บันทึกสำเร็จ', 'การตั้งค่า Area Availability ได้รับการบันทึกแล้ว');
-        this.showSaveStatus('บันทึกสำเร็จ');
-      } else {
-        this.showInfo('ไม่มีข้อมูลที่ต้องบันทึก');
-      }
-    } catch (error) {
-      console.error('Error saving area config:', error);
-      this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกการตั้งค่าได้');
-    } finally {
-      this.isSaving.set(false);
-    }
+    this.persistAreaConfig();
   }
 
   hasAreaChanges(): boolean {
@@ -592,7 +559,6 @@ export class SystemInterfaceComponent implements OnInit {
           this.areaConfig = getAreaAvailabilityConfig();
           this.areaChanges = {};
           this.showSuccess('รีเซ็ตสำเร็จ', 'การตั้งค่า Area Availability ถูกรีเซ็ตเป็นค่าเริ่มต้นแล้ว');
-          this.showSaveStatus('รีเซ็ตเป็นค่าเริ่มต้นแล้ว');
         } catch (error) {
           console.error('Error resetting area config:', error);
           this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถรีเซ็ตการตั้งค่าได้');
@@ -620,31 +586,47 @@ export class SystemInterfaceComponent implements OnInit {
 
   removeRentableItem(id: string): void {
     const item = this.rentableItems().find(i => i.id === id);
-    const itemName = item?.nameTh || 'รายการนี้';
-    
+    const itemName = item?.nameTh || item?.name || 'รายการนี้';
+
     this.confirmationService.confirm({
-      message: `คุณต้องการลบ${itemName}หรือไม่?`,
+      message: `คุณต้องการลบ "${itemName}" หรือไม่?`,
       header: 'ยืนยันการลบ',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       acceptLabel: 'ลบ',
       rejectLabel: 'ยกเลิก',
       accept: () => {
-        this.rentableItems.set(this.rentableItems().filter(item => item.id !== id));
-        this.showInfo('ลบสำเร็จ', `ลบ${itemName}เรียบร้อยแล้ว`);
+        this.rentableItems.set(this.rentableItems().filter(i => i.id !== id));
+        this.saveRentableItems();
+        this.showSuccess('ลบรายการแล้ว', 'บันทึกอัตโนมัติแล้ว');
       }
     });
   }
 
+  /** Debounced auto-save for rentable items (name/color/icon/toggle changes). */
+  onRentableItemFieldChange(): void {
+    if (this.rentableSaveDebounce) clearTimeout(this.rentableSaveDebounce);
+    this.rentableSaveDebounce = setTimeout(() => {
+      this.rentableSaveDebounce = null;
+      this.saveRentableItems();
+    }, this.RENTABLE_SAVE_DEBOUNCE_MS);
+  }
+
+  private flushRentableSaveDebounce(): void {
+    if (this.rentableSaveDebounce) {
+      clearTimeout(this.rentableSaveDebounce);
+      this.rentableSaveDebounce = null;
+      this.saveRentableItems();
+    }
+  }
+
   saveRentableItems(): void {
-    // Validate items
     const items = this.rentableItems();
     const invalidItems = items.filter(item => !item.nameTh || !item.nameTh.trim());
     if (invalidItems.length > 0) {
       this.showError('กรุณากรอกชื่อ (ไทย) สำหรับทุกรายการ');
       return;
     }
-    
     this.isSaving.set(true);
     try {
       updateModuleConfig('facilitiesUtilities', {
@@ -652,8 +634,7 @@ export class SystemInterfaceComponent implements OnInit {
       } as Partial<FacilitiesUtilitiesConfig>);
       this.facilitiesConfig = getFacilitiesUtilitiesConfig();
       this.loadRentableItems();
-      this.showSuccess('บันทึกสำเร็จ', 'รายการสิ่งที่จะเช่าได้ได้รับการบันทึกแล้ว');
-      this.showSaveStatus('บันทึกสำเร็จ');
+      this.showSuccess('บันทึกแล้ว', 'รายการสิ่งที่จะเช่าได้บันทึกอัตโนมัติ');
     } catch (error) {
       console.error('Error saving rentable items:', error);
       this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกรายการได้');
@@ -670,15 +651,15 @@ export class SystemInterfaceComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       acceptLabel: 'รีเซ็ต',
       rejectLabel: 'ยกเลิก',
-      accept: () => {
+        accept: () => {
         try {
           this.rentableItems.set([]);
           updateModuleConfig('facilitiesUtilities', {
             rentableItems: [],
           } as Partial<FacilitiesUtilitiesConfig>);
           this.facilitiesConfig = getFacilitiesUtilitiesConfig();
+          this.loadRentableItems(); // sync snapshot
           this.showSuccess('รีเซ็ตสำเร็จ', 'รายการสิ่งที่จะเช่าได้ถูกรีเซ็ตเป็นค่าเริ่มต้นแล้ว');
-          this.showSaveStatus('รีเซ็ตเป็นค่าเริ่มต้นแล้ว');
         } catch (error) {
           console.error('Error resetting rentable items:', error);
           this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถรีเซ็ตรายการได้');
@@ -704,8 +685,8 @@ export class SystemInterfaceComponent implements OnInit {
           : item
       );
       this.rentableItems.set(items);
-      this.showInfo('เลือกไอคอนสำเร็จ', 'กรุณากดบันทึกเพื่อบันทึกการเปลี่ยนแปลง');
-    } 
+      this.onRentableItemFieldChange();
+    }
     // Handle Area status icons
     else if (this.selectedItemForIcon.startsWith('area_')) {
       const key = this.selectedItemForIcon.replace('area_', '');
@@ -713,7 +694,7 @@ export class SystemInterfaceComponent implements OnInit {
       if (!this.areaChanges.statusIconTypes) this.areaChanges.statusIconTypes = {};
       this.areaChanges.statusIcons[key] = iconClass;
       this.areaChanges.statusIconTypes[key] = 'library';
-      this.showInfo('เลือกไอคอนสำเร็จ', 'กรุณากดบันทึกเพื่อบันทึกการเปลี่ยนแปลง');
+      this.persistAreaConfig();
     }
     // Handle Facilities meter type icons
     else if (this.selectedItemForIcon.startsWith('facilities_')) {
@@ -722,9 +703,9 @@ export class SystemInterfaceComponent implements OnInit {
       if (!this.facilitiesChanges.iconTypes) this.facilitiesChanges.iconTypes = {};
       this.facilitiesChanges.icons[key] = iconClass;
       this.facilitiesChanges.iconTypes[key] = 'library';
-      this.showInfo('เลือกไอคอนสำเร็จ', 'กรุณากดบันทึกเพื่อบันทึกการเปลี่ยนแปลง');
+      this.persistFacilitiesConfig();
     }
-    
+
     this.showIconLibrary.set(false);
     this.selectedItemForIcon = null;
     this.iconSearchQuery = '';
@@ -755,7 +736,8 @@ export class SystemInterfaceComponent implements OnInit {
         item.id === id ? { ...item, icon: dataURL, iconType: 'upload' as const } : item
       );
       this.rentableItems.set(items);
-      this.showInfo('อัปโหลดสำเร็จ', 'กรุณากดบันทึกเพื่อบันทึกการเปลี่ยนแปลง');
+      input.value = ''; // allow selecting same file again
+      this.onRentableItemFieldChange();
     } catch (error) {
       console.error('Error uploading icon:', error);
       this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถอัปโหลดไอคอนได้');
@@ -782,15 +764,19 @@ export class SystemInterfaceComponent implements OnInit {
   }
 
   getFacilitiesIconType(key: string): 'library' | 'upload' {
-    // Return from changes first, then config
-    return this.facilitiesChanges.iconTypes?.[key] || 
-           this.facilitiesConfig.iconTypes?.[key] || 
-           ((this.facilitiesChanges.icons?.[key] || this.facilitiesConfig.icons?.[key])?.startsWith('data:') ? 'upload' : 'library');
+    const icon = this.getFacilitiesIcon(key);
+    if (!icon) return 'library';
+    return this.facilitiesChanges.iconTypes?.[key] ||
+           this.facilitiesConfig.iconTypes?.[key] ||
+           (icon.startsWith('data:') ? 'upload' : 'library');
   }
 
   getFacilitiesIcon(key: string): string {
-    // Return from changes first, then config
-    return this.facilitiesChanges.icons?.[key] || this.facilitiesConfig.icons?.[key] || '';
+    // Return from changes first, then config.icons, then meterTypes (default)
+    const fromChanges = this.facilitiesChanges.icons?.[key];
+    const fromConfig = this.facilitiesConfig.icons?.[key];
+    const fromMeterTypes = this.facilitiesConfig.meterTypes?.[key]?.icon;
+    return fromChanges ?? fromConfig ?? fromMeterTypes ?? '';
   }
 
   // Temporary storage for unsaved changes (exposed for template)
@@ -804,20 +790,28 @@ export class SystemInterfaceComponent implements OnInit {
 
   onFacilitiesColorChange(key: string, event: Event): void {
     const input = event.target as HTMLInputElement;
+    const value = input.value;
+    const hex = this.normalizeHexColor(value);
     if (!this.facilitiesChanges.colors) this.facilitiesChanges.colors = {};
-    this.facilitiesChanges.colors[key] = input.value;
+    this.facilitiesChanges.colors[key] = hex || value;
+    if (hex && input.type === 'text') {
+      input.value = hex;
+    }
+    this.persistFacilitiesConfig();
   }
 
   onFacilitiesLabelChange(key: string, event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!this.facilitiesChanges.labels) this.facilitiesChanges.labels = {};
     this.facilitiesChanges.labels[key] = input.value;
+    this.persistFacilitiesConfig();
   }
 
   onFacilitiesLabelEnChange(key: string, event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!this.facilitiesChanges.labelsEn) this.facilitiesChanges.labelsEn = {};
     this.facilitiesChanges.labelsEn[key] = input.value;
+    this.persistFacilitiesConfig();
   }
 
   openFacilitiesIconLibrary(key: string): void {
@@ -851,7 +845,8 @@ export class SystemInterfaceComponent implements OnInit {
       if (!this.facilitiesChanges.iconTypes) this.facilitiesChanges.iconTypes = {};
       this.facilitiesChanges.icons[key] = dataURL;
       this.facilitiesChanges.iconTypes[key] = 'upload';
-      this.showInfo('อัปโหลดสำเร็จ', 'กรุณากดบันทึกเพื่อบันทึกการเปลี่ยนแปลง');
+      input.value = ''; // allow selecting same file again
+      this.persistFacilitiesConfig();
     } catch (error) {
       console.error('Error uploading icon:', error);
       this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถอัปโหลดไอคอนได้');
@@ -859,45 +854,22 @@ export class SystemInterfaceComponent implements OnInit {
     }
   }
 
-  saveFacilitiesConfig(): void {
-    if (!this.hasFacilitiesChanges() && this.rentableItems().length === (this.facilitiesConfig.rentableItems?.length || 0)) {
-      this.showInfo('ไม่มีข้อมูลที่ต้องบันทึก');
-      return;
-    }
-    
+  /** Persist facilities meter types only (auto-save). Rentable items saved via saveRentableItems. */
+  private persistFacilitiesConfig(): void {
+    if (!this.hasFacilitiesChanges()) return;
     this.isSaving.set(true);
     try {
       const updates: any = {};
-      if (this.facilitiesChanges.colors) {
-        updates.colors = { ...this.facilitiesConfig.colors, ...this.facilitiesChanges.colors };
-      }
-      if (this.facilitiesChanges.labels) {
-        updates.labels = { ...this.facilitiesConfig.labels, ...this.facilitiesChanges.labels };
-      }
-      if (this.facilitiesChanges.labelsEn) {
-        updates.labelsEn = { ...(this.facilitiesConfig.labelsEn || {}), ...this.facilitiesChanges.labelsEn };
-      }
-      if (this.facilitiesChanges.icons) {
-        updates.icons = { ...this.facilitiesConfig.icons, ...this.facilitiesChanges.icons };
-      }
-      if (this.facilitiesChanges.iconTypes) {
-        updates.iconTypes = { ...(this.facilitiesConfig.iconTypes || {}), ...this.facilitiesChanges.iconTypes };
-      }
-      
-      // Always save rentable items if they exist
-      if (this.rentableItems().length > 0) {
-        updates.rentableItems = this.rentableItems();
-      }
-
+      if (this.facilitiesChanges.colors) updates.colors = { ...this.facilitiesConfig.colors, ...this.facilitiesChanges.colors };
+      if (this.facilitiesChanges.labels) updates.labels = { ...this.facilitiesConfig.labels, ...this.facilitiesChanges.labels };
+      if (this.facilitiesChanges.labelsEn) updates.labelsEn = { ...(this.facilitiesConfig.labelsEn || {}), ...this.facilitiesChanges.labelsEn };
+      if (this.facilitiesChanges.icons) updates.icons = { ...this.facilitiesConfig.icons, ...this.facilitiesChanges.icons };
+      if (this.facilitiesChanges.iconTypes) updates.iconTypes = { ...(this.facilitiesConfig.iconTypes || {}), ...this.facilitiesChanges.iconTypes };
       if (Object.keys(updates).length > 0) {
         updateModuleConfig('facilitiesUtilities', updates);
         this.facilitiesConfig = getFacilitiesUtilitiesConfig();
         this.facilitiesChanges = {};
-        this.loadRentableItems();
-        this.showSuccess('บันทึกสำเร็จ', 'การตั้งค่า Facilities (Utilities) ได้รับการบันทึกแล้ว');
-        this.showSaveStatus('บันทึกสำเร็จ');
-      } else {
-        this.showInfo('ไม่มีข้อมูลที่ต้องบันทึก');
+        this.showSuccess('บันทึกแล้ว', 'การตั้งค่า Facilities บันทึกอัตโนมัติ');
       }
     } catch (error) {
       console.error('Error saving facilities config:', error);
@@ -907,8 +879,17 @@ export class SystemInterfaceComponent implements OnInit {
     }
   }
 
+  saveFacilitiesConfig(): void {
+    this.persistFacilitiesConfig();
+  }
+
   hasFacilitiesChanges(): boolean {
     return Object.keys(this.facilitiesChanges).length > 0;
+  }
+
+  /** True when rentable items list or any item content differs from saved state */
+  hasRentableItemsChanges(): boolean {
+    return JSON.stringify(this.rentableItems()) !== this.rentableItemsSnapshot;
   }
   
   hasUnsavedChanges(): boolean {
@@ -917,7 +898,7 @@ export class SystemInterfaceComponent implements OnInit {
     } else if (this.selectedModule === 'areaAvailability') {
       return this.hasAreaChanges();
     } else if (this.selectedModule === 'facilitiesUtilities') {
-      return this.hasFacilitiesChanges();
+      return this.hasFacilitiesChanges() || this.hasRentableItemsChanges();
     }
     return false;
   }
@@ -937,13 +918,28 @@ export class SystemInterfaceComponent implements OnInit {
           this.facilitiesChanges = {};
           this.loadRentableItems();
           this.showSuccess('รีเซ็ตสำเร็จ', 'การตั้งค่า Facilities (Utilities) ถูกรีเซ็ตเป็นค่าเริ่มต้นแล้ว');
-          this.showSaveStatus('รีเซ็ตเป็นค่าเริ่มต้นแล้ว');
         } catch (error) {
           console.error('Error resetting facilities config:', error);
           this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถรีเซ็ตการตั้งค่าได้');
         }
       }
     });
+  }
+
+  /** Normalize hex color to #RRGGBB (6 digits). Returns empty string if invalid. */
+  private normalizeHexColor(value: string): string {
+    const v = (value || '').trim();
+    if (/^#([A-Fa-f0-9]{6})$/.test(v)) return v;
+    if (/^#([A-Fa-f0-9]{3})$/.test(v)) {
+      const r = v[1] + v[1], g = v[2] + v[2], b = v[3] + v[3];
+      return `#${r}${g}${b}`;
+    }
+    if (/^([A-Fa-f0-9]{6})$/.test(v)) return '#' + v;
+    if (/^([A-Fa-f0-9]{3})$/.test(v)) {
+      const r = v[0] + v[0], g = v[1] + v[1], b = v[2] + v[2];
+      return '#' + r + g + b;
+    }
+    return '';
   }
 }
 

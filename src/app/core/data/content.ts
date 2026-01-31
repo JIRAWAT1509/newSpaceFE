@@ -316,11 +316,6 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
         name: 'report_collection',
         icon: 'assets/icons/clipboard-outline.svg',
         route: '/reports/category/collection'
-      },
-      {
-        name: 'report_interface',
-        icon: 'assets/icons/business-outline.svg',
-        route: '/reports/category/interface'
       }
     ]
   },
