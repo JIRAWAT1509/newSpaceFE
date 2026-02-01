@@ -21,3 +21,31 @@ export function fromDateString(dateString: string): Date {
 export function nowDateString(): string {
   return toDateString(new Date());
 }
+
+/**
+ * Parse various date formats to Date object
+ */
+export function parseToDate(value: unknown): Date | null {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  if (typeof value === 'string') {
+    const match = value.match(/\/Date\((\d+)\)\//);
+    if (match) return new Date(parseInt(match[1], 10));
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+  return null;
+}
+
+/**
+ * Format date for display (handles /Date()/, ISO string, Date object)
+ */
+export function formatDateForDisplay(value: unknown, locale = 'th-TH'): string {
+  const date = parseToDate(value);
+  if (!date) return typeof value === 'string' ? value : '-';
+  return date.toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}

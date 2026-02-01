@@ -71,7 +71,12 @@
   box-sizing: border-box;
 }
 
-/* Body Styles */
+/* Body Styles - responsive */
+html, body {
+  overflow-x: hidden;
+  min-width: 0;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
   font-size: 14px;

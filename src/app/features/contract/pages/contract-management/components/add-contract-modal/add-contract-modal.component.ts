@@ -7,6 +7,7 @@ import { GeneralDetailTabComponent } from './components/general-detail-tab/gener
 import { ContractDetailTabComponent } from './components/contract-detail-tab/contract-detail-tab.component';
 import { ConditionsTabComponent } from './components/conditions-tab/conditions-tab.component';
 import { DocumentTabComponent } from './components/document-tab/document-tab.component';
+import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 
 interface Tab {
   id: string;
@@ -23,7 +24,8 @@ interface Tab {
     GeneralDetailTabComponent,
     ContractDetailTabComponent,
     ConditionsTabComponent,
-    DocumentTabComponent
+    DocumentTabComponent,
+    WarningModalComponent
   ],
   templateUrl: './add-contract-modal.component.html',
   styleUrl: './add-contract-modal.component.css'
@@ -57,6 +59,11 @@ export class AddContractModalComponent implements OnInit {
 
   // Modal title based on mode
   modalTitle = signal<string>('เพิ่มสัญญาใหม่');
+
+  // In-app message modal (for child tabs e.g. general-detail)
+  showMessageModal = signal<boolean>(false);
+  messageModalTitle = signal<string>('');
+  messageModalMessage = signal<string>('');
 
   constructor(private fb: FormBuilder) {
     // Update modal title when mode changes
@@ -157,7 +164,8 @@ export class AddContractModalComponent implements OnInit {
       contractNumberMain: contract.CONTRACT_NUMBER_MAIN,
       contractNumberSub: contract.CONTRACT_NUMBER_SUB,
       quotationStatus: contract.QUOTATION_STATUS,
-      contractDate: contract.CONTRACT_DATE,
+      quotationDate: contract.CONTRACT_DATE,
+      quotationLevelDate: (contract as any).QUOTATION_LEVEL_DATE ?? contract.RECORD_DATE ?? '',
       recordDate: contract.RECORD_DATE,
       approvalDate: contract.APPROVAL_DATE,
       intentionLetter: contract.INTENTION_LETTER,
@@ -246,9 +254,10 @@ export class AddContractModalComponent implements OnInit {
   isCurrentTabValid(): boolean {
     switch (this.activeTabIndex()) {
       case 0: return this.generalDetailForm.valid;
-      case 2: return this.conditionsForm.valid || true; // Placeholder always valid
-      case 3: return this.documentForm.valid || true; // Placeholder always valid
-      case 4: return true; // Summary tab is always valid (read-only)
+      case 1: return true; // Contract detail tab – sub-forms validated on submit
+      case 2: return this.conditionsForm.valid || true;
+      case 3: return this.documentForm.valid || true;
+      case 4: return true;
       default: return false;
     }
   }
@@ -289,6 +298,16 @@ export class AddContractModalComponent implements OnInit {
 
   onCancel(): void {
     this.close.emit();
+  }
+
+  showMessage(event: { title: string; message: string }): void {
+    this.messageModalTitle.set(event.title);
+    this.messageModalMessage.set(event.message);
+    this.showMessageModal.set(true);
+  }
+
+  closeMessageModal(): void {
+    this.showMessageModal.set(false);
   }
 
   markAllAsTouched(): void {

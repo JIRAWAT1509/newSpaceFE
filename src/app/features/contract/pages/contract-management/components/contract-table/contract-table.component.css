@@ -129,11 +129,11 @@
   @apply text-sm text-gray-600 font-medium;
 }
 
-/* Bulk Actions Menu */
+/* Bulk Actions Menu - เปิดขึ้นด้านบน ไม่บังตาราง */
 .bulk-actions-menu {
-  @apply absolute top-full left-0 mt-2 z-10;
+  @apply absolute bottom-full left-0 mb-2 z-20;
   @apply bg-white rounded-lg shadow-lg border border-gray-200;
-  @apply py-1 min-w-[200px];
+  @apply py-1 min-w-[220px];
 }
 
 .menu-item {

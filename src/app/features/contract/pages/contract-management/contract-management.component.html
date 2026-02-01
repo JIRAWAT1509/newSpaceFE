@@ -7,7 +7,7 @@
   </div>
 
   <!-- Tabs -->
-  <p-tabs [(value)]="activeTab" styleClass="contract-tabs">
+  <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" styleClass="contract-tabs">
     <p-tablist>
       <p-tab value="quotation">
         <div class="tab-header">
@@ -41,6 +41,7 @@
           [sharedFilters]="sharedFilters()"
           (searchTextChange)="onSearchUpdate($event)"
           (filtersChange)="onFiltersUpdate($event)"
+          (contractSaved)="onContractSaved($event)"
         />
       </p-tabpanel>
 
@@ -53,6 +54,7 @@
           [sharedFilters]="sharedFilters()"
           (searchTextChange)="onSearchUpdate($event)"
           (filtersChange)="onFiltersUpdate($event)"
+          (contractSaved)="onContractSaved($event)"
         />
       </p-tabpanel>
 
@@ -65,6 +67,7 @@
           [sharedFilters]="sharedFilters()"
           (searchTextChange)="onSearchUpdate($event)"
           (filtersChange)="onFiltersUpdate($event)"
+          (contractSaved)="onContractSaved($event)"
         />
       </p-tabpanel>
     </p-tabpanels>

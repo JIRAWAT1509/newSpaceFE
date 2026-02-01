@@ -11,7 +11,8 @@
           type="text"
           class="search-input"
           placeholder="Search"
-          [(ngModel)]="simpleSearchText"
+          [ngModel]="simpleSearchText()"
+          (ngModelChange)="simpleSearchText.set($event)"
           (keyup.enter)="onSimpleSearch()"
         />
         @if (simpleSearchText()) {
@@ -70,13 +71,13 @@
       <button
         class="action-btn manage-btn"
         [disabled]="selectedIds().length === 0"
-        (click)="showBulkActions = !showBulkActions"
+        (click)="showBulkActions.set(!showBulkActions())"
       >
         <i class="pi pi-cog"></i>
         <span>จัดการ</span>
       </button>
 
-      @if (showBulkActions && selectedIds().length > 0) {
+      @if (showBulkActions() && selectedIds().length > 0) {
         <div class="bulk-actions-menu">
           <button class="menu-item" (click)="onBulkAction('extend')">
             <i class="pi pi-calendar-plus"></i>
@@ -96,7 +97,7 @@
           </button>
           <button class="menu-item" (click)="onBulkAction('edit')">
             <i class="pi pi-pencil"></i>
-            <span>แก้ไขสัญญาเช่า เดี่ยว</span>
+            <span>{{ getEditBulkActionLabel() }}</span>
           </button>
         </div>
       }
@@ -127,7 +128,7 @@
               (change)="toggleSelectAll()"
             />
           </th>
-          <th>เลขที่สัญญาเช่า</th>
+          <th>{{ getContractNumberColumnLabel() }}</th>
           <th>ประเภทสัญญา</th>
           <th>วันเริ่มต้นสัญญา</th>
           <th>วันสิ้นสุดสัญญา</th>
@@ -184,7 +185,7 @@
                   </button>
                   <button class="menu-item" (click)="onRowAction('addendum', item)">
                     <i class="pi pi-file-plus"></i>
-                    <span>ยกเลิกสัญญา + addendum</span>
+                    <span>ยกเลิกสัญญาและภาคผนวก</span>
                   </button>
                 </div>
               }
@@ -222,3 +223,21 @@
     (save)="saveNewContract($event)"
   />
 }
+
+<!-- In-app message modal (replaces browser alert) -->
+<app-warning-modal
+  [isOpen]="showMessageModal()"
+  [title]="messageModalTitle()"
+  [message]="messageModalMessage()"
+  buttonText="ตกลง"
+  (onClose)="closeMessageModal()"
+/>
+
+<!-- Bulk Action Modal -->
+<app-bulk-action-modal
+  [isOpen]="showBulkActionModal()"
+  [action]="currentBulkAction()"
+  [selectedContracts]="selectedContractsForBulk()"
+  (close)="closeBulkActionModal()"
+  (confirm)="onBulkActionConfirm($event)"
+/>

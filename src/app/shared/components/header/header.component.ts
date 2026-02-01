@@ -1,6 +1,6 @@
 // header.component.ts - UPDATED with logo navigation
 
-import { Component, HostListener, OnInit, effect } from '@angular/core';
+import { Component, HostListener, OnInit, effect, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router'; // Add Router import
 import { FormsModule } from '@angular/forms';
@@ -79,6 +79,8 @@ import { getLabelOverride } from '@core/services/ui-settings';
   ],
 })
 export class HeaderComponent implements OnInit {
+  isMobile = input<boolean>(false);
+
   // Navigation data
   navigationItems: NavigationItem[] = NAVIGATION_CONTENT.filter(
     (item) => item.primary_content !== 'setting'
@@ -156,8 +158,11 @@ export class HeaderComponent implements OnInit {
    */
   onLogoClick(): void {
     this.router.navigate(['/dashboard/overview']);
-    // Optionally collapse sidebar and clear active menu
     this.navigationService.setSidebarExpanded(false);
+  }
+
+  toggleSidebar(): void {
+    this.navigationService.toggleSidebar();
   }
 
   setActiveMenuItem(item: string): void {

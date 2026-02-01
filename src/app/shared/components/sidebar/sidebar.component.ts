@@ -1,4 +1,4 @@
-import { Component, OnInit, effect } from '@angular/core';
+import { Component, OnInit, effect, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { animate, style, transition, trigger } from '@angular/animations';
@@ -37,8 +37,9 @@ import { SIDEBAR_TEXTS } from '@assets/language/sidebar.text';
   ]
 })
 export class SidebarComponent implements OnInit {
-  // --- Component State ---
-  // REMOVED: Local isExpanded property is gone.
+  /** When true (mobile overlay), sidebar uses full width of overlay */
+  isMobileOverlay = input<boolean>(false);
+
   isHovering: boolean = false;
   openAccordion: string | null = null;
 

@@ -1,7 +1,8 @@
 <aside
   class="bg-gradient-to-b from-primary via-primary to-secondary text-primary-foreground h-full flex flex-col transition-all duration-[300ms] ease-in-out overflow-x-hidden"
-  [class.w-72]="isExpanded() || isHovering"
-  [class.w-20]="!isExpanded() && !isHovering"
+  [class.w-full]="isMobileOverlay()"
+  [class.w-64]="!isMobileOverlay() && (isExpanded() || isHovering)"
+  [class.w-20]="!isMobileOverlay() && !isExpanded() && !isHovering"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
 >
@@ -36,9 +37,10 @@
         />
       </div>
 
-      <div *ngIf="isExpanded() || isHovering" [@fadeInOut] class="w-full ml-1">
+      <div *ngIf="isExpanded() || isHovering" [@fadeInOut] class="w-full min-w-0 ml-1 flex-1">
         <span
-          class="font-medium text-sm whitespace-nowrap transition-colors duration-200 drop-shadow-md"
+          class="font-medium text-sm transition-colors duration-200 drop-shadow-md break-words"
+          style="word-break: break-word; white-space: normal;"
           [ngClass]="{
             'text-primary-foreground': isItemHighlighted(item),
             'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)
@@ -77,9 +79,10 @@
         />
       </div>
 
-      <div *ngIf="isExpanded() || isHovering" class="flex justify-between items-center w-full ml-1" [@fadeInOut]>
+      <div *ngIf="isExpanded() || isHovering" class="flex justify-between items-center w-full min-w-0 ml-1 flex-1" [@fadeInOut]>
         <span
-          class="font-medium text-sm whitespace-nowrap transition-colors duration-200 drop-shadow-md"
+          class="font-medium text-sm transition-colors duration-200 drop-shadow-md break-words"
+          style="word-break: break-word; white-space: normal;"
           [ngClass]="{
             'text-primary-foreground': isItemHighlighted(item),
             'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)
@@ -89,7 +92,7 @@
         </span>
 
         <svg
-          class="w-4 h-4 transition-transform duration-200"
+          class="w-4 h-4 flex-shrink-0 transition-transform duration-200"
           [class.rotate-180]="openAccordion === item.name"
           fill="none"
           stroke="currentColor"

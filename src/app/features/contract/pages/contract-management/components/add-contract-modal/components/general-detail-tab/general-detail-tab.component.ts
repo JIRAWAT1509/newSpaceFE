@@ -41,6 +41,7 @@ export class GeneralDetailTabComponent implements OnInit {
 
   // Outputs
   selectorOpen = output<{ field: string; options: SelectorOption[] }>();
+  messageRequest = output<{ title: string; message: string }>();
 
   // Sections for progress indicator - Updated for Q structure
   sections: Section[] = [
@@ -231,13 +232,11 @@ export class GeneralDetailTabComponent implements OnInit {
   // ==================== ACTIONS ====================
 
   openDeclineInfo(): void {
-    // TODO: Open decline information modal
-    alert('Decline information modal');
+    this.messageRequest.emit({ title: 'ข้อมูลการ Decline', message: 'ฟีเจอร์นี้จะเปิดโมดอลข้อมูลการ Decline (กำลังพัฒนา)' });
   }
 
   openCustomerDetails(): void {
-    // TODO: Open customer details modal
-    alert('Customer details modal');
+    this.messageRequest.emit({ title: 'รายละเอียดลูกค้า', message: 'ฟีเจอร์นี้จะเปิดโมดอลรายละเอียดลูกค้า (กำลังพัฒนา)' });
   }
 
   // ==================== VALIDATION ====================

@@ -184,7 +184,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             name: 'daily_transactions',
             route: '/contract/lease/daily',
             hasDeeper: true,
-            deeperNote: 'Contains: Lease, Copy, Addendum, etc.',
+            deeperNote: 'Contains: Lease, Copy, ภาคผนวก, etc.',
           },
           {
             name: 'processing',
@@ -532,6 +532,11 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             route: '/reports/category/collection',
           },
         ],
+      },
+      {
+        name: 'dashboard',
+        icon: 'assets/icons/dashboard.svg',
+        route: '/dashboard/overview',
       },
     ],
   },

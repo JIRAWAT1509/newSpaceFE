@@ -1,9 +1,12 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, signal, effect } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, signal, effect } from '@angular/core';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { HeaderComponent } from './shared/components/header/header.component';
-import { SidebarComponent } from './shared/components/sidebar/sidebar.component'; // <-- Import sidebar
+import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { HeaderService } from '@core/services/header.service';
 import { NavigationService } from '@core/services/navigation.service';
+
+const MOBILE_BREAKPOINT = 768;
 
 @Component({
   selector: 'app-root',
@@ -12,35 +15,72 @@ import { NavigationService } from '@core/services/navigation.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   title = 'newSpaceFE';
 
-  // Make the signal from the service available to the template
   isScrolled;
   isSidebarExpanded;
 
-  // Header height tracking
-  headerHeight = signal<number>(96); // Default to 96px (not scrolled)
-  
+  headerHeight = signal<number>(96);
+  isMobile = signal<boolean>(false);
+
+  private mediaQuery: MediaQueryList | null = null;
+  private mediaListener?: () => void;
+  private routerSub?: ReturnType<typeof filter>;
+
   @ViewChild('headerRef', { read: ElementRef }) headerRef?: ElementRef<HTMLElement>;
 
   constructor(
     private headerService: HeaderService,
-    private navigationService: NavigationService
+    private navigationService: NavigationService,
+    private router: Router
   ) {
     this.isScrolled = this.headerService.isScrolled;
     this.isSidebarExpanded = this.navigationService.isSidebarExpanded;
 
-    // Update header height when scroll state changes
     effect(() => {
-      const scrolled = this.isScrolled();
+      this.isScrolled();
       this.updateHeaderHeight();
     });
   }
 
   ngOnInit(): void {
-    // Initial header height calculation
+    if (typeof window !== 'undefined') {
+      this.mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+      this.updateMobileState();
+      if (this.isMobile()) {
+        this.navigationService.setSidebarExpanded(false);
+      }
+      this.mediaListener = () => {
+        this.updateMobileState();
+        if (this.isMobile()) {
+          this.navigationService.setSidebarExpanded(false);
+        }
+      };
+      this.mediaQuery.addEventListener('change', this.mediaListener);
+    }
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd)
+    ).subscribe(() => {
+      if (this.isMobile()) {
+        this.navigationService.setSidebarExpanded(false);
+      }
+    });
     setTimeout(() => this.updateHeaderHeight(), 0);
+  }
+
+  ngOnDestroy(): void {
+    if (this.mediaQuery && this.mediaListener) {
+      this.mediaQuery.removeEventListener('change', this.mediaListener);
+    }
+  }
+
+  private updateMobileState(): void {
+    this.isMobile.set(this.mediaQuery?.matches ?? (typeof window !== 'undefined' && window.innerWidth < MOBILE_BREAKPOINT));
+  }
+
+  closeSidebar(): void {
+    this.navigationService.setSidebarExpanded(false);
   }
 
   ngAfterViewInit(): void {

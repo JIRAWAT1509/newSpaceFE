@@ -31,7 +31,10 @@
     <!-- Tab Content -->
     <div class="modal-body">
       @if (activeTabIndex() === 0) {
-        <app-general-detail-tab [form]="generalDetailForm" />
+        <app-general-detail-tab
+          [form]="generalDetailForm"
+          (messageRequest)="showMessage($event)"
+        />
       }
 
       @if (activeTabIndex() === 1) {
@@ -81,7 +84,7 @@
               </div>
 
               <div class="summary-item">
-                <span class="summary-label">วันที่ระดับ Quotation:</span>
+                <span class="summary-label">วันที่สถานะใบเสนอราคา:</span>
                 <span class="summary-value">{{ formatDate(getFormValue('quotationLevelDate')) || '-' }}</span>
               </div>
 
@@ -348,4 +351,13 @@
       </div>
     </div>
   </div>
+
+  <!-- In-app message modal (e.g. from general-detail-tab) -->
+  <app-warning-modal
+    [isOpen]="showMessageModal()"
+    [title]="messageModalTitle()"
+    [message]="messageModalMessage()"
+    buttonText="ตกลง"
+    (onClose)="closeMessageModal()"
+  />
 </div>
