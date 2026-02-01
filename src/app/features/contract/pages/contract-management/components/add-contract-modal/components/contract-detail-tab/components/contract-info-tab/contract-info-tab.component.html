@@ -32,262 +32,169 @@
 
   <form [formGroup]="form">
 
-    <!-- Section 1: Basic Contract Info -->
-    <div class="form-section" id="section-basic">
-      <div class="form-grid-3">
-        <!-- Contract Duration -->
-        <div class="form-group required span-3">
-          <label>ระยะเวลาสัญญา</label>
-          <div class="duration-inputs">
-            <div class="duration-field">
-              <input type="number" pInputText formControlName="durationYears" class="w-full" min="0" />
-              <span>ปี</span>
-            </div>
-            <div class="duration-field">
-              <input type="number" pInputText formControlName="durationMonths" class="w-full" min="0" max="11" />
-              <span>เดือน</span>
-            </div>
-            <div class="duration-field">
-              <input type="number" pInputText formControlName="durationDays" class="w-full" min="0" max="30" />
-              <span>วัน</span>
-            </div>
-          </div>
+    <!-- Section 1: ข้อมูลใบจอง -->
+    <div class="form-section" id="section-booking">
+      <h4 class="section-title">1. ข้อมูลใบจอง</h4>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>เลขที่ใบจอง</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="bookingNumber"
+            placeholder="กรอกเลขที่ใบจอง"
+            class="w-full"
+          />
         </div>
 
-        <!-- Start Date -->
-        <div class="form-group required">
-          <label>วันที่เริ่มต้นสัญญา</label>
+        <div class="form-group">
+          <label>วันที่ใบจอง</label>
           <p-datepicker
-            formControlName="startDate"
+            formControlName="bookingDate"
             [showIcon]="true"
             dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
             styleClass="w-full"
           ></p-datepicker>
         </div>
 
-        <!-- End Date -->
-        <div class="form-group required">
-          <label>วันที่สิ้นสุดสัญญา</label>
+        <div class="form-group">
+          <label>สถานะใบจอง</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="bookingStatus"
+            placeholder="กรอกสถานะใบจอง"
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>วันที่เริ่มจอง</label>
           <p-datepicker
-            formControlName="endDate"
+            formControlName="bookingStartDate"
             [showIcon]="true"
             dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
             styleClass="w-full"
           ></p-datepicker>
         </div>
 
-        <!-- Rent Service Ratio -->
-        <div class="form-group span-3">
-          <label>อัตราส่วนค่าเช่า:ค่าบริการ</label>
-          <div class="ratio-inputs">
-            <input type="number" pInputText formControlName="rentRatio" class="flex-1" placeholder="ค่าเช่า" />
-            <span>:</span>
-            <input type="number" pInputText formControlName="serviceRatio" class="flex-1" placeholder="ค่าบริการ" />
-          </div>
-        </div>
-
-        <!-- Rent Start Date -->
-        <div class="form-group required">
-          <label>วันที่เริ่มคิดค่าเช่า</label>
+        <div class="form-group">
+          <label>วันที่สิ้นสุดจอง</label>
           <p-datepicker
-            formControlName="rentStartDate"
+            formControlName="bookingEndDate"
             [showIcon]="true"
             dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
             styleClass="w-full"
           ></p-datepicker>
         </div>
 
-        <!-- Renewal Notice -->
         <div class="form-group">
-          <label>แจ้งต่ออายุล่วงหน้า</label>
-          <div class="input-with-suffix">
-            <input type="number" pInputText formControlName="renewalNoticeDays" class="flex-1" />
-            <span>วัน</span>
-          </div>
+          <label>ระยะเวลาการจอง</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="bookingDuration"
+            placeholder="กรอกระยะเวลาการจอง"
+            class="w-full"
+          />
         </div>
 
-        <!-- Credit Terms -->
-        <div class="form-group required">
-          <label>Credit Term (Rent/Service)</label>
-          <input type="number" pInputText formControlName="creditTermRent" class="w-full" />
-        </div>
-
-        <div class="form-group required">
-          <label>Credit Term (Utility)</label>
-          <input type="number" pInputText formControlName="creditTermUtility" class="w-full" />
-        </div>
-
-        <!-- Payment Day -->
-        <div class="form-group">
-          <label>นำส่งเงินให้แก่ผู้บริการทุกวันที่</label>
-          <input type="number" pInputText formControlName="paymentDay" class="w-full" min="1" max="31" />
-        </div>
-
-        <!-- Penalty -->
-        <div class="form-group">
-          <label>เงินปรับกรณีร้านค้าหยุดทำการ</label>
-          <input type="number" pInputText formControlName="closurePenalty" class="w-full" />
-        </div>
-
-        <!-- Payment Method -->
-        <div class="form-group required span-2">
-          <label>การชำระค่าเช่า,ค่าบริการ,ค่าบริการส่วนกลาง</label>
-          <p-select
-            formControlName="paymentMethod"
-            [options]="paymentMethodOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="เลือกวิธีชำระเงิน"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-
-        <!-- Revenue Collection -->
-        <div class="form-group span-2">
-          <label>การรับเงินยอดขาย</label>
-          <p-select
-            formControlName="revenueCollection"
-            [options]="revenueCollectionOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="เลือกประเภท"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-
-        <!-- Has Addendum -->
-        <div class="form-group">
-          <label>มีบันทึกแนบท้ายสัญญา</label>
-          <p-select
-            formControlName="hasAddendum"
-            [options]="yesNoOptions"
-            optionLabel="label"
-            optionValue="value"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-
-        <!-- Rent Adjustment -->
-        <div class="form-group span-2">
-          <label>ปรับอัตราค่าเช่า/ค่าบริการทุกๆ</label>
-          <div class="adjustment-inputs">
-            <input type="number" pInputText formControlName="adjustmentYears" placeholder="ปี" class="flex-1" />
-            <span>ร้อยละ</span>
-            <input type="number" pInputText formControlName="adjustmentPercent" placeholder="%" class="flex-1" />
-          </div>
-        </div>
-
-        <!-- Excluded Products -->
-        <div class="form-group span-3">
-          <label>สินค้ายกเว้นการคิดยอดรายได้</label>
-          <textarea pInputTextarea formControlName="excludedProducts" rows="2" class="w-full"></textarea>
+        <div class="form-group full-width">
+          <label>การโอนใบสัญญาจอง</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="transferBookingContract"
+            placeholder="กรอกข้อมูลการโอน"
+            class="w-full"
+          />
         </div>
       </div>
     </div>
 
-    <!-- Section 2: Renewal Agreement (Table) -->
-    <div class="form-section" id="section-renewal">
-      <div class="section-header">
-        <h4>ข้อตกลงต่ออายุสัญญาสำหรับสัญญาเกิน 3 ปี</h4>
-        <button type="button" class="btn-add" (click)="addRenewalRow()">
-          <i class="pi pi-plus"></i>
-          <span>เพิ่ม</span>
-        </button>
-      </div>
-
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>วันที่เริ่มต้น</th>
-              <th>วันที่สิ้นสุด</th>
-              <th>อัตราร้อยละ</th>
-              <th class="w-20"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (renewal of renewalAgreements(); track $index) {
-              <tr>
-                <td>
-                  <p-datepicker [(ngModel)]="renewal.startDate" [ngModelOptions]="{standalone: true}" dateFormat="dd/mm/yy" styleClass="w-full"></p-datepicker>
-                </td>
-                <td>
-                  <p-datepicker [(ngModel)]="renewal.endDate" [ngModelOptions]="{standalone: true}" dateFormat="dd/mm/yy" styleClass="w-full"></p-datepicker>
-                </td>
-                <td>
-                  <input type="number" pInputText [(ngModel)]="renewal.rate" [ngModelOptions]="{standalone: true}" class="w-full" />
-                </td>
-                <td>
-                  <button type="button" class="btn-icon-delete" (click)="removeRenewalRow($index)">
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="4" class="text-center py-4 text-gray-500">No records to display.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Section 3: Area Details (Table) -->
-    <div class="form-section" id="section-area">
-      <div class="section-header">
-        <h4>พื้นที่รวมทั้งหมด (ตร.ม.)</h4>
-        <div class="header-actions">
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="requestAreaMeasurement" />
-            <span>ขอวัดขนาดพื้นที่</span>
-          </label>
-          <button type="button" class="btn-add" (click)="addAreaRow()">
-            <i class="pi pi-plus"></i>
-            <span>เพิ่ม</span>
-          </button>
+    <!-- Section 2: ข้อมูลผู้เช่า (ฉบับยืนยัน) -->
+    <div class="form-section" id="section-tenant">
+      <h4 class="section-title">2. ข้อมูลผู้เช่า (ฉบับยืนยัน)</h4>
+      <div class="form-grid-2">
+        <div class="form-group required">
+          <label>ผู้ทำสัญญา</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="contractMaker"
+            placeholder="กรอกชื่อผู้ทำสัญญา"
+            class="w-full"
+          />
         </div>
-      </div>
 
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>อาคาร</th>
-              <th>ชื่อชั้น</th>
-              <th>เลขที่ยูนิต</th>
-              <th>สถานะ</th>
-              <th>บริเวณ</th>
-              <th>กว้าง</th>
-              <th>ยาว</th>
-              <th>รวมเนื้อที่ (ตร.ม.)</th>
-              <th class="w-20"></th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (area of areaDetails(); track $index) {
-              <tr>
-                <td><input type="text" pInputText [(ngModel)]="area.building" [ngModelOptions]="{standalone: true}" class="w-full" /></td>
-                <td><input type="text" pInputText [(ngModel)]="area.floor" [ngModelOptions]="{standalone: true}" class="w-full" /></td>
-                <td><input type="text" pInputText [(ngModel)]="area.unitNumber" [ngModelOptions]="{standalone: true}" class="w-full" /></td>
-                <td><input type="text" pInputText [(ngModel)]="area.status" [ngModelOptions]="{standalone: true}" class="w-full" /></td>
-                <td><input type="text" pInputText [(ngModel)]="area.zone" [ngModelOptions]="{standalone: true}" class="w-full" /></td>
-                <td><input type="number" pInputText [(ngModel)]="area.width" [ngModelOptions]="{standalone: true}" class="w-full" (input)="calculateArea($index)" /></td>
-                <td><input type="number" pInputText [(ngModel)]="area.length" [ngModelOptions]="{standalone: true}" class="w-full" (input)="calculateArea($index)" /></td>
-                <td><input type="number" pInputText [(ngModel)]="area.totalArea" [ngModelOptions]="{standalone: true}" class="w-full" readonly /></td>
-                <td>
-                  <button type="button" class="btn-icon-delete" (click)="removeAreaRow($index)">
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="9" class="text-center py-4 text-gray-500">No records to display.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <div class="form-group required full-width">
+          <label>ชื่อนิติบุคคล / บุคคล</label>
+          <textarea
+            pInputTextarea
+            formControlName="legalEntityName"
+            rows="2"
+            placeholder="กรอกชื่อนิติบุคคล/บุคคล"
+            class="w-full"
+          ></textarea>
+        </div>
+
+        <div class="form-group required full-width">
+          <label>ที่อยู่ตามทะเบียน</label>
+          <textarea
+            pInputTextarea
+            formControlName="registeredAddress"
+            rows="3"
+            placeholder="กรอกที่อยู่ตามทะเบียน"
+            class="w-full"
+          ></textarea>
+        </div>
+
+        <div class="form-group required full-width">
+          <label>ที่อยู่จัดส่งเอกสาร</label>
+          <textarea
+            pInputTextarea
+            formControlName="documentDeliveryAddress"
+            rows="3"
+            placeholder="กรอกที่อยู่จัดส่งเอกสาร"
+            class="w-full"
+          ></textarea>
+        </div>
+
+        <div class="form-group required">
+          <label>เบอร์โทรศัพท์</label>
+          <input
+            type="tel"
+            pInputText
+            formControlName="phone"
+            placeholder="กรอกเบอร์โทรศัพท์"
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group required">
+          <label>อีเมล</label>
+          <input
+            type="email"
+            pInputText
+            formControlName="email"
+            placeholder="กรอกอีเมล"
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label>ผู้ติดต่อ / ผู้ประสานงาน</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="contactPerson"
+            placeholder="กรอกชื่อผู้ติดต่อ/ผู้ประสานงาน"
+            class="w-full"
+          />
+        </div>
       </div>
     </div>
 

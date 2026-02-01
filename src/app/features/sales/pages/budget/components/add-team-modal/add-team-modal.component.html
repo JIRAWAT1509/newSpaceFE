@@ -1,0 +1,123 @@
+<!-- add-team-modal.component.html -->
+
+<div class="modal-overlay" (click)="onClose()">
+
+  <div class="modal-container" (click)="onModalClick($event)">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <h2 class="modal-title">
+          <i class="pi pi-users"></i>
+          <span>Add New Team</span>
+        </h2>
+        <p class="modal-subtitle">Create a team and assign a leader</p>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+
+      <!-- Team Name -->
+      <div class="form-group">
+        <label class="form-label">
+          Team Name <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          pInputText
+          class="w-full"
+          placeholder="e.g., Bangkok East Sales"
+          [(ngModel)]="teamName"
+          (ngModelChange)="updateTeamName($event)"
+        />
+      </div>
+
+      <!-- Team Leader -->
+      <div class="form-group">
+        <label class="form-label">
+          Team Leader <span class="required">*</span>
+        </label>
+        <p-select
+          [(ngModel)]="leaderId"
+          (ngModelChange)="updateLeader($event)"
+          [options]="availableUsers()"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select team leader..."
+          styleClass="w-full"
+        >
+          <ng-template let-user pTemplate="item">
+            <div class="user-option">
+              <div class="user-avatar">{{ user.name.substring(0, 1) }}</div>
+              <div class="user-info">
+                <div class="user-name">{{ user.name }}</div>
+                <div class="user-role">{{ user.role }}</div>
+              </div>
+            </div>
+          </ng-template>
+        </p-select>
+        <small class="form-hint">The leader will be automatically added as the first team member</small>
+      </div>
+
+      <!-- Team Budget -->
+      <div class="form-group">
+        <label class="form-label">
+          Team Budget <span class="required">*</span>
+        </label>
+        <p-inputNumber
+          [(ngModel)]="budget"
+          (ngModelChange)="updateBudget($event)"
+          mode="currency"
+          currency="THB"
+          locale="th-TH"
+          [min]="0"
+          [max]="maxBudget()"
+          styleClass="w-full"
+          placeholder="฿4,000,000"
+        ></p-inputNumber>
+        <small class="form-hint">
+          Maximum available: {{ formatCurrency(maxBudget()) }}
+        </small>
+        @if (budget > maxBudget()) {
+          <small class="form-error">
+            <i class="pi pi-exclamation-circle"></i>
+            Budget exceeds available amount
+          </small>
+        }
+      </div>
+
+      <!-- Info Box -->
+      <div class="info-box">
+        <i class="pi pi-info-circle"></i>
+        <div class="info-content">
+          <p class="info-title">Next Steps</p>
+          <p class="info-text">
+            After creating the team, you can add more members and allocate individual budgets to each member.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="onClose()">
+        <span>Cancel</span>
+      </button>
+      <button
+        class="btn-save"
+        (click)="onSave()"
+        [disabled]="!isValid()"
+      >
+        <i class="pi pi-check"></i>
+        <span>Create Team</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>

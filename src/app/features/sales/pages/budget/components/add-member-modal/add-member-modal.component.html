@@ -1,0 +1,108 @@
+<!-- add-member-modal.component.html -->
+
+<div class="modal-overlay" (click)="onClose()">
+
+  <div class="modal-container" (click)="onModalClick($event)">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <h2 class="modal-title">
+          <i class="pi pi-user-plus"></i>
+          <span>Add Team Member</span>
+        </h2>
+        <p class="modal-subtitle">Add a member to {{ teamName() }}</p>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+
+      <!-- Select User -->
+      <div class="form-group">
+        <label class="form-label">
+          Select Member <span class="required">*</span>
+        </label>
+        <p-select
+          [(ngModel)]="userId"
+          (ngModelChange)="updateUser($event)"
+          [options]="availableUsers()"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select a user to add..."
+          styleClass="w-full"
+        >
+          <ng-template let-user pTemplate="item">
+            <div class="user-option">
+              <div class="user-avatar">{{ user.name.substring(0, 1) }}</div>
+              <div class="user-info">
+                <div class="user-name">{{ user.name }}</div>
+                <div class="user-role">{{ user.role }}</div>
+              </div>
+            </div>
+          </ng-template>
+        </p-select>
+        <small class="form-hint">Only users not already in this team are shown</small>
+      </div>
+
+      <!-- Member Budget -->
+      <div class="form-group">
+        <label class="form-label">
+          Member Budget <span class="required">*</span>
+        </label>
+        <p-inputNumber
+          [(ngModel)]="budget"
+          (ngModelChange)="updateBudget($event)"
+          mode="currency"
+          currency="THB"
+          locale="th-TH"
+          [min]="0"
+          [max]="maxBudget()"
+          styleClass="w-full"
+          placeholder="฿1,300,000"
+        ></p-inputNumber>
+        <small class="form-hint">
+          Team remaining budget: {{ formatCurrency(maxBudget()) }}
+        </small>
+        @if (budget > maxBudget()) {
+          <small class="form-error">
+            <i class="pi pi-exclamation-circle"></i>
+            Budget exceeds team's remaining budget
+          </small>
+        }
+      </div>
+
+      <!-- Info Box -->
+      <div class="info-box">
+        <i class="pi pi-info-circle"></i>
+        <div class="info-content">
+          <p class="info-title">Budget Allocation</p>
+          <p class="info-text">
+            The member's budget will be allocated from the team's budget. The sum of all member budgets must equal the team budget.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="onClose()">
+        <span>Cancel</span>
+      </button>
+      <button
+        class="btn-save"
+        (click)="onSave()"
+        [disabled]="!isValid()"
+      >
+        <i class="pi pi-check"></i>
+        <span>Add Member</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>

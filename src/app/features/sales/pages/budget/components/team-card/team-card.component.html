@@ -1,0 +1,89 @@
+<!-- team-card.component.html -->
+
+<div class="team-card" [class.expanded]="expanded()">
+
+  <!-- Team Header (always visible) -->
+  <div class="team-header" (click)="onToggleExpand()">
+
+    <!-- Expand Icon -->
+    <span class="expand-icon" [class.rotated]="expanded()">
+      <i class="pi pi-chevron-right"></i>
+    </span>
+
+    <!-- Team Info -->
+    <div class="team-info">
+      <div class="team-name">{{ team().name }}</div>
+      <div class="team-leader">
+        <i class="pi pi-user"></i>
+        <span>Leader: {{ team().leaderName }}</span>
+      </div>
+    </div>
+
+    <!-- Team Budget Bar -->
+    <div class="team-budget" (click)="$event.stopPropagation()">
+      <app-budget-bar
+        [actual]="team().budget.actual"
+        [forecast]="team().budget.forecast"
+        [size]="'small'"
+        [showLabel]="false"
+        [showValues]="true"
+        [showPercentage]="true"
+      ></app-budget-bar>
+    </div>
+
+    <!-- Team Actions -->
+    <div class="team-actions" (click)="$event.stopPropagation()">
+      <button class="icon-btn" (click)="onEdit()" title="Edit Team">
+        <i class="pi pi-pencil"></i>
+      </button>
+      <button class="icon-btn" (click)="onMoveUp()" title="Move Up">
+        <i class="pi pi-arrow-up"></i>
+      </button>
+      <button class="icon-btn" (click)="onMoveDown()" title="Move Down">
+        <i class="pi pi-arrow-down"></i>
+      </button>
+      <button class="icon-btn danger" (click)="onDelete()" title="Delete Team">
+        <i class="pi pi-trash"></i>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Members Section (shown when expanded) -->
+  @if (expanded()) {
+    <div class="members-section">
+
+      <!-- Members Header -->
+      <div class="members-header">
+        <span class="members-title">
+          <i class="pi pi-users"></i>
+          <span>Team Members ({{ getMembersCount() }})</span>
+        </span>
+        <button class="btn-add-member" (click)="onAddMember()">
+          <i class="pi pi-plus"></i>
+          <span>Add Member</span>
+        </button>
+      </div>
+
+      <!-- Members List -->
+      <div class="members-list">
+        @for (member of team().members; track member.id) {
+          <app-member-card
+            [member]="member"
+            (edit)="onEditMember($event)"
+            (remove)="onRemoveMember($event)"
+          ></app-member-card>
+        }
+
+        @if (team().members.length === 0) {
+          <div class="no-members">
+            <i class="pi pi-users"></i>
+            <p>No members in this team yet</p>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</div>

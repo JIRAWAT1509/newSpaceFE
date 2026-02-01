@@ -1,0 +1,113 @@
+.report-page {
+  background: rgb(var(--card));
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(var(--shadow), 0.12);
+  padding: 20px 24px;
+}
+
+
+
+.report-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(var(--fg));
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-buttons button {
+  border: 1px solid transparent;
+  background: rgb(var(--bg));
+  color: rgb(var(--fg));
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.filter-buttons button.active {
+  background: rgb(var(--primary));
+  color: rgb(var(--primary-foreground));
+}
+
+.report-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 12px 0 16px;
+  color: rgb(var(--fg));
+}
+
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-item {
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(var(--shadow), 0.08);
+}
+
+.report-item.clickable {
+  cursor: pointer;
+}
+
+.report-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.report-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(var(--fg));
+}
+
+.report-desc {
+  font-size: 12px;
+  color: rgb(var(--muted));
+}
+
+.bookmark-btn {
+  border: none;
+  background: transparent;
+  color: rgb(var(--muted));
+  cursor: pointer;
+}
+
+.bookmark-btn:hover {
+  color: rgb(var(--primary));
+}
+
+.report-empty {
+  border: 1px dashed rgb(var(--border));
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  color: rgb(var(--muted));
+  font-size: 13px;
+}

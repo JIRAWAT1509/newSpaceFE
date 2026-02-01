@@ -1,0 +1,47 @@
+<!-- member-card.component.html -->
+
+<div class="member-card">
+
+  <!-- Avatar -->
+  <div class="member-avatar" [style.background]="getAvatarColor()">
+    {{ getInitials() }}
+  </div>
+
+  <!-- Info -->
+  <div class="member-info">
+    <div class="member-name">{{ member().name }}</div>
+    <div class="member-role" [class.leader]="member().role === 'leader'">
+      @if (member().role === 'leader') {
+        <i class="pi pi-crown"></i>
+        <span>Team Leader</span>
+      } @else {
+        <span>Member</span>
+      }
+    </div>
+  </div>
+
+  <!-- Budget Bar -->
+  <div class="member-budget">
+    <app-budget-bar
+      [actual]="member().budget.actual"
+      [forecast]="member().budget.forecast"
+      [size]="'small'"
+      [showLabel]="false"
+      [showValues]="true"
+      [showPercentage]="true"
+    ></app-budget-bar>
+  </div>
+
+  <!-- Actions -->
+  <div class="member-actions">
+    <button class="icon-btn" (click)="onEdit()" title="Edit Budget">
+      <i class="pi pi-pencil"></i>
+    </button>
+    @if (member().role !== 'leader') {
+      <button class="icon-btn danger" (click)="onRemove()" title="Remove Member">
+        <i class="pi pi-trash"></i>
+      </button>
+    }
+  </div>
+
+</div>

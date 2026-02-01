@@ -151,15 +151,18 @@
 }
 
 .status-badge.status-ready {
-  @apply bg-green-100 text-green-700;
+  background: rgb(var(--success) / 0.18);
+  color: rgb(var(--success));
 }
 
 .status-badge.status-open {
-  @apply bg-blue-100 text-blue-700;
+  background: rgb(var(--info) / 0.18);
+  color: rgb(var(--info));
 }
 
 .status-badge.status-cancel {
-  @apply bg-red-100 text-red-700;
+  background: rgb(var(--danger) / 0.18);
+  color: rgb(var(--danger));
 }
 
 /* Row Actions */

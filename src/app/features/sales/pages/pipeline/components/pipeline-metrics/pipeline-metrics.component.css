@@ -1,0 +1,164 @@
+/* pipeline-metrics.component.css */
+
+/* ==================== GRID ==================== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* ==================== METRIC CARD ==================== */
+.metric-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid;
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+}
+
+.metric-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.metric-card.active {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Color variations */
+.metric-card.color-blue { border-left-color: #3b82f6; }
+.metric-card.color-green { border-left-color: #10b981; }
+.metric-card.color-purple { border-left-color: #8b5cf6; }
+.metric-card.color-orange { border-left-color: #f59e0b; }
+.metric-card.color-red { border-left-color: #ef4444; }
+.metric-card.color-cyan { border-left-color: #06b6d4; }
+
+/* ==================== HEADER ==================== */
+.metric-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.metric-icon {
+  font-size: 20px;
+}
+
+.metric-label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ==================== VALUE ==================== */
+.metric-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+/* ==================== SUBTEXT ==================== */
+.metric-subtext {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+/* ==================== CHANGE ==================== */
+.metric-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.metric-change.change-up {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.metric-change.change-down {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.metric-change.change-neutral {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+/* ==================== ACTIVE INDICATOR ==================== */
+.active-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 6px 10px;
+  background: #eff6ff;
+  border-radius: 6px;
+}
+
+.active-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3b82f6;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.active-text {
+  font-size: 11px;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .metric-card {
+    padding: 16px;
+  }
+
+  .metric-value {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}

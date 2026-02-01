@@ -1,0 +1,21 @@
+<!-- kanban-board.component.html -->
+
+<div class="kanban-board">
+
+  @for (stage of stages(); track stage.id) {
+    <app-stage-column
+      [stage]="stage"
+      [deals]="getDealsForStage(stage.id)"
+      [viewConfig]="getViewConfigForStage(stage.id)"
+      [stageMetrics]="getMetricsForStage(stage.id)"
+      (sortChange)="onStageSortChange(stage.id, $event)"
+      (pageChange)="onStagePageChange(stage.id, $event)"
+      (cardsPerPageChange)="onStageCardsPerPageChange(stage.id, $event)"
+      (stageSettings)="onStageSettings(stage.id)"
+      (dealClicked)="onDealClicked($event)"
+      (dealMenuClicked)="onDealMenuClicked($event)"
+      (dealDropped)="onDealDropped($event, stage.id)"
+    />
+  }
+
+</div>

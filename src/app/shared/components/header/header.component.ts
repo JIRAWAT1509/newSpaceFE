@@ -23,6 +23,7 @@ import { NAVIGATION_TEXTS } from '@assets/language/navigation.text';
 
 import { NavigationService } from '@core/services/navigation.service';
 import { HeaderService } from '@core/services/header.service';
+import { getLabelOverride } from '@core/services/ui-settings';
 
 @Component({
   selector: 'app-header',
@@ -79,8 +80,19 @@ import { HeaderService } from '@core/services/header.service';
 })
 export class HeaderComponent implements OnInit {
   // Navigation data
-  navigationItems: NavigationItem[] = NAVIGATION_CONTENT;
+  navigationItems: NavigationItem[] = NAVIGATION_CONTENT.filter(
+    (item) => item.primary_content !== 'setting'
+  );
   activeMenuItem: string = '';
+  navIconMap: Record<string, string> = {
+    sales: 'pi pi-chart-line',
+    area: 'pi pi-map',
+    contract: 'pi pi-file-edit',
+    collection_finance: 'pi pi-wallet',
+    facilities: 'pi pi-cog',
+    report_dashboard: 'pi pi-chart-bar',
+    setting: 'pi pi-sliders-h',
+  };
 
   // UI state
   isScrolled: boolean = false;
@@ -159,6 +171,10 @@ export class HeaderComponent implements OnInit {
       // If a new item is clicked, change the category AND ensure the sidebar is expanded
       this.navigationService.setActivePrimaryNavItem(item);
       this.navigationService.setSidebarExpanded(true);
+      const targetRoute = this.getPrimaryRoute(item);
+      if (targetRoute) {
+        this.router.navigate([targetRoute]);
+      }
     }
   }
 
@@ -188,7 +204,46 @@ export class HeaderComponent implements OnInit {
   }
 
   translateNav(key: string): string {
+    const lookupKey = key === 'report_dashboard' ? 'report' : key;
+    const override = getLabelOverride(lookupKey);
+    if (override) {
+      return override;
+    }
     return NAVIGATION_TEXTS[this.currentLanguage.code][key] || key;
+  }
+
+  goToSettings(): void {
+    this.navigationService.setActivePrimaryNavItem('setting');
+    this.navigationService.setSidebarExpanded(true);
+    this.router.navigate(['/setting/user-accounts/data']);
+    this.isProfileDropdownOpen = false;
+  }
+
+  private getPrimaryRoute(key: string): string | null {
+    const navItem = this.navigationItems.find(
+      (item) => item.primary_content === key
+    );
+    if (!navItem) {
+      return null;
+    }
+
+    for (const secondary of navItem.secondary_content || []) {
+      if (secondary.route) {
+        return secondary.route;
+      }
+      if (secondary.sub && secondary.sub.length > 0) {
+        const firstSubRoute = secondary.sub.find((sub) => !!sub.route)?.route;
+        if (firstSubRoute) {
+          return firstSubRoute;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  getNavIcon(key: string): string {
+    return this.navIconMap[key] || 'pi pi-circle';
   }
 
   logout(): void {

@@ -4,11 +4,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { RevenueFormDrawerComponent } from './component/revenue-form-drawer/revenue-form-drawer.component';
+import { RevenueTypeFormDrawerComponent } from './component/revenue-type-form-drawer/revenue-type-form-drawer.component';
+import { BusinessRevenueFormDrawerComponent } from './component/business-revenue-form-drawer/business-revenue-form-drawer.component';
 
 @Component({
   selector: 'app-revenue',
   standalone: true,
-  imports: [CommonModule, FormsModule, Button, RevenueFormDrawerComponent],
+  imports: [CommonModule, FormsModule, Button, RevenueFormDrawerComponent, RevenueTypeFormDrawerComponent, BusinessRevenueFormDrawerComponent],
   templateUrl: './revenue.component.html',
   styleUrl: './revenue.component.css'
 })
@@ -20,6 +22,14 @@ export class RevenueComponent implements OnInit {
 revenueDrawerOpen = false;
 revenueDrawerMode: 'create' | 'edit' = 'create';
 selectedRevenue: any = null;
+
+revenueTypeDrawerOpen = false;
+revenueTypeDrawerMode: 'create' | 'edit' = 'create';
+selectedRevenueType: any = null;
+
+businessRevenueDrawerOpen = false;
+businessRevenueDrawerMode: 'create' | 'edit' = 'create';
+selectedBusinessRevenue: any = null;
 
 
   // ==================== DATA COUNTS ====================
@@ -151,8 +161,15 @@ openAddModal(): void {
     this.revenueDrawerMode = 'create';
     this.selectedRevenue = null;
     this.revenueDrawerOpen = true;
+  } else if (this.activeCategory === 'revenue-type') {
+    this.revenueTypeDrawerMode = 'create';
+    this.selectedRevenueType = null;
+    this.revenueTypeDrawerOpen = true;
+  } else if (this.activeCategory === 'business-revenue') {
+    this.businessRevenueDrawerMode = 'create';
+    this.selectedBusinessRevenue = null;
+    this.businessRevenueDrawerOpen = true;
   }
-  // TODO: Add other categories later
 }
 
 
@@ -161,6 +178,14 @@ editItem(item: any): void {
     this.revenueDrawerMode = 'edit';
     this.selectedRevenue = item;
     this.revenueDrawerOpen = true;
+  } else if (this.activeCategory === 'revenue-type') {
+    this.revenueTypeDrawerMode = 'edit';
+    this.selectedRevenueType = item;
+    this.revenueTypeDrawerOpen = true;
+  } else if (this.activeCategory === 'business-revenue') {
+    this.businessRevenueDrawerMode = 'edit';
+    this.selectedBusinessRevenue = item;
+    this.businessRevenueDrawerOpen = true;
   }
 }
 
@@ -178,6 +203,40 @@ onRevenueDrawerSave(event: any): void {
     if (idx !== -1) this.revenues[idx] = data;
   }
   this.revenueCount = this.revenues.length;
+}
+
+onRevenueTypeDrawerClose(): void {
+  this.revenueTypeDrawerOpen = false;
+  this.selectedRevenueType = null;
+}
+
+onRevenueTypeDrawerSave(event: any): void {
+  const { data, mode } = event;
+  if (mode === 'create') {
+    this.revenueTypes = [data, ...this.revenueTypes];
+  } else {
+    const idx = this.revenueTypes.findIndex(r => r.TYPE_CODE === data.TYPE_CODE);
+    if (idx !== -1) this.revenueTypes[idx] = data;
+  }
+  this.revenueTypeCount = this.revenueTypes.length;
+}
+
+onBusinessRevenueDrawerClose(): void {
+  this.businessRevenueDrawerOpen = false;
+  this.selectedBusinessRevenue = null;
+}
+
+onBusinessRevenueDrawerSave(event: any): void {
+  const { data, mode } = event;
+  if (mode === 'create') {
+    this.businessRevenues = [data, ...this.businessRevenues];
+  } else {
+    const idx = this.businessRevenues.findIndex(r => 
+      r.BUSINESS_TYPE === data.BUSINESS_TYPE && r.REVENUE_CODE === data.REVENUE_CODE
+    );
+    if (idx !== -1) this.businessRevenues[idx] = data;
+  }
+  this.businessRevenueCount = this.businessRevenues.length;
 }
 
   deleteItem(item: any): void {

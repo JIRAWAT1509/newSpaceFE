@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { DashboardService } from '@core/services/dashboard.service';
 import { UtilitiesService } from '@core/services/utilities.service';
+import { getStatusPalette } from '@core/utils/chart-colors';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -105,10 +106,11 @@ export class AreaBlockComponent implements OnInit {
       this.datasetVisibility.vacant ? vacant : 0,
     ];
 
+    const statusColors = getStatusPalette();
     const newBackgroundColors = [
-      this.datasetVisibility.unallocated ? '#FF6384' : 'transparent',
-      this.datasetVisibility.leased ? '#FFD05F' : 'transparent',
-      this.datasetVisibility.vacant ? '#80E08E' : 'transparent',
+      this.datasetVisibility.unallocated ? statusColors.danger : 'transparent',
+      this.datasetVisibility.leased ? statusColors.warning : 'transparent',
+      this.datasetVisibility.vacant ? statusColors.success : 'transparent',
     ];
 
     // Update dataset
@@ -146,6 +148,7 @@ export class AreaBlockComponent implements OnInit {
       vacant,
     });
 
+    const statusColors = getStatusPalette();
     const config: ChartConfiguration<'doughnut'> = {
       type: 'doughnut',
       data: {
@@ -154,11 +157,15 @@ export class AreaBlockComponent implements OnInit {
           {
             data: [unAllocated, this.leased, vacant],
             backgroundColor: [
-              '#FF6384', // Unallocated (Red)
-              '#FFD05F', // Leased (Yellow)
-              '#80E08E', // Vacant (Green)
+              statusColors.danger,
+              statusColors.warning,
+              statusColors.success,
             ],
-            hoverBackgroundColor: ['#FF6384', '#FFD05F', '#80E08E'],
+            hoverBackgroundColor: [
+              statusColors.danger,
+              statusColors.warning,
+              statusColors.success,
+            ],
             borderWidth: 0,
           },
         ],
@@ -230,7 +237,8 @@ export class AreaBlockComponent implements OnInit {
     };
 
     try {
-      this.chart = new Chart(ctx, config);
+      this.chart = new Chart(ctx, config) as any;
+
       console.log('Chart created successfully');
     } catch (error) {
       console.error('Error creating chart:', error);

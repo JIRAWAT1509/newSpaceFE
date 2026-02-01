@@ -1,1 +1,777 @@
-<p>system-interface works!</p>
+<div class="interface-settings-page">
+  <!-- Toast and Confirm Dialog -->
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <!-- Loading Overlay -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="loading-spinner">
+        <i class="pi pi-spin pi-spinner"></i>
+        <p>กำลังโหลด...</p>
+      </div>
+    </div>
+  }
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Interface Settings</h1>
+      <p class="page-subtitle">ปรับแต่งธีม สี และการแสดงผลของระบบ — การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
+    </div>
+  </div>
+
+  <!-- Main Content: Split Layout -->
+  <div class="settings-layout">
+    <!-- Left Sidebar: Module Selector -->
+    <aside class="settings-sidebar">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">
+          <i class="pi pi-sliders-h"></i>
+          <span>เลือกหน้าที่ต้องการตั้งค่า</span>
+        </h3>
+        <nav class="module-nav">
+          <!-- Global Settings -->
+          <button
+            class="module-nav-item"
+            [class.active]="selectedModule === 'global'"
+            (click)="onModuleChange('global')"
+            [attr.aria-label]="'เลือกธีมและสีหลัก'"
+            type="button"
+          >
+            <i class="pi pi-palette"></i>
+            <span>ธีมและสีหลัก</span>
+          </button>
+
+          <!-- Module Options -->
+          <button
+            class="module-nav-item"
+            [class.active]="selectedModule === 'areaAvailability'"
+            (click)="onModuleChange('areaAvailability')"
+            [attr.aria-label]="'เลือก Area Availability'"
+            type="button"
+          >
+            <i class="pi pi-map"></i>
+            <span>Area Availability</span>
+          </button>
+
+          <button
+            class="module-nav-item"
+            [class.active]="selectedModule === 'facilitiesUtilities'"
+            (click)="onModuleChange('facilitiesUtilities')"
+            [attr.aria-label]="'เลือก Facilities (Utilities)'"
+            type="button"
+          >
+            <i class="pi pi-cog"></i>
+            <span>Facilities (Utilities)</span>
+          </button>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Right Content: Settings Panel -->
+    <main class="settings-content">
+      <!-- Global Settings: ธีมและสีหลัก — ออกแบบให้อยู่หน้าเดียว ไม่ต้องสกอร์ล -->
+      @if (selectedModule === 'global') {
+        <div class="settings-panel global-theme-panel">
+          <div class="panel-header panel-header--compact">
+            <div>
+              <h2 class="panel-title">ธีมและสีหลัก</h2>
+              <p class="panel-subtitle">ปรับแต่งธีม สี และการแสดงผลของระบบ</p>
+            </div>
+          </div>
+
+          <!-- แถวที่ 1: โหมดธีม + รูปแบบไอคอน (คู่กัน) -->
+          <div class="global-theme-row global-theme-row--toggles">
+            <div class="settings-card settings-card--compact">
+              <div class="card-header card-header--compact">
+                <div class="card-title">
+                  <i class="pi pi-moon"></i>
+                  <span>โหมดธีม</span>
+                </div>
+              </div>
+              <div class="card-content card-content--compact">
+                <div class="theme-mode-selector theme-mode-selector--compact">
+                  <button
+                    class="theme-mode-btn theme-mode-btn--compact"
+                    [class.active]="(globalChanges.themeMode || config.themeMode) === 'light'"
+                    (click)="onThemeModeChange('light')"
+                    type="button"
+                    [attr.aria-pressed]="(globalChanges.themeMode || config.themeMode) === 'light'"
+                    title="โหมดสว่าง"
+                  >
+                    <i class="pi pi-sun"></i>
+                    <span>Light</span>
+                  </button>
+                  <button
+                    class="theme-mode-btn theme-mode-btn--compact"
+                    [class.active]="(globalChanges.themeMode || config.themeMode) === 'dark'"
+                    (click)="onThemeModeChange('dark')"
+                    type="button"
+                    [attr.aria-pressed]="(globalChanges.themeMode || config.themeMode) === 'dark'"
+                    title="โหมดมืด"
+                  >
+                    <i class="pi pi-moon"></i>
+                    <span>Dark</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="settings-card settings-card--compact">
+              <div class="card-header card-header--compact">
+                <div class="card-title">
+                  <i class="pi pi-image"></i>
+                  <span>รูปแบบไอคอน</span>
+                </div>
+              </div>
+              <div class="card-content card-content--compact">
+                <div class="icon-style-selector icon-style-selector--compact">
+                  <button
+                    class="icon-style-btn icon-style-btn--compact"
+                    [class.active]="(globalChanges.iconStyle || config.iconStyle) === 'outline'"
+                    (click)="onIconStyleChange('outline')"
+                    type="button"
+                    [attr.aria-pressed]="(globalChanges.iconStyle || config.iconStyle) === 'outline'"
+                    title="ไอคอนแบบเส้นขอบ"
+                  >
+                    <i class="pi pi-circle"></i>
+                    <span>Outline</span>
+                  </button>
+                  <button
+                    class="icon-style-btn icon-style-btn--compact"
+                    [class.active]="(globalChanges.iconStyle || config.iconStyle) === 'solid'"
+                    (click)="onIconStyleChange('solid')"
+                    type="button"
+                    [attr.aria-pressed]="(globalChanges.iconStyle || config.iconStyle) === 'solid'"
+                    title="ไอคอนแบบทึบ"
+                  >
+                    <i class="pi pi-circle-fill"></i>
+                    <span>Solid</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- แถวที่ 2: ชุดสีหลัก | ชุดสีสถานะ (สองคอลัมน์) -->
+          <div class="global-theme-row global-theme-row--presets">
+            <div class="settings-card settings-card--compact global-theme-card-presets">
+              <div class="card-header card-header--compact">
+                <div class="card-title">
+                  <i class="pi pi-palette"></i>
+                  <span>ชุดสีหลัก</span>
+                </div>
+                <p class="card-description card-description--compact">เลือกชุดสีที่ต้องการใช้</p>
+              </div>
+              <div class="card-content card-content--compact">
+                <div class="preset-grid preset-grid--compact preset-grid--primary">
+                  @for (preset of presets; track preset.id) {
+                    <button
+                      class="preset-card preset-card--compact"
+                      [class.active]="config.activePresetId === preset.id && config.paletteMode === 'preset'"
+                      (click)="selectPreset(preset)"
+                      type="button"
+                      [title]="'เลือกชุดสี ' + preset.name"
+                    >
+                      <div class="preset-preview preset-preview--compact" [style.background]="preset.light.primary"></div>
+                      <span class="preset-name preset-name--compact">{{ preset.name }}</span>
+                      @if (config.activePresetId === preset.id && config.paletteMode === 'preset') {
+                        <div class="preset-check preset-check--compact"><i class="pi pi-check"></i></div>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="settings-card settings-card--compact global-theme-card-status">
+              <div class="card-header card-header--compact">
+                <div class="card-title">
+                  <i class="pi pi-circle-fill"></i>
+                  <span>ชุดสีสถานะ</span>
+                </div>
+                <p class="card-description card-description--compact">เลือกชุดสีสำหรับสถานะต่างๆ</p>
+              </div>
+              <div class="card-content card-content--compact">
+                <div class="preset-grid preset-grid--compact preset-grid--status">
+                  @for (preset of statusPresets; track preset.id) {
+                    <button
+                      class="preset-card preset-card--compact status-preset"
+                      [class.active]="(globalChanges.activeStatusPresetId !== undefined ? globalChanges.activeStatusPresetId : config.activeStatusPresetId) === preset.id && (globalChanges.statusMode !== undefined ? globalChanges.statusMode : config.statusMode) === 'preset'"
+                      (click)="selectStatusPreset(preset)"
+                      type="button"
+                      [title]="'เลือกชุดสีสถานะ ' + preset.name"
+                    >
+                      <div class="status-preset-preview status-preset-preview--compact">
+                        <span [style.background]="preset.tokens.success" title="Success"></span>
+                        <span [style.background]="preset.tokens.warning" title="Warning"></span>
+                        <span [style.background]="preset.tokens.danger" title="Danger"></span>
+                        <span [style.background]="preset.tokens.info" title="Info"></span>
+                      </div>
+                      <span class="preset-name preset-name--compact">{{ preset.name }}</span>
+                      @if ((globalChanges.activeStatusPresetId !== undefined ? globalChanges.activeStatusPresetId : config.activeStatusPresetId) === preset.id && (globalChanges.statusMode !== undefined ? globalChanges.statusMode : config.statusMode) === 'preset') {
+                        <div class="preset-check preset-check--compact"><i class="pi pi-check"></i></div>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- แถวที่ 3: รีเซ็ตเท่านั้น (การเปลี่ยนแปลงจะบันทึกอัตโนมัติ) -->
+          <div class="panel-actions-footer panel-actions-footer--compact">
+            <p class="panel-footer-hint"><i class="pi pi-info-circle"></i> การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
+            <button
+              class="btn-secondary"
+              (click)="resetGlobalConfigToDefault()"
+              [disabled]="isSaving()"
+              type="button"
+            >
+              <i class="pi pi-refresh"></i>
+              <span>รีเซ็ตเป็นค่าเริ่มต้น</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Area Availability Settings -->
+      @if (selectedModule === 'areaAvailability') {
+        <div class="settings-panel area-availability-panel">
+          <div class="panel-header panel-header--compact">
+            <div>
+              <h2 class="panel-title">Area Availability</h2>
+              <p class="panel-subtitle">ตั้งค่าสี ชื่อ และไอคอนสำหรับสถานะต่างๆ — การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
+            </div>
+          </div>
+
+          <!-- Status Configuration -->
+          <div class="settings-card settings-card--compact">
+            <div class="card-header card-header--compact">
+              <div class="card-title">
+                <i class="pi pi-palette"></i>
+                <span>สถานะและสี</span>
+              </div>
+              <p class="card-description">ตั้งค่าสี ชื่อ และไอคอนสำหรับแต่ละสถานะ</p>
+            </div>
+            <div class="card-content card-content--compact">
+              <div class="status-config-list status-config-list--grid">
+                @for (status of ['unallocated', 'quotation', 'leased', 'vacant']; track status) {
+                  <div class="status-config-row">
+                    <div class="status-config-main">
+                        <div class="status-preview">
+                        <div class="status-color-badge" [style.background]="getAreaColor(status)" [title]="'สี: ' + getAreaColor(status)"></div>
+                        <div class="status-info">
+                          <div class="status-label-display">
+                            {{ getAreaLabel(status) }}
+                            @if (getAreaLabelEn(status) && getAreaLabelEn(status) !== status) {
+                              <span class="label-en-badge">({{ getAreaLabelEn(status) }})</span>
+                            }
+                          </div>
+                          <div class="status-key-text">{{ status }}</div>
+                        </div>
+                        @if (getAreaIcon(status)) {
+                          <div class="status-icon-preview">
+                            @if (getAreaIconType(status) === 'library') {
+                              <i class="pi" [ngClass]="getAreaIcon(status)" aria-hidden="true"></i>
+                            } @else {
+                              <img [src]="getAreaIcon(status)" alt="" />
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="status-config-form">
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-palette"></i>
+                            <span>สี *</span>
+                          </label>
+                          <div class="color-input-row">
+                            <input
+                              type="color"
+                              [ngModel]="getAreaColor(status)"
+                              (input)="onAreaColorChange(status, $event)"
+                              class="color-picker-input"
+                              title="เลือกสี"
+                            />
+                            <input
+                              type="text"
+                              [ngModel]="getAreaColor(status)"
+                              (input)="onAreaColorChange(status, $event)"
+                              class="color-hex-input"
+                              placeholder="#000000"
+                              pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                              maxlength="7"
+                            />
+                          </div>
+                          <small class="form-hint">คลิกที่ช่องสีเพื่อเลือก หรือกรอกโค้ดสี (เช่น #FF5733)</small>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-tag"></i>
+                            <span>ชื่อ (ไทย) *</span>
+                          </label>
+                          <input
+                            type="text"
+                            [ngModel]="getAreaLabel(status)"
+                            (input)="onAreaLabelChange(status, $event)"
+                            class="text-input"
+                            [placeholder]="getAreaLabel(status)"
+                            required
+                            maxlength="50"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-tag"></i>
+                            <span>ชื่อ (อังกฤษ)</span>
+                          </label>
+                          <input
+                            type="text"
+                            [ngModel]="getAreaLabelEn(status)"
+                            (input)="onAreaLabelEnChange(status, $event)"
+                            class="text-input"
+                            [placeholder]="getAreaLabelEn(status)"
+                            maxlength="50"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-image"></i>
+                            <span>ไอคอน</span>
+                          </label>
+                          <div class="icon-actions-row">
+                            <button
+                              class="btn-icon-library"
+                              (click)="openAreaIconLibrary(status)"
+                              title="เลือกไอคอนจากไลบรารี"
+                              type="button"
+                            >
+                              <i class="pi pi-th-large"></i>
+                              <span>เลือก</span>
+                            </button>
+                            <label class="file-upload-button" title="อัปโหลดไฟล์ PNG หรือ SVG">
+                              <input
+                                type="file"
+                                accept="image/png,image/svg+xml"
+                                (change)="onAreaIconUpload(status, $event)"
+                                class="file-input-hidden"
+                              />
+                              <i class="pi pi-upload"></i>
+                              <span>อัปโหลด</span>
+                            </label>
+                            @if (getAreaIcon(status)) {
+                              @if (getAreaIconType(status) === 'library') {
+                                <div class="icon-preview" [title]="'ไอคอน: ' + getAreaIcon(status)">
+                                  <i class="pi" [ngClass]="getAreaIcon(status)" aria-hidden="true"></i>
+                                </div>
+                              } @else {
+                                <div class="icon-preview" title="ไอคอนที่อัปโหลด">
+                                  <img [src]="getAreaIcon(status)" alt="" />
+                                </div>
+                              }
+                            } @else {
+                              <div class="icon-preview-empty" title="ยังไม่ได้เลือกไอคอน">
+                                <i class="pi pi-image"></i>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Actions Footer: hint + รีเซ็ต -->
+          <div class="panel-actions-footer">
+            <p class="panel-footer-hint"><i class="pi pi-info-circle"></i> การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
+            <button
+              class="btn-secondary"
+              (click)="resetAreaConfigToDefault()"
+              [disabled]="isSaving()"
+              type="button"
+            >
+              <i class="pi pi-refresh"></i>
+              <span>รีเซ็ตเป็นค่าเริ่มต้น</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Facilities Utilities Settings -->
+      @if (selectedModule === 'facilitiesUtilities') {
+        <div class="settings-panel facilities-utilities-panel">
+          <div class="panel-header panel-header--compact">
+            <div>
+              <h2 class="panel-title">Facilities (Utilities)</h2>
+              <p class="panel-subtitle">ตั้งค่าสี ชื่อ และไอคอนสำหรับประเภทมิเตอร์และสิ่งที่จะเช่าได้ — การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
+            </div>
+          </div>
+
+          <!-- Meter Types Configuration (same layout as Area Availability) -->
+          <div class="settings-card settings-card--compact">
+            <div class="card-header card-header--compact">
+              <div class="card-title">
+                <i class="pi pi-palette"></i>
+                <span>ประเภทมิเตอร์</span>
+              </div>
+              <p class="card-description">ตั้งค่าสี ชื่อ และไอคอนสำหรับแต่ละประเภท</p>
+            </div>
+            <div class="card-content card-content--compact">
+              <div class="status-config-list status-config-list--grid">
+                @for (type of ['electricity', 'water', 'gas', 'ac']; track type) {
+                  <div class="status-config-row">
+                    <div class="status-config-main">
+                      <div class="status-preview">
+                        <div class="status-color-badge" [style.background]="getFacilitiesColor(type)" [title]="'สี: ' + getFacilitiesColor(type)"></div>
+                        <div class="status-info">
+                          <div class="status-label-display">
+                            {{ getFacilitiesLabel(type) }}
+                            @if (getFacilitiesLabelEn(type) && getFacilitiesLabelEn(type) !== type) {
+                              <span class="label-en-badge">({{ getFacilitiesLabelEn(type) }})</span>
+                            }
+                          </div>
+                          <div class="status-key-text">{{ type }}</div>
+                        </div>
+                        @if (getFacilitiesIcon(type)) {
+                          <div class="status-icon-preview">
+                            @if (getFacilitiesIconType(type) === 'library') {
+                              <i class="pi" [ngClass]="getFacilitiesIcon(type)" aria-hidden="true"></i>
+                            } @else {
+                              <img [src]="getFacilitiesIcon(type)" alt="" />
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="status-config-form">
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-palette"></i>
+                            <span>สี *</span>
+                          </label>
+                          <div class="color-input-row">
+                            <input
+                              type="color"
+                              [ngModel]="getFacilitiesColor(type)"
+                              (input)="onFacilitiesColorChange(type, $event)"
+                              class="color-picker-input"
+                              title="เลือกสี"
+                            />
+                            <input
+                              type="text"
+                              [ngModel]="getFacilitiesColor(type)"
+                              (input)="onFacilitiesColorChange(type, $event)"
+                              class="color-hex-input"
+                              placeholder="#000000"
+                              pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                              maxlength="7"
+                            />
+                          </div>
+                          <small class="form-hint">คลิกที่ช่องสีเพื่อเลือก หรือกรอกโค้ดสี (เช่น #FF5733)</small>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-tag"></i>
+                            <span>ชื่อ (ไทย) *</span>
+                          </label>
+                          <input
+                            type="text"
+                            [ngModel]="getFacilitiesLabel(type)"
+                            (input)="onFacilitiesLabelChange(type, $event)"
+                            class="text-input"
+                            [placeholder]="getFacilitiesLabel(type)"
+                            required
+                            maxlength="50"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-tag"></i>
+                            <span>ชื่อ (อังกฤษ)</span>
+                          </label>
+                          <input
+                            type="text"
+                            [ngModel]="getFacilitiesLabelEn(type)"
+                            (input)="onFacilitiesLabelEnChange(type, $event)"
+                            class="text-input"
+                            [placeholder]="getFacilitiesLabelEn(type)"
+                            maxlength="50"
+                          />
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">
+                            <i class="pi pi-image"></i>
+                            <span>ไอคอน</span>
+                          </label>
+                          <div class="icon-actions-row">
+                            <button
+                              class="btn-icon-library"
+                              (click)="openFacilitiesIconLibrary(type)"
+                              title="เลือกไอคอนจากไลบรารี"
+                              type="button"
+                            >
+                              <i class="pi pi-th-large"></i>
+                              <span>เลือก</span>
+                            </button>
+                            <label class="file-upload-button" title="อัปโหลดไฟล์ PNG หรือ SVG">
+                              <input
+                                type="file"
+                                accept="image/png,image/svg+xml"
+                                (change)="onFacilitiesIconUpload(type, $event)"
+                                class="file-input-hidden"
+                              />
+                              <i class="pi pi-upload"></i>
+                              <span>อัปโหลด</span>
+                            </label>
+                            @if (getFacilitiesIcon(type)) {
+                              @if (getFacilitiesIconType(type) === 'library') {
+                                <div class="icon-preview" [title]="'ไอคอน: ' + getFacilitiesIcon(type)">
+                                  <i class="pi" [ngClass]="getFacilitiesIcon(type)" aria-hidden="true"></i>
+                                </div>
+                              } @else {
+                                <div class="icon-preview" title="ไอคอนที่อัปโหลด">
+                                  <img [src]="getFacilitiesIcon(type)" alt="" />
+                                </div>
+                              }
+                            } @else {
+                              <div class="icon-preview-empty" title="ยังไม่ได้เลือกไอคอน">
+                                <i class="pi pi-image"></i>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Rentable Items -->
+          <div class="settings-card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="pi pi-list"></i>
+                <span>สิ่งที่จะเช่าได้</span>
+              </div>
+              <div class="card-actions">
+                <button
+                  type="button"
+                  class="btn-primary"
+                  (click)="addRentableItem()"
+                  title="เพิ่มรายการสิ่งที่จะเช่าได้ใหม่"
+                >
+                  <i class="pi pi-plus"></i>
+                  <span>เพิ่มรายการ</span>
+                </button>
+              </div>
+            </div>
+            <div class="card-content">
+              @if (rentableItems().length === 0) {
+                <div class="empty-state">
+                  <i class="pi pi-inbox"></i>
+                  <p>ยังไม่มีรายการ</p>
+                  <button type="button" class="btn-link" (click)="addRentableItem()">เพิ่มรายการแรก</button>
+                </div>
+              } @else {
+                <div class="rentable-items-list">
+                  @for (item of rentableItems(); track item.id) {
+                    <div class="rentable-item-row">
+                      <div class="rentable-item-preview">
+                        <div class="item-icon-display" [style.background]="item.color" [title]="item.nameTh || item.name || 'Preview'">
+                          @if (item.iconType === 'upload' && item.icon) {
+                            <img [src]="item.icon" alt="" />
+                          } @else if (item.icon) {
+                            <i class="pi" [ngClass]="item.icon" aria-hidden="true"></i>
+                          } @else {
+                            <i class="pi pi-box" aria-hidden="true"></i>
+                          }
+                        </div>
+                        @if (!item.enabled) {
+                          <div class="item-disabled-badge">
+                            <i class="pi pi-ban"></i>
+                          </div>
+                        }
+                      </div>
+                      <div class="rentable-item-controls">
+                        <input
+                          type="text"
+                          [(ngModel)]="item.nameTh"
+                          (ngModelChange)="onRentableItemFieldChange()"
+                          placeholder="ชื่อ (ไทย) *"
+                          class="text-input"
+                          required
+                          maxlength="50"
+                        />
+                        <input
+                          type="text"
+                          [(ngModel)]="item.name"
+                          (ngModelChange)="onRentableItemFieldChange()"
+                          placeholder="ชื่อ (อังกฤษ)"
+                          class="text-input"
+                          maxlength="50"
+                        />
+                        <div class="rentable-item-actions">
+                          <button
+                            class="btn-icon-library"
+                            (click)="openIconLibrary(item.id)"
+                            title="เลือกไอคอนจากไลบรารี"
+                            type="button"
+                          >
+                            <i class="pi pi-th-large"></i>
+                          </button>
+                          <label class="file-upload-button-small">
+                            <input
+                              type="file"
+                              accept="image/png,image/svg+xml"
+                              (change)="onRentableItemIconUpload(item.id, $event)"
+                              class="file-input-hidden"
+                            />
+                            <i class="pi pi-upload"></i>
+                          </label>
+                          <input
+                            type="color"
+                            [(ngModel)]="item.color"
+                            (ngModelChange)="onRentableItemFieldChange()"
+                            class="color-picker-small"
+                          />
+                          <label class="toggle-switch" [title]="item.enabled ? 'ปิดการใช้งาน' : 'เปิดการใช้งาน'">
+                            <input
+                              type="checkbox"
+                              [(ngModel)]="item.enabled"
+                              (ngModelChange)="onRentableItemFieldChange()"
+                            />
+                            <span class="toggle-slider"></span>
+                          </label>
+                          <button
+                            class="btn-danger-small"
+                            (click)="removeRentableItem(item.id)"
+                            title="ลบ"
+                            type="button"
+                          >
+                            <i class="pi pi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+                @if (rentableItems().length > 0) {
+                  <div class="rentable-items-actions">
+                    <button 
+                      class="btn-secondary" 
+                      (click)="resetRentableItemsToDefault()"
+                      [disabled]="isSaving()"
+                      type="button"
+                    >
+                      <i class="pi pi-refresh"></i>
+                      <span>รีเซ็ตรายการสิ่งที่จะเช่าได้</span>
+                    </button>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- Panel Actions Footer: hint + รีเซ็ต -->
+          <div class="panel-actions-footer">
+            <p class="panel-footer-hint"><i class="pi pi-info-circle"></i> การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
+            <button
+              class="btn-secondary"
+              (click)="resetFacilitiesConfigToDefault()"
+              [disabled]="isSaving()"
+              type="button"
+            >
+              <i class="pi pi-refresh"></i>
+              <span>รีเซ็ตเป็นค่าเริ่มต้น</span>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Icon Library Modal -->
+      @if (showIconLibrary()) {
+        <div class="modal-overlay" (click)="showIconLibrary.set(false)">
+          <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <div>
+                <h3 class="modal-title">เลือกไอคอน</h3>
+                <p class="modal-subtitle">คลิกเพื่อเลือกไอคอน หรือค้นหาไอคอนที่ต้องการ</p>
+              </div>
+              <button
+                type="button"
+                class="modal-close"
+                (click)="showIconLibrary.set(false)"
+                aria-label="ปิด"
+              >
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="icon-library-search">
+                <i class="pi pi-search search-icon"></i>
+                <input
+                  type="text"
+                  [(ngModel)]="iconSearchQuery"
+                  placeholder="ค้นหาไอคอน... (เช่น: home, user, settings)"
+                  class="icon-search-input"
+                  autofocus
+                />
+                @if (iconSearchQuery) {
+                  <button 
+                    class="clear-search-btn"
+                    (click)="iconSearchQuery = ''"
+                    aria-label="ล้างการค้นหา"
+                  >
+                    <i class="pi pi-times"></i>
+                  </button>
+                }
+              </div>
+              <div class="icon-library-info">
+                <span class="icon-count">{{ filteredIcons().length }} ไอคอน</span>
+                @if (iconSearchQuery) {
+                  <span class="search-results">ผลลัพธ์สำหรับ "{{ iconSearchQuery }}"</span>
+                }
+              </div>
+              <div class="icon-library-grid">
+                @for (icon of filteredIcons(); track icon) {
+                  <button
+                    class="icon-library-item"
+                    (click)="selectIconFromLibrary(icon)"
+                    [title]="icon"
+                    [attr.aria-label]="'เลือกไอคอน ' + icon"
+                  >
+                    <i class="pi" [ngClass]="icon" aria-hidden="true"></i>
+                    <span class="icon-name">{{ icon.replace('pi-', '') }}</span>
+                  </button>
+                }
+              </div>
+              @if (filteredIcons().length === 0) {
+                <div class="icon-library-empty">
+                  <i class="pi pi-search"></i>
+                  <p>ไม่พบไอคอนที่ค้นหา</p>
+                  <button class="btn-link" (click)="iconSearchQuery = ''">
+                    ล้างการค้นหา
+                  </button>
+                </div>
+              }
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn-secondary" (click)="showIconLibrary.set(false)">
+                <i class="pi pi-times"></i>
+                <span>ยกเลิก</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </main>
+  </div>
+</div>

@@ -39,11 +39,273 @@
       }
 
       @if (activeTabIndex() === 2) {
-        <app-conditions-tab />
+        <app-conditions-tab [form]="conditionsForm" />
       }
 
       @if (activeTabIndex() === 3) {
         <app-document-tab [form]="documentForm" />
+      }
+
+      @if (activeTabIndex() === 4) {
+        <div class="summary-section">
+          <h3 class="step-title">สรุปและยืนยัน</h3>
+
+          <div class="summary-grid">
+            <!-- Section A: ข้อมูลอ้างอิงเอกสาร -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">A. ข้อมูลอ้างอิงเอกสาร</h4>
+
+              <div class="summary-item">
+                <span class="summary-label">สาขา:</span>
+                <span class="summary-value">{{ getFormValue('branch') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ประเภทสัญญา:</span>
+                <span class="summary-value">{{ getFormValue('contractType') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">เลขที่ใบเสนอราคา (น.หลัก):</span>
+                <span class="summary-value">{{ getFormValue('contractNumberMain') || 'AUTO' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">เลขที่ใบเสนอราคา (น.ร่วม):</span>
+                <span class="summary-value">{{ getFormValue('contractNumberSub') || 'AUTO' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">สถานะใบเสนอราคา:</span>
+                <span class="summary-value">{{ getFormValue('quotationStatus') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">วันที่ระดับ Quotation:</span>
+                <span class="summary-value">{{ formatDate(getFormValue('quotationLevelDate')) || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">วันที่ใบเสนอราคา:</span>
+                <span class="summary-value">{{ formatDate(getFormValue('quotationDate')) || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">วันที่อนุมัติใบเสนอราคา:</span>
+                <span class="summary-value">{{ formatDate(getFormValue('approvalDate')) || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">วันที่บันทึกใบเสนอราคา:</span>
+                <span class="summary-value">{{ formatDate(getFormValue('recordDate')) || '-' }}</span>
+              </div>
+            </div>
+
+            <!-- Section B: ข้อมูลสินค้า/บริการ (ต้นทาง) -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">B. ข้อมูลสินค้า/บริการ (ต้นทาง)</h4>
+
+              <div class="summary-item">
+                <span class="summary-label">Sub Category:</span>
+                <span class="summary-value">{{ getFormValue('subCategory') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Category:</span>
+                <span class="summary-value">{{ getFormValue('category') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Profit Center:</span>
+                <span class="summary-value">{{ getFormValue('profitCenter') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">สินค้า/บริการหลัก:</span>
+                <span class="summary-value">{{ getFormValue('businessName') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ประเภทสินค้า/บริการ 1:</span>
+                <span class="summary-value">{{ getFormValue('productType1') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ประเภทสินค้า/บริการ 2:</span>
+                <span class="summary-value">{{ getFormValue('productType2') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ประเภทสินค้า/บริการ 3:</span>
+                <span class="summary-value">{{ getFormValue('productType3') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ประเภทสินค้า/บริการ 4:</span>
+                <span class="summary-value">{{ getFormValue('productType4') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ประเภทสินค้า/บริการ 5:</span>
+                <span class="summary-value">{{ getFormValue('productType5') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ประเภทสินค้า/บริการ 6:</span>
+                <span class="summary-value">{{ getFormValue('productType6') || '-' }}</span>
+              </div>
+            </div>
+
+            <!-- Section C: ข้อมูลพื้นที่ (จากใบเสนอราคา) -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">C. ข้อมูลพื้นที่ (จากใบเสนอราคา)</h4>
+
+              <div class="summary-item">
+                <span class="summary-label">อาคาร:</span>
+                <span class="summary-value">{{ getFormValue('areaBuilding') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ชั้น:</span>
+                <span class="summary-value">{{ getFormValue('areaFloor') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">เลขที่ยูนิต / ห้อง:</span>
+                <span class="summary-value">{{ getFormValue('areaUnitNumber') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">พื้นที่รวม (ตร.ม.):</span>
+                <span class="summary-value">{{ getFormValue('areaTotal') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ประเภทพื้นที่:</span>
+                <span class="summary-value">{{ getFormValue('areaType') || '-' }}</span>
+              </div>
+            </div>
+
+            <!-- ข้อมูลใบจอง -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">ข้อมูลใบจอง</h4>
+
+              <div class="summary-item">
+                <span class="summary-label">เลขที่ใบจอง:</span>
+                <span class="summary-value">{{ getContractDetailValue('bookingNumber') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">วันที่ใบจอง:</span>
+                <span class="summary-value">{{ formatDate(getContractDetailValue('bookingDate')) || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">สถานะใบจอง:</span>
+                <span class="summary-value">{{ getContractDetailValue('bookingStatus') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">วันที่เริ่มจอง:</span>
+                <span class="summary-value">{{ formatDate(getContractDetailValue('bookingStartDate')) || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">วันที่สิ้นสุดจอง:</span>
+                <span class="summary-value">{{ formatDate(getContractDetailValue('bookingEndDate')) || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ระยะเวลาการจอง:</span>
+                <span class="summary-value">{{ getContractDetailValue('bookingDuration') || '-' }}</span>
+              </div>
+            </div>
+
+            <!-- ข้อมูลผู้เช่า (ฉบับยืนยัน) -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">ข้อมูลผู้เช่า (ฉบับยืนยัน)</h4>
+
+              <div class="summary-item">
+                <span class="summary-label">ผู้ทำสัญญา:</span>
+                <span class="summary-value">{{ getContractDetailValue('contractMaker') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ชื่อนิติบุคคล / บุคคล:</span>
+                <span class="summary-value">{{ getContractDetailValue('legalEntityName') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ที่อยู่ตามทะเบียน:</span>
+                <span class="summary-value">{{ getContractDetailValue('registeredAddress') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ที่อยู่จัดส่งเอกสาร:</span>
+                <span class="summary-value">{{ getContractDetailValue('documentDeliveryAddress') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">เบอร์โทรศัพท์:</span>
+                <span class="summary-value">{{ getContractDetailValue('phone') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">อีเมล:</span>
+                <span class="summary-value">{{ getContractDetailValue('email') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ผู้ติดต่อ / ผู้ประสานงาน:</span>
+                <span class="summary-value">{{ getContractDetailValue('contactPerson') || '-' }}</span>
+              </div>
+            </div>
+
+            <!-- เงื่อนไขอื่นๆ -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">เงื่อนไขอื่นๆ</h4>
+
+              <div class="summary-item">
+                <span class="summary-label">ระยะเวลาสัญญา:</span>
+                <span class="summary-value">
+                  {{ getConditionsValue('durationYears') || 0 }} ปี 
+                  {{ getConditionsValue('durationMonths') || 0 }} เดือน 
+                  {{ getConditionsValue('durationDays') || 0 }} วัน
+                </span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">วันที่เริ่มต้นสัญญา:</span>
+                <span class="summary-value">{{ formatDate(getConditionsValue('contractStartDate')) || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">วันที่สิ้นสุดสัญญา:</span>
+                <span class="summary-value">{{ formatDate(getConditionsValue('contractEndDate')) || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">อัตราค่าเช่า:</span>
+                <span class="summary-value">{{ getConditionsValue('rentRate') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">อัตราค่าบริการ:</span>
+                <span class="summary-value">{{ getConditionsValue('serviceRate') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Credit Term (Rent/Service):</span>
+                <span class="summary-value">{{ getConditionsValue('creditTermRent') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Credit Term (Utility):</span>
+                <span class="summary-value">{{ getConditionsValue('creditTermUtility') || '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       }
     </div>
 
@@ -80,7 +342,7 @@
             [disabled]="!isAllFormsValid()"
           >
             <i class="pi pi-check"></i>
-            <span>{{ mode() === 'edit' ? 'บันทึกการแก้ไข' : 'บันทึก' }}</span>
+            <span>{{ mode() === 'edit' ? 'บันทึกการแก้ไข' : 'บันทึกสัญญา' }}</span>
           </button>
         }
       </div>

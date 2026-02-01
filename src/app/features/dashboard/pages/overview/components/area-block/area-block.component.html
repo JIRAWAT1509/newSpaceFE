@@ -24,7 +24,7 @@
             class="flex items-center gap-1.5 cursor-pointer hover:opacity-75 transition-opacity"
             [class.opacity-50]="!datasetVisibility.unallocated">
             <div class="w-4 h-4 rounded flex-shrink-0"
-                 [style.background-color]="datasetVisibility.unallocated ? '#FF6384' : '#E5E7EB'"></div>
+                 [style.background-color]="datasetVisibility.unallocated ? 'rgb(var(--danger))' : 'rgb(var(--border))'"></div>
             <span class="text-xs text-gray-900 whitespace-nowrap"
                   [style.text-decoration]="!datasetVisibility.unallocated ? 'line-through' : 'none'">
               Unallocated
@@ -35,7 +35,7 @@
             class="flex items-center gap-1.5 cursor-pointer hover:opacity-75 transition-opacity"
             [class.opacity-50]="!datasetVisibility.leased">
             <div class="w-4 h-4 rounded flex-shrink-0"
-                 [style.background-color]="datasetVisibility.leased ? '#FFD05F' : '#E5E7EB'"></div>
+                 [style.background-color]="datasetVisibility.leased ? 'rgb(var(--warning))' : 'rgb(var(--border))'"></div>
             <span class="text-xs text-gray-900 whitespace-nowrap"
                   [style.text-decoration]="!datasetVisibility.leased ? 'line-through' : 'none'">
               Leased
@@ -46,7 +46,7 @@
             class="flex items-center gap-1.5 cursor-pointer hover:opacity-75 transition-opacity"
             [class.opacity-50]="!datasetVisibility.vacant">
             <div class="w-4 h-4 rounded flex-shrink-0"
-                 [style.background-color]="datasetVisibility.vacant ? '#80E08E' : '#E5E7EB'"></div>
+                 [style.background-color]="datasetVisibility.vacant ? 'rgb(var(--success))' : 'rgb(var(--border))'"></div>
             <span class="text-xs text-gray-900 whitespace-nowrap"
                   [style.text-decoration]="!datasetVisibility.vacant ? 'line-through' : 'none'">
               Vacant

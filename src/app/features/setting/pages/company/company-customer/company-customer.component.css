@@ -248,13 +248,13 @@
 }
 
 .status-badge.status-A {
-  background-color: #d1fae5;
-  color: #059669;
+  background-color: rgb(var(--success) / 0.18);
+  color: rgb(var(--success));
 }
 
 .status-badge.status-I {
-  background-color: #fee2e2;
-  color: #dc2626;
+  background-color: rgb(var(--danger) / 0.18);
+  color: rgb(var(--danger));
 }
 
 .action-buttons {
@@ -449,7 +449,10 @@
 
 .form-label.required::after {
   content: ' *';
-  color: #dc2626;
+  color: #dc2626 !important;
+  margin-left: 2px;
+  font-weight: 600;
+  display: inline-block;
 }
 
 .form-grid input,
@@ -799,24 +802,24 @@
 }
 
 ::ng-deep .p-inputswitch .p-inputswitch-slider {
-  background-color: #ef4444;
+  background-color: rgb(var(--danger));
   transition: background-color 0.2s;
 }
 
 ::ng-deep .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
-  background-color: #10b981;
+  background-color: rgb(var(--success));
 }
 
 .status-label {
   margin-left: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #ef4444;
+  color: rgb(var(--danger));
   transition: color 0.2s;
 }
 
 .status-label.active {
-  color: #10b981;
+  color: rgb(var(--success));
 }
 
 /* ==================== DETAILS MODAL ==================== */

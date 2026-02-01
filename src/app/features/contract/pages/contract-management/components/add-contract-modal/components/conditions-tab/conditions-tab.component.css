@@ -60,8 +60,16 @@
 }
 
 /* ==================== FORM GROUP ==================== */
+.form-grid-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
 .form-group {
   @apply flex flex-col gap-2;
+}
+
+.form-group.full-width {
+  @apply col-span-full;
 }
 
 .form-group label {
@@ -71,6 +79,33 @@
 .form-group.required label::after {
   content: ' *';
   @apply text-red-600;
+}
+
+.section-title {
+  @apply text-lg font-bold text-gray-900 mb-4;
+  @apply flex items-center gap-2;
+}
+
+.section-title::before {
+  content: '';
+  @apply w-1 h-6 bg-blue-600 rounded;
+}
+
+/* Duration Inputs */
+.duration-inputs {
+  @apply flex items-center gap-2;
+}
+
+.duration-field {
+  @apply flex items-center gap-2 flex-1;
+}
+
+.duration-field input {
+  @apply flex-1;
+}
+
+.duration-field span {
+  @apply text-sm text-gray-600 whitespace-nowrap;
 }
 
 /* ==================== TABLE ==================== */

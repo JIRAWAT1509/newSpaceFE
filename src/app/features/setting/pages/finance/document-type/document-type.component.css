@@ -187,24 +187,33 @@
   font-size: 0.875rem;
 }
 
-.action-btn-edit {
-  background-color: #dbeafe;
-  color: #1e40af;
+/* Edit/Delete buttons now use global styles from styles.css */
+/* Override for document-type specific styling */
+.action-btn.action-btn-edit {
+  background-color: transparent !important;
+  border: none !important;
+  color: #374151 !important;
 }
 
-.action-btn-edit:hover {
-  background-color: #bfdbfe;
-  color: #1e3a8a;
+.action-btn.action-btn-edit:hover {
+  background-color: #f3f4f6 !important;
+  color: #1f2937 !important;
 }
 
-.action-btn-delete {
-  background-color: #fee2e2;
-  color: #991b1b;
+.action-btn.action-btn-delete {
+  background-color: #ef4444 !important;
+  border: none !important;
+  color: #ffffff !important;
+  border-radius: 50% !important;
 }
 
-.action-btn-delete:hover {
-  background-color: #fecaca;
-  color: #7f1d1d;
+.action-btn.action-btn-delete:hover {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+.action-btn.action-btn-delete i {
+  color: #ffffff !important;
 }
 
 /* ==================== EMPTY STATE ==================== */

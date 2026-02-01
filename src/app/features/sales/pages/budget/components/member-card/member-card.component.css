@@ -1,0 +1,137 @@
+/* member-card.component.css */
+
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s;
+}
+
+.member-card:hover {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+/* ==================== AVATAR ==================== */
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== INFO ==================== */
+.member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.125rem;
+}
+
+.member-role {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.member-role.leader {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.member-role i {
+  font-size: 0.625rem;
+}
+
+/* ==================== BUDGET ==================== */
+.member-budget {
+  flex: 2;
+  min-width: 0;
+}
+
+/* ==================== ACTIONS ==================== */
+.member-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.icon-btn.danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.icon-btn i {
+  font-size: 0.875rem;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .member-card {
+    flex-wrap: wrap;
+  }
+
+  .member-info {
+    flex: 1 1 auto;
+  }
+
+  .member-budget {
+    flex: 1 1 100%;
+    order: 3;
+  }
+
+  .member-actions {
+    order: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .member-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8125rem;
+  }
+
+  .member-name {
+    font-size: 0.8125rem;
+  }
+}

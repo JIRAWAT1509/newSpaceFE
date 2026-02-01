@@ -47,6 +47,32 @@
   gap: 0.75rem;
 }
 
+/* ==================== PAGE FOOTER ACTIONS ==================== */
+.page-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 640px) {
+  .page-footer-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .page-footer-actions p-button {
+    width: 100%;
+  }
+}
+
 /* Change Indicator */
 .changes-indicator {
   margin-top: 1rem;
@@ -771,6 +797,37 @@
   margin: 0 0 1.5rem 0;
 }
 
+/* Warning message in modals */
+.warning-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.warning-message i {
+  color: #f59e0b;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.warning-message p {
+  color: #92400e;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.warning-message strong {
+  color: #78350f;
+  font-weight: 600;
+}
+
 .modal-description.centered {
   text-align: center;
 }
@@ -903,6 +960,90 @@
   accent-color: #3b82f6;
 }
 
+/* ==================== TEMPLATE RADIO LIST ==================== */
+
+.template-radio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.template-radio-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #ffffff;
+}
+
+.template-radio-item:hover {
+  border-color: #3b82f6;
+  background-color: #f9fafb;
+}
+
+.template-radio-item.selected {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.template-radio-input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.template-radio-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.template-radio-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.template-radio-item.selected .template-radio-icon {
+  background-color: #dbeafe;
+  color: #3b82f6;
+}
+
+.template-radio-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.template-radio-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.template-radio-info p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
 /* ==================== SELECT IN DIALOG ==================== */
 
 ::ng-deep .p-dialog .p-select {
@@ -918,6 +1059,115 @@
 ::ng-deep .p-dialog .p-select.p-focus {
   border-color: #3b82f6 !important;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Fix dropdown scroll issue */
+::ng-deep .p-select-panel {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}
+
+::ng-deep .p-select-panel .p-select-items-wrapper {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}
+
+/* Specific fix for copy role dropdown in dialog - properly anchored dropdown */
+.copy-role-select {
+  position: relative;
+  width: 100%;
+}
+
+/* Dropdown panel styling - properly anchored and visible */
+::ng-deep .copy-role-dropdown-panel {
+  z-index: 10001 !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+  background-color: #ffffff !important;
+  margin-top: 4px !important;
+}
+
+::ng-deep .copy-role-dropdown-panel .p-select-items-wrapper {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+}
+
+/* Ensure dropdown overlay is properly positioned within dialog */
+::ng-deep .p-dialog .p-select {
+  position: relative;
+  width: 100%;
+}
+
+::ng-deep .p-dialog .p-select-overlay {
+  z-index: 10001 !important;
+  position: absolute !important;
+  width: 100% !important;
+}
+
+/* Ensure dropdown panel width matches input and is properly aligned */
+::ng-deep .p-dialog .p-select-overlay .p-select-panel {
+  min-width: 100% !important;
+  width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Ensure dialog content doesn't clip dropdown */
+::ng-deep .p-dialog .p-dialog-content {
+  overflow: visible !important;
+  position: relative;
+}
+
+::ng-deep .p-dialog {
+  overflow: visible !important;
+}
+
+/* Focus state for select in dialog */
+::ng-deep .p-dialog .p-select.p-focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Ensure select input has proper styling */
+::ng-deep .p-dialog .p-select .p-select-label {
+  width: 100%;
+}
+
+/* Dropdown items styling */
+::ng-deep .copy-role-dropdown-panel .p-select-item {
+  padding: 0.75rem 1rem !important;
+  transition: background-color 0.2s !important;
+}
+
+::ng-deep .copy-role-dropdown-panel .p-select-item:hover {
+  background-color: #f3f4f6 !important;
+}
+
+::ng-deep .copy-role-dropdown-panel .p-select-item.p-highlight {
+  background-color: #eff6ff !important;
+  color: #1e40af !important;
+}
+
+/* Scrollbar styling for dropdown */
+::ng-deep .copy-role-dropdown-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+::ng-deep .copy-role-dropdown-panel::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::ng-deep .copy-role-dropdown-panel::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::ng-deep .copy-role-dropdown-panel::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* ==================== BUTTON SIZING IN DIALOGS ==================== */
@@ -977,6 +1227,33 @@
   }
 
   .template-info p {
+    font-size: 0.8125rem;
+  }
+
+  .template-radio-list {
+    gap: 0.5rem;
+  }
+
+  .template-radio-item {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .template-radio-content {
+    gap: 0.75rem;
+  }
+
+  .template-radio-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.125rem;
+  }
+
+  .template-radio-info h4 {
+    font-size: 0.875rem;
+  }
+
+  .template-radio-info p {
     font-size: 0.8125rem;
   }
 }

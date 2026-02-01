@@ -1,0 +1,54 @@
+<div class="report-page">
+  <div class="report-filters">
+    <div class="filter-group">
+      <span class="filter-label">รายงาน</span>
+      <div class="filter-buttons">
+        <button
+          [class.active]="selectedCategoryId === 'all'"
+          (click)="selectCategory('all')"
+        >
+          All
+        </button>
+        <button
+          *ngFor="let category of categories"
+          [class.active]="selectedCategoryId === category.id"
+          (click)="selectCategory(category.id)"
+        >
+          {{ category.name }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-content">
+    <h2 class="report-title">{{ selectedCategoryName }}</h2>
+
+    <div class="report-list">
+      <div
+        *ngFor="let report of filteredItems"
+        class="report-item"
+        [class.clickable]="!!report.route"
+        (click)="openReport(report)"
+      >
+        <div class="report-text">
+          <div class="report-name">{{ report.title }}</div>
+          <div class="report-desc">{{ report.description }}</div>
+        </div>
+        <button
+          class="bookmark-btn"
+          (click)="toggleBookmark(report, $event)"
+        >
+          <i
+            class="pi"
+            [ngClass]="
+              isBookmarked(report.id) ? 'pi-bookmark-fill' : 'pi-bookmark'
+            "
+          ></i>
+        </button>
+      </div>
+      <div *ngIf="filteredItems.length === 0" class="report-empty">
+        ไม่พบรายงานในหมวดนี้
+      </div>
+    </div>
+  </div>
+</div>

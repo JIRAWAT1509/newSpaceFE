@@ -1,0 +1,62 @@
+<!-- pipeline-filters.component.html -->
+
+<div class="filters-container">
+
+  <div class="filters-row">
+
+    <!-- Search Input -->
+    <div class="filter-search">
+      <p-iconfield iconPosition="left">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          type="text"
+          pInputText
+          [ngModel]="searchValue()"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="🔍 Search deals, customers, areas..."
+          class="search-input"
+        />
+      </p-iconfield>
+    </div>
+
+    <!-- Owner Filter -->
+    <div class="filter-select">
+      <p-select
+        [ngModel]="selectedOwner() || ''"
+        (ngModelChange)="onOwnerChange($event)"
+        [options]="getOwnerOptions()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Owners"
+        styleClass="owner-select"
+      ></p-select>
+    </div>
+
+    <!-- Priority Filter -->
+    <div class="filter-select">
+      <p-select
+        [ngModel]="selectedPriority() || ''"
+        (ngModelChange)="onPriorityChange($event)"
+        [options]="priorityOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="All Priorities"
+        styleClass="priority-select"
+      ></p-select>
+    </div>
+
+    <!-- Clear Filters Button -->
+    @if (hasActiveFilters()) {
+      <button
+        class="clear-filters-btn"
+        (click)="clearFilters()"
+        type="button"
+      >
+        <span class="btn-icon">✕</span>
+        <span class="btn-label">Clear</span>
+      </button>
+    }
+
+  </div>
+
+</div>

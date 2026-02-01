@@ -1,0 +1,43 @@
+<!-- pipeline-metrics.component.html -->
+
+<div class="metrics-grid">
+
+  @for (card of getMetricCards(); track card.label) {
+    <div
+      class="metric-card"
+      [ngClass]="[
+        'color-' + card.color,
+        isCardActive(card.id) ? 'active' : ''
+      ]"
+      (click)="onMetricClick(card.id)"
+      [attr.role]="card.id !== 'all' ? 'button' : null"
+      [attr.tabindex]="card.id !== 'all' ? '0' : null"
+    >
+      <div class="metric-header">
+        <span class="metric-icon">{{ card.icon }}</span>
+        <span class="metric-label">{{ card.label }}</span>
+      </div>
+
+      <div class="metric-value">{{ card.value }}</div>
+
+      <div class="metric-subtext">{{ card.subtext }}</div>
+
+      @if (card.change) {
+        <div
+          class="metric-change"
+          [ngClass]="card.changeType ? 'change-' + card.changeType : ''"
+        >
+          {{ card.change }}
+        </div>
+      }
+
+      @if (isCardActive(card.id)) {
+        <div class="active-indicator">
+          <div class="active-dot"></div>
+          <span class="active-text">Active Filter</span>
+        </div>
+      }
+    </div>
+  }
+
+</div>

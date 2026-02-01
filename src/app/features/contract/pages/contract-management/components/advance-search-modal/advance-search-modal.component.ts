@@ -8,7 +8,8 @@ import {
   SearchFieldType,
   SEARCH_FIELD_CONFIG,
   BUILDING_OPTIONS,
-  CATEGORY_OPTIONS
+  CATEGORY_OPTIONS,
+  SavedSearch
 } from '@core/models/contract-search.model';
 import { CONTRACT_TYPE_LABELS, CONTRACT_STATUS_LABELS } from '@core/models/contract.model';
 
@@ -22,9 +23,13 @@ import { CONTRACT_TYPE_LABELS, CONTRACT_STATUS_LABELS } from '@core/models/contr
 export class AdvanceSearchModalComponent implements OnInit {
   filters = input<SearchFilter[]>([]);
   filtersChange = output<SearchFilter[]>();
+  savedSearchChange = output<SavedSearch>();
   close = output<void>();
 
   localFilters = signal<SearchFilter[]>([]);
+  showSaveDialog = signal<boolean>(false);
+  bookmarkName = signal<string>('');
+  private readonly bookmarkKey = 'contract_advance_search_bookmarks';
 
   ngOnInit(): void {
     // Initialize with existing filters or one empty filter
@@ -132,5 +137,65 @@ export class AdvanceSearchModalComponent implements OnInit {
 
   onCancel(): void {
     this.close.emit();
+  }
+
+  // ==================== BOOKMARK MANAGEMENT ====================
+
+  openSaveDialog(): void {
+    if (!this.hasValidFilters()) {
+      return;
+    }
+    this.bookmarkName.set('');
+    this.showSaveDialog.set(true);
+  }
+
+  closeSaveDialog(): void {
+    this.showSaveDialog.set(false);
+    this.bookmarkName.set('');
+  }
+
+  saveBookmark(): void {
+    const name = this.bookmarkName().trim();
+    if (!name) {
+      return;
+    }
+
+    const validFilters = this.localFilters().filter(f => f.isComplete);
+    if (validFilters.length === 0) {
+      return;
+    }
+
+    const bookmark: SavedSearch = {
+      id: `bookmark-${Date.now()}`,
+      name: name,
+      filters: JSON.parse(JSON.stringify(validFilters)), // Deep copy
+      createdAt: new Date()
+    };
+
+    // Save to localStorage
+    const existing = this.loadBookmarks();
+    existing.push(bookmark);
+    localStorage.setItem(this.bookmarkKey, JSON.stringify(existing));
+
+    // Emit to parent
+    this.savedSearchChange.emit(bookmark);
+    this.closeSaveDialog();
+  }
+
+  private loadBookmarks(): SavedSearch[] {
+    const raw = localStorage.getItem(this.bookmarkKey);
+    if (!raw) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(raw) as SavedSearch[];
+      // Convert date strings back to Date objects
+      return parsed.map(b => ({
+        ...b,
+        createdAt: new Date(b.createdAt)
+      }));
+    } catch {
+      return [];
+    }
   }
 }

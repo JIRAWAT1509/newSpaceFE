@@ -1,0 +1,136 @@
+<!-- monthly-breakdown-modal.component.html -->
+
+<div class="modal-overlay" (click)="onClose()">
+
+  <div class="modal-container" (click)="onModalClick($event)">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <h2 class="modal-title">
+          <i class="pi pi-calendar"></i>
+          <span>Monthly Budget Breakdown</span>
+        </h2>
+        <p class="modal-subtitle">{{ companyName() }} - Year {{ year() }}</p>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+
+      <!-- Summary Info -->
+      <div class="summary-card">
+        <div class="summary-row">
+          <span class="summary-label">Yearly Budget:</span>
+          <span class="summary-value">{{ formatCurrency(yearlyForecast()) }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Monthly Total:</span>
+          <span class="summary-value" [class.highlight]="!isBalanced()">
+            {{ formatCurrency(totalMonthlyForecast()) }}
+          </span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Difference:</span>
+          <span
+            class="summary-value"
+            [class.danger]="getStatusColor() === 'danger'"
+            [class.warning]="getStatusColor() === 'warning'"
+          >
+            {{ formatCurrency(Math.abs(difference())) }}
+          </span>
+        </div>
+        <div class="summary-row status-row">
+          <span class="summary-label">Status:</span>
+          <span class="status-badge" [attr.data-status]="getStatusColor()">
+            <i class="pi" [ngClass]="isBalanced() ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
+            <span>{{ getStatusText() }}</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <button class="action-btn" (click)="distributeEvenly()">
+          <i class="pi pi-chart-line"></i>
+          <span>Distribute Evenly</span>
+        </button>
+        <button class="action-btn" (click)="autoBalance()">
+          <i class="pi pi-calculator"></i>
+          <span>Auto Balance</span>
+        </button>
+      </div>
+
+      <!-- Monthly Inputs Grid -->
+      <div class="months-grid">
+        @for (month of months(); track month.month; let idx = $index) {
+          <div class="month-card">
+            <label class="month-label">
+              <span class="month-name">{{ getMonthName(month) }}</span>
+              <span class="month-number">#{{ month.month }}</span>
+            </label>
+            <p-inputNumber
+              [(ngModel)]="month.forecast"
+              (ngModelChange)="updateMonthForecast(idx, $event)"
+              mode="currency"
+              currency="THB"
+              locale="th-TH"
+              [min]="0"
+              styleClass="w-full"
+            ></p-inputNumber>
+
+            <!-- Actual vs Forecast (if has actual data) -->
+            @if (month.actual > 0) {
+              <div class="month-progress">
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    [style.width.%]="month.forecast > 0 ? Math.min(100, (month.actual / month.forecast) * 100) : 0"
+                  ></div>
+                </div>
+                <small class="progress-text">
+                  {{ formatCurrency(month.actual) }} / {{ formatCurrency(month.forecast) }}
+                  ({{ month.forecast > 0 ? Math.round((month.actual / month.forecast) * 100) : 0 }}%)
+                </small>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Help Text -->
+      <div class="help-box">
+        <i class="pi pi-info-circle"></i>
+        <div class="help-content">
+          <p class="help-title">Tips:</p>
+          <ul class="help-list">
+            <li>Click "Distribute Evenly" to split the yearly budget equally across all 12 months</li>
+            <li>Click "Auto Balance" to automatically adjust December to match the yearly total</li>
+            <li>The sum of all months must equal the yearly budget to save</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="onClose()">
+        <span>Cancel</span>
+      </button>
+      <button
+        class="btn-save"
+        (click)="onSave()"
+        [disabled]="!isValid()"
+      >
+        <i class="pi pi-check"></i>
+        <span>Save Monthly Breakdown</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>

@@ -1,10 +1,12 @@
 // meter-list.component.ts - FINAL CORRECTED
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Select } from 'primeng/select';
 import { MeterInputCardComponent } from '../meter-input-list/components/meter-input-card/meter-input-card.component';
-import { Meter, MeterType, MeterGroup } from '@core/models/meter.model';
+import { Meter, MeterType, MeterGroup, getMeterTypeLabel } from '@core/models/meter.model';
 import { MOCK_METER_GROUPS } from '@core/data/meter.mock';
+import { getFacilitiesUtilitiesConfig } from '@core/services/ui-settings';
+import { interval, Subscription } from 'rxjs';
 
 interface CompletedMeter extends Meter {
   completedDate: string;
@@ -19,22 +21,53 @@ interface CompletedMeter extends Meter {
   templateUrl: './meter-list.component.html',
   styleUrl: './meter-list.component.css'
 })
-export class MeterListComponent implements OnInit {
+export class MeterListComponent implements OnInit, OnDestroy {
   // State
   completedMeters = signal<CompletedMeter[]>([]);
   groups = signal<MeterGroup[]>([]);
-  selectedType = signal<MeterType | 'all'>('all');
+  selectedType = signal<MeterType | 'all' | string>('all');
   selectedGroup = signal<string | null>(null); // null = not selected
   expandedMeterId = signal<string | null>(null); // Only ONE expanded at a time
 
-  // Filter options
-  filterOptions = [
-    { type: 'all' as const, label: 'All Meters', icon: 'pi-th-large', color: '#667eea' },
-    { type: 'electricity' as const, label: 'Electricity', icon: 'pi-bolt', color: '#FFD700' },
-    { type: 'water' as const, label: 'Water', icon: 'pi-droplet', color: '#4CA3FF' },
-    { type: 'gas' as const, label: 'Gas', icon: 'pi-fire', color: '#FF6384' },
-    { type: 'ac' as const, label: 'Air Con', icon: 'pi-sun', color: '#80E08E' }
-  ];
+  private configCheckInterval?: Subscription;
+  // Signal to track config changes and force recomputation
+  private configVersion = signal<number>(0);
+
+  // Filter options - computed to include rentable items and use config values
+  filterOptions = computed(() => {
+    // Access configVersion to make this reactive to config changes
+    this.configVersion();
+    
+    // Get meter type info from config
+    const electricityInfo = getMeterTypeLabel('electricity');
+    const waterInfo = getMeterTypeLabel('water');
+    const gasInfo = getMeterTypeLabel('gas');
+    const acInfo = getMeterTypeLabel('ac');
+
+    const baseOptions = [
+      { type: 'all' as const, label: 'All Meters', icon: 'pi-th-large', color: '#667eea' },
+      { type: 'electricity' as const, label: electricityInfo.EN, icon: electricityInfo.icon, color: electricityInfo.color },
+      { type: 'water' as const, label: waterInfo.EN, icon: waterInfo.icon, color: waterInfo.color },
+      { type: 'gas' as const, label: gasInfo.EN, icon: gasInfo.icon, color: gasInfo.color },
+      { type: 'ac' as const, label: acInfo.EN, icon: acInfo.icon, color: acInfo.color }
+    ];
+
+    // Add rentable items from config
+    const config = getFacilitiesUtilitiesConfig();
+    const rentableItems = config.rentableItems || [];
+    
+    const rentableOptions = rentableItems
+      .filter(item => item.enabled)
+      .sort((a, b) => a.order - b.order)
+      .map(item => ({
+        type: `rentable_${item.id}` as const,
+        label: item.nameTh || item.name,
+        icon: item.icon || 'pi-box',
+        color: item.color || '#667eea'
+      }));
+
+    return [...baseOptions, ...rentableOptions];
+  });
 
   // Computed group dropdown options
   groupDropdownOptions = computed(() => {
@@ -50,7 +83,13 @@ export class MeterListComponent implements OnInit {
 
     // Filter by type
     if (type !== 'all') {
-      meters = meters.filter(m => m.meterType === type);
+      if (type.startsWith('rentable_')) {
+        // For rentable items, show all meters for now
+        // (This can be customized based on requirements)
+        return meters;
+      } else {
+        meters = meters.filter(m => m.meterType === type);
+      }
     }
 
     // Filter by group
@@ -91,7 +130,7 @@ export class MeterListComponent implements OnInit {
     }
 
     if (type !== 'all') {
-      const option = this.filterOptions.find(o => o.type === type);
+      const option = this.filterOptions().find((o: any) => o.type === type);
       title = `${title} - ${option?.label || ''}`;
     }
 
@@ -101,6 +140,35 @@ export class MeterListComponent implements OnInit {
   ngOnInit(): void {
     this.loadCompletedMeters();
     this.loadGroups();
+    
+    // Track last config hash to detect changes
+    let lastConfigHash = '';
+    
+    // Check for config changes every 1 second to refresh filter options
+    this.configCheckInterval = interval(1000).subscribe(() => {
+      const config = getFacilitiesUtilitiesConfig();
+      // Create hash of relevant config values
+      const configHash = JSON.stringify({
+        colors: config.colors,
+        labels: config.labels,
+        labelsEn: config.labelsEn,
+        icons: config.icons,
+        iconTypes: config.iconTypes,
+        rentableItems: config.rentableItems
+      });
+      
+      // If config changed, update version to trigger recomputation
+      if (configHash !== lastConfigHash) {
+        lastConfigHash = configHash;
+        this.configVersion.update(v => v + 1);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.configCheckInterval) {
+      this.configCheckInterval.unsubscribe();
+    }
   }
 
   loadCompletedMeters(): void {
@@ -155,12 +223,12 @@ export class MeterListComponent implements OnInit {
     this.groups.set(MOCK_METER_GROUPS);
   }
 
-  selectFilter(type: MeterType | 'all'): void {
+  selectFilter(type: MeterType | 'all' | string): void {
     this.selectedType.set(type);
     this.expandedMeterId.set(null); // Reset expanded
   }
 
-  isFilterSelected(type: MeterType | 'all'): boolean {
+  isFilterSelected(type: MeterType | 'all' | string): boolean {
     return this.selectedType() === type;
   }
 
@@ -169,7 +237,12 @@ export class MeterListComponent implements OnInit {
     this.expandedMeterId.set(null); // Reset expanded when group changes
   }
 
-  getMeterCountByType(type: MeterType): number {
+  getMeterCountByType(type: MeterType | string): number {
+    if (type.startsWith('rentable_')) {
+      // For rentable items, return total count for now
+      return this.completedMeters().length;
+    }
+    
     switch (type) {
       case 'electricity': return this.electricityCount();
       case 'water': return this.waterCount();

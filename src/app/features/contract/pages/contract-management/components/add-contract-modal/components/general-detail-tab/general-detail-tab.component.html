@@ -32,8 +32,9 @@
 
   <form [formGroup]="form()">
 
-    <!-- Header Section -->
+    <!-- Section A: ข้อมูลอ้างอิงเอกสาร -->
     <div class="form-section header-section" id="section-header">
+      <h4 class="section-title">A. ข้อมูลอ้างอิงเอกสาร</h4>
       <div class="form-grid-2">
         <!-- Row 1 -->
         <div class="form-group required">
@@ -74,7 +75,7 @@
 
         <!-- Row 2 -->
         <div class="form-group required">
-          <label>เลขที่ใบเสนอราคา บ.หลัก</label>
+          <label>เลขที่ใบเสนอราคา (น.หลัก)</label>
           <input
             type="text"
             pInputText
@@ -85,7 +86,7 @@
         </div>
 
         <div class="form-group">
-          <label>เลขที่ใบเสนอราคา บ.ร่วม</label>
+          <label>เลขที่ใบเสนอราคา (น.ร่วม)</label>
           <input
             type="text"
             pInputText
@@ -112,10 +113,10 @@
           </div>
         </div>
 
-        <div class="form-group required">
-          <label>สัญญาลงวันที่</label>
+        <div class="form-group">
+          <label>วันที่ระดับ Quotation</label>
           <p-datepicker
-            formControlName="contractDate"
+            formControlName="quotationLevelDate"
             [showIcon]="true"
             dateFormat="dd/mm/yy"
             placeholder="เลือกวันที่"
@@ -124,19 +125,22 @@
         </div>
 
         <!-- Row 4 -->
-        <div class="form-group">
-          <label>วันที่บันทึกสัญญา</label>
+        <div class="form-group required">
+          <label>วันที่ใบเสนอราคา</label>
           <p-datepicker
-            formControlName="recordDate"
+            formControlName="quotationDate"
             [showIcon]="true"
             dateFormat="dd/mm/yy"
             placeholder="เลือกวันที่"
             styleClass="w-full"
           ></p-datepicker>
+          @if (isFieldInvalid('quotationDate')) {
+            <small class="error-msg">กรุณาเลือกวันที่ใบเสนอราคา</small>
+          }
         </div>
 
         <div class="form-group">
-          <label>วันที่อนุมัติ</label>
+          <label>วันที่อนุมัติใบเสนอราคา</label>
           <p-datepicker
             formControlName="approvalDate"
             [showIcon]="true"
@@ -148,249 +152,21 @@
 
         <!-- Row 5 -->
         <div class="form-group">
-          <label>ใบแสดงเจตนาจอง</label>
-          <input
-            type="text"
-            pInputText
-            formControlName="intentionLetter"
-            class="w-full"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>การโอนไปสัญญาจอง</label>
-          <input
-            type="text"
-            pInputText
-            formControlName="transferToBooking"
-            class="w-full"
-          />
+          <label>วันที่บันทึกใบเสนอราคา</label>
+          <p-datepicker
+            formControlName="recordDate"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="เลือกวันที่"
+            styleClass="w-full"
+          ></p-datepicker>
         </div>
       </div>
     </div>
 
-    <!-- Section 1: ผู้ให้บริการ -->
-    <div class="form-section subsection" id="section-provider">
-      <h4 class="section-title">1. ผู้ให้บริการ</h4>
-
-      <div class="form-grid-2">
-        <div class="form-group required">
-          <label>สถานที่ทำสัญญา</label>
-          <div class="selector-field" (click)="openSelector('contractLocation')">
-            <input
-              type="text"
-              pInputText
-              formControlName="contractLocation"
-              placeholder="เลือกสถานที่"
-              readonly
-              class="w-full"
-            />
-            <i class="pi pi-search selector-icon"></i>
-          </div>
-        </div>
-
-        <div class="form-group required full-width">
-          <label>ที่อยู่สำนักงานใหญ่</label>
-          <textarea
-            pInputTextarea
-            formControlName="headOfficeAddress"
-            rows="2"
-            class="w-full"
-          ></textarea>
-        </div>
-
-        <div class="form-group required">
-          <label>ผู้ดำเนินการแทน</label>
-          <p-select
-            formControlName="representative"
-            [options]="representativeOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="เลือกผู้ดำเนินการ"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-
-        <div class="form-group full-width">
-          <label>ที่อยู่สาขาที่เช่า</label>
-          <textarea
-            pInputTextarea
-            formControlName="branchAddress"
-            rows="2"
-            class="w-full"
-          ></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>ผู้ติดต่อ</label>
-          <input
-            type="text"
-            pInputText
-            formControlName="contactPerson"
-            class="w-full"
-          />
-        </div>
-
-        <div class="form-group full-width">
-          <label>ที่อยู่ผู้ติดต่อ</label>
-          <div class="radio-group">
-            <p-radiobutton
-              formControlName="contactAddressType"
-              value="headOffice"
-              label="สำนักงานใหญ่"
-            />
-            <p-radiobutton
-              formControlName="contactAddressType"
-              value="branch"
-              label="สาขา"
-            />
-          </div>
-          <textarea
-            pInputTextarea
-            formControlName="contactAddress"
-            rows="2"
-            class="w-full mt-2"
-          ></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 2: ผู้รับบริการ -->
-    <div class="form-section subsection" id="section-customer">
-      <h4 class="section-title">2. ผู้รับบริการ</h4>
-
-      <div class="form-grid-2">
-        <div class="form-group required">
-          <label>รหัสลูกค้า</label>
-          <div class="input-with-button">
-            <div class="selector-field flex-1" (click)="openSelector('customerId')">
-              <input
-                type="text"
-                pInputText
-                formControlName="customerId"
-                placeholder="เลือกลูกค้า"
-                readonly
-                class="w-full"
-              />
-              <i class="pi pi-search selector-icon"></i>
-            </div>
-            <button type="button" class="action-btn" (click)="openCustomerDetails()">
-              บันทึกรายละเอียดลูกค้า
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group full-width">
-          <label>ที่อยู่ที่จัดส่งเอกสาร</label>
-          <div class="selector-field" (click)="openSelector('documentAddress')">
-            <input
-              type="text"
-              pInputText
-              formControlName="documentAddress"
-              placeholder="เลือกที่อยู่"
-              readonly
-              class="w-full"
-            />
-            <i class="pi pi-search selector-icon"></i>
-          </div>
-        </div>
-
-        <div class="form-group full-width">
-          <label>ที่อยู่สำหรับออกใบแจ้งหนี้</label>
-          <div class="selector-field" (click)="openSelector('billingAddress')">
-            <input
-              type="text"
-              pInputText
-              formControlName="billingAddress"
-              placeholder="เลือกที่อยู่"
-              readonly
-              class="w-full"
-            />
-            <i class="pi pi-search selector-icon"></i>
-          </div>
-        </div>
-
-        <div class="form-group full-width">
-          <label>ชื่อบริษัทที่ทำสัญญาด้วย</label>
-          <textarea
-            pInputTextarea
-            formControlName="companyName"
-            rows="2"
-            class="w-full"
-          ></textarea>
-        </div>
-
-        <!-- Authorized Person 1 -->
-        <div class="form-group required">
-          <label>ผู้ดำเนินการทำสัญญา 1</label>
-          <input
-            type="text"
-            pInputText
-            formControlName="authorizedPerson1"
-            class="w-full"
-          />
-        </div>
-
-        <div class="form-group required">
-          <label>โทรศัพท์</label>
-          <input
-            type="tel"
-            pInputText
-            formControlName="phone1"
-            class="w-full"
-          />
-        </div>
-
-        <div class="form-group required full-width">
-          <label>ในฐานะ</label>
-          <p-select
-            formControlName="position1"
-            [options]="positionOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="เลือกตำแหน่ง"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-
-        <!-- Authorized Person 2 -->
-        <div class="form-group">
-          <label>ผู้ดำเนินการทำสัญญา 2</label>
-          <input
-            type="text"
-            pInputText
-            formControlName="authorizedPerson2"
-            class="w-full"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>โทรศัพท์</label>
-          <input
-            type="tel"
-            pInputText
-            formControlName="phone2"
-            class="w-full"
-          />
-        </div>
-
-        <div class="form-group full-width">
-          <label>ในฐานะ</label>
-          <p-select
-            formControlName="position2"
-            [options]="positionOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="เลือกตำแหน่ง"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 3: สินค้า/บริการ -->
+    <!-- Section B: ข้อมูลสินค้า/บริการ (ต้นทาง) -->
     <div class="form-section subsection" id="section-products">
-      <h4 class="section-title">3. สินค้า/บริการ</h4>
+      <h4 class="section-title">B. ข้อมูลสินค้า/บริการ (ต้นทาง)</h4>
 
       <div class="form-grid-2">
         <div class="form-group required">
@@ -441,18 +217,14 @@
         </div>
 
         <div class="form-group full-width">
-          <label>หมวดสินค้า/บริการ</label>
-          <div class="selector-field" (click)="openSelector('productCategory')">
-            <input
-              type="text"
-              pInputText
-              formControlName="productCategory"
-              placeholder="เลือกหมวดสินค้า"
-              readonly
-              class="w-full"
-            />
-            <i class="pi pi-search selector-icon"></i>
-          </div>
+          <label>สินค้า/บริการหลัก</label>
+          <textarea
+            pInputTextarea
+            formControlName="businessName"
+            rows="2"
+            class="w-full"
+            placeholder="กรอกสินค้า/บริการหลัก"
+          ></textarea>
         </div>
 
         <!-- Product Types 1-6 -->
@@ -488,109 +260,87 @@
       </div>
     </div>
 
-    <!-- Section 4: ผู้ลงนาม/อนุมัติ -->
-    <div class="form-section subsection" id="section-signatories">
-      <h4 class="section-title">4. ผู้ลงนาม/อนุมัติ</h4>
+    <!-- Section C: ข้อมูลพื้นที่ (จากใบเสนอราคา) -->
+    <div class="form-section subsection" id="section-area">
+      <h4 class="section-title">C. ข้อมูลพื้นที่ (จากใบเสนอราคา)</h4>
 
       <div class="form-grid-2">
-        <!-- Provider 1 -->
-        <div class="form-group">
-          <label>ผู้ให้บริการ 1</label>
-          <div class="selector-field" (click)="openSelector('provider1')">
+        <div class="form-group required">
+          <label>อาคาร</label>
+          <div class="selector-field" (click)="openSelector('areaBuilding')">
             <input
               type="text"
               pInputText
-              formControlName="provider1"
-              placeholder="เลือกผู้ให้บริการ"
+              formControlName="areaBuilding"
+              placeholder="เลือกอาคาร"
               readonly
               class="w-full"
             />
             <i class="pi pi-search selector-icon"></i>
           </div>
+          @if (isFieldInvalid('areaBuilding')) {
+            <small class="error-msg">กรุณาเลือกอาคาร</small>
+          }
         </div>
 
-        <div class="form-group">
-          <label>ในฐานะ</label>
-          <p-select
-            formControlName="providerPosition1"
-            [options]="positionOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="เลือกตำแหน่ง"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-
-        <!-- Provider 2 -->
-        <div class="form-group">
-          <label>ผู้ให้บริการ 2</label>
-          <div class="selector-field" (click)="openSelector('provider2')">
+        <div class="form-group required">
+          <label>ชั้น</label>
+          <div class="selector-field" (click)="openSelector('areaFloor')">
             <input
               type="text"
               pInputText
-              formControlName="provider2"
-              placeholder="เลือกผู้ให้บริการ"
+              formControlName="areaFloor"
+              placeholder="เลือกชั้น"
               readonly
               class="w-full"
             />
             <i class="pi pi-search selector-icon"></i>
           </div>
+          @if (isFieldInvalid('areaFloor')) {
+            <small class="error-msg">กรุณาเลือกชั้น</small>
+          }
         </div>
 
-        <div class="form-group">
-          <label>ในฐานะ</label>
-          <p-select
-            formControlName="providerPosition2"
-            [options]="positionOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="เลือกตำแหน่ง"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-
-        <!-- Witnesses -->
-        <div class="form-group">
-          <label>พยานที่ 1</label>
-          <div class="selector-field" (click)="openSelector('witness1')">
-            <input
-              type="text"
-              pInputText
-              formControlName="witness1"
-              placeholder="เลือกพยาน"
-              readonly
-              class="w-full"
-            />
-            <i class="pi pi-search selector-icon"></i>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>พยานที่ 2</label>
-          <div class="selector-field" (click)="openSelector('witness2')">
-            <input
-              type="text"
-              pInputText
-              formControlName="witness2"
-              placeholder="เลือกพยาน"
-              readonly
-              class="w-full"
-            />
-            <i class="pi pi-search selector-icon"></i>
-          </div>
-        </div>
-
-        <!-- Contract Creator -->
-        <div class="form-group full-width">
-          <label>ชื่อผู้ทำสัญญา</label>
+        <div class="form-group required">
+          <label>เลขที่ยูนิต / ห้อง</label>
           <input
             type="text"
             pInputText
-            formControlName="contractCreator"
-            value="SPACE"
-            readonly
+            formControlName="areaUnitNumber"
+            placeholder="กรอกเลขที่ยูนิต/ห้อง"
             class="w-full"
           />
+          @if (isFieldInvalid('areaUnitNumber')) {
+            <small class="error-msg">กรุณากรอกเลขที่ยูนิต/ห้อง</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>พื้นที่รวม (ตร.ม.)</label>
+          <input
+            type="number"
+            pInputText
+            formControlName="areaTotal"
+            placeholder="0.00"
+            class="w-full"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label>ประเภทพื้นที่ (Retail / Kiosk / ฯลฯ)</label>
+          <div class="selector-field" (click)="openSelector('areaType')">
+            <input
+              type="text"
+              pInputText
+              formControlName="areaType"
+              placeholder="เลือกประเภทพื้นที่"
+              readonly
+              class="w-full"
+            />
+            <i class="pi pi-search selector-icon"></i>
+          </div>
         </div>
       </div>
     </div>

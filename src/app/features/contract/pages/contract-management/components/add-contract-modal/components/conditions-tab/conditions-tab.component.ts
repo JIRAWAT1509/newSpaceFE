@@ -1,7 +1,9 @@
 // conditions-tab.component.ts
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, input, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Select } from 'primeng/select';
+import { DatePicker } from 'primeng/datepicker';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 
@@ -22,6 +24,8 @@ interface ContractCondition {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    Select,
+    DatePicker,
     InputText,
     Textarea
   ],
@@ -29,13 +33,15 @@ interface ContractCondition {
   styleUrl: './conditions-tab.component.css'
 })
 export class ConditionsTabComponent implements OnInit {
-  form!: FormGroup;
+  form = input<FormGroup>();
   conditionForm!: FormGroup;
 
   sections: Section[] = [
-    { id: 'subject', name: 'เรื่อง' },
-    { id: 'contract-conditions', name: 'เงื่อนไขตามสัญญา' },
-    { id: 'internal-notes', name: 'บันทึกภายใน' }
+    { id: 'duration', name: 'ระยะเวลา & การต่อสัญญา' },
+    { id: 'financial', name: 'เงื่อนไขทางการเงิน' },
+    { id: 'special', name: 'เงื่อนไขพิเศษ' },
+    { id: 'addendum', name: 'บันทึกแนบท้ายสัญญา' },
+    { id: 'additional', name: 'เงื่อนไขเพิ่มเติม' }
   ];
 
   // State
@@ -43,18 +49,16 @@ export class ConditionsTabComponent implements OnInit {
   editingIndex = signal<number | null>(null);
   conditionList = signal<ContractCondition[]>([]);
 
+  // Dropdown options
+  yesNoOptions = [
+    { label: 'YES', value: true },
+    { label: 'NO', value: false }
+  ];
+
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    this.initForm();
     this.initConditionForm();
-  }
-
-  initForm(): void {
-    this.form = this.fb.group({
-      subject: [''],
-      internalNotes: ['']
-    });
   }
 
   initConditionForm(): void {
@@ -67,25 +71,27 @@ export class ConditionsTabComponent implements OnInit {
 
   // ==================== SECTION PROGRESS ====================
   isSectionCompleted(sectionId: string): boolean {
+    if (!this.form()) return false;
     const requiredFields = this.getRequiredFieldsBySection(sectionId);
     return requiredFields.every(field => {
-      const control = this.form.get(field);
+      const control = this.form()!.get(field);
       return control && control.valid && control.value;
     });
   }
 
   getSectionProgress(sectionId: string): number {
+    if (!this.form()) return 0;
     const requiredFields = this.getRequiredFieldsBySection(sectionId);
     if (requiredFields.length === 0) {
-      // For conditions section, check if any conditions exist
-      if (sectionId === 'contract-conditions') {
+      // For additional conditions section, check if any conditions exist
+      if (sectionId === 'additional') {
         return this.conditionList().length > 0 ? 100 : 0;
       }
       return 100;
     }
 
     const completedFields = requiredFields.filter(field => {
-      const control = this.form.get(field);
+      const control = this.form()!.get(field);
       return control && control.valid && control.value;
     }).length;
 
@@ -94,12 +100,16 @@ export class ConditionsTabComponent implements OnInit {
 
   getRequiredFieldsBySection(sectionId: string): string[] {
     switch (sectionId) {
-      case 'subject':
-        return ['subject'];
-      case 'contract-conditions':
-        return []; // Handled separately by checking list
-      case 'internal-notes':
+      case 'duration':
+        return ['durationYears', 'contractStartDate', 'contractEndDate'];
+      case 'financial':
+        return ['rentRate', 'creditTermRent', 'creditTermUtility'];
+      case 'special':
         return [];
+      case 'addendum':
+        return [];
+      case 'additional':
+        return []; // Handled separately by checking conditionList
       default:
         return [];
     }

@@ -5,7 +5,10 @@
 
   <div class="stats-grid">
     @for (card of statCards(); track card.label) {
-      <div class="stat-card" [style.background]="card.bgGradient">
+      <div
+        class="stat-card"
+        [ngClass]="'stat-card--' + card.tone"
+      >
         <!-- Decorative Background -->
         <div class="stat-card-bg"></div>
 
@@ -26,7 +29,10 @@
         <div class="stat-label">{{ card.label }}</div>
 
         <!-- Change Badge -->
-        <div class="stat-change" [style.background-color]="getChangeColor(card.change)">
+        <div
+          class="stat-change"
+          [ngClass]="card.change > 0 ? 'stat-change--positive' : 'stat-change--negative'"
+        >
           <i class="pi" [ngClass]="getChangeIcon(card.change)"></i>
           <span>{{ card.change > 0 ? '+' : '' }}{{ card.change }}%</span>
         </div>

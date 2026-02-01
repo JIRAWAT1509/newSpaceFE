@@ -1,0 +1,41 @@
+<!-- budget-summary.component.html -->
+
+<div class="budget-summary">
+
+  <h3 class="summary-title">
+    <i class="pi pi-chart-line"></i>
+    <span>Budget Summary</span>
+  </h3>
+
+  <div class="summary-content">
+
+    <div class="summary-row">
+      <span class="summary-label">Company Budget (Forecast):</span>
+      <span class="summary-value">{{ formatCurrency(company().budget.forecast) }}</span>
+    </div>
+
+    <div class="summary-row">
+      <span class="summary-label">Total Team Budgets:</span>
+      <span class="summary-value" [class.highlight]="!validation().valid">
+        {{ formatCurrency(totalTeamBudgets()) }}
+      </span>
+    </div>
+
+    <div class="summary-row">
+      <span class="summary-label">Difference:</span>
+      <span class="summary-value" [class.danger]="statusType() === 'over'" [class.warning]="statusType() === 'under'">
+        {{ formatCurrency(Math.abs(validation().difference)) }}
+      </span>
+    </div>
+
+    <div class="summary-row status-row">
+      <span class="summary-label">Status:</span>
+      <span class="status-badge" [attr.data-status]="statusType()">
+        <i class="pi" [ngClass]="getStatusIcon()"></i>
+        <span>{{ getStatusText() }}</span>
+      </span>
+    </div>
+
+  </div>
+
+</div>

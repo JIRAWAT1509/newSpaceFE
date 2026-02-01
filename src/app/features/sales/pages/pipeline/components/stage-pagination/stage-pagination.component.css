@@ -1,0 +1,116 @@
+/* stage-pagination.component.css */
+
+/* ==================== CONTAINER ==================== */
+.pagination-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  border-radius: 0 0 12px 12px;
+}
+
+/* ==================== INFO TEXT ==================== */
+.pagination-info {
+  text-align: center;
+}
+
+.info-text {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ==================== CONTROLS ==================== */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Buttons */
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.pagination-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  font-size: 14px;
+}
+
+.btn-label {
+  font-size: 13px;
+}
+
+/* Page Selector */
+.pagination-page-selector {
+  flex: 1;
+  max-width: 200px;
+}
+
+/* ==================== PER PAGE SELECTOR ==================== */
+.pagination-per-page {
+  display: flex;
+  justify-content: center;
+}
+
+/* ==================== PRIMENG OVERRIDES ==================== */
+::ng-deep .page-select,
+::ng-deep .per-page-select {
+  width: 100%;
+}
+
+::ng-deep .page-select .p-select,
+::ng-deep .per-page-select .p-select {
+  width: 100%;
+}
+
+::ng-deep .page-select .p-select-label,
+::ng-deep .per-page-select .p-select-label {
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 640px) {
+  .pagination-controls {
+    flex-wrap: wrap;
+  }
+
+  .pagination-page-selector {
+    order: 3;
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .pagination-btn {
+    flex: 1;
+  }
+}

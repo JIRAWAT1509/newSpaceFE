@@ -1,0 +1,91 @@
+<!-- stage-column.component.html -->
+
+<div class="stage-column">
+
+  <!-- Stage Header -->
+  <div class="stage-header">
+    <div class="stage-header-top">
+      <div class="stage-info">
+        <div class="stage-color" [style.background]="stage().color"></div>
+        <span class="stage-name">{{ stage().name }}</span>
+        <span class="stage-count">{{ deals().length }}</span>
+      </div>
+      <button
+        class="stage-settings-btn"
+        (click)="onStageSettings()"
+        title="Stage settings"
+        type="button"
+      >
+        ⚙️
+      </button>
+    </div>
+
+    <!-- Stage Metrics -->
+    <div class="stage-metrics">
+      <div class="metric-item">
+        <span class="metric-label">Total:</span>
+        <span class="metric-value">{{ formatCurrency(stageMetrics().totalValue) }}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Weighted:</span>
+        <span class="metric-value">{{ formatCurrency(stageMetrics().totalWeightedValue) }}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Forecast:</span>
+        <span class="metric-value">{{ stageMetrics().forecastWinRate }}%</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">Actual:</span>
+        <span class="metric-value">{{ stageMetrics().actualWinRate }}%</span>
+      </div>
+    </div>
+
+    <!-- Sort Selector -->
+    <div class="stage-sort">
+      <p-select
+        [ngModel]="viewConfig().sortBy"
+        (ngModelChange)="onSortChange($event)"
+        [options]="sortOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sort by..."
+        styleClass="sort-select"
+      ></p-select>
+    </div>
+  </div>
+
+  <!-- Deals List (Drop Zone) -->
+  <div
+    class="deals-list"
+    (dragover)="onDragOver($event)"
+    (drop)="onDrop($event)"
+  >
+    @if (paginatedDeals().length > 0) {
+      @for (deal of paginatedDeals(); track deal.id) {
+        <app-deal-card
+          [deal]="deal"
+          (clicked)="onDealClicked(deal.id)"
+          (menuClicked)="onDealMenuClicked(deal.id)"
+        />
+      }
+    } @else {
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-text">No deals in this stage</div>
+      </div>
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (deals().length > 0) {
+    <app-stage-pagination
+      [currentPage]="viewConfig().currentPage"
+      [totalPages]="totalPages()"
+      [totalDeals]="sortedDeals().length"
+      [cardsPerPage]="viewConfig().cardsPerPage"
+      (pageChange)="onPageChange($event)"
+      (cardsPerPageChange)="onCardsPerPageChange($event)"
+    />
+  }
+
+</div>

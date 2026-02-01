@@ -4,10 +4,13 @@ import { Routes } from '@angular/router';
 export const COLLECTION_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'sales/daily',
+    redirectTo: 'finance/master',
     pathMatch: 'full'
   },
-
+{
+    path: 'finance/master',
+    loadComponent: () => import('../finance/pages/finance-master/finance-master.component').then(m => m.FinanceMasterComponent)
+  },
   // Sales Recording
   {
     path: 'sales/daily',

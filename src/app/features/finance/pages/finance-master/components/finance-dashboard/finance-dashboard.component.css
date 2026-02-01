@@ -106,7 +106,7 @@
 }
 
 .overdue-days.critical {
-  @apply text-red-600;
+  color: rgb(var(--danger));
 }
 
 /* Status Badge */
@@ -115,15 +115,18 @@
 }
 
 .status-badge.status-new {
-  @apply bg-green-100 text-green-700;
+  background: rgb(var(--success) / 0.18);
+  color: rgb(var(--success));
 }
 
 .status-badge.status-warning {
-  @apply bg-yellow-100 text-yellow-700;
+  background: rgb(var(--warning) / 0.18);
+  color: rgb(var(--warning));
 }
 
 .status-badge.status-critical {
-  @apply bg-red-100 text-red-700;
+  background: rgb(var(--danger) / 0.18);
+  color: rgb(var(--danger));
 }
 
 /* Action Buttons */

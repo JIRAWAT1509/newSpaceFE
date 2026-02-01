@@ -1,0 +1,50 @@
+<!-- company-budget-card.component.html -->
+
+<div class="company-budget-card">
+
+  <!-- Header -->
+  <div class="company-header">
+    <div class="company-info">
+      <h2 class="company-name">{{ company().name }}</h2>
+      <div class="company-meta">
+        <span class="meta-item">
+          <i class="pi pi-users"></i>
+          <span>Teams: {{ getTeamsCount() }}</span>
+        </span>
+        <span class="meta-item">
+          <i class="pi pi-user"></i>
+          <span>Members: {{ getMembersCount() }}</span>
+        </span>
+        <span class="meta-item">
+          <i class="pi pi-calendar"></i>
+          <span>Year: {{ company().year }}</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="company-actions">
+      <button class="btn-secondary" (click)="onEdit()">
+        <i class="pi pi-pencil"></i>
+        <span>Edit</span>
+      </button>
+      <button class="btn-secondary" (click)="onViewMonthly()">
+        <i class="pi pi-chart-bar"></i>
+        <span>Monthly Breakdown</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Budget Bar -->
+  <div class="budget-section">
+    <app-budget-bar
+      [actual]="company().budget.actual"
+      [forecast]="company().budget.forecast"
+      [size]="'large'"
+      [label]="'Company Budget'"
+      [showLabel]="true"
+      [showValues]="true"
+      [showPercentage]="true"
+    ></app-budget-bar>
+  </div>
+
+</div>

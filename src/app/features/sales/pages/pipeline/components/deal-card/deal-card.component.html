@@ -1,0 +1,108 @@
+<!-- deal-card.component.html -->
+
+<div class="deal-card" (click)="onCardClick()" draggable="true">
+
+  <!-- Header: Customer + Menu -->
+  <div class="deal-header">
+    <div class="deal-customer">
+      <div class="customer-avatar">{{ getCustomerInitials() }}</div>
+      <span class="customer-name">{{ deal().customerName }}</span>
+    </div>
+    <button class="deal-menu" (click)="onMenuClick($event)" type="button">⋮</button>
+  </div>
+
+  <!-- Deal Title -->
+  <div class="deal-title">{{ deal().title }}</div>
+
+  <!-- Deal Value -->
+  <div class="deal-value">{{ formatCurrency(deal().value) }}</div>
+
+  <!-- Actual Win Rate (Probability) -->
+  <div class="deal-probability">
+    <div class="probability-label">
+      <span>Probability</span>
+      <span class="probability-value">{{ deal().actualWinRate }}%</span>
+    </div>
+    <div class="probability-bar">
+      <div class="probability-fill" [style.width.%]="deal().actualWinRate"></div>
+    </div>
+  </div>
+
+  <!-- Location Info -->
+  @if (deal().areaName || deal().buildingName) {
+    <div class="deal-location">
+      @if (deal().areaName) {
+        <span class="location-item">
+          <span class="location-icon">📍</span>
+          {{ deal().areaName }}
+        </span>
+      }
+      @if (deal().buildingName) {
+        <span class="location-item">
+          <span class="location-icon">🏢</span>
+          {{ deal().buildingName }} @if (deal().floorNumber) { Fl.{{ deal().floorNumber }} }
+        </span>
+      }
+    </div>
+  }
+
+  <!-- Due Date Status -->
+  <div class="deal-due" [ngClass]="getDueStatusClass()">
+    <span class="due-icon">{{ getDueStatusIcon() }}</span>
+    <span class="due-text">{{ getDueStatusText() }}</span>
+  </div>
+
+  <!-- Tags -->
+  @if (deal().tags.length > 0) {
+    <div class="deal-tags">
+      @for (tag of deal().tags; track tag) {
+        <span class="deal-tag">{{ tag }}</span>
+      }
+    </div>
+  }
+
+  <!-- Last Activity -->
+  @if (deal().lastActivityType) {
+    <div class="deal-activity">
+      <span class="activity-type">{{ getLastActivityText() }}</span>
+      <span class="activity-time">{{ getTimeAgo() }}</span>
+    </div>
+  }
+
+  <!-- Footer -->
+  <div class="deal-footer">
+    <div class="footer-left">
+      <div class="deal-owner">
+        <div class="owner-avatar">{{ getOwnerInitials() }}</div>
+        <span class="owner-name">{{ deal().ownerName }}</span>
+      </div>
+    </div>
+
+    <div class="footer-right">
+      <!-- Attachment & Activity Counts -->
+      @if (deal().attachmentCount > 0 || deal().activityCount > 0) {
+        <div class="deal-counts">
+          @if (deal().attachmentCount > 0) {
+            <span class="count-item" title="Attachments">
+              <span class="count-icon">📎</span>
+              <span class="count-value">{{ deal().attachmentCount }}</span>
+            </span>
+          }
+          @if (deal().activityCount > 0) {
+            <span class="count-item" title="Activities">
+              <span class="count-icon">💬</span>
+              <span class="count-value">{{ deal().activityCount }}</span>
+            </span>
+          }
+        </div>
+      }
+
+      <!-- Priority Badge -->
+      <div class="deal-priority" [ngClass]="getPriorityClass()">
+        <span class="priority-icon">{{ getPriorityIcon() }}</span>
+        <span class="priority-label">{{ getPriorityLabel() }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,372 @@
+/* deal-card.component.css */
+
+/* ==================== CARD CONTAINER ==================== */
+.deal-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.deal-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.deal-card[draggable="true"] {
+  cursor: grab;
+}
+
+.deal-card:active {
+  cursor: grabbing;
+}
+
+/* ==================== HEADER ==================== */
+.deal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.deal-customer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.customer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.customer-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deal-menu {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.deal-menu:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* ==================== TITLE & VALUE ==================== */
+.deal-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.deal-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #10b981;
+  margin-bottom: 10px;
+}
+
+/* ==================== PROBABILITY ==================== */
+.deal-probability {
+  margin-bottom: 10px;
+}
+
+.probability-label {
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.probability-value {
+  font-weight: 700;
+  color: #374151;
+}
+
+.probability-bar {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.probability-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* ==================== LOCATION ==================== */
+.deal-location {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.location-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.location-icon {
+  font-size: 12px;
+}
+
+/* ==================== DUE DATE ==================== */
+.deal-due {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.deal-due.overdue {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.deal-due.warning {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.deal-due.ok {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.due-icon {
+  font-size: 12px;
+}
+
+.due-text {
+  flex: 1;
+}
+
+/* ==================== TAGS ==================== */
+.deal-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.deal-tag {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ==================== ACTIVITY ==================== */
+.deal-activity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 10px;
+  padding: 6px 8px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.activity-type {
+  font-weight: 600;
+}
+
+.activity-time {
+  font-weight: 400;
+}
+
+/* ==================== FOOTER ==================== */
+.deal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid #f3f4f6;
+  gap: 8px;
+}
+
+.footer-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Owner */
+.deal-owner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.owner-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.owner-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Counts */
+.deal-counts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.count-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.count-icon {
+  font-size: 12px;
+}
+
+.count-value {
+  font-weight: 600;
+}
+
+/* Priority */
+.deal-priority {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.deal-priority.high {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.deal-priority.medium {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.deal-priority.low {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.priority-icon {
+  font-size: 10px;
+}
+
+.priority-label {
+  white-space: nowrap;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .deal-card {
+    padding: 12px;
+  }
+
+  .deal-location {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .deal-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .footer-left,
+  .footer-right {
+    width: 100%;
+  }
+
+  .footer-right {
+    justify-content: space-between;
+  }
+}

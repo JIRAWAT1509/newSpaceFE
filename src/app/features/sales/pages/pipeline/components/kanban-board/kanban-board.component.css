@@ -1,0 +1,51 @@
+/* kanban-board.component.css */
+
+/* ==================== BOARD CONTAINER ==================== */
+.kanban-board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 16px;
+  height: calc(100vh - 300px); /* Adjust based on header/metrics height */
+  min-height: 600px;
+}
+
+/* Custom scrollbar for horizontal scroll */
+.kanban-board::-webkit-scrollbar {
+  height: 10px;
+}
+
+.kanban-board::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 5px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 5px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* ==================== SMOOTH SCROLLING ==================== */
+.kanban-board {
+  scroll-behavior: smooth;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .kanban-board {
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .kanban-board {
+    gap: 8px;
+    padding: 8px;
+  }
+}

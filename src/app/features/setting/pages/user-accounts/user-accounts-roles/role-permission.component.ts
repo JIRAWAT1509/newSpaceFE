@@ -1,5 +1,5 @@
 // role-permission.component.ts - Main component for role and permission management
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -95,7 +95,10 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
 
   // ==================== CONSTRUCTOR ====================
 
-  constructor(private rolePermissionService: RolePermissionService) {
+  constructor(
+    private rolePermissionService: RolePermissionService,
+    private cdr: ChangeDetectorRef
+  ) {
     // Setup search debounce
     this.searchSubject
       .pipe(
@@ -475,7 +478,26 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Apply selected template
+   * Cancel template modal
+   */
+  cancelTemplateModal(): void {
+    this.showTemplateModal = false;
+    this.selectedTemplate = '';
+  }
+
+  /**
+   * Handle template selection (does NOT apply, just selects)
+   */
+  onTemplateSelect(templateId: string): void {
+    this.selectedTemplate = templateId;
+    // Force change detection to update footer button
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    }, 0);
+  }
+
+  /**
+   * Apply selected template (only called when user clicks Apply Template button)
    */
   applyTemplate(): void {
     if (!this.selectedTemplate) return;
@@ -503,6 +525,7 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
     this.hasChanges = true;
     this.updateSummary();
     this.showTemplateModal = false;
+    this.selectedTemplate = '';
     this.showSuccess(`Template "${template.name}" applied successfully`);
   }
 
@@ -514,6 +537,14 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   openCopyModal(): void {
     this.copyFromRole = '';
     this.showCopyModal = true;
+  }
+
+  /**
+   * Cancel copy modal
+   */
+  cancelCopyModal(): void {
+    this.showCopyModal = false;
+    this.copyFromRole = '';
   }
 
   /**
@@ -535,6 +566,7 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.showCopyModal = false;
+          this.copyFromRole = '';
           this.loadPermissions();
           this.showSuccess('Permissions copied successfully');
         },
@@ -681,5 +713,15 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   getRoleLabel(value: string): string {
     const role = this.roles.find(r => r.USER_GROUP === value);
     return role ? role.GROUP_NAME : value;
+  }
+
+  /**
+   * Open Add Role modal
+   */
+  openAddRoleModal(): void {
+    // TODO: Implement Add Role functionality
+    // For now, just show a message
+    this.showSuccess('Add Role feature coming soon');
+    // You can add a modal here similar to copy/template modals
   }
 }

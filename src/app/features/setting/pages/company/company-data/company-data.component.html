@@ -95,23 +95,23 @@
         </div>
         <p-button
           *ngIf="selectedCategory === 'company'"
-          label="Add Company"
+          label="เพิ่ม"
           icon="pi pi-plus"
-          severity="success"
+          severity="primary"
           (onClick)="openAddCompanyModal()"
         ></p-button>
         <p-button
           *ngIf="selectedCategory === 'legal'"
-          label="Add Legal Entity"
+          label="เพิ่ม"
           icon="pi pi-plus"
-          severity="success"
+          severity="primary"
           (onClick)="openAddLegalModal()"
         ></p-button>
         <p-button
           *ngIf="selectedCategory === 'branch'"
-          label="Add Branch"
+          label="เพิ่ม"
           icon="pi pi-plus"
-          severity="success"
+          severity="primary"
           (onClick)="openAddBranchModal()"
         ></p-button>
       </div>
@@ -142,14 +142,24 @@
             <td (click)="openEditCompanyModal(company)">{{ company.COMP_CODE }}</td>
             <td (click)="openEditCompanyModal(company)">{{ company.OU_NAME }}</td>
             <td class="actions-column">
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                severity="danger"
-                size="small"
-                (onClick)="deleteCompany(company)"
-              ></p-button>
+              <div class="flex items-center justify-center gap-2">
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="info"
+                  size="small"
+                  (onClick)="openEditCompanyModal(company); $event.stopPropagation()"
+                ></p-button>
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  (onClick)="deleteCompany(company); $event.stopPropagation()"
+                ></p-button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -194,14 +204,24 @@
               </span>
             </td>
             <td class="actions-column">
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                severity="danger"
-                size="small"
-                (onClick)="deleteLegal(legal)"
-              ></p-button>
+              <div class="flex items-center justify-center gap-2">
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="info"
+                  size="small"
+                  (onClick)="openEditLegalModal(legal); $event.stopPropagation()"
+                ></p-button>
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  (onClick)="deleteLegal(legal); $event.stopPropagation()"
+                ></p-button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -246,14 +266,24 @@
               </span>
             </td>
             <td class="actions-column">
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                severity="danger"
-                size="small"
-                (onClick)="deleteBranch(branch)"
-              ></p-button>
+              <div class="flex items-center justify-center gap-2">
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="info"
+                  size="small"
+                  (onClick)="openEditBranchModal(branch); $event.stopPropagation()"
+                ></p-button>
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  (onClick)="deleteBranch(branch); $event.stopPropagation()"
+                ></p-button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -334,7 +364,7 @@
   <ng-template pTemplate="footer">
     <div class="modal-footer">
       <p-button
-        label="Cancel"
+        label="ยกเลิก"
         icon="pi pi-times"
         severity="secondary"
         [outlined]="true"
@@ -342,7 +372,7 @@
         [disabled]="isSaving"
       ></p-button>
       <p-button
-        [label]="isEditMode ? 'Save Changes' : 'Create Company'"
+        [label]="isEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างบริษัท'"
         icon="pi pi-check"
         severity="primary"
         (onClick)="saveCompanyModal()"
@@ -518,7 +548,7 @@
   <ng-template pTemplate="footer">
     <div class="modal-footer">
       <p-button
-        label="Cancel"
+        label="ยกเลิก"
         icon="pi pi-times"
         severity="secondary"
         [outlined]="true"
@@ -526,7 +556,7 @@
         [disabled]="isSaving"
       ></p-button>
       <p-button
-        [label]="isEditMode ? 'Save Changes' : 'Create Legal Entity'"
+        [label]="isEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างนิติบุคคล'"
         icon="pi pi-check"
         severity="primary"
         (onClick)="saveLegalModal()"
@@ -769,7 +799,7 @@
   <ng-template pTemplate="footer">
     <div class="modal-footer">
       <p-button
-        label="Cancel"
+        label="ยกเลิก"
         icon="pi pi-times"
         severity="secondary"
         [outlined]="true"
@@ -777,7 +807,7 @@
         [disabled]="isSaving"
       ></p-button>
       <p-button
-        [label]="isEditMode ? 'Save Changes' : 'Create Branch'"
+        [label]="isEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างสาขา'"
         icon="pi pi-check"
         severity="primary"
         (onClick)="saveBranchModal()"

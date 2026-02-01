@@ -1,4 +1,4 @@
-<div class="area-availability-container">
+<div class="area-availability-container" data-module="areaAvailability">
   <div class="section-header">
     <h2 class="section-title">Area Availability</h2>
   </div>
@@ -10,11 +10,14 @@
         [class]="getStatusCardClasses(status.id)"
         (click)="toggleFilter(status.id)"
       >
-        <!-- Icon Circle -->
-        <div class="icon-circle" [style.backgroundColor]="status.color">
-          <i class="pi pi-building"></i>
+        <!-- Status Icon -->
+        <div class="icon-circle" [style.backgroundColor]="status.color" [attr.aria-hidden]="true">
+          @if (getStatusIconType(status.id) === 'upload') {
+            <img [src]="getStatusIcon(status.id)" alt="" class="status-icon-image" />
+          } @else {
+            <i class="pi" [ngClass]="getStatusIcon(status.id)" aria-hidden="true"></i>
+          }
         </div>
-
         <!-- Content -->
         <div class="card-content">
           <div class="card-header">

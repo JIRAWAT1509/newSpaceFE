@@ -1,0 +1,135 @@
+/* budget-summary.component.css */
+
+.budget-summary {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== TITLE ==================== */
+.summary-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+}
+
+.summary-title i {
+  font-size: 0.9375rem;
+  color: #3b82f6;
+}
+
+/* ==================== CONTENT ==================== */
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-row.status-row {
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  border-top: 2px solid #f3f4f6;
+  border-bottom: none;
+}
+
+.summary-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.summary-value.highlight {
+  color: #3b82f6;
+}
+
+.summary-value.danger {
+  color: #dc2626;
+}
+
+.summary-value.warning {
+  color: #f59e0b;
+}
+
+/* ==================== STATUS BADGE ==================== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-badge[data-status="balanced"] {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.status-badge[data-status="over"] {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-badge[data-status="under"] {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-badge i {
+  font-size: 0.875rem;
+}
+
+/* ==================== UTILITY ==================== */
+.Math {
+  /* For Math.abs() in template */
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 640px) {
+  .budget-summary {
+    padding: 1rem;
+  }
+
+  .summary-title {
+    font-size: 0.9375rem;
+  }
+
+  .summary-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.375rem;
+  }
+
+  .summary-value {
+    font-size: 1rem;
+  }
+
+  .status-badge {
+    width: 100%;
+    justify-content: center;
+  }
+}

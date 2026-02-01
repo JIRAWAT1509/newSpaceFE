@@ -32,20 +32,8 @@ export class ContractTableComponent {
   simpleSearchText = signal<string>('');
   activeFilters = signal<SearchFilter[]>([]);
 
-  savedSearches = signal<SavedSearch[]>([
-    {
-      id: 'bookmark1',
-      name: 'Bookmark1',
-      filters: [],
-      createdAt: new Date()
-    },
-    {
-      id: 'bookmark2',
-      name: 'Bookmark2',
-      filters: [],
-      createdAt: new Date()
-    }
-  ]);
+  savedSearches = signal<SavedSearch[]>([]);
+  private readonly bookmarkKey = 'contract_advance_search_bookmarks';
 
   // Selection
   selectedIds = signal<string[]>([]);
@@ -77,41 +65,71 @@ export class ContractTableComponent {
     // Apply advanced filters
     const filters = this.activeFilters();
     filters.forEach(filter => {
-      if (!filter.field || !filter.isComplete) return;
+      // Check if filter is valid (has field and value)
+      if (!filter.field) return;
+      
+      // Check if value exists and is not empty
+      const hasValue = Array.isArray(filter.value) 
+        ? filter.value.length > 0 
+        : typeof filter.value === 'string' 
+          ? filter.value.trim().length > 0 
+          : filter.value !== null && filter.value !== undefined;
+      
+      if (!hasValue) return;
 
       switch (filter.field) {
         case 'CONTRACT_NUMBER':
           contracts = contracts.filter(c =>
-            c.CONTRACT_NUMBER.toLowerCase().includes((filter.value as string).toLowerCase())
+            c.CONTRACT_NUMBER && c.CONTRACT_NUMBER.toLowerCase().includes((filter.value as string).toLowerCase())
           );
           break;
         case 'CUSTOMER':
+          contracts = contracts.filter(c =>
+            (c.TENANT_NAME_TH && c.TENANT_NAME_TH.toLowerCase().includes((filter.value as string).toLowerCase())) ||
+            (c.TENANT_NAME_EN && c.TENANT_NAME_EN.toLowerCase().includes((filter.value as string).toLowerCase())) ||
+            (c.CUSTOMER_ID && c.CUSTOMER_ID.toLowerCase().includes((filter.value as string).toLowerCase()))
+          );
+          break;
         case 'COMPANY_NAME':
           contracts = contracts.filter(c =>
-            c.TENANT_NAME_TH.toLowerCase().includes((filter.value as string).toLowerCase()) ||
-            c.TENANT_NAME_EN.toLowerCase().includes((filter.value as string).toLowerCase())
+            (c.TENANT_NAME_TH && c.TENANT_NAME_TH.toLowerCase().includes((filter.value as string).toLowerCase())) ||
+            (c.TENANT_NAME_EN && c.TENANT_NAME_EN.toLowerCase().includes((filter.value as string).toLowerCase()))
           );
           break;
         case 'CONTRACT_TYPE':
-          if (Array.isArray(filter.value)) {
+          if (Array.isArray(filter.value) && filter.value.length > 0) {
             contracts = contracts.filter(c => filter.value.includes(c.CONTRACT_TYPE));
           }
           break;
         case 'STATUS':
-          if (Array.isArray(filter.value)) {
+          if (Array.isArray(filter.value) && filter.value.length > 0) {
             contracts = contracts.filter(c => filter.value.includes(c.STATUS));
           }
           break;
         case 'BUILDING':
-          if (Array.isArray(filter.value)) {
+          if (Array.isArray(filter.value) && filter.value.length > 0) {
             contracts = contracts.filter(c =>
               c.BUILDING_CODE && filter.value.includes(c.BUILDING_CODE)
             );
           }
           break;
+        case 'BRANCH':
+          if (typeof filter.value === 'string') {
+            contracts = contracts.filter(c =>
+              c.BRANCH_CODE && c.BRANCH_CODE.toLowerCase().includes((filter.value as string).toLowerCase())
+            );
+          }
+          break;
+        case 'CATEGORY':
+          if (Array.isArray(filter.value) && filter.value.length > 0) {
+            contracts = contracts.filter(c =>
+              c.CATEGORY && filter.value.includes(c.CATEGORY)
+            );
+          }
+          break;
         case 'AREA_ID':
           contracts = contracts.filter(c =>
-            c.AREA_ID.toLowerCase().includes((filter.value as string).toLowerCase())
+            c.AREA_ID && c.AREA_ID.toLowerCase().includes((filter.value as string).toLowerCase())
           );
           break;
       }
@@ -132,6 +150,9 @@ export class ContractTableComponent {
   });
 
   constructor() {
+    // Load saved searches from localStorage
+    this.loadSavedSearches();
+
     // Sync incoming shared state to local state
     effect(() => {
       this.simpleSearchText.set(this.sharedSearchText());
@@ -188,8 +209,58 @@ export class ContractTableComponent {
   }
 
   applyBookmark(bookmark: SavedSearch): void {
-    this.activeFilters.set([...bookmark.filters]);
-    this.filtersChange.emit([...bookmark.filters]);
+    // Deep copy filters to avoid reference issues
+    const filters = JSON.parse(JSON.stringify(bookmark.filters));
+    
+    // Ensure all filters have isComplete flag set correctly
+    const restoredFilters = filters.map((filter: SearchFilter) => ({
+      ...filter,
+      // Ensure isComplete is true if field and value exist
+      isComplete: filter.field !== null && 
+                   filter.field !== undefined && 
+                   (Array.isArray(filter.value) ? filter.value.length > 0 : 
+                    typeof filter.value === 'string' ? filter.value.trim().length > 0 : 
+                    filter.value !== null && filter.value !== undefined)
+    }));
+    
+    // Set active filters and trigger search
+    this.activeFilters.set(restoredFilters);
+    this.filtersChange.emit(restoredFilters);
+    
+    // Clear simple search when applying bookmark
+    this.simpleSearchText.set('');
+    this.searchTextChange.emit('');
+  }
+
+  onSavedSearchChange(bookmark: SavedSearch): void {
+    // Reload saved searches to include the new one
+    this.loadSavedSearches();
+  }
+
+  deleteBookmark(bookmarkId: string, event: MouseEvent): void {
+    event.stopPropagation();
+    const updated = this.savedSearches().filter(b => b.id !== bookmarkId);
+    this.savedSearches.set(updated);
+    localStorage.setItem(this.bookmarkKey, JSON.stringify(updated));
+  }
+
+  private loadSavedSearches(): void {
+    const raw = localStorage.getItem(this.bookmarkKey);
+    if (!raw) {
+      this.savedSearches.set([]);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw) as SavedSearch[];
+      // Convert date strings back to Date objects
+      const searches = parsed.map(b => ({
+        ...b,
+        createdAt: new Date(b.createdAt)
+      }));
+      this.savedSearches.set(searches);
+    } catch {
+      this.savedSearches.set([]);
+    }
   }
 
   getFieldLabel(field: SearchFieldType): string {
@@ -316,7 +387,10 @@ export class ContractTableComponent {
   }
 
   getStatusColor(status: string): string {
-    return CONTRACT_STATUS_LABELS[status as keyof typeof CONTRACT_STATUS_LABELS]?.COLOR || '#9CA3AF';
+    return (
+      CONTRACT_STATUS_LABELS[status as keyof typeof CONTRACT_STATUS_LABELS]?.COLOR ||
+      'rgb(var(--muted))'
+    );
   }
 
   getContractTypeLabel(type: string): string {

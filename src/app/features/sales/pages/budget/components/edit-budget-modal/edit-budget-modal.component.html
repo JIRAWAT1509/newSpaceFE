@@ -1,0 +1,113 @@
+<!-- edit-budget-modal.component.html -->
+
+<div class="modal-overlay" (click)="onClose()">
+
+  <div class="modal-container" (click)="onModalClick($event)">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <h2 class="modal-title">
+          <i class="pi pi-pencil"></i>
+          <span>Edit Budget</span>
+        </h2>
+        <p class="modal-subtitle">{{ getTypeDisplayName() }}: {{ name() }}</p>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+
+      <!-- Actual Budget -->
+      <div class="form-group">
+        <label class="form-label">
+          Actual Budget
+          <span class="label-hint">(Current achievement/spending)</span>
+        </label>
+        <p-inputNumber
+          [(ngModel)]="actual"
+          (ngModelChange)="updateActual($event)"
+          mode="currency"
+          currency="THB"
+          locale="th-TH"
+          [min]="0"
+          styleClass="w-full"
+          placeholder="฿7,500,000"
+        ></p-inputNumber>
+        <small class="form-hint">The amount actually spent or achieved so far</small>
+      </div>
+
+      <!-- Forecast Budget -->
+      <div class="form-group">
+        <label class="form-label">
+          Forecast Budget <span class="required">*</span>
+          <span class="label-hint">(Target/Original budget)</span>
+        </label>
+        <p-inputNumber
+          [(ngModel)]="forecast"
+          (ngModelChange)="updateForecast($event)"
+          mode="currency"
+          currency="THB"
+          locale="th-TH"
+          [min]="0"
+          [max]="maxBudget() || undefined"
+          styleClass="w-full"
+          placeholder="฿10,000,000"
+        ></p-inputNumber>
+        <small class="form-hint">The target or original budget amount</small>
+        @if (maxBudget() > 0) {
+          <small class="form-hint">
+            Maximum available: {{ formatCurrency(maxBudget()) }}
+          </small>
+        }
+        @if (maxBudget() > 0 && forecast > maxBudget()) {
+          <small class="form-error">
+            <i class="pi pi-exclamation-circle"></i>
+            Forecast exceeds maximum available budget
+          </small>
+        }
+      </div>
+
+      <!-- Progress Preview -->
+      <div class="preview-box">
+        <div class="preview-label">Progress Preview:</div>
+        <div class="preview-bar">
+          <div
+            class="preview-fill"
+            [style.width.%]="forecast > 0 ? Math.min(100, (actual / forecast) * 100) : 0"
+          >
+            <span class="preview-percentage">
+              {{ forecast > 0 ? Math.round((actual / forecast) * 100) : 0 }}%
+            </span>
+          </div>
+        </div>
+        <div class="preview-values">
+          <span class="preview-actual">{{ formatCurrency(actual) }}</span>
+          <span class="preview-separator">/</span>
+          <span class="preview-forecast">{{ formatCurrency(forecast) }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="onClose()">
+        <span>Cancel</span>
+      </button>
+      <button
+        class="btn-save"
+        (click)="onSave()"
+        [disabled]="!isValid()"
+      >
+        <i class="pi pi-check"></i>
+        <span>Save Changes</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>

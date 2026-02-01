@@ -1,0 +1,413 @@
+// src/app/core/data/pipeline.mock.ts
+import { DateTime } from 'luxon';
+import {
+  Deal,
+  PipelineStage,
+  DEFAULT_STAGES,
+  calculateDaysInStage,
+  calculateDaysUntilDue,
+  calculateWeightedValue
+} from '../models/pipeline.model';
+
+// Mock Deals - Connected to existing customer data
+export const MOCK_DEALS: Deal[] = [
+  // ==================== PROSPECT STAGE ====================
+  {
+    id: 'deal-001',
+    title: 'Cafe Space - Sukhumvit Area',
+    customerId: 'cust-001',
+    customerName: 'สมชาย ใจดี',
+    companyName: 'บริษัท ไทยเทค โซลูชั่น จำกัด',
+    stageId: 'stage-1',
+    stageName: 'Prospect',
+    value: 2500000,
+    actualWinRate: 20, // Manually set (different from stage's 15%)
+    weightedValue: 500000,
+    createdAt: DateTime.now().minus({ days: 8 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 8 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 2 }).toISO(),
+    areaId: 'area-001',
+    areaName: '2MD010B',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'สมชาย ใจดี',
+    contactPhone: '02-123-4567',
+    contactEmail: 'somchai@thaitech.com',
+    tags: ['cafe', 'food', 'beverage'],
+    priority: 'high',
+    notes: 'ลูกค้าสนใจพื้นที่ขนาด 50-80 ตร.ม. สำหรับเปิดร้านกาแฟ specialty',
+    ownerId: 'user-001',
+    ownerName: 'Somchai',
+    lastActivityAt: DateTime.now().minus({ days: 1 }).toISO(),
+    lastActivityType: 'call',
+    daysInStage: 8,
+    daysUntilDue: 2,
+    attachmentCount: 3,
+    activityCount: 7,
+    nextAction: 'นัดหมาย site visit วันพฤหัสบดี'
+  },
+  {
+    id: 'deal-002',
+    title: 'Fashion Retail Store',
+    customerId: 'cust-002',
+    customerName: 'วิภา สุขสันต์',
+    companyName: 'บริษัท เอส เอ็ม อี คอนซัลติ้ง จำกัด',
+    stageId: 'stage-1',
+    stageName: 'Prospect',
+    value: 1800000,
+    actualWinRate: 15,
+    weightedValue: 270000,
+    createdAt: DateTime.now().minus({ days: 6 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 6 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 4 }).toISO(),
+    areaId: 'area-004',
+    areaName: '2MD012',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'วิภา สุขสันต์',
+    contactPhone: '089-234-5678',
+    contactEmail: 'wipa@smeconsult.com',
+    tags: ['retail', 'fashion', 'clothing'],
+    priority: 'medium',
+    notes: 'ต้องการพื้นที่ high foot traffic สำหรับ boutique',
+    ownerId: 'user-002',
+    ownerName: 'Wipa',
+    lastActivityAt: DateTime.now().minus({ days: 2 }).toISO(),
+    lastActivityType: 'email',
+    daysInStage: 6,
+    daysUntilDue: 4,
+    attachmentCount: 2,
+    activityCount: 4,
+    nextAction: 'ส่งรายละเอียดพื้นที่ที่มี'
+  },
+
+  // ==================== SITE VISIT STAGE ====================
+  {
+    id: 'deal-003',
+    title: 'Electronics & Gadget Store',
+    customerId: 'cust-003',
+    customerName: 'ธนวัฒน์ รุ่งเรือง',
+    companyName: 'Startup Innovation Hub',
+    stageId: 'stage-2',
+    stageName: 'Site Visit',
+    value: 3200000,
+    actualWinRate: 35, // Higher than stage default (30%)
+    weightedValue: 1120000,
+    createdAt: DateTime.now().minus({ days: 13 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 5 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 4 }).toISO(),
+    areaId: 'area-009',
+    areaName: 'OP-01',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'ธนวัฒน์ รุ่งเรือง',
+    contactPhone: '092-345-6789',
+    contactEmail: 'tanawat@startupinno.com',
+    tags: ['electronics', 'retail', 'gadget'],
+    priority: 'high',
+    notes: 'Site visit แล้ว ชอบมาก กำลังตรวจสอบงบประมาณ',
+    ownerId: 'user-003',
+    ownerName: 'Tanawat',
+    lastActivityAt: DateTime.now().minus({ hours: 8 }).toISO(),
+    lastActivityType: 'meeting',
+    daysInStage: 5,
+    daysUntilDue: 4,
+    attachmentCount: 5,
+    activityCount: 12,
+    nextAction: 'รอคำตอบเรื่องงบประมาณ'
+  },
+  {
+    id: 'deal-004',
+    title: 'Bookstore & Reading Space',
+    customerId: 'cust-004',
+    customerName: 'นภา วงศ์ใหญ่',
+    companyName: 'บริษัท กรุงเทพการค้า จำกัด (มหาชน)',
+    stageId: 'stage-2',
+    stageName: 'Site Visit',
+    value: 2800000,
+    actualWinRate: 30,
+    weightedValue: 840000,
+    createdAt: DateTime.now().minus({ days: 16 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 3 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 5 }).toISO(),
+    areaId: 'area-008',
+    areaName: 'LOG-02',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'นภา วงศ์ใหญ่',
+    contactPhone: '02-456-7890',
+    contactEmail: 'napa@bkktrading.com',
+    tags: ['bookstore', 'cafe', 'lifestyle'],
+    priority: 'medium',
+    notes: 'ชอบแสงธรรมชาติในพื้นที่ ต้องการปรับแต่งเพิ่ม',
+    ownerId: 'user-004',
+    ownerName: 'Napa',
+    lastActivityAt: DateTime.now().minus({ days: 1 }).toISO(),
+    lastActivityType: 'note',
+    daysInStage: 3,
+    daysUntilDue: 5,
+    attachmentCount: 4,
+    activityCount: 9,
+    nextAction: 'ส่ง quotation สำหรับ customization'
+  },
+
+  // ==================== QUOTATION STAGE ====================
+  {
+    id: 'deal-005',
+    title: 'Premium Fitness Center',
+    customerId: 'cust-005',
+    customerName: 'ประเสริฐ มั่งมี',
+    companyName: 'ร้านกาแฟสดใจกลางเมือง',
+    stageId: 'stage-3',
+    stageName: 'Quotation',
+    value: 4500000,
+    actualWinRate: 55, // Slightly higher confidence
+    weightedValue: 2475000,
+    createdAt: DateTime.now().minus({ days: 28 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 8 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 7 }).toISO(),
+    areaId: 'area-002',
+    areaName: 'KK-01',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'ประเสริฐ มั่งมี',
+    contactPhone: '081-567-8901',
+    contactEmail: 'prasert@coffeecity.com',
+    tags: ['fitness', 'wellness', 'premium'],
+    priority: 'high',
+    notes: 'ส่ง quotation แล้ว ลูกค้ากำลังพิจารณา ต้องการพื้นที่ 200+ ตร.ม.',
+    ownerId: 'user-005',
+    ownerName: 'Prasert',
+    lastActivityAt: DateTime.now().minus({ hours: 18 }).toISO(),
+    lastActivityType: 'email',
+    daysInStage: 8,
+    daysUntilDue: 7,
+    attachmentCount: 8,
+    activityCount: 15,
+    nextAction: 'Follow up quotation response'
+  },
+  {
+    id: 'deal-006',
+    title: 'Japanese Restaurant',
+    customerId: 'cust-006',
+    customerName: 'อรุณี สว่างไสว',
+    companyName: undefined,
+    stageId: 'stage-3',
+    stageName: 'Quotation',
+    value: 3100000,
+    actualWinRate: 50,
+    weightedValue: 1550000,
+    createdAt: DateTime.now().minus({ days: 25 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 6 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 9 }).toISO(),
+    areaId: 'area-011',
+    areaName: 'KK-03',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'อรุณี สว่างไสว',
+    contactPhone: '095-678-9012',
+    contactEmail: 'arunee.design@gmail.com',
+    tags: ['restaurant', 'japanese', 'food'],
+    priority: 'high',
+    notes: 'กำลังถามเรื่องค่าติดตั้งครัว และระบบระบายอากาศ',
+    ownerId: 'user-006',
+    ownerName: 'Arunee',
+    lastActivityAt: DateTime.now().minus({ hours: 36 }).toISO(),
+    lastActivityType: 'call',
+    daysInStage: 6,
+    daysUntilDue: 9,
+    attachmentCount: 6,
+    activityCount: 11,
+    nextAction: 'ส่งข้อมูล kitchen setup costs'
+  },
+  {
+    id: 'deal-007',
+    title: 'Co-working Space Hub',
+    customerId: 'cust-007',
+    customerName: 'พงศกร ทรงศิลป์',
+    companyName: 'บริษัท ดิจิทัล มาร์เก็ตติ้ง โปร จำกัด',
+    stageId: 'stage-3',
+    stageName: 'Quotation',
+    value: 5200000,
+    actualWinRate: 48,
+    weightedValue: 2496000,
+    createdAt: DateTime.now().minus({ days: 30 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 10 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 5 }).toISO(),
+    areaId: 'area-010',
+    areaName: 'OP-02',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'พงศกร ทรงศิลป์',
+    contactPhone: '02-789-0123',
+    contactEmail: 'pongsakorn@digitalmarketingpro.com',
+    tags: ['coworking', 'office', 'tech'],
+    priority: 'medium',
+    notes: 'พื้นที่ใหญ่ 300+ ตร.ม. กำลัง negotiate เรื่อง fixtures',
+    ownerId: 'user-007',
+    ownerName: 'Pongsakorn',
+    lastActivityAt: DateTime.now().minus({ hours: 48 }).toISO(),
+    lastActivityType: 'meeting',
+    daysInStage: 10,
+    daysUntilDue: 5,
+    attachmentCount: 10,
+    activityCount: 18,
+    nextAction: 'รอตอบกลับเรื่อง fixtures negotiation'
+  },
+
+  // ==================== NEGOTIATION STAGE ====================
+  {
+    id: 'deal-008',
+    title: 'Luxury Watch Boutique',
+    customerId: 'cust-008',
+    customerName: 'สุดา ประทีปพร',
+    companyName: 'โรงเรียนกวดวิชาเพชรพิทยา',
+    stageId: 'stage-4',
+    stageName: 'Negotiation',
+    value: 2400000,
+    actualWinRate: 75, // High confidence
+    weightedValue: 1800000,
+    createdAt: DateTime.now().minus({ days: 35 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 4 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 7 }).toISO(),
+    areaId: 'area-007',
+    areaName: 'LOG-01',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'สุดา ประทีปพร',
+    contactPhone: '089-890-1234',
+    contactEmail: 'suda@petchpittaya.com',
+    tags: ['retail', 'luxury', 'watches'],
+    priority: 'high',
+    notes: 'Negotiate lease term: ต้องการ 3+2 year contract',
+    ownerId: 'user-008',
+    ownerName: 'Suda',
+    lastActivityAt: DateTime.now().minus({ hours: 12 }).toISO(),
+    lastActivityType: 'call',
+    daysInStage: 4,
+    daysUntilDue: 7,
+    attachmentCount: 12,
+    activityCount: 22,
+    nextAction: 'รอการอนุมัติเงื่อนไข 3+2 ปี'
+  },
+  {
+    id: 'deal-009',
+    title: 'Kids Play & Education Center',
+    customerId: 'cust-009',
+    customerName: 'รัชพล เจริญสุข',
+    companyName: 'บริษัท ไอทีออลล์ เซอร์วิส จำกัด',
+    stageId: 'stage-4',
+    stageName: 'Negotiation',
+    value: 3800000,
+    actualWinRate: 70,
+    weightedValue: 2660000,
+    createdAt: DateTime.now().minus({ days: 40 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 6 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 4 }).toISO(),
+    areaId: 'area-001',
+    areaName: '2MD010B',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'รัชพล เจริญสุข',
+    contactPhone: '02-234-5678',
+    contactEmail: 'ratchapon@itallservice.com',
+    tags: ['entertainment', 'kids', 'family', 'education'],
+    priority: 'high',
+    notes: 'Final negotiation: cost sharing สำหรับ safety modifications',
+    ownerId: 'user-009',
+    ownerName: 'Ratchapon',
+    lastActivityAt: DateTime.now().minus({ hours: 8 }).toISO(),
+    lastActivityType: 'meeting',
+    daysInStage: 6,
+    daysUntilDue: 4,
+    attachmentCount: 15,
+    activityCount: 28,
+    nextAction: 'ส่งข้อเสนอ final cost sharing'
+  },
+
+  // ==================== CLOSING STAGE ====================
+  {
+    id: 'deal-010',
+    title: 'Organic Grocery & Health Store',
+    customerId: 'cust-010',
+    customerName: 'วรรณา สุขสวัสดิ์',
+    companyName: 'คลินิกสุขภาพดีมีสุข',
+    stageId: 'stage-5',
+    stageName: 'Closing',
+    value: 2700000,
+    actualWinRate: 95, // Very high, almost done
+    weightedValue: 2565000,
+    createdAt: DateTime.now().minus({ days: 50 }).toISO(),
+    movedToStageAt: DateTime.now().minus({ days: 2 }).toISO(),
+    dueDate: DateTime.now().plus({ days: 5 }).toISO(),
+    areaId: 'area-004',
+    areaName: '2MD012',
+    buildingId: 'bld-001',
+    buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3',
+    floorNumber: 55,
+    contactPerson: 'วรรณา สุขสวัสดิ์',
+    contactPhone: '091-345-6789',
+    contactEmail: 'wanna@healthclinic.com',
+    tags: ['retail', 'grocery', 'organic', 'health'],
+    priority: 'high',
+    notes: 'สัญญาพร้อมลงนาม รอการอนุมัติขั้นสุดท้าย',
+    ownerId: 'user-010',
+    ownerName: 'Wanna',
+    lastActivityAt: DateTime.now().minus({ hours: 4 }).toISO(),
+    lastActivityType: 'email',
+    daysInStage: 2,
+    daysUntilDue: 5,
+    attachmentCount: 18,
+    activityCount: 32,
+    nextAction: 'นัดลงนามสัญญาวันศุกร์นี้'
+  }
+];
+
+export const MOCK_STAGES: PipelineStage[] = [...DEFAULT_STAGES];
+
+// Helper to get deals by stage
+export function getDealsByStage(stageId: string): Deal[] {
+  return MOCK_DEALS.filter(deal => deal.stageId === stageId);
+}
+
+// Helper to get deal count by stage
+export function getDealCountByStage(stageId: string): number {
+  return getDealsByStage(stageId).length;
+}
+
+// Helper to get total value by stage
+export function getTotalValueByStage(stageId: string): number {
+  return getDealsByStage(stageId).reduce((sum, deal) => sum + deal.value, 0);
+}
+
+// Helper to get weighted value by stage
+export function getWeightedValueByStage(stageId: string): number {
+  return getDealsByStage(stageId).reduce((sum, deal) => sum + deal.weightedValue, 0);
+}
+
+// Helper to get average actual win rate by stage
+export function getAverageActualWinRateByStage(stageId: string): number {
+  const deals = getDealsByStage(stageId);
+  if (deals.length === 0) return 0;
+  const sum = deals.reduce((acc, deal) => acc + deal.actualWinRate, 0);
+  return Math.round(sum / deals.length);
+}
+
+// Update deal calculations (call after updating actualWinRate)
+export function recalculateDeal(deal: Deal): Deal {
+  return {
+    ...deal,
+    weightedValue: calculateWeightedValue(deal.value, deal.actualWinRate),
+    daysInStage: calculateDaysInStage(deal.movedToStageAt),
+    daysUntilDue: calculateDaysUntilDue(deal.dueDate)
+  };
+}

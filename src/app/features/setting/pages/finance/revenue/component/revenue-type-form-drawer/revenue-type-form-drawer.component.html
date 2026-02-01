@@ -1,0 +1,124 @@
+<!-- revenue-type-form-drawer.component.html -->
+
+<!-- Backdrop -->
+@if (isOpen) {
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+    (click)="onClose()"
+  ></div>
+}
+
+<!-- Drawer -->
+@if (isOpen) {
+  <div
+    class="fixed z-50 bg-white shadow-2xl transition-all duration-300 ease-in-out overflow-hidden
+           md:top-0 md:right-0 md:h-full md:w-[700px]
+           max-md:top-1/2 max-md:left-1/2 max-md:transform max-md:-translate-x-1/2 max-md:-translate-y-1/2
+           max-md:rounded-lg max-md:w-[95%] max-md:max-w-[600px] max-md:max-h-[90vh]"
+  >
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-white">
+        {{ mode === 'create' ? 'เพิ่มประเภทรายได้และกลุ่มรายได้' : 'แก้ไขประเภทรายได้และกลุ่มรายได้' }}
+      </h2>
+      <button
+        (click)="onClose()"
+        class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1 transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Form Content (Scrollable) -->
+    <div class="overflow-y-auto p-6" style="max-height: calc(100vh - 140px);">
+      <form>
+        <div class="space-y-4">
+
+          <!-- รหัสประเภท -->
+          <div class="form-field">
+            <label class="form-label required">รหัสประเภท:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.TYPE_CODE"
+              name="typeCode"
+              [disabled]="mode === 'edit'"
+              placeholder="กรอกรหัสประเภท"
+              class="form-input"
+              [class.input-error]="!!errors['TYPE_CODE']"
+            />
+            @if (errors['TYPE_CODE']) {
+              <p class="error-message">{{ errors['TYPE_CODE'] }}</p>
+            }
+          </div>
+
+          <!-- ชื่อประเภทรายได้ -->
+          <div class="form-field">
+            <label class="form-label required">ชื่อประเภทรายได้:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.TYPE_NAME"
+              name="typeName"
+              placeholder="กรอกชื่อประเภทรายได้"
+              class="form-input"
+              [class.input-error]="!!errors['TYPE_NAME']"
+            />
+            @if (errors['TYPE_NAME']) {
+              <p class="error-message">{{ errors['TYPE_NAME'] }}</p>
+            }
+          </div>
+
+          <!-- กลุ่มรายได้ -->
+          <div class="form-field">
+            <label class="form-label required">กลุ่มรายได้:</label>
+            <input
+              type="text"
+              [(ngModel)]="formData.GROUP_NAME"
+              name="groupName"
+              placeholder="กรอกกลุ่มรายได้"
+              class="form-input"
+              [class.input-error]="!!errors['GROUP_NAME']"
+            />
+            @if (errors['GROUP_NAME']) {
+              <p class="error-message">{{ errors['GROUP_NAME'] }}</p>
+            }
+          </div>
+
+          <!-- สถานะ -->
+          <div class="form-field">
+            <label class="form-label">สถานะ:</label>
+            <select
+              [(ngModel)]="formData.STATUS"
+              name="status"
+              class="form-input"
+            >
+              <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3">
+      <p-button
+        label="ยกเลิก"
+        icon="pi pi-times"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="onClose()"
+        [disabled]="isSubmitting"
+      ></p-button>
+
+      <p-button
+        [label]="mode === 'create' ? 'สร้าง' : 'บันทึก'"
+        icon="pi pi-check"
+        severity="primary"
+        (onClick)="onSubmit()"
+        [loading]="isSubmitting"
+      ></p-button>
+    </div>
+  </div>
+}

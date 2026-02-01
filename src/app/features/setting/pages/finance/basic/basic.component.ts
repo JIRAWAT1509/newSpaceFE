@@ -1,5 +1,5 @@
 // src/app/features/setting/pages/finance/basic/basic.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -88,6 +88,26 @@ export class BasicComponent implements OnInit {
     | 'credit-note-reason'
     | 'credit-term' = 'master';
   activeTab: 'company' | 'misc1' | 'misc2' | 'misc3' = 'company';
+  
+  // Form visibility states
+  showBaseForm = false;
+  isEditBaseMode = false;
+  editingBaseMaster: any = null;
+  
+  // Form visibility for other features
+  showCurrencyForm = false;
+  isEditCurrencyMode = false;
+  editingCurrency: any = null;
+  
+  showCreditNoteReasonForm = false;
+  isEditCreditNoteReasonMode = false;
+  editingCreditNoteReason: any = null;
+  
+  showCreditTermForm = false;
+  isEditCreditTermMode = false;
+  editingCreditTerm: any = null;
+  
+  @ViewChild(BranchMasterComponent) branchMasterComponent?: BranchMasterComponent;
 
   // search term (shared for now, can split later)
   searchQuery: string = '';
@@ -126,6 +146,25 @@ export class BasicComponent implements OnInit {
   creditTerms: any[] = [
     { code: 'C005', description: 'ชำระภายในวันที 5 ของทุกเดือน', days: 5 },
   ];
+  
+  // Form models
+  currencyForm = {
+    code: '',
+    name: '',
+    rate: 1,
+    active: true
+  };
+  
+  creditNoteReasonForm = {
+    code: '',
+    description: ''
+  };
+  
+  creditTermForm = {
+    code: '',
+    description: '',
+    days: 0
+  };
 
 
   private readonly serviceMock = {
@@ -453,13 +492,64 @@ export class BasicComponent implements OnInit {
   }
 
   saveBaseForm(): void {
-    // ไว้ยิง API ทีหลัง
+    // TODO: ไว้ยิง API ทีหลัง
     console.log('save basic form', this.baseForm);
+    
+    if (this.isEditBaseMode && this.editingBaseMaster) {
+      // Update existing record
+      const index = this.baseMaster.findIndex(item => item === this.editingBaseMaster);
+      if (index !== -1) {
+        this.baseMaster[index] = {
+          ...this.baseMaster[index],
+          taxId: this.baseForm.taxId,
+          compThai: this.baseForm.compThai,
+          compEng: this.baseForm.compEng,
+          addrThai1: this.baseForm.addrThai1,
+        };
+      }
+      this.messageService.add({
+        severity: 'success',
+        summary: 'บันทึกสำเร็จ',
+        detail: 'แก้ไขข้อมูลพื้นฐานเรียบร้อยแล้ว',
+      });
+    } else {
+      // Add new record
+      const newRecord = {
+        taxId: this.baseForm.taxId,
+        compThai: this.baseForm.compThai,
+        compEng: this.baseForm.compEng,
+        addrThai1: this.baseForm.addrThai1,
+      };
+      this.baseMaster.push(newRecord);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'บันทึกสำเร็จ',
+        detail: 'เพิ่มข้อมูลพื้นฐานเรียบร้อยแล้ว',
+      });
+    }
+    
+    // Close form and reset
+    this.showBaseForm = false;
+    this.isEditBaseMode = false;
+    this.editingBaseMaster = null;
   }
   // card click
   selectFeature(feature: FinanceFeatureKey): void {
     this.selectedFeature = feature;
     this.searchQuery = '';
+    // Reset all form states
+    this.showBaseForm = false;
+    this.isEditBaseMode = false;
+    this.editingBaseMaster = null;
+    this.showCurrencyForm = false;
+    this.isEditCurrencyMode = false;
+    this.editingCurrency = null;
+    this.showCreditNoteReasonForm = false;
+    this.isEditCreditNoteReasonMode = false;
+    this.editingCreditNoteReason = null;
+    this.showCreditTermForm = false;
+    this.isEditCreditTermMode = false;
+    this.editingCreditTerm = null;
   }
 
   // ================== LOADERS (stub) ==================
@@ -513,23 +603,357 @@ export class BasicComponent implements OnInit {
     }, 200);
   }
 
-  // ================== ACTIONS (stub) ==================
+  // ================== ACTIONS ==================
   openCreate(): void {
-    this.messageService.add({
-      severity: 'info',
-      summary: 'TODO',
-      detail: 'open create panel for ' + this.selectedFeature,
+    if (this.selectedFeature === 'master') {
+      this.showBaseForm = true;
+      this.isEditBaseMode = false;
+      this.editingBaseMaster = null;
+      // Reset form
+      this.baseForm = {
+        taxId: '',
+        compThai: '',
+        compEng: '',
+        addrThai1: '',
+        addrThai2: '',
+        addrEng1: '',
+        addrEng2: '',
+        postCode: '',
+        tel: '',
+        fax: '',
+        telAcc: '',
+        vatCode: '',
+        houseTaxCode: '',
+        houseTaxRate: 0,
+        stampCode: '',
+        canEditVat: 'Y',
+        currencyCode: '',
+        shortTermMonth: 0,
+        creditTermCode: '',
+        insuranceCode: '',
+        insuranceRate: 0,
+        splitInvoiceType: 'D',
+        prefixCust: '',
+        priceDiff: 0,
+        termCreNotice: 0,
+        waterFeeCode: '',
+        electricFeeCode: '',
+        gasFeeCode: '',
+        financeServiceCode: '',
+        phoneInstallCode: '',
+        depositRentCode: '',
+        depositServiceCode: '',
+        depositMeterCode: '',
+        depositTelephoneCode: '',
+        quotationDocCode: '',
+        reserveContractDoc: '',
+        leaseContractDoc: '',
+        areaDocCode: '',
+        renovationDocCode: '',
+        jobDocCode: '',
+        invoiceDocCode: '',
+        creditNoteDocCode: '',
+        monthlyInvoiceDocCode: '',
+        finTransferDocCode: '',
+        accTransferDocCode: '',
+        invoiceAddressType: '',
+        receiptDocCode: '',
+        receiptTaxDocCode: '',
+        tempReceiptDocCode: '',
+        creditNoteReceiptDocCode: '',
+        creditNoteTaxDocCode: '',
+      };
+      this.activeTab = 'company';
+    } else if (this.selectedFeature === 'currency') {
+      this.showCurrencyForm = true;
+      this.isEditCurrencyMode = false;
+      this.editingCurrency = null;
+      this.currencyForm = {
+        code: '',
+        name: '',
+        rate: 1,
+        active: true
+      };
+    } else if (this.selectedFeature === 'credit-note-reason') {
+      this.showCreditNoteReasonForm = true;
+      this.isEditCreditNoteReasonMode = false;
+      this.editingCreditNoteReason = null;
+      this.creditNoteReasonForm = {
+        code: '',
+        description: ''
+      };
+    } else if (this.selectedFeature === 'credit-term') {
+      this.showCreditTermForm = true;
+      this.isEditCreditTermMode = false;
+      this.editingCreditTerm = null;
+      this.creditTermForm = {
+        code: '',
+        description: '',
+        days: 0
+      };
+    } else if (this.selectedFeature === 'branch-master') {
+      // Call openAddPanel on BranchMasterComponent
+      if (this.branchMasterComponent) {
+        this.branchMasterComponent.openAddPanel();
+      }
+    }
+  }
+
+  editBaseMaster(row: any): void {
+    this.showBaseForm = true;
+    this.isEditBaseMode = true;
+    this.editingBaseMaster = row;
+    // Load data into form (you'll need to map row data to baseForm)
+    // For now, just set some basic fields
+    if (row.taxId) this.baseForm.taxId = row.taxId;
+    if (row.compThai) this.baseForm.compThai = row.compThai;
+    if (row.compEng) this.baseForm.compEng = row.compEng;
+    if (row.addrThai1) this.baseForm.addrThai1 = row.addrThai1;
+    this.activeTab = 'company';
+  }
+
+  deleteBaseMaster(row: any): void {
+    this.confirmService.confirm({
+      message: 'ยืนยันการลบข้อมูลพื้นฐานนี้?',
+      accept: () => {
+        // TODO: Implement delete logic
+        this.messageService.add({
+          severity: 'success',
+          summary: 'ลบสำเร็จ',
+          detail: 'ลบข้อมูลพื้นฐานเรียบร้อยแล้ว',
+        });
+        this.loadBaseMaster();
+      },
     });
+  }
+
+  cancelBaseForm(): void {
+    this.showBaseForm = false;
+    this.isEditBaseMode = false;
+    this.editingBaseMaster = null;
+  }
+
+  editCurrency(row: any): void {
+    this.showCurrencyForm = true;
+    this.isEditCurrencyMode = true;
+    this.editingCurrency = row;
+    this.currencyForm = {
+      code: row.code || '',
+      name: row.name || '',
+      rate: row.rate || 1,
+      active: row.active !== undefined ? row.active : true
+    };
+  }
+
+  editCreditNoteReason(row: any): void {
+    this.showCreditNoteReasonForm = true;
+    this.isEditCreditNoteReasonMode = true;
+    this.editingCreditNoteReason = row;
+    this.creditNoteReasonForm = {
+      code: row.code || '',
+      description: row.description || ''
+    };
+  }
+
+  editCreditTerm(row: any): void {
+    this.showCreditTermForm = true;
+    this.isEditCreditTermMode = true;
+    this.editingCreditTerm = row;
+    this.creditTermForm = {
+      code: row.code || '',
+      description: row.description || '',
+      days: row.days || 0
+    };
+  }
+  
+  saveCurrencyForm(): void {
+    // TODO: Implement save logic with API
+    console.log('save currency form', this.currencyForm);
+    
+    if (this.isEditCurrencyMode && this.editingCurrency) {
+      // Update existing record
+      const index = this.currencies.findIndex(item => item.code === this.editingCurrency.code);
+      if (index !== -1) {
+        this.currencies[index] = {
+          ...this.currencyForm
+        };
+      }
+      this.messageService.add({
+        severity: 'success',
+        summary: 'บันทึกสำเร็จ',
+        detail: 'แก้ไขข้อมูลสกุลเงินเรียบร้อยแล้ว',
+      });
+    } else {
+      // Add new record
+      const newRecord = {
+        code: this.currencyForm.code,
+        name: this.currencyForm.name,
+        rate: this.currencyForm.rate,
+        active: this.currencyForm.active
+      };
+      this.currencies.push(newRecord);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'บันทึกสำเร็จ',
+        detail: 'เพิ่มข้อมูลสกุลเงินเรียบร้อยแล้ว',
+      });
+    }
+    
+    // Close form and reset
+    this.showCurrencyForm = false;
+    this.isEditCurrencyMode = false;
+    this.editingCurrency = null;
+    this.currencyForm = {
+      code: '',
+      name: '',
+      rate: 1,
+      active: true
+    };
+  }
+  
+  saveCreditNoteReasonForm(): void {
+    // TODO: Implement save logic with API
+    console.log('save credit note reason form', this.creditNoteReasonForm);
+    
+    if (this.isEditCreditNoteReasonMode && this.editingCreditNoteReason) {
+      // Update existing record
+      const index = this.creditNoteReasons.findIndex(item => item.code === this.editingCreditNoteReason.code);
+      if (index !== -1) {
+        this.creditNoteReasons[index] = {
+          ...this.creditNoteReasonForm
+        };
+      }
+      this.messageService.add({
+        severity: 'success',
+        summary: 'บันทึกสำเร็จ',
+        detail: 'แก้ไขข้อมูลสาเหตุการลดหนี้เรียบร้อยแล้ว',
+      });
+    } else {
+      // Add new record
+      const newRecord = {
+        code: this.creditNoteReasonForm.code,
+        description: this.creditNoteReasonForm.description
+      };
+      this.creditNoteReasons.push(newRecord);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'บันทึกสำเร็จ',
+        detail: 'เพิ่มข้อมูลสาเหตุการลดหนี้เรียบร้อยแล้ว',
+      });
+    }
+    
+    // Close form and reset
+    this.showCreditNoteReasonForm = false;
+    this.isEditCreditNoteReasonMode = false;
+    this.editingCreditNoteReason = null;
+    this.creditNoteReasonForm = {
+      code: '',
+      description: ''
+    };
+  }
+  
+  saveCreditTermForm(): void {
+    // TODO: Implement save logic with API
+    console.log('save credit term form', this.creditTermForm);
+    
+    if (this.isEditCreditTermMode && this.editingCreditTerm) {
+      // Update existing record
+      const index = this.creditTerms.findIndex(item => item.code === this.editingCreditTerm.code);
+      if (index !== -1) {
+        this.creditTerms[index] = {
+          ...this.creditTermForm
+        };
+      }
+      this.messageService.add({
+        severity: 'success',
+        summary: 'บันทึกสำเร็จ',
+        detail: 'แก้ไขข้อมูล Credit Term เรียบร้อยแล้ว',
+      });
+    } else {
+      // Add new record
+      const newRecord = {
+        code: this.creditTermForm.code,
+        description: this.creditTermForm.description,
+        days: this.creditTermForm.days
+      };
+      this.creditTerms.push(newRecord);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'บันทึกสำเร็จ',
+        detail: 'เพิ่มข้อมูล Credit Term เรียบร้อยแล้ว',
+      });
+    }
+    
+    // Close form and reset
+    this.showCreditTermForm = false;
+    this.isEditCreditTermMode = false;
+    this.editingCreditTerm = null;
+    this.creditTermForm = {
+      code: '',
+      description: '',
+      days: 0
+    };
+  }
+  
+  cancelCurrencyForm(): void {
+    this.showCurrencyForm = false;
+    this.isEditCurrencyMode = false;
+    this.editingCurrency = null;
+  }
+  
+  cancelCreditNoteReasonForm(): void {
+    this.showCreditNoteReasonForm = false;
+    this.isEditCreditNoteReasonMode = false;
+    this.editingCreditNoteReason = null;
+  }
+  
+  cancelCreditTermForm(): void {
+    this.showCreditTermForm = false;
+    this.isEditCreditTermMode = false;
+    this.editingCreditTerm = null;
   }
 
   confirmDelete(row: any): void {
     this.confirmService.confirm({
-      message: 'Delete this item?',
+      message: 'คุณต้องการลบรายการนี้หรือไม่?',
+      header: 'ยืนยันการลบ',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      acceptLabel: 'ลบ',
+      rejectLabel: 'ยกเลิก',
       accept: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Deleted',
-        });
+        // Determine which array to delete from based on selectedFeature
+        if (this.selectedFeature === 'currency') {
+          const index = this.currencies.findIndex(item => item.code === row.code);
+          if (index !== -1) {
+            this.currencies.splice(index, 1);
+          }
+          this.messageService.add({
+            severity: 'success',
+            summary: 'ลบสำเร็จ',
+            detail: 'ลบข้อมูลสกุลเงินเรียบร้อยแล้ว',
+          });
+        } else if (this.selectedFeature === 'credit-note-reason') {
+          const index = this.creditNoteReasons.findIndex(item => item.code === row.code);
+          if (index !== -1) {
+            this.creditNoteReasons.splice(index, 1);
+          }
+          this.messageService.add({
+            severity: 'success',
+            summary: 'ลบสำเร็จ',
+            detail: 'ลบข้อมูลสาเหตุการลดหนี้เรียบร้อยแล้ว',
+          });
+        } else if (this.selectedFeature === 'credit-term') {
+          const index = this.creditTerms.findIndex(item => item.code === row.code);
+          if (index !== -1) {
+            this.creditTerms.splice(index, 1);
+          }
+          this.messageService.add({
+            severity: 'success',
+            summary: 'ลบสำเร็จ',
+            detail: 'ลบข้อมูล Credit Term เรียบร้อยแล้ว',
+          });
+        }
       },
     });
   }

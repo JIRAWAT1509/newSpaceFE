@@ -1,0 +1,40 @@
+<!-- budget-bar.component.html -->
+
+<div class="budget-bar-container" [attr.data-size]="size()">
+
+  <!-- Header with label and values -->
+  @if (showLabel() || showValues()) {
+    <div class="budget-bar-header">
+      @if (showLabel() && label()) {
+        <span class="budget-label">{{ label() }}</span>
+      }
+
+      @if (showValues()) {
+        <span class="budget-values">
+          <span class="actual">{{ formatCurrency(actual()) }}</span>
+          <span class="separator">/</span>
+          <span class="forecast">{{ formatCurrency(forecast()) }}</span>
+        </span>
+      }
+    </div>
+  }
+
+  <!-- Progress bar -->
+  <div class="budget-bar" [attr.data-size]="size()">
+    <div
+      class="budget-bar-fill"
+      [style.width.%]="percentage()"
+      [attr.data-status]="getStatusColor()"
+    >
+      @if (showPercentage() && percentage() > 10) {
+        <span class="percentage-text">{{ percentage() }}%</span>
+      }
+    </div>
+
+    <!-- Percentage outside bar if too small -->
+    @if (showPercentage() && percentage() <= 10) {
+      <span class="percentage-outside">{{ percentage() }}%</span>
+    }
+  </div>
+
+</div>

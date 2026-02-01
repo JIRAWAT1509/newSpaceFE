@@ -1,28 +1,65 @@
+<!-- pipeline-master.component.html -->
 
-<div class="page-container">
+<div class="pipeline-page">
+
+  <!-- Page Header -->
   <div class="page-header">
-    <div class="header-content">
-      <div class="header-icon pipeline">
-        <i class="pi pi-sitemap"></i>
+    <div class="header-left">
+      <div class="header-icon">🪜</div>
+      <div class="header-title">
+        <h1>Sales Pipeline Management</h1>
+        <p>จัดการกระบวนการขาย และติดตามดีลจนปิดสัญญา</p>
       </div>
-      <div>
-        <h1 class="header-title">Sales Pipeline Management</h1>
-        <p class="header-subtitle">จัดการกระบวนการขายและดีล</p>
-      </div>
+    </div>
+    <div class="header-actions">
+      <button
+        class="btn btn-secondary"
+        (click)="onConfigureStages()"
+        type="button"
+      >
+        <span class="btn-icon">⚙️</span>
+        <span class="btn-label">Configure Stages</span>
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="onAddDeal()"
+        type="button"
+      >
+        <span class="btn-icon">+</span>
+        <span class="btn-label">Add Deal</span>
+      </button>
     </div>
   </div>
 
-  <div class="placeholder-content">
-    <i class="pi pi-sitemap placeholder-icon"></i>
-    <h2 class="placeholder-title">Sales Pipeline</h2>
-    <p class="placeholder-text">This page will contain:</p>
-    <ul class="feature-list">
-      <li>Deal Pipeline Stages</li>
-      <li>Kanban Board View</li>
-      <li>Deal Cards with Details</li>
-      <li>Deal Value & Probability Tracking</li>
-      <li>Stage Conversion Rates</li>
-      <li>Pipeline Forecasting</li>
-    </ul>
+  <!-- Pipeline Metrics -->
+  <app-pipeline-metrics
+    [metrics]="pipelineMetrics()"
+    [activeHotFilter]="activeHotFilter()"
+    (hotFilterChange)="onHotFilterChange($event)"
+  />
+
+  <!-- Pipeline Filters -->
+  <app-pipeline-filters
+    [owners]="uniqueOwners()"
+    [tags]="uniqueTags()"
+    (filterChange)="onFilterChange($event)"
+  />
+
+  <!-- Kanban Board -->
+  <div class="kanban-container">
+    <app-kanban-board
+      [stages]="stages()"
+      [dealsByStage]="dealsByStage()"
+      [stageViewConfigs]="stageViewConfigs()"
+      [stageMetrics]="stageMetrics()"
+      (stageSortChange)="onStageSortChange($event)"
+      (stagePageChange)="onStagePageChange($event)"
+      (stageCardsPerPageChange)="onStageCardsPerPageChange($event)"
+      (stageSettings)="onStageSettings($event)"
+      (dealClicked)="onDealClicked($event)"
+      (dealMenuClicked)="onDealMenuClicked($event)"
+      (dealMoved)="onDealMoved($event)"
+    />
   </div>
+
 </div>
