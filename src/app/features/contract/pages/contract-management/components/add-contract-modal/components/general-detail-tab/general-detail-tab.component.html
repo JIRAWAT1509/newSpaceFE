@@ -73,7 +73,7 @@
           }
         </div>
 
-        <!-- Row 2 -->
+        <!-- Row 2: ระบบเจน AUTO ให้ แก้ไขไม่ได้ -->
         <div class="form-group required">
           <label>เลขที่ใบเสนอราคา (น.หลัก)</label>
           <input
@@ -81,7 +81,8 @@
             pInputText
             formControlName="contractNumberMain"
             placeholder="AUTO"
-            class="w-full"
+            readonly
+            class="w-full field-auto"
           />
         </div>
 
@@ -92,7 +93,8 @@
             pInputText
             formControlName="contractNumberSub"
             placeholder="AUTO"
-            class="w-full"
+            readonly
+            class="w-full field-auto"
           />
         </div>
 

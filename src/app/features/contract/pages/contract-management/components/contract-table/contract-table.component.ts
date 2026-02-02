@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Contract, CONTRACT_STATUS_LABELS } from '@core/models/contract.model';
 import { SearchFilter, SavedSearch, SearchFieldType, SEARCH_FIELD_CONFIG } from '@core/models/contract-search.model';
+import type { CancelType } from '@core/services/contract.service';
 import { formatDateForDisplay } from '@core/utils/date-utils';
 import { AdvanceSearchModalComponent } from '../advance-search-modal/advance-search-modal.component';
 import { AddContractModalComponent } from '../add-contract-modal/add-contract-modal.component';
@@ -29,7 +30,9 @@ export class ContractTableComponent {
   // Outputs to sync state back to parent
   searchTextChange = output<string>();
   filtersChange = output<SearchFilter[]>();
-  contractSaved = output<any>(); // New output for saved contract
+  contractSaved = output<any>();
+  contractCopied = output<Contract>();
+  contractCancelRequest = output<{ contract: Contract; cancelType: CancelType }>();
 
   // Local search (syncs with shared)
   simpleSearchText = signal<string>('');
@@ -487,18 +490,140 @@ export class ContractTableComponent {
       case 'edit':
         this.openEditModal(contract);
         break;
-      case 'copy-booking':
-        this.openMessageModal('คัดลอกสัญญา', `คัดลอกสัญญาเช่าไปเป็นสัญญาจอง: ${contract.CONTRACT_NUMBER}`);
+      case 'copy-contract':
+        this.copyContractImmediately(contract);
         break;
-      case 'copy-quotation':
-        this.openMessageModal('คัดลอกสัญญา', `คัดลอกสัญญาเช่าไปเป็นใบเสนอราคา: ${contract.CONTRACT_NUMBER}`);
+      case 'transfer-to-booking':
+        this.transferToBooking(contract);
+        break;
+      case 'transfer-to-lease':
+        this.transferToLease(contract);
+        break;
+      case 'copy-to-booking':
+        this.copyLeaseToBooking(contract);
+        break;
+      case 'copy-to-quotation':
+        this.copyLeaseToQuotation(contract);
+        break;
+      case 'cancel-quotation':
+        this.cancelQuotation(contract);
+        break;
+      case 'cancel-booking':
+        this.cancelBooking(contract);
         break;
       case 'addendum':
-        this.openMessageModal('ยกเลิกสัญญาและภาคผนวก', `เลขที่สัญญา: ${contract.CONTRACT_NUMBER}`);
+        this.openAddendum(contract);
         break;
       default:
         this.openMessageModal('ดำเนินการ', `${action}: ${contract.CONTRACT_NUMBER}`);
     }
+  }
+
+  /** ป้ายชื่อปุ่มคัดลอกตามประเภท */
+  getCopyContractLabel(): string {
+    switch (this.contractType()) {
+      case 'quotation': return 'คัดลอกใบเสนอราคา';
+      case 'booking': return 'คัดลอกสัญญาจอง';
+      case 'lease': return 'คัดลอกสัญญาเช่า';
+      default: return 'คัดลอกสัญญา';
+    }
+  }
+
+  private newContractNumber(): string {
+    return `AUTO-${Date.now()}`;
+  }
+
+  /** คัดลอกสัญญาทันที: สร้างสัญญาใหม่เหมือนเดิม แต่เลขที่ไม่ซ้ำ (ไม่เปิดโมดอล) */
+  copyContractImmediately(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_NUMBER_MAIN: contract.CONTRACT_NUMBER_MAIN ? newNumber : undefined,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB ? `${newNumber}-SUB` : undefined
+    };
+    this.contractCopied.emit(copy);
+    this.openMessageModal('คัดลอกสัญญาเรียบร้อย', `สร้างสัญญาใหม่เลขที่: ${newNumber}`);
+  }
+
+  /** ใบเสนอราคา → โอนเป็นสัญญาจอง (สร้างสัญญาจองจากใบเสนอราคา) */
+  transferToBooking(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_TYPE: 'DEPOSIT_AGREEMENT',
+      CONTRACT_NUMBER_MAIN: contract.CONTRACT_NUMBER_MAIN ?? newNumber,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB ? `${newNumber}-SUB` : undefined,
+      BOOKING_NUMBER: newNumber
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('โอนเป็นสัญญาจองเรียบร้อย', `เลขที่สัญญาจอง: ${newNumber}`);
+  }
+
+  /** สัญญาจอง → โอนเป็นสัญญาเช่า (สร้างสัญญาเช่าจากสัญญาจอง) */
+  transferToLease(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_TYPE: 'LEASE_AGREEMENT',
+      BOOKING_NUMBER: contract.CONTRACT_NUMBER ?? contract.BOOKING_NUMBER,
+      CONTRACT_NUMBER_MAIN: contract.CONTRACT_NUMBER_MAIN,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('โอนเป็นสัญญาเช่าเรียบร้อย', `เลขที่สัญญาเช่า: ${newNumber}`);
+  }
+
+  /** สัญญาเช่า → คัดลอกไปเป็นสัญญาจอง */
+  copyLeaseToBooking(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_TYPE: 'DEPOSIT_AGREEMENT',
+      CONTRACT_NUMBER_MAIN: contract.CONTRACT_NUMBER_MAIN,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB ? `${newNumber}-SUB` : undefined,
+      BOOKING_NUMBER: newNumber
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('คัดลอกเป็นสัญญาจองเรียบร้อย', `เลขที่สัญญาจอง: ${newNumber}`);
+  }
+
+  /** สัญญาเช่า → คัดลอกไปเป็นใบเสนอราคา */
+  copyLeaseToQuotation(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_TYPE: 'QUOTATION_AGREEMENT',
+      CONTRACT_NUMBER_MAIN: newNumber,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB ? `${newNumber}-SUB` : undefined,
+      BOOKING_NUMBER: undefined
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('คัดลอกเป็นใบเสนอราคาเรียบร้อย', `เลขที่ใบเสนอราคา: ${newNumber}`);
+  }
+
+  /** ยกเลิกใบเสนอราคา: ส่งไป parent เพื่อเรียก API แล้วอัปเดตสถานะ */
+  cancelQuotation(contract: Contract): void {
+    this.contractCancelRequest.emit({ contract, cancelType: 'quotation' });
+  }
+
+  /** ยกเลิกสัญญาจอง: ส่งไป parent เพื่อเรียก API แล้วอัปเดตสถานะ */
+  cancelBooking(contract: Contract): void {
+    this.contractCancelRequest.emit({ contract, cancelType: 'booking' });
+  }
+
+  /** ยกเลิกสัญญาและภาคผนวก (สัญญาเช่า): ส่งไป parent เพื่อเรียก API แล้วอัปเดตสถานะ */
+  openAddendum(contract: Contract): void {
+    this.contractCancelRequest.emit({ contract, cancelType: 'lease' });
   }
 
   openAddModal(): void {
@@ -522,26 +647,23 @@ export class ContractTableComponent {
   saveNewContract(formData: any): void {
     const mode = formData.mode || 'add';
 
+    this.closeAddModal();
+    this.contractSaved.emit(formData);
+
     if (mode === 'edit') {
       console.log('Updating contract:', formData.contractId, formData);
-      this.openMessageModal('บันทึกสำเร็จ', `สัญญาถูกแก้ไขเรียบร้อยแล้ว\nเลขที่สัญญา: ${formData.contractId}`, () => {
-        this.contractSaved.emit(formData); // Emit to parent
-        this.closeAddModal();
-      });
+      this.openMessageModal('บันทึกสำเร็จ', `สัญญาถูกแก้ไขเรียบร้อยแล้ว\nเลขที่สัญญา: ${formData.contractId}`);
     } else {
+      const msg = formData.saveAsQuotationOnly
+        ? 'บันทึกใบเสนอราคาแล้ว แสดงในแท็บใบเสนอราคา'
+        : formData.saveAsBooking
+          ? 'บันทึกสัญญาจองแล้ว แสดงในแท็บสัญญาจอง'
+          : 'สัญญาใหม่ถูกบันทึกแล้ว';
       console.log('Creating new contract:', formData);
-      this.openMessageModal('บันทึกสำเร็จ', 'สัญญาใหม่ถูกบันทึกแล้ว', () => {
-        this.contractSaved.emit(formData); // Emit to parent
-        this.closeAddModal();
-      });
+      this.openMessageModal('บันทึกสำเร็จ', msg);
     }
 
     // TODO: Call API to save/update contract
-    // if (mode === 'edit') {
-    //   this.contractService.updateContract(formData).subscribe(...)
-    // } else {
-    //   this.contractService.createContract(formData).subscribe(...)
-    // }
   }
 
   openMessageModal(title: string, message: string, onClose?: () => void): void {

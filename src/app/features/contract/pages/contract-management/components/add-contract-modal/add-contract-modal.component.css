@@ -203,6 +203,14 @@
   @apply disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
+.btn-save-quotation {
+  @apply flex items-center gap-2 px-5 py-2;
+  @apply bg-emerald-600 hover:bg-emerald-700 text-white;
+  @apply rounded-lg font-medium text-sm;
+  @apply transition-colors;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-600;
+}
+
 .btn-success {
   @apply flex items-center gap-2 px-6 py-2;
   @apply bg-green-600 hover:bg-green-700 text-white;

@@ -5,8 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { ContractTableComponent } from './components/contract-table/contract-table.component';
 import { Contract } from '@core/models/contract.model';
-import { MOCK_CONTRACTS } from '@core/data/contract.mock';
 import { SearchFilter } from '@core/models/contract-search.model';
+import { ContractService, CancelType } from '@core/services/contract.service';
 
 @Component({
   selector: 'app-contract-management',
@@ -30,8 +30,8 @@ export class ContractManagementComponent implements OnInit {
   sharedSearchText = signal<string>('');
   sharedFilters = signal<SearchFilter[]>([]);
 
-  // Local contract lists (writable) - start with mock data
-  private contractsList = signal<Contract[]>([...MOCK_CONTRACTS]);
+  // Local contract lists: โหลดจาก localStorage (ผ่าน service) เพื่อไม่หายเมื่อรีเฟรช
+  private contractsList = signal<Contract[]>([]);
 
   // Filter contracts by type for each tab
   quotationData = computed<Contract[]>(() =>
@@ -50,9 +50,14 @@ export class ContractManagementComponent implements OnInit {
     )
   );
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private contractService: ContractService
+  ) {}
 
   ngOnInit(): void {
+    this.contractsList.set(this.contractService.getContracts());
+
     // Check for query params from area page
     this.route.queryParams.subscribe(params => {
       const areaId = params['areaId'];
@@ -91,15 +96,34 @@ export class ContractManagementComponent implements OnInit {
   // Add new contract to list (called from child table component)
   onContractSaved(formData: any): void {
     const newContract: Contract = this.mapFormDataToContract(formData);
-    
+
     if (formData.mode === 'edit') {
-      // Update existing contract
-      this.contractsList.update(list => 
+      this.contractsList.update(list =>
         list.map(c => c.CONTRACT_ID === formData.contractId ? newContract : c)
       );
-    } else {
-      // Add new contract
-      this.contractsList.update(list => [newContract, ...list]);
+      this.contractService.saveContracts(this.contractsList());
+      return;
+    }
+
+    this.contractsList.update(list => [newContract, ...list]);
+    this.contractService.saveContracts(this.contractsList());
+
+    // ถ้ากรอกรายละเอียดทั่วไป + รายละเอียดสัญญาครบ → ไปหน้า สัญญาจอง
+    if (formData.saveAsBooking) {
+      this.activeTab.set('booking');
+    }
+  }
+
+  /** คัดลอก/โอนสัญญา: เพิ่มสัญญาใหม่แล้วสลับไปแท็บที่ตรงกับประเภทสัญญา */
+  onContractCopied(contract: Contract): void {
+    this.contractsList.update(list => [contract, ...list]);
+    this.contractService.saveContracts(this.contractsList());
+    if (contract.CONTRACT_TYPE === 'DEPOSIT_AGREEMENT') {
+      this.activeTab.set('booking');
+    } else if (contract.CONTRACT_TYPE === 'LEASE_AGREEMENT' || contract.CONTRACT_TYPE === 'LEASE_RENEWAL' || contract.CONTRACT_TYPE === 'LEASE_AMENDMENT') {
+      this.activeTab.set('lease');
+    } else if (contract.CONTRACT_TYPE === 'QUOTATION_AGREEMENT') {
+      this.activeTab.set('quotation');
     }
   }
 
@@ -107,6 +131,7 @@ export class ContractManagementComponent implements OnInit {
   private mapFormDataToContract(formData: any): Contract {
     const general = formData?.generalDetails || {};
     const conditions = formData?.conditions || {};
+    const contractDetails = formData?.contractDetails || {};
 
     const toDateStr = (val: unknown): string => {
       if (!val) return '';
@@ -115,19 +140,32 @@ export class ContractManagementComponent implements OnInit {
       return '';
     };
 
+    // บันทึกจากปุ่ม "บันทึก" (เฉพาะรายละเอียดทั่วไป) → ใบเสนอราคา
+    // บันทึกจากปุ่ม "บันทึกสัญญา" และกรอกรายละเอียดสัญญาครบ → สัญญาจอง
+    // บันทึกจากปุ่ม "บันทึกสัญญา" แต่กรอกแค่รายละเอียดทั่วไป → ใบเสนอราคา
+    const contractType = formData.saveAsQuotationOnly
+      ? 'QUOTATION_AGREEMENT'
+      : formData.saveAsBooking
+        ? 'DEPOSIT_AGREEMENT'
+        : formData.mode === 'edit'
+          ? this.mapContractTypeCode(general.contractType)
+          : 'QUOTATION_AGREEMENT';
+
+    const displayName = general.businessName || contractDetails.legalEntityName || general.companyName || 'N/A';
+
     return {
       CONTRACT_ID: formData.contractId || `CNT-${Date.now()}`,
       OU_CODE: 'OU001',
       AREA_ID: general.areaUnitNumber || '',
       CONTRACT_NUMBER: general.contractNumberMain || `AUTO-${Date.now()}`,
-      CONTRACT_TYPE: this.mapContractTypeCode(general.contractType),
+      CONTRACT_TYPE: contractType,
       STATUS: 'ACTIVE',
       CONTRACT_TOPIC: `สัญญา ${general.contractType}`,
       CONTRACT_TOPIC_TH: `สัญญา ${general.contractType}`,
       CONTRACT_TOPIC_EN: `Contract ${general.contractType}`,
-      TENANT_NAME: general.companyName || 'N/A',
-      TENANT_NAME_TH: general.companyName || 'N/A',
-      TENANT_NAME_EN: general.companyName || 'N/A',
+      TENANT_NAME: displayName,
+      TENANT_NAME_TH: displayName,
+      TENANT_NAME_EN: displayName,
       LANDLORD_NAME: 'บริษัท Space Management จำกัด',
       ISSUE_DATE: toDateStr(general.quotationDate) || new Date().toISOString().split('T')[0],
       EXPIRY_DATE: toDateStr(conditions.contractEndDate) || '',
@@ -171,5 +209,27 @@ export class ContractManagementComponent implements OnInit {
       'AMENDMENT': 'LEASE_AMENDMENT'
     };
     return typeMap[code] || 'QUOTATION_AGREEMENT';
+  }
+
+  /** ยกเลิกใบเสนอราคา/สัญญาจอง/สัญญาเช่า: เรียก API แล้วอัปเดตสถานะท้องถิ่น */
+  onContractCancelRequest(payload: { contract: Contract; cancelType: CancelType }): void {
+    const { contract, cancelType } = payload;
+    const id = contract.CONTRACT_ID;
+
+    const apiCall =
+      cancelType === 'quotation'
+        ? this.contractService.cancelQuotation(id)
+        : cancelType === 'booking'
+          ? this.contractService.cancelBooking(id)
+          : this.contractService.terminateLease(id);
+
+    apiCall.subscribe(res => {
+      this.contractsList.update(list =>
+        list.map(c =>
+          c.CONTRACT_ID === id ? { ...c, STATUS: 'TERMINATED' as const } : c
+        )
+      );
+      this.contractService.saveContracts(this.contractsList());
+    });
   }
 }

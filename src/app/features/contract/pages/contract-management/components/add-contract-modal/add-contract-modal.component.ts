@@ -49,6 +49,8 @@ export class AddContractModalComponent implements OnInit {
 
   // Tab state
   activeTabIndex = signal<number>(0);
+  /** เก็บค่าฟอร์มรายละเอียดสัญญาเมื่อออกจากแท็บ 1 (ใช้ตอนส่งจากแท็บสรุป) */
+  lastContractDetailValue = signal<Record<string, unknown>>({});
   tabs: Tab[] = [
     { id: 'general', label: 'รายละเอียดทั่วไป', completed: false },
     { id: 'contract', label: 'รายละเอียดสัญญา', completed: false },
@@ -71,10 +73,10 @@ export class AddContractModalComponent implements OnInit {
       this.modalTitle.set(this.mode() === 'edit' ? 'แก้ไขข้อมูลสัญญา' : 'เพิ่มสัญญาใหม่');
     });
 
-    // Load contract data when it changes (for edit mode)
+    // Load contract data when it changes (for edit mode or copy mode)
     effect(() => {
       const contract = this.contractData();
-      if (contract && this.mode() === 'edit') {
+      if (contract && (this.mode() === 'edit' || this.mode() === 'add')) {
         this.loadContractData(contract);
       }
     });
@@ -221,12 +223,18 @@ export class AddContractModalComponent implements OnInit {
 
   goToTab(index: number): void {
     if (this.canNavigateToTab(index)) {
+      if (this.activeTabIndex() === 1 && this.contractDetailTab?.contractInfoTab?.form) {
+        this.lastContractDetailValue.set(this.contractDetailTab.contractInfoTab.form.value);
+      }
       this.activeTabIndex.set(index);
     }
   }
 
   nextTab(): void {
     if (this.activeTabIndex() < this.tabs.length - 1) {
+      if (this.activeTabIndex() === 1 && this.contractDetailTab?.contractInfoTab?.form) {
+        this.lastContractDetailValue.set(this.contractDetailTab.contractInfoTab.form.value);
+      }
       this.markTabCompleted(this.activeTabIndex());
       this.activeTabIndex.update(i => i + 1);
     }
@@ -278,12 +286,52 @@ export class AddContractModalComponent implements OnInit {
 
   // ==================== ACTIONS ====================
 
-  onSubmit(): void {
-    if (this.isAllFormsValid()) {
+  /** บันทึกเฉพาะรายละเอียดทั่วไป → แสดงในแท็บใบเสนอราคา */
+  onSaveQuotationOnly(): void {
+    if (this.generalDetailForm.valid) {
       const formData = {
         mode: this.mode(),
-        contractId: this.contractData()?.CONTRACT_ID,
+        contractId: this.mode() === 'edit' ? this.contractData()?.CONTRACT_ID : undefined,
+        saveAsQuotationOnly: true,
         generalDetails: this.generalDetailForm.value,
+        conditions: this.conditionsForm.value,
+        documents: this.documentForm.value
+      };
+      this.save.emit(formData);
+      this.close.emit();
+    }
+  }
+
+  /** ตรวจว่า tab รายละเอียดสัญญา (contract detail) กรอกครบหรือไม่ */
+  isContractDetailValid(): boolean {
+    const form = this.contractDetailTab?.contractInfoTab?.form;
+    const value = form ? form.value : this.lastContractDetailValue();
+    const required = ['bookingNumber', 'legalEntityName', 'contractMaker'];
+    return required.every(f => {
+      const v = value[f];
+      return v !== null && v !== undefined && String(v).trim() !== '';
+    });
+  }
+
+  /** ค่าฟอร์มรายละเอียดสัญญา (จาก tab ปัจจุบันหรือค่าที่เก็บไว้) */
+  getContractDetailsPayload(): Record<string, unknown> {
+    if (this.contractDetailTab?.contractInfoTab?.form) {
+      return this.contractDetailTab.contractInfoTab.form.value;
+    }
+    return this.lastContractDetailValue();
+  }
+
+  onSubmit(): void {
+    if (this.isAllFormsValid()) {
+      // กด "บันทึกสัญญา" จากแท็บสรุป (ขั้นตอนสุดท้าย) = ส่งไปหน้าสัญญาจองเสมอ
+      // ถ้าต้องการแค่ใบเสนอราคา ให้กดปุ่ม "บันทึก" ที่แท็บรายละเอียดทั่วไป
+      const formData = {
+        mode: this.mode(),
+        contractId: this.mode() === 'edit' ? this.contractData()?.CONTRACT_ID : undefined,
+        saveAsQuotationOnly: false,
+        saveAsBooking: true,
+        generalDetails: this.generalDetailForm.value,
+        contractDetails: this.getContractDetailsPayload(),
         conditions: this.conditionsForm.value,
         documents: this.documentForm.value
       };

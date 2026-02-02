@@ -76,6 +76,16 @@
   @apply w-1 h-6 bg-blue-600 rounded;
 }
 
+/* ==================== Auto-generated fields (กดไม่ได้, สีเทา) ==================== */
+.field-auto {
+  @apply bg-gray-100 text-gray-600 cursor-not-allowed;
+  @apply border-gray-300;
+}
+
+.field-auto:focus {
+  @apply outline-none ring-0 border-gray-300;
+}
+
 /* ==================== Form Grid ==================== */
 .form-grid-2 {
   @apply grid grid-cols-1 md:grid-cols-2 gap-4;

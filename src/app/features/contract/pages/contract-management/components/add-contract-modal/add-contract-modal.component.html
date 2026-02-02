@@ -328,6 +328,18 @@
           ยกเลิก
         </button>
 
+        @if (activeTabIndex() === 0) {
+          <button
+            type="button"
+            class="btn-save-quotation"
+            [disabled]="!generalDetailForm.valid"
+            (click)="onSaveQuotationOnly()"
+          >
+            <i class="pi pi-save"></i>
+            <span>บันทึก</span>
+          </button>
+        }
+
         @if (activeTabIndex() < tabs.length - 1) {
           <button
             type="button"
