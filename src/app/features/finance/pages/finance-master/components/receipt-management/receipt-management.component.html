@@ -18,7 +18,7 @@
   <div class="content-header">
     <div>
       <h2 class="page-title">
-        {{ isActiveSubTab('issue') ? 'รายการออกใบแจ้งหนี้' : 'รายการออกใบเสร็จ' }}
+        {{ isActiveSubTab('issue') ? 'ประวัติการออกใบแจ้งหนี้' : 'ประวัติการออกใบเสร็จ' }}
       </h2>
       <p class="page-subtitle">จัดการและติดตามเอกสาร</p>
     </div>
@@ -36,10 +36,7 @@
             <i class="pi pi-print"></i>
             <span>พิมพ์เอกสาร</span>
           </button>
-          <button class="bulk-btn" (click)="onBulkAction()">
-            <i class="pi pi-check"></i>
-            <span>คลิก</span>
-          </button>
+
         </div>
       </div>
     }
@@ -48,6 +45,7 @@
   <!-- Receipt Table -->
   <div class="table-container">
     <table class="receipt-table">
+
       <thead>
         <tr>
           <th class="checkbox-col">
@@ -57,13 +55,13 @@
               (change)="toggleSelectAll($event)"
             />
           </th>
-          <th>เลขที่สัญญาเช่า</th>
-          <th>ชื่อลูกค้า</th>
-          <th>รายการเรียกเก็บหลัก</th>
-          <th>ยอดเงิน (รวมภาษี)</th>
-          <th>วันที่เริ่มต้นเรียกเก็บ</th>
-          <th>สถานะ</th>
-          <th class="text-center">Actions</th>
+            <th>{{ isActiveSubTab('issue') ? 'เลขที่ใบแจ้งหนี้' : 'เลขที่ใบเสร็จ' }} <i class="pi pi-sort"></i></th>
+            <th>ชื่อลูกค้า <i class="pi pi-sort"></i></th>
+            <th>รายการเรียกเก็บหลัก <i class="pi pi-sort"></i></th>
+            <th>ยอดเงิน (รวมภาษี) <i class="pi pi-sort"></i></th>
+            <th>วันที่เริ่มต้นเรียกเก็บ <i class="pi pi-sort"></i></th>
+            <th>สถานะ <i class="pi pi-sort"></i></th>
+            <th class="text-center">Actions <i class="pi pi-sort"></i></th>
         </tr>
       </thead>
       <tbody>
