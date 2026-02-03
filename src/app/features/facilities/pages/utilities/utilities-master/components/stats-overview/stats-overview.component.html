@@ -1,45 +1,31 @@
-<!-- stats-overview.component.html -->
-
 <div class="stats-section">
   <h2 class="section-title">Dashboard Overview</h2>
 
   <div class="stats-grid">
     @for (card of statCards(); track card.label) {
-      <div
-        class="stat-card"
-        [ngClass]="'stat-card--' + card.tone"
-      >
-        <!-- Decorative Background -->
+      <article class="stat-card" [ngClass]="'stat-card--' + card.tone">
         <div class="stat-card-bg"></div>
-
-        <!-- Icon -->
-        <div class="stat-icon">
+        <div class="stat-card-icon">
           <i class="pi" [ngClass]="card.icon"></i>
         </div>
-
-        <!-- Value -->
-        <div class="stat-value">
-          {{ card.value }}
-          @if (card.unit) {
-            <span class="stat-unit">{{ card.unit }}</span>
-          }
+        <div class="stat-card-body">
+          <p class="stat-label">{{ card.label }}</p>
+          <p class="stat-value">
+            {{ card.value }}
+            @if (card.unit) {
+              <span class="stat-unit">{{ card.unit }}</span>
+            }
+          </p>
+          <p
+            class="stat-change"
+            [ngClass]="card.change >= 0 ? 'stat-change--up' : 'stat-change--down'"
+          >
+            <i class="pi" [ngClass]="getChangeIcon(card.change)"></i>
+            <span>{{ card.change >= 0 ? '+' : '' }}{{ card.change }}%</span>
+            <span class="stat-change-hint">{{ card.changeLabel }}</span>
+          </p>
         </div>
-
-        <!-- Label -->
-        <div class="stat-label">{{ card.label }}</div>
-
-        <!-- Change Badge -->
-        <div
-          class="stat-change"
-          [ngClass]="card.change > 0 ? 'stat-change--positive' : 'stat-change--negative'"
-        >
-          <i class="pi" [ngClass]="getChangeIcon(card.change)"></i>
-          <span>{{ card.change > 0 ? '+' : '' }}{{ card.change }}%</span>
-        </div>
-
-        <!-- Change Label -->
-        <div class="stat-change-label">{{ card.changeLabel }}</div>
-      </div>
+      </article>
     }
   </div>
 </div>
