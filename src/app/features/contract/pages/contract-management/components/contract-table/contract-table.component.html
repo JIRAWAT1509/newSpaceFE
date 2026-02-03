@@ -171,7 +171,7 @@
 
               @if (activeRowMenu() === item.CONTRACT_ID) {
                 <div class="row-actions-menu">
-                  <!-- ทุกประเภท -->
+                  <!-- ทุกประเภท (ตามรูป: ไอคอนดินสอ + คัดลอก) -->
                   <button class="menu-item" (click)="onRowAction('edit', item)">
                     <i class="pi pi-pencil"></i>
                     <span>แก้ไขข้อมูล</span>
@@ -181,27 +181,31 @@
                     <span>{{ getCopyContractLabel() }}</span>
                   </button>
 
-                  <!-- ใบเสนอราคา -->
+                  <!-- ใบเสนอราคา (ตามรูป: แก้ไข, คัดลอก, คัดลอกไปเป็นสัญญาจอง, ยกเลิกและภาคผนวก) -->
                   @if (contractType() === 'quotation') {
                     <button class="menu-item" (click)="onRowAction('transfer-to-booking', item)">
-                      <i class="pi pi-arrow-right-arrow-left"></i>
-                      <span>โอนเป็นสัญญาจอง</span>
+                      <i class="pi pi-copy"></i>
+                      <span>คัดลอกใบเสนอราคาไปเป็นสัญญาจอง</span>
                     </button>
                     <button class="menu-item" (click)="onRowAction('cancel-quotation', item)">
-                      <i class="pi pi-times-circle"></i>
-                      <span>ยกเลิกใบเสนอราคา</span>
+                      <i class="pi pi-file-plus"></i>
+                      <span>ยกเลิกใบเสนอราคาและภาคผนวก</span>
                     </button>
                   }
 
-                  <!-- สัญญาจอง -->
+                  <!-- สัญญาจอง (ตามรูป: แก้ไข, คัดลอก, คัดลอกไปเป็นใบเสนอราคา, โอนเป็นสัญญาเช่า, ยกเลิกและภาคผนวก) -->
                   @if (contractType() === 'booking') {
+                    <button class="menu-item" (click)="onRowAction('copy-booking-to-quotation', item)">
+                      <i class="pi pi-copy"></i>
+                      <span>คัดลอกสัญญาจองไปเป็นใบเสนอราคา</span>
+                    </button>
                     <button class="menu-item" (click)="onRowAction('transfer-to-lease', item)">
                       <i class="pi pi-arrow-right-arrow-left"></i>
                       <span>โอนเป็นสัญญาเช่า</span>
                     </button>
                     <button class="menu-item" (click)="onRowAction('cancel-booking', item)">
-                      <i class="pi pi-times-circle"></i>
-                      <span>ยกเลิกสัญญาจอง</span>
+                      <i class="pi pi-file-plus"></i>
+                      <span>ยกเลิกสัญญาจองและภาคผนวก</span>
                     </button>
                   }
 

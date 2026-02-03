@@ -47,5 +47,5 @@
 
 /* Mobile: padding so content is not hidden behind bottom nav */
 .main-with-bottom-nav {
-  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
 }

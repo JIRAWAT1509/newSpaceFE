@@ -505,6 +505,9 @@ export class ContractTableComponent {
       case 'copy-to-quotation':
         this.copyLeaseToQuotation(contract);
         break;
+      case 'copy-booking-to-quotation':
+        this.copyBookingToQuotation(contract);
+        break;
       case 'cancel-quotation':
         this.cancelQuotation(contract);
         break;
@@ -609,6 +612,22 @@ export class ContractTableComponent {
     } as Contract;
     this.contractCopied.emit(copy);
     this.openMessageModal('คัดลอกเป็นใบเสนอราคาเรียบร้อย', `เลขที่ใบเสนอราคา: ${newNumber}`);
+  }
+
+  /** สัญญาจอง → คัดลอกไปเป็นใบเสนอราคา */
+  copyBookingToQuotation(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_TYPE: 'QUOTATION_AGREEMENT',
+      CONTRACT_NUMBER_MAIN: newNumber,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB ? `${newNumber}-SUB` : undefined,
+      BOOKING_NUMBER: undefined
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('คัดลอกสัญญาจองไปเป็นใบเสนอราคาเรียบร้อย', `เลขที่ใบเสนอราคา: ${newNumber}`);
   }
 
   /** ยกเลิกใบเสนอราคา: ส่งไป parent เพื่อเรียก API แล้วอัปเดตสถานะ */
@@ -718,7 +737,7 @@ export class ContractTableComponent {
       'LEASE_RENEWAL': 'ต่อสัญญาเช่า',
       'LEASE_AMENDMENT': 'แก้ไขสัญญา',
       'LEASE_TERMINATION': 'เลิกสัญญา',
-      'DEPOSIT_AGREEMENT': 'สัญญามัดจำ',
+      'DEPOSIT_AGREEMENT': 'สัญญาจอง',
       'QUOTATION_AGREEMENT': 'ใบเสนอราคา',
       'MAINTENANCE_AGREEMENT': 'สัญญาบำรุงรักษา',
       'ADDENDUM': 'ภาคผนวก',

@@ -326,7 +326,7 @@ export const CONTRACT_TYPE_LABELS: Record<ContractType, { TH: string; EN: string
   'LEASE_RENEWAL': { TH: 'ต่อสัญญาเช่า', EN: 'Lease Renewal' },
   'LEASE_AMENDMENT': { TH: 'แก้ไขสัญญา', EN: 'Lease Amendment' },
   'LEASE_TERMINATION': { TH: 'เลิกสัญญา', EN: 'Lease Termination' },
-  'DEPOSIT_AGREEMENT': { TH: 'สัญญามัดจำ', EN: 'Deposit Agreement' },
+  'DEPOSIT_AGREEMENT': { TH: 'สัญญาจอง', EN: 'Reservation Contract' },
   'QUOTATION_AGREEMENT': { TH: 'ใบเสนอราคา', EN: 'Quotation Agreement' },
   'MAINTENANCE_AGREEMENT': { TH: 'สัญญาบำรุงรักษา', EN: 'Maintenance Agreement' },
   'ADDENDUM': { TH: 'ภาคผนวก', EN: 'Addendum' },
