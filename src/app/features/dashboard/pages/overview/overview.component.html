@@ -1,50 +1,349 @@
-<div class="container mx-auto px-4 py-6">
-  <!-- Header with Title and Branch Selector -->
-  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Dashboard Overview</h1>
+<!-- Executive Command Center (Dashboard Overview replacement) -->
+<div class="exec-dashboard">
+  <!-- ==================== HERO ==================== -->
+  <div class="exec-hero">
+    <div class="exec-hero-inner">
+      <div class="exec-hero-left">
+        <div class="exec-title-row">
+          <div class="exec-title-head">
+            <div class="exec-hero-badge" aria-hidden="true">
+              <i class="pi pi-sparkles"></i>
+            </div>
+            <div class="exec-title-stack">
+              <div class="exec-title">
+                Executive <span class="exec-title-accent">Command</span> Center
+              </div>
+              <div class="exec-subtitle">Global Portfolio Performance &amp; Asset Deep-Dive</div>
+            </div>
+          </div>
+        </div>
 
-    <!-- Branch Dropdown -->
-    <div class="flex items-center gap-3">
-      <label for="branchSelect" class="text-base font-semibold text-gray-700 whitespace-nowrap">สาขา: </label>
-      <select
-        id="branchSelect"
-        [(ngModel)]="selectedBranch"
-        (change)="onBranchChange(selectedBranch)"
-        class="px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-header-gradient-start focus:border-transparent bg-white shadow-sm hover:border-gray-400 transition-colors"
-        style="min-width: 280px;">
-        <option *ngFor="let branch of branches" [value]="branch.id" class="rounded-md">
-          {{ branch.displayName }}
-        </option>
-      </select>
+        <div class="exec-tabs">
+          <button
+            type="button"
+            class="exec-tab"
+            [class.exec-tab-active]="activeTab === 'portfolio'"
+            (click)="setTab('portfolio')"
+          >
+            Portfolio Overview
+          </button>
+          <button
+            type="button"
+            class="exec-tab"
+            [class.exec-tab-active]="activeTab === 'building'"
+            (click)="setTab('building')"
+          >
+            Building Analysis
+          </button>
+          <button
+            type="button"
+            class="exec-tab"
+            [class.exec-tab-active]="activeTab === 'collections'"
+            (click)="setTab('collections')"
+          >
+            Collections
+          </button>
+        </div>
+      </div>
+
+      <div class="exec-hero-right">
+        <div class="exec-pill-row">
+          <!-- hardcoded revenue pills -->
+          <div class="exec-pill">
+            <div class="exec-pill-icon">
+              <i class="pi pi-chart-line"></i>
+            </div>
+            <div class="exec-pill-content">
+              <div class="exec-pill-label">REV VS. LAST WEEK</div>
+              <div class="exec-pill-value">
+                <span class="exec-pill-money">$</span>42.5<span class="exec-pill-suffix">k</span>
+              </div>
+            </div>
+            <div class="exec-pill-change exec-pill-change--up">
+              <i class="pi pi-arrow-up-right"></i>
+              +3.2%
+            </div>
+          </div>
+          <div class="exec-pill">
+            <div class="exec-pill-icon">
+              <i class="pi pi-chart-line"></i>
+            </div>
+            <div class="exec-pill-content">
+              <div class="exec-pill-label">REV VS. LAST MONTH</div>
+              <div class="exec-pill-value">
+                <span class="exec-pill-money">$</span>128<span class="exec-pill-suffix">k</span>
+              </div>
+            </div>
+            <div class="exec-pill-change exec-pill-change--up">
+              <i class="pi pi-arrow-up-right"></i>
+              +8.4%
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- First Row: Area, Building, Top10s -->
-  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
-    <app-area-block></app-area-block>
-    <app-building-block></app-building-block>
-
-    <!-- Top 10 Combined Container - 1 column always -->
-    <div class="flex flex-col gap-6">
-      <app-top-rental-size-block></app-top-rental-size-block>
-      <app-top-rent-rates-block></app-top-rent-rates-block>
+  <!-- ==================== KPI SUMMARY ROW (colored cards) ==================== -->
+  <div class="exec-kpi-row">
+    <div class="exec-kpi-card kpi-occupancy">
+      <div class="exec-kpi-top">
+        <div class="exec-kpi-title-wrap">
+          <div class="exec-kpi-icon tone-success">
+            <i class="pi pi-percentage"></i>
+          </div>
+          <div class="exec-kpi-title">PORTFOLIO OCCUPANCY</div>
+        </div>
+        <div class="exec-kpi-badge">▲ 1.2% YoY</div>
+      </div>
+      <div class="exec-kpi-value">94.2%</div>
+      <div class="exec-kpi-bar-wrap">
+        <div class="exec-kpi-bar-track">
+          <div class="exec-kpi-bar-fill" style="width: 94.2%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="exec-kpi-card kpi-revenue">
+      <div class="exec-kpi-top">
+        <div class="exec-kpi-title-wrap">
+          <div class="exec-kpi-icon tone-primary">
+            <i class="pi pi-dollar"></i>
+          </div>
+          <div class="exec-kpi-title">ACTUAL YTD REVENUE</div>
+        </div>
+        <div class="exec-kpi-badge">YoY +12%</div>
+      </div>
+      <div class="exec-kpi-value">$14.2M</div>
+      <div class="exec-kpi-sub">Budget: $423.0M</div>
+      <div class="exec-kpi-bar-wrap">
+        <div class="exec-kpi-bar-track">
+          <div class="exec-kpi-bar-fill" style="width: 3.36%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="exec-kpi-card kpi-forecast">
+      <div class="exec-kpi-top">
+        <div class="exec-kpi-title-wrap">
+          <div class="exec-kpi-icon tone-info">
+            <i class="pi pi-compass"></i>
+          </div>
+          <div class="exec-kpi-title">FORECAST (DEC 2026)</div>
+        </div>
+        <div class="exec-kpi-status exec-kpi-status--ontrack">On Track</div>
+      </div>
+      <div class="exec-kpi-value">$18.1M</div>
+      <div class="exec-kpi-bar-wrap">
+        <div class="exec-kpi-bar-track">
+          <div class="exec-kpi-bar-fill" style="width: 75%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="exec-kpi-card kpi-lease">
+      <div class="exec-kpi-top">
+        <div class="exec-kpi-title-wrap">
+          <div class="exec-kpi-icon tone-warning">
+            <i class="pi pi-calendar"></i>
+          </div>
+          <div class="exec-kpi-title">AVG LEASE DURATION</div>
+        </div>
+        <div class="exec-kpi-badge">↑+0.4</div>
+      </div>
+      <div class="exec-kpi-value">3.2 yrs</div>
+      <div class="exec-kpi-sub">New Contracts YTD</div>
+      <div class="exec-kpi-bar-wrap">
+        <div class="exec-kpi-bar-track">
+          <div class="exec-kpi-bar-fill" style="width: 55%"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Second Row: Middle blocks -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <app-reserve-block></app-reserve-block>
-    <app-renew-customer-block></app-renew-customer-block>
-    <app-contract-block></app-contract-block>
-    <app-new-customer-block></app-new-customer-block>
+  <!-- ==================== MAIN ANALYTICS GRID ==================== -->
+  <div class="exec-main-grid">
+    <!-- Left: Revenue Performance (structure like Building Performance Deep-Dive) -->
+    <div class="exec-card exec-card-lg">
+      <div class="exec-rev-head">
+        <div class="exec-card-title">Revenue Performance: Actual vs Budget &amp; Forecast</div>
+      </div>
+      <div class="exec-rev-body">
+        <div class="exec-chart-wrap exec-chart-rev">
+          <canvas #revPerfChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Donut + Bars + Performance table -->
+    <div class="exec-right-stack">
+      <div class="exec-card exec-card-sm exec-card-occupancy">
+        <div class="exec-mini-title">Occupancy by Business Type</div>
+        <div class="exec-occupancy-chart">
+          <div class="exec-mini-grid">
+            <div class="exec-donut-wrap">
+              <canvas #occupancyDonutChart></canvas>
+            </div>
+            <div class="exec-mini-legend">
+              @for (seg of occupancyByBusinessType; track seg.type; let i = $index) {
+                <div class="exec-legend-item">
+                  <span class="exec-legend-dot" [style.background]="occupancyPalette[i]"></span>
+                  <span class="exec-legend-label">{{ seg.type }} <span class="exec-legend-pct">{{ seg.percent }}%</span></span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exec-card exec-card-sm exec-card-portfolio">
+        <div class="exec-portfolio-header">
+          <div class="exec-mini-title">Portfolio by Business Type</div>
+          <div class="exec-mini-subtitle">Mix &amp; Occupancy</div>
+        </div>
+        <div class="exec-bars">
+          @for (mix of portfolioMix; track mix.type; let i = $index) {
+            <div class="exec-bar-row">
+              <div class="exec-bar-label">{{ mix.type }}</div>
+              <div class="exec-bar-track">
+                <div class="exec-bar-fill" [style.width.%]="mix.percent" [style.background]="portfolioBarPalette[i]"></div>
+              </div>
+              <div class="exec-bar-val">{{ mix.percent }}%</div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="exec-card exec-card-sm">
+        <div class="exec-mini-title">Building Performance Analytics</div>
+        <div class="exec-table">
+          <div class="exec-table-head">
+            <div class="exec-col-asset">ASSET</div>
+            <div class="exec-col-occ">OCC.</div>
+            <div class="exec-col-trend">TREND</div>
+          </div>
+          @for (row of buildingPerformance; track row.assetName) {
+            <div class="exec-table-row">
+              <div class="exec-col-asset">{{ row.assetName }}</div>
+              <div class="exec-col-occ">{{ row.occupancy }}%</div>
+              <div class="exec-col-trend">
+                <span class="exec-trend-pill" [class]="getBuildingTrendClass(row.trend)">
+                  {{ row.trend }}
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Third Row: Outstanding, Income, Financial -->
-  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-    <app-outstanding-block></app-outstanding-block>
-    <app-income-block></app-income-block>
-    <app-financial-block></app-financial-block>
-  </div>
+  <!-- ==================== DEEP DIVE + RIGHT COLUMN ==================== -->
+  <div class="exec-deep-grid">
+    <!-- Left: Building Performance Deep-Dive -->
+    <div class="exec-card exec-card-deep">
+      <div class="exec-deep-head">
+        <div>
+          <div class="exec-card-title">Building Performance Deep-Dive</div>
+          <div class="exec-deep-sub">Asset: Skyline Tower (HQ)</div>
+        </div>
 
-  <p-button label="Check" />
+        <div class="exec-asset-select">
+          <div class="exec-select-wrap">
+            <select
+              [(ngModel)]="selectedAsset"
+              class="exec-select"
+              aria-label="Select Asset"
+            >
+              @for (a of assets; track a) {
+                <option [value]="a">{{ a }}</option>
+              }
+            </select>
+            <i class="pi pi-chevron-down exec-select-chevron" aria-hidden="true"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="exec-deep-body">
+        <div class="exec-deep-left">
+          <div class="exec-mini-title">Revenue Mix by Segment</div>
+          <div class="exec-revenue-mix-chart">
+            <div class="exec-deep-donut-grid">
+              <div class="exec-deep-donut">
+                <canvas #deepDiveDonutChart></canvas>
+              </div>
+              <div class="exec-deep-legend">
+                @for (seg of deepDiveRevenueMix; track seg.type; let i = $index) {
+                  <div class="exec-legend-item">
+                    <span class="exec-legend-dot" [style.background]="deepDivePalette[i]"></span>
+                    <span class="exec-legend-label">{{ seg.type }} <span class="exec-legend-pct">{{ seg.percent }}%</span></span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="exec-deep-mid">
+          <div class="exec-mini-title">Performance Index vs Last Year</div>
+          <div class="exec-chart-wrap exec-chart-mid">
+            <canvas #performanceIndexChart></canvas>
+          </div>
+
+          <div class="exec-card exec-card-inset">
+            <div class="exec-portfolio-header">
+              <div class="exec-mini-title">Portfolio by Business Type</div>
+              <div class="exec-mini-subtitle">Mix &amp; Occupancy</div>
+            </div>
+            <div class="exec-bars compact">
+              @for (mix of portfolioMix; track mix.type; let i = $index) {
+                <div class="exec-bar-row">
+                  <div class="exec-bar-label">{{ mix.type }}</div>
+                  <div class="exec-bar-track">
+                    <div class="exec-bar-fill" [style.width.%]="mix.percent" [style.background]="portfolioBarPalette[i]"></div>
+                  </div>
+                  <div class="exec-bar-val">{{ mix.percent }}%</div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column cards -->
+    <div class="exec-right-col">
+      <div class="exec-card exec-card-side exec-card-sales">
+        <div class="exec-card-title">Sales Team vs. Budget</div>
+        <div class="exec-side-list">
+          @for (person of salesTeamPerformance; track person.name) {
+            <div class="exec-side-row" [ngClass]="getSalesRowClass(person.percent)">
+              <div class="exec-side-name">{{ person.name }}</div>
+              <div class="exec-side-track">
+                <div class="exec-side-fill" [style.width.%]="person.percent > 100 ? 100 : person.percent"></div>
+              </div>
+              <div class="exec-side-pct">{{ person.percent }}%</div>
+            </div>
+          }
+        </div>
+        <button type="button" class="exec-side-btn">VIEW LEADERBOARD</button>
+      </div>
+
+      <div class="exec-card exec-card-side exec-card-aging">
+        <div class="exec-card-title">Revenue Collection Aging</div>
+        <div class="exec-aging-list">
+          @for (bucket of collectionAging; track bucket.bucket; let i = $index) {
+            <div class="exec-aging-row">
+              <div class="exec-aging-label">{{ bucket.bucket }}</div>
+              <div class="exec-aging-track">
+                <div
+                  class="exec-aging-fill"
+                  [style.width.%]="maxAgingAmount ? (bucket.amount / maxAgingAmount) * 100 : 0"
+                  [style.background]="agingBarPalette[i]"
+                ></div>
+              </div>
+              <div class="exec-aging-val">{{ formatMoney(bucket.amount) }}</div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
