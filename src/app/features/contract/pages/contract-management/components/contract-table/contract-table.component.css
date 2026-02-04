@@ -275,27 +275,99 @@
   @apply font-medium text-sm transition-colors;
 }
 
-/* ==================== Responsive ==================== */
+/* ==================== Responsive - Mobile ==================== */
 @media (max-width: 768px) {
+  .contract-table-container {
+    min-height: 400px;
+    height: auto;
+  }
+
   .search-section {
-    @apply px-4 py-3;
+    @apply px-4 py-3 gap-2;
+  }
+
+  .search-bar {
+    @apply flex-col items-stretch gap-2;
+  }
+
+  .search-input-wrapper {
+    min-width: 0;
+  }
+
+  .advance-search-btn {
+    @apply w-full justify-center;
+  }
+
+  .advance-search-btn span {
+    @apply text-sm;
   }
 
   .actions-section {
-    @apply px-4 py-2 flex-col items-stretch gap-2;
+    @apply px-4 py-3 flex-wrap gap-2;
   }
 
-  .actions-left,
+  .actions-left {
+    @apply flex-wrap;
+  }
+
   .actions-right {
-    @apply justify-between;
+    @apply w-full sm:w-auto;
+  }
+
+  .action-btn.add-btn {
+    @apply w-full sm:w-auto justify-center;
+  }
+
+  .table-wrapper {
+    @apply overflow-x-auto overflow-y-auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .data-table {
+    min-width: 720px;
     @apply text-xs;
   }
 
   .data-table th,
   .data-table td {
-    @apply px-2 py-2;
+    @apply px-2 py-2.5 whitespace-nowrap;
+  }
+
+  .contract-number-cell {
+    @apply gap-2 min-w-0 max-w-[140px];
+  }
+
+  .contract-number {
+    @apply truncate block;
+  }
+
+  .company-name {
+    @apply truncate block;
+  }
+
+  .bulk-actions-menu {
+    min-width: 200px;
+  }
+
+  .row-actions-menu {
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-section {
+    @apply px-3 py-2;
+  }
+
+  .actions-section {
+    @apply px-3 py-2;
+  }
+
+  .advance-search-btn span {
+    font-size: 0.8125rem;
+  }
+
+  .filter-tag {
+    @apply px-2 py-1 text-xs;
   }
 }

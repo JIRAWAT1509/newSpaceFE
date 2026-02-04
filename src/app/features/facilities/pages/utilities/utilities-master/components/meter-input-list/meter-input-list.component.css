@@ -102,7 +102,7 @@
 }
 
 .section-header {
-  @apply mb-6 pb-4 border-b border-gray-200;
+  @apply mb-4 pb-4 border-b border-gray-200;
 }
 
 .section-title {
@@ -113,11 +113,16 @@
   @apply text-gray-500 font-normal;
 }
 
-/* Meters Grid - ALWAYS Compact by Default */
-.meters-grid {
-  @apply grid gap-4;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 250px));
-  justify-content: start;
+.section-hint {
+  @apply text-sm text-gray-500 mt-1;
+}
+
+/* Meters List - แถวละ 4 การ์ด (280×280px) พื้นที่ว่างสองข้างเท่ากัน */
+.meters-list {
+  display: grid;
+  grid-template-columns: repeat(4, 280px);
+  gap: 1.25rem;
+  justify-content: center;
 }
 
 /* Empty State */
@@ -169,6 +174,20 @@
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  .meters-list {
+    grid-template-columns: repeat(3, 280px);
+    justify-content: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .meters-list {
+    grid-template-columns: repeat(2, 280px);
+    justify-content: center;
+  }
+}
+
 @media (max-width: 768px) {
   .header-stats {
     @apply grid-cols-1;
@@ -182,8 +201,9 @@
     @apply w-full;
   }
 
-  .meters-grid {
+  .meters-list {
     grid-template-columns: 1fr;
+    justify-items: center;
   }
 
   .action-buttons {
@@ -192,5 +212,11 @@
 
   .action-btn {
     @apply w-full justify-center;
+  }
+}
+
+@media (max-width: 480px) {
+  .meters-list {
+    grid-template-columns: 1fr;
   }
 }

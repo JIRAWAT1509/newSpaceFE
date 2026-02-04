@@ -1,39 +1,44 @@
 /* utilities-master.component.css */
 
+/* ระยะเท่า Area Layout: p-6, ระหว่างบล็อก gap-6 */
 .utilities-container {
-  @apply w-full;
+  @apply w-full min-h-screen p-6 flex flex-col gap-6;
 }
 
-/* Header */
+/* Page header (หัวข้อหน้าอยู่นอกการ์ด - รูปแบบเดียวกับหน้าอื่น) */
 .utilities-header {
-  @apply mb-8 pb-6 border-b-2 border-border;
+  @apply rounded-xl;
+  padding: 1rem 1.25rem;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
 .header-content {
-  @apply flex items-center gap-4;
+  @apply flex items-center gap-3;
 }
 
 .header-icon {
-  @apply w-16 h-16 rounded-xl flex items-center justify-center text-white text-3xl;
+  @apply w-12 h-12 rounded-lg flex items-center justify-center text-white text-2xl;
   background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
-  box-shadow: 0 4px 15px rgb(var(--shadow) / 0.25);
+  box-shadow: 0 2px 8px rgb(var(--shadow) / 0.2);
 }
 
 .header-title {
-  @apply text-3xl font-bold text-fg;
+  @apply text-2xl font-bold text-fg;
 }
 
 .header-subtitle {
-  @apply text-muted mt-1;
+  @apply text-muted mt-0.5 text-sm;
 }
 
-/* Tab Navigation */
+/* Tab Navigation - compact */
 .tab-navigation {
-  @apply flex gap-3 mb-8 p-3 bg-card rounded-xl border border-border;
+  @apply flex gap-2 p-2 bg-card rounded-lg border border-border;
 }
 
 .tab-btn {
-  @apply flex items-center gap-2 px-6 py-3 rounded-lg;
+  @apply flex items-center gap-2 px-4 py-2 rounded-md text-sm;
   @apply text-muted font-medium transition-all duration-300;
   @apply border-none bg-transparent cursor-pointer;
 }
@@ -43,17 +48,16 @@
 }
 
 .tab-btn.active {
-  @apply bg-primary text-primary-foreground shadow-md;
-  box-shadow: 0 4px 15px rgb(var(--shadow) / 0.25);
+  @apply bg-primary text-primary-foreground shadow-sm;
 }
 
 .tab-btn i {
-  @apply text-lg;
+  @apply text-base;
 }
 
 /* Tab Content */
 .tab-content {
-  @apply min-h-screen;
+  @apply min-h-0;
 }
 
 .tab-panel {
@@ -93,17 +97,51 @@
   @apply text-muted;
 }
 
-/* Responsive */
+/* Responsive - Mobile (เท่า Area Layout) */
 @media (max-width: 768px) {
+  .utilities-container {
+    @apply p-4 gap-4;
+  }
+
+  .header-content {
+    @apply gap-2;
+  }
+
+  .header-icon {
+    @apply w-10 h-10 text-xl;
+  }
+
   .header-title {
-    @apply text-2xl;
+    @apply text-xl;
+  }
+
+  .header-subtitle {
+    @apply text-xs;
   }
 
   .tab-navigation {
-    @apply flex-col gap-2;
+    @apply p-2 gap-1;
   }
 
   .tab-btn {
-    @apply justify-center;
+    @apply px-3 py-2 text-sm flex-1 justify-center min-w-0;
+  }
+
+  .tab-btn span {
+    @apply truncate;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-title {
+    @apply text-lg;
+  }
+
+  .tab-navigation {
+    @apply flex-wrap;
+  }
+
+  .tab-btn {
+    @apply basis-[calc(50%-0.25rem)];
   }
 }

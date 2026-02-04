@@ -1,167 +1,185 @@
-/* stats-overview.component.css */
+/* Dashboard Overview - หัวข้อ section อยู่ในการ์ด */
 
-.stats-section {
-  @apply mb-8;
+.section-card {
+  @apply rounded-xl border p-4 mb-4;
+  background: rgb(var(--card));
+  border-color: rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
 .section-title {
-  @apply text-2xl font-bold text-fg mb-6;
+  @apply text-xl font-bold mb-3;
+  color: rgb(var(--fg));
 }
 
-/* Stats Grid */
 .stats-grid {
-  @apply grid gap-6;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  @apply grid gap-4;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-/* Stat Card */
 .stat-card {
-  @apply relative overflow-hidden rounded-2xl p-6;
-  @apply transition-all duration-300 cursor-pointer;
-  color: rgb(var(--stat-fg, var(--primary-fg)));
-  min-height: 200px;
-  box-shadow: 0 4px 15px rgb(var(--shadow) / 0.12);
+  @apply relative flex items-center gap-4 p-4 rounded-xl overflow-hidden;
+  @apply transition-all duration-200 cursor-pointer;
+  min-height: 100px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
 }
 
 .stat-card:hover {
-  @apply -translate-y-2;
-  box-shadow: 0 10px 30px rgb(var(--shadow) / 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
 }
 
-/* Decorative Background */
+/* Decorative background shape - very subtle on solid background */
 .stat-card-bg {
-  @apply absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: rgb(var(--primary-fg) / 0.12);
-  transform: rotate(45deg);
-  pointer-events: none;
+  @apply absolute pointer-events-none opacity-0;
 }
 
-/* Icon */
-.stat-icon {
-  @apply relative z-10 mb-4;
-  font-size: 3rem;
-  opacity: 0.9;
+/* Icon - light on colored background, centered in the circle */
+.stat-card-icon {
+  @apply relative z-10 w-11 h-11 rounded-xl flex-shrink-0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
 }
 
-/* Value */
+.stat-card-icon i {
+  font-size: 1.25rem;
+  color: white;
+  font-family: 'primeicons' !important;
+  line-height: 1 !important;
+  display: block !important;
+  text-align: center !important;
+  /* Slight nudge so PrimeIcons glyph sits visually centered in the circle */
+  transform: translate(0.03em, 0.06em);
+}
+
+/* Content */
+.stat-card-body {
+  @apply relative z-10 flex flex-col justify-center min-w-0 flex-1;
+}
+
+.stat-label {
+  @apply text-sm font-medium mb-0.5;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .stat-value {
-  @apply relative z-10 text-4xl font-bold mb-2;
+  @apply font-bold leading-tight mb-1;
+  font-size: 1.35rem;
+  color: white;
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
 }
 
 .stat-unit {
-  @apply text-xl font-normal opacity-90;
+  @apply font-normal;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.92);
 }
 
-/* Label */
-.stat-label {
-  @apply relative z-10 text-sm opacity-90 mb-3;
-  font-weight: 500;
-}
-
-/* Change Badge */
 .stat-change {
-  @apply absolute top-5 right-5 z-10;
-  @apply flex items-center gap-1;
-  @apply px-3 py-1 rounded-full text-xs font-semibold;
-  background: rgb(var(--primary-fg) / 0.22);
-  backdrop-filter: blur(10px);
+  @apply flex items-center gap-1.5 text-xs font-medium;
 }
 
-.stat-change i {
-  @apply text-xs;
+/* ยอดเพิ่ม = เขียวเข้ม, ยอดลด = แดงเข้ม (สีไม่กลืนกับพื้นการ์ด teal/เขียว) */
+.stat-change--up {
+  color: rgb(6 78 59);
+  text-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4), 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
-/* Change Label */
-.stat-change-label {
-  @apply relative z-10 text-xs opacity-75;
-  font-weight: 400;
+.stat-change--up .stat-change-hint {
+  color: rgba(255, 255, 255, 0.9);
 }
 
+.stat-change--down {
+  color: rgb(220 38 38);
+  text-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.stat-change--down .stat-change-hint {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.stat-change .pi {
+  font-size: 0.6rem;
+}
+
+.stat-change-hint {
+  @apply font-normal;
+}
+
+/* Solid backgrounds - one color per card (สีเดิม) */
 .stat-card--primary {
-  --stat-fg: var(--primary-fg);
-  background: linear-gradient(
-    135deg,
-    rgb(var(--primary)) 0%,
-    rgb(var(--secondary)) 100%
-  );
+  background: rgb(var(--primary));
+  color: rgb(var(--primary-fg));
 }
 
 .stat-card--warning {
-  --stat-fg: var(--warning-fg);
-  background: linear-gradient(
-    135deg,
-    rgb(var(--warning)) 0%,
-    rgb(var(--warning) / 0.7) 100%
-  );
+  background: rgb(var(--warning));
+  color: rgb(var(--warning-fg));
 }
 
 .stat-card--info {
-  --stat-fg: var(--info-fg);
-  background: linear-gradient(
-    135deg,
-    rgb(var(--info)) 0%,
-    rgb(var(--primary)) 100%
-  );
+  background: rgb(20 184 166);
+  color: white;
 }
 
 .stat-card--success {
-  --stat-fg: var(--success-fg);
-  background: linear-gradient(
-    135deg,
-    rgb(var(--success)) 0%,
-    rgb(var(--success) / 0.7) 100%
-  );
-}
-
-.stat-change--positive {
   background: rgb(var(--success));
   color: rgb(var(--success-fg));
 }
 
-.stat-change--negative {
-  background: rgb(var(--danger));
-  color: rgb(var(--danger-fg));
-}
-
-/* Animation on Load */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.stat-card {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.stat-card:nth-child(1) { animation-delay: 0s; }
-.stat-card:nth-child(2) { animation-delay: 0.1s; }
-.stat-card:nth-child(3) { animation-delay: 0.2s; }
-.stat-card:nth-child(4) { animation-delay: 0.3s; }
-
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1280px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .section-card {
+    @apply mb-3 p-3;
+  }
+
+  .section-title {
+    @apply text-lg mb-2;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
+    @apply gap-3;
+  }
+
+  .stat-card {
+    @apply p-3 gap-3;
+  }
+
+  .stat-card-icon {
+    @apply w-10 h-10;
+  }
+
+  .stat-card-icon i {
+    font-size: 1.1rem;
   }
 
   .stat-value {
-    @apply text-3xl;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    @apply p-2.5 gap-2.5;
   }
 
-  .stat-icon {
-    font-size: 2.5rem;
+  .stat-label {
+    @apply text-xs;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
   }
 }

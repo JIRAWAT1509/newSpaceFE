@@ -184,23 +184,32 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: { padding: { top: 8, right: 16, bottom: 8, left: 8 } },
         plugins: {
           legend: {
             display: true,
-            position: 'top'
+            position: 'top',
+            labels: { font: { size: 13 }, padding: 16 }
           },
           title: {
             display: true,
             text: 'Consumption Trend Over Time',
-            font: { size: 16, weight: 'bold' }
+            font: { size: 18, weight: 'bold' },
+            padding: { bottom: 12 }
           }
         },
         scales: {
+          x: {
+            ticks: { font: { size: 12 }, maxRotation: 0 },
+            title: { display: true, font: { size: 12 } }
+          },
           y: {
             beginAtZero: true,
+            ticks: { font: { size: 12 } },
             title: {
               display: true,
-              text: 'Consumption (kWh / m³)'
+              text: 'Consumption (kWh / m³)',
+              font: { size: 12 }
             }
           }
         }
@@ -297,14 +306,17 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: { padding: { top: 8, right: 16, bottom: 8, left: 16 } },
         plugins: {
           legend: {
-            position: 'bottom'
+            position: 'bottom',
+            labels: { font: { size: 13 }, padding: 14 }
           },
           title: {
             display: true,
             text: 'Consumption by Meter Type (%)',
-            font: { size: 16, weight: 'bold' }
+            font: { size: 18, weight: 'bold' },
+            padding: { bottom: 12 }
           }
         }
       }
@@ -335,23 +347,24 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
         responsive: true,
         maintainAspectRatio: false,
         indexAxis: 'y',
+        layout: { padding: { top: 8, right: 16, bottom: 8, left: 8 } },
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           title: {
             display: true,
             text: 'Top 5 Consumers',
-            font: { size: 16, weight: 'bold' }
+            font: { size: 18, weight: 'bold' },
+            padding: { bottom: 12 }
           }
         },
         scales: {
           x: {
             beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Total Consumption'
-            }
+            ticks: { font: { size: 12 } },
+            title: { display: true, text: 'Total Consumption', font: { size: 12 } }
+          },
+          y: {
+            ticks: { font: { size: 12 } }
           }
         }
       }
@@ -383,22 +396,28 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: { padding: { top: 8, right: 16, bottom: 8, left: 8 } },
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           title: {
             display: true,
             text: 'Monthly Cost Analysis (฿)',
-            font: { size: 16, weight: 'bold' }
+            font: { size: 18, weight: 'bold' },
+            padding: { bottom: 12 }
           }
         },
         scales: {
+          x: {
+            ticks: { font: { size: 12 } }
+          },
           y: {
             beginAtZero: true,
             ticks: {
-              callback: (value) => '฿' + value.toLocaleString()
-            }
+              font: { size: 12 },
+              callback: (tickValue: string | number) =>
+                '฿' + Number(tickValue).toLocaleString()
+            },
+            title: { display: false }
           }
         }
       }

@@ -1,21 +1,21 @@
 /* analytics-charts.component.css */
 
 .analytics-container {
-  @apply space-y-6;
+  @apply space-y-5;
 }
 
 /* Filter Panel */
 .filter-panel {
-  @apply bg-white p-6 rounded-xl border border-gray-200;
-  @apply space-y-6;
+  @apply bg-white p-4 rounded-xl border border-gray-200;
+  @apply flex flex-wrap items-end gap-x-6 gap-y-3;
 }
 
 .filter-group {
-  @apply space-y-3;
+  @apply space-y-1.5 flex-shrink-0;
 }
 
 .filter-title {
-  @apply flex items-center gap-2 text-lg font-bold text-gray-800;
+  @apply flex items-center gap-1.5 text-sm font-bold text-gray-800;
 }
 
 .filter-title i {
@@ -24,11 +24,11 @@
 
 /* Filter Options */
 .filter-options {
-  @apply flex flex-wrap gap-3;
+  @apply flex flex-wrap gap-2;
 }
 
 .filter-chip {
-  @apply px-4 py-2 rounded-lg border-2;
+  @apply px-3 py-1.5 rounded-md border-2 text-sm;
   @apply transition-all duration-200 cursor-pointer;
   @apply bg-white text-gray-700 font-medium;
   white-space: nowrap;
@@ -49,7 +49,7 @@
 }
 
 .chip-icon {
-  @apply w-8 h-8 rounded-lg flex items-center justify-center text-white;
+  @apply w-6 h-6 rounded flex items-center justify-center text-white text-xs;
 }
 
 .type-chip.active .chip-icon {
@@ -62,8 +62,8 @@
 
 /* Custom Date Range */
 .custom-date-range {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-4 mt-4;
-  @apply p-4 bg-blue-50 rounded-lg border border-blue-200;
+  @apply grid grid-cols-1 md:grid-cols-2 gap-3 mt-2;
+  @apply p-3 bg-blue-50 rounded-lg border border-blue-200;
 }
 
 .date-input-group {
@@ -71,37 +71,35 @@
 }
 
 .date-input-group label {
-  @apply text-sm font-semibold text-gray-700;
+  @apply text-xs font-semibold text-gray-700;
 }
 
-/* Charts Grid */
+/* Charts Grid: 2 columns - more gap so it doesn’t feel cramped */
 .charts-grid {
   @apply grid gap-6;
   grid-template-columns: repeat(2, 1fr);
 }
 
-/* Chart Card */
+/* Chart Card - more padding for breathing room */
 .chart-card {
-  @apply bg-white p-6 rounded-xl border border-gray-200;
+  @apply bg-white rounded-xl border border-gray-200;
   @apply transition-all duration-300;
+  padding: 1.25rem 1.5rem;
 }
 
 .chart-card:hover {
-  @apply shadow-xl;
+  @apply shadow-lg;
 }
 
-.chart-card.large {
-  @apply col-span-2;
+/* Hero row: Consumption + Cost - taller for readability */
+.chart-card--hero .chart-wrapper {
+  height: 280px;
 }
 
-/* Chart Wrapper */
+/* Chart Wrapper - enough height so content isn’t squeezed */
 .chart-wrapper {
   @apply relative;
-  height: 350px;
-}
-
-.chart-card.large .chart-wrapper {
-  height: 400px;
+  height: 260px;
 }
 
 /* Calendar Override */
@@ -124,26 +122,68 @@
     grid-template-columns: 1fr;
   }
 
-  .chart-card.large {
-    @apply col-span-1;
+  .chart-card--hero .chart-wrapper {
+    height: 300px;
   }
 }
 
 @media (max-width: 768px) {
+  .analytics-container {
+    @apply space-y-4;
+  }
+
+  .filter-panel {
+    @apply flex-col items-stretch p-3;
+  }
+
   .filter-options {
-    @apply flex-col;
+    @apply flex-wrap gap-2;
   }
 
   .filter-chip {
-    @apply w-full justify-center;
+    @apply justify-center py-2;
   }
 
   .custom-date-range {
     @apply grid-cols-1;
   }
 
+  .charts-grid {
+    @apply gap-4;
+  }
+
+  .chart-card {
+    @apply p-3;
+  }
+
   .chart-wrapper {
-    height: 300px;
+    height: 260px;
+  }
+
+  .chart-card--hero .chart-wrapper {
+    height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-panel {
+    @apply p-2;
+  }
+
+  .filter-title {
+    @apply text-sm;
+  }
+
+  .chart-card {
+    @apply p-2;
+  }
+
+  .chart-wrapper {
+    height: 220px;
+  }
+
+  .chart-card--hero .chart-wrapper {
+    height: 240px;
   }
 }
 

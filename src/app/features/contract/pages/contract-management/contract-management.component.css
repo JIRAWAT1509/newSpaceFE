@@ -1,26 +1,44 @@
 /* contract-management.component.css */
 
+/* ระยะเท่า Area Layout: p-6, ระหว่างบล็อก gap-6 */
 .contract-management-container {
-  @apply h-full flex flex-col bg-gray-50;
+  @apply min-h-screen p-6 flex flex-col gap-6;
+  background: rgb(var(--bg));
 }
 
-/* ==================== Header ==================== */
+/* ==================== Page header (ยึด Area Layout) ==================== */
 .page-header {
-  @apply bg-white border-b border-gray-200 px-6 py-4;
+  @apply rounded-xl;
+  padding: 1rem 1.25rem;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
 .page-title {
-  @apply text-2xl font-bold text-gray-900;
+  @apply text-2xl font-bold m-0;
+  color: rgb(var(--fg));
+}
+
+/* ==================== Content card (ขนาดการ์ดเท่า Area Layout) ==================== */
+.content-card {
+  @apply flex-1 flex flex-col rounded-xl overflow-hidden;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
+  padding: 0;
 }
 
 /* ==================== Tabs ==================== */
 ::ng-deep .contract-tabs {
-  @apply flex-1 flex flex-col bg-white;
+  @apply flex-1 flex flex-col;
+  background: transparent;
 }
 
 ::ng-deep .contract-tabs .p-tablist {
-  @apply bg-white border-b border-gray-200;
+  @apply border-b border-gray-200;
   @apply flex gap-1 px-6;
+  background: rgb(var(--card));
 }
 
 ::ng-deep .contract-tabs .p-tab {
@@ -55,8 +73,12 @@
   @apply font-medium text-sm;
 }
 
-/* ==================== Responsive ==================== */
+/* ==================== Responsive - Mobile (เท่า Area Layout) ==================== */
 @media (max-width: 768px) {
+  .contract-management-container {
+    @apply min-h-0 p-4 gap-4;
+  }
+
   .page-header {
     @apply px-4 py-3;
   }
@@ -66,11 +88,15 @@
   }
 
   ::ng-deep .contract-tabs .p-tablist {
-    @apply px-4;
+    @apply px-3 gap-0;
   }
 
   ::ng-deep .contract-tabs .p-tab {
-    @apply px-4 py-2;
+    @apply px-3 py-2.5 flex-1 justify-center;
+  }
+
+  .tab-header {
+    @apply justify-center;
   }
 
   .tab-header span {
@@ -78,6 +104,20 @@
   }
 
   .tab-header i {
+    @apply text-lg;
+  }
+
+  ::ng-deep .contract-tabs .p-tabpanels {
+    @apply min-h-0;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    @apply px-3 py-2;
+  }
+
+  .page-title {
     @apply text-lg;
   }
 }
