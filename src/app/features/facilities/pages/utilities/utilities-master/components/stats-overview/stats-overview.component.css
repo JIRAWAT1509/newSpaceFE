@@ -1,11 +1,15 @@
-/* Dashboard Overview - colored card backgrounds (like original) */
+/* Dashboard Overview - หัวข้อ section อยู่ในการ์ด */
 
-.stats-section {
-  @apply mb-4;
+.section-card {
+  @apply rounded-xl border p-4 mb-4;
+  background: rgb(var(--card));
+  border-color: rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
 .section-title {
-  @apply text-xl font-bold text-fg mb-3;
+  @apply text-xl font-bold mb-3;
+  color: rgb(var(--fg));
 }
 
 .stats-grid {
@@ -136,6 +140,14 @@
 }
 
 @media (max-width: 640px) {
+  .section-card {
+    @apply mb-3 p-3;
+  }
+
+  .section-title {
+    @apply text-lg mb-2;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
     @apply gap-3;
@@ -155,5 +167,19 @@
 
   .stat-value {
     font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    @apply p-2.5 gap-2.5;
+  }
+
+  .stat-label {
+    @apply text-xs;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
   }
 }

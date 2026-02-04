@@ -1,12 +1,17 @@
 /* utilities-master.component.css */
 
+/* ระยะเท่า Area Layout: p-6, ระหว่างบล็อก gap-6 */
 .utilities-container {
-  @apply w-full;
+  @apply w-full min-h-screen p-6 flex flex-col gap-6;
 }
 
-/* Header - compact for above-the-fold UX */
+/* Page header (หัวข้อหน้าอยู่นอกการ์ด - รูปแบบเดียวกับหน้าอื่น) */
 .utilities-header {
-  @apply mb-4 pb-4 border-b border-border;
+  @apply rounded-xl;
+  padding: 1rem 1.25rem;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
 .header-content {
@@ -29,7 +34,7 @@
 
 /* Tab Navigation - compact */
 .tab-navigation {
-  @apply flex gap-2 mb-4 p-2 bg-card rounded-lg border border-border;
+  @apply flex gap-2 p-2 bg-card rounded-lg border border-border;
 }
 
 .tab-btn {
@@ -92,17 +97,51 @@
   @apply text-muted;
 }
 
-/* Responsive */
+/* Responsive - Mobile (เท่า Area Layout) */
 @media (max-width: 768px) {
+  .utilities-container {
+    @apply p-4 gap-4;
+  }
+
+  .header-content {
+    @apply gap-2;
+  }
+
+  .header-icon {
+    @apply w-10 h-10 text-xl;
+  }
+
   .header-title {
-    @apply text-2xl;
+    @apply text-xl;
+  }
+
+  .header-subtitle {
+    @apply text-xs;
   }
 
   .tab-navigation {
-    @apply flex-col gap-2;
+    @apply p-2 gap-1;
   }
 
   .tab-btn {
-    @apply justify-center;
+    @apply px-3 py-2 text-sm flex-1 justify-center min-w-0;
+  }
+
+  .tab-btn span {
+    @apply truncate;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-title {
+    @apply text-lg;
+  }
+
+  .tab-navigation {
+    @apply flex-wrap;
+  }
+
+  .tab-btn {
+    @apply basis-[calc(50%-0.25rem)];
   }
 }

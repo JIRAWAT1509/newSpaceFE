@@ -1,9 +1,32 @@
 .layout-master-container {
-  @apply min-h-screen bg-gray-50 p-6 flex flex-col gap-6;
+  @apply min-h-screen p-6 flex flex-col gap-6;
+  background: rgb(var(--bg));
+}
+
+/* Page header (หัวข้อหน้าอยู่นอกการ์ด - รูปแบบเดียวกับหน้าอื่น) */
+.page-header {
+  @apply rounded-xl;
+  padding: 1rem 1.25rem;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
+}
+
+.page-title {
+  @apply text-2xl font-bold m-0;
+  color: rgb(var(--fg));
+}
+
+.page-subtitle {
+  @apply text-sm m-0 mt-0.5;
+  color: rgb(var(--muted));
 }
 
 .section {
-  @apply bg-white rounded-lg shadow-sm;
+  @apply rounded-xl border;
+  background: rgb(var(--card));
+  border-color: rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
 /* Section 1: Area Availability - Full Width at Top */

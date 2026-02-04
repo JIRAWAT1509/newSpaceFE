@@ -1,6 +1,5 @@
-<div class="stats-section">
+<div class="section-card">
   <h2 class="section-title">Dashboard Overview</h2>
-
   <div class="stats-grid">
     @for (card of statCards(); track card.label) {
       <article class="stat-card" [ngClass]="'stat-card--' + card.tone">
@@ -29,3 +28,4 @@
     }
   </div>
 </div>
+

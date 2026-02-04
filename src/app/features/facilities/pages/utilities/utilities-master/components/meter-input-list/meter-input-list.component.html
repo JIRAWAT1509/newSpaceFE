@@ -68,24 +68,23 @@
     </div>
   </div>
 
-  <!-- Meters Grid -->
+  <!-- Meters List: กรอกได้เลยโดยไม่ต้องขยาย -->
   <div class="meters-section">
     <div class="section-header">
       <h3 class="section-title">
         {{ sectionTitle() }}
         <span class="meter-count">({{ filteredMeters().length }})</span>
       </h3>
+      <p class="section-hint">กรอกค่ามิเตอร์ในแต่ละการ์ดได้เลย แล้วกดบันทึก (ไม่ต้องคลิกขยาย)</p>
     </div>
 
     @if (filteredMeters().length > 0) {
-      <div class="meters-grid">
+      <div class="meters-list">
         @for (meter of filteredMeters(); track meter.id) {
           <app-meter-input-card
             [meter]="meter"
-            [isExpanded]="isCardExpanded(meter.id)"
+            [inlineMode]="true"
             (readingSaved)="onReadingSaved($event)"
-            (cardClicked)="onCardClicked($event)"
-            (backgroundClicked)="onCardBackgroundClicked($event)"
           />
         }
       </div>

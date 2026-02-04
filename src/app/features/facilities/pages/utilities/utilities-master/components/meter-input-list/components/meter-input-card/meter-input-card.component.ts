@@ -4,6 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { Meter, getMeterTypeLabel } from '@core/models/meter.model';
+import {
+  computeExpectedRange,
+  formatMinForDisplay,
+  formatRangeForDisplay,
+  ExpectedRangeResult
+} from '@core/utils/meter-range.util';
 import { getFacilitiesUtilitiesConfig } from '@core/services/ui-settings';
 import { interval, Subscription } from 'rxjs';
 
@@ -19,6 +25,8 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   meter = input.required<Meter>();
   isExpanded = input<boolean>(false); // Controlled by parent
   isCompleted = input<boolean>(false); // For meter list view
+  /** เมื่อ true แสดงเป็นแถวเดียว มีช่องกรอกและปุ่มบันทึกให้กรอกได้เลยโดยไม่ต้องขยาย */
+  inlineMode = input<boolean>(false);
 
   // Outputs
   readingSaved = output<{ meterId: string; reading: number; photos: string[] }>();
@@ -32,6 +40,8 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   showSuccess = signal<boolean>(false);
   hasError = signal<boolean>(false);
   errorMessage = signal<string>('');
+  isWarning = signal<boolean>(false);
+  warningMessage = signal<string>('');
   isEditing = signal<boolean>(false);
 
   // Config tracking
@@ -92,9 +102,29 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     return this.meterTypeInfo()?.EN || 'Electricity';
   }
 
-  getExpectedRange(): string {
-    const meter = this.meter();
-    return `${meter.expectedMin.toLocaleString()} - ${meter.expectedMax.toLocaleString()}`;
+  /** Cached result for current meter; used by display and validation. */
+  getExpectedRangeInfo(): ExpectedRangeResult {
+    return computeExpectedRange(this.meter());
+  }
+
+  /** For display: "X - Y" only when we have a real range (X < Y). */
+  getExpectedRangeDisplay(): string | null {
+    const info = this.getExpectedRangeInfo();
+    if (!info.hasRange || info.max == null) return null;
+    return formatRangeForDisplay(info.min, info.max);
+  }
+
+  /** For display when only minimum rule: "Minimum allowed: X unit" or min value. */
+  getMinimumAllowedDisplay(): string {
+    const info = this.getExpectedRangeInfo();
+    const minStr = formatMinForDisplay(info.min);
+    const unit = this.meter().unit ?? 'kWh';
+    return `Minimum allowed: ${minStr} ${unit}`;
+  }
+
+  /** True when we show "Expected range: X - Y" (real range). */
+  hasExpectedRange(): boolean {
+    return this.getExpectedRangeInfo().hasRange;
   }
 
   getConsumption(): number {
@@ -104,10 +134,12 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
 
   isOutOfRange(): boolean {
     const reading = this.currentReading();
-    if (!reading) return false;
+    if (reading === null || reading === undefined) return false;
 
-    const meter = this.meter();
-    return reading < meter.expectedMin || reading > meter.expectedMax;
+    const info = this.getExpectedRangeInfo();
+    if (reading < info.min) return true;
+    if (info.hasRange && info.max != null && reading > info.max) return true;
+    return false;
   }
 
   // Card Click Handlers
@@ -178,24 +210,33 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     if (!reading || reading === 0) {
       this.hasError.set(true);
       this.errorMessage.set('Please enter a reading value');
+      this.isWarning.set(false);
+      this.warningMessage.set('');
       return false;
     }
 
-    const meter = this.meter();
-    if (reading < meter.currentReading) {
+    const info = this.getExpectedRangeInfo();
+    if (reading < info.min) {
       this.hasError.set(true);
-      this.errorMessage.set('Reading cannot be less than previous reading');
+      this.errorMessage.set('Reading must be greater than last reading');
+      this.isWarning.set(false);
+      this.warningMessage.set('');
       return false;
     }
 
     if (this.isOutOfRange()) {
-      this.hasError.set(true);
-      this.errorMessage.set('Reading is outside expected range');
-      return false;
+      // อนุญาตให้บันทึกได้ แต่แสดงคำเตือน
+      this.hasError.set(false);
+      this.errorMessage.set('');
+      this.isWarning.set(true);
+      this.warningMessage.set('Warning: reading is outside expected range');
+      return true;
     }
 
     this.hasError.set(false);
     this.errorMessage.set('');
+    this.isWarning.set(false);
+    this.warningMessage.set('');
     return true;
   }
 
@@ -232,6 +273,9 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   onInputChange(): void {
     this.hasError.set(false);
     this.errorMessage.set('');
+    // รีเซ็ตคำเตือนเมื่อแก้ไขค่า
+    this.isWarning.set(false);
+    this.warningMessage.set('');
   }
 
   // Edit mode for meter list
