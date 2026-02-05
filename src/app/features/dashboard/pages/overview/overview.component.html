@@ -87,72 +87,57 @@
   <!-- ==================== KPI SUMMARY ROW (colored cards) ==================== -->
   <div class="exec-kpi-row">
     <div class="exec-kpi-card kpi-occupancy">
-      <div class="exec-kpi-top">
-        <div class="exec-kpi-title-wrap">
-          <div class="exec-kpi-icon tone-success">
-            <i class="pi pi-percentage"></i>
-          </div>
-          <div class="exec-kpi-title">PORTFOLIO OCCUPANCY</div>
-        </div>
-        <div class="exec-kpi-badge">▲ 1.2% YoY</div>
+      <div class="exec-kpi-icon tone-success">
+        <i class="pi pi-percentage"></i>
       </div>
-      <div class="exec-kpi-value">94.2%</div>
-      <div class="exec-kpi-bar-wrap">
-        <div class="exec-kpi-bar-track">
-          <div class="exec-kpi-bar-fill" style="width: 94.2%"></div>
+      <div class="exec-kpi-body">
+        <div class="exec-kpi-title">PORTFOLIO OCCUPANCY</div>
+        <div class="exec-kpi-value">94.2%</div>
+        <div class="exec-kpi-change exec-kpi-change--up">
+          <i class="pi pi-arrow-up"></i>
+          <span>+1.2%</span>
+          <span class="exec-kpi-change-hint">vs last year</span>
         </div>
       </div>
     </div>
     <div class="exec-kpi-card kpi-revenue">
-      <div class="exec-kpi-top">
-        <div class="exec-kpi-title-wrap">
-          <div class="exec-kpi-icon tone-primary">
-            <i class="pi pi-dollar"></i>
-          </div>
-          <div class="exec-kpi-title">ACTUAL YTD REVENUE</div>
-        </div>
-        <div class="exec-kpi-badge">YoY +12%</div>
+      <div class="exec-kpi-icon tone-primary">
+        <i class="pi pi-dollar"></i>
       </div>
-      <div class="exec-kpi-value">$14.2M</div>
-      <div class="exec-kpi-sub">Budget: $423.0M</div>
-      <div class="exec-kpi-bar-wrap">
-        <div class="exec-kpi-bar-track">
-          <div class="exec-kpi-bar-fill" style="width: 3.36%"></div>
+      <div class="exec-kpi-body">
+        <div class="exec-kpi-title">ACTUAL YTD REVENUE</div>
+        <div class="exec-kpi-value">$14.2M</div>
+        <div class="exec-kpi-change exec-kpi-change--up">
+          <i class="pi pi-arrow-up"></i>
+          <span>+12%</span>
+          <span class="exec-kpi-change-hint">vs last year</span>
         </div>
       </div>
     </div>
     <div class="exec-kpi-card kpi-forecast">
-      <div class="exec-kpi-top">
-        <div class="exec-kpi-title-wrap">
-          <div class="exec-kpi-icon tone-info">
-            <i class="pi pi-compass"></i>
-          </div>
-          <div class="exec-kpi-title">FORECAST (DEC 2026)</div>
-        </div>
-        <div class="exec-kpi-status exec-kpi-status--ontrack">On Track</div>
+      <div class="exec-kpi-icon tone-info">
+        <i class="pi pi-compass"></i>
       </div>
-      <div class="exec-kpi-value">$18.1M</div>
-      <div class="exec-kpi-bar-wrap">
-        <div class="exec-kpi-bar-track">
-          <div class="exec-kpi-bar-fill" style="width: 75%"></div>
+      <div class="exec-kpi-body">
+        <div class="exec-kpi-title">FORECAST (DEC 2026)</div>
+        <div class="exec-kpi-value">$18.1M</div>
+        <div class="exec-kpi-change exec-kpi-change--up">
+          <i class="pi pi-check"></i>
+          <span>On Track</span>
         </div>
       </div>
     </div>
     <div class="exec-kpi-card kpi-lease">
-      <div class="exec-kpi-top">
-        <div class="exec-kpi-title-wrap">
-          <div class="exec-kpi-icon tone-warning">
-            <i class="pi pi-calendar"></i>
-          </div>
-          <div class="exec-kpi-title">AVG LEASE DURATION</div>
-        </div>
-        <div class="exec-kpi-badge">↑+0.4</div>
+      <div class="exec-kpi-icon tone-warning">
+        <i class="pi pi-calendar"></i>
       </div>
-      <div class="exec-kpi-value">3.2 yrs</div>
-      <div class="exec-kpi-sub">New Contracts YTD</div>
-      <div class="exec-kpi-bar-wrap">
-        <div class="exec-kpi-bar-track">
-          <div class="exec-kpi-bar-fill" style="width: 55%"></div>
+      <div class="exec-kpi-body">
+        <div class="exec-kpi-title">AVG LEASE DURATION</div>
+        <div class="exec-kpi-value">3.2 yrs</div>
+        <div class="exec-kpi-change exec-kpi-change--up">
+          <i class="pi pi-arrow-up"></i>
+          <span>+0.4</span>
+          <span class="exec-kpi-change-hint">vs last year</span>
         </div>
       </div>
     </div>
@@ -176,19 +161,17 @@
     <div class="exec-right-stack">
       <div class="exec-card exec-card-sm exec-card-occupancy">
         <div class="exec-mini-title">Occupancy by Business Type</div>
-        <div class="exec-occupancy-chart">
-          <div class="exec-mini-grid">
-            <div class="exec-donut-wrap">
-              <canvas #occupancyDonutChart></canvas>
-            </div>
-            <div class="exec-mini-legend">
-              @for (seg of occupancyByBusinessType; track seg.type; let i = $index) {
-                <div class="exec-legend-item">
-                  <span class="exec-legend-dot" [style.background]="occupancyPalette[i]"></span>
-                  <span class="exec-legend-label">{{ seg.type }} <span class="exec-legend-pct">{{ seg.percent }}%</span></span>
-                </div>
-              }
-            </div>
+        <div class="exec-occupancy-chart exec-chart-horizontal">
+          <div class="exec-donut-wrap-center">
+            <canvas #occupancyDonutChart></canvas>
+          </div>
+          <div class="exec-legend-horizontal">
+            @for (seg of occupancyByBusinessType; track seg.type; let i = $index) {
+              <div class="exec-legend-item-h">
+                <span class="exec-legend-dot" [style.background]="occupancyPalette[i]"></span>
+                <span class="exec-legend-label">{{ seg.type }}</span>
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -264,19 +247,17 @@
       <div class="exec-deep-body">
         <div class="exec-deep-left">
           <div class="exec-mini-title">Revenue Mix by Segment</div>
-          <div class="exec-revenue-mix-chart">
-            <div class="exec-deep-donut-grid">
-              <div class="exec-deep-donut">
-                <canvas #deepDiveDonutChart></canvas>
-              </div>
-              <div class="exec-deep-legend">
-                @for (seg of deepDiveRevenueMix; track seg.type; let i = $index) {
-                  <div class="exec-legend-item">
-                    <span class="exec-legend-dot" [style.background]="deepDivePalette[i]"></span>
-                    <span class="exec-legend-label">{{ seg.type }} <span class="exec-legend-pct">{{ seg.percent }}%</span></span>
-                  </div>
-                }
-              </div>
+          <div class="exec-revenue-mix-chart exec-chart-horizontal">
+            <div class="exec-donut-wrap-center exec-donut-lg">
+              <canvas #deepDiveDonutChart></canvas>
+            </div>
+            <div class="exec-legend-horizontal">
+              @for (seg of deepDiveRevenueMix; track seg.type; let i = $index) {
+                <div class="exec-legend-item-h">
+                  <span class="exec-legend-dot" [style.background]="deepDivePalette[i]"></span>
+                  <span class="exec-legend-label">{{ seg.type }}</span>
+                </div>
+              }
             </div>
           </div>
         </div>

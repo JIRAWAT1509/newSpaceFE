@@ -273,13 +273,10 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const fg = this.getCssColor('--fg', '#111827');
     const muted = this.getCssColor('--muted', '#6B7280');
-    const border = this.getCssColor('--border', '#E5E7EB');
     const gridColor = this.getCssColorWithAlpha('--border', 0.35, 'rgba(229,231,235,0.35)');
     const primary = this.getCssColor('--primary', '#2563eb');
-    const primaryFill = this.getCssColorWithAlpha('--primary', 0.14, 'rgba(37,99,235,0.14)');
-    const info = this.getCssColor('--info', '#38bdf8');
-    const primaryBar = this.getCssColorWithAlpha('--primary', 0.85, 'rgba(37,99,235,0.85)');
-    const successBar = this.getCssColorWithAlpha('--success', 0.85, 'rgba(34,197,94,0.85)');
+    const success = this.getCssColor('--success', '#22C55E');
+    const warning = this.getCssColor('--warning', '#F59E0B');
 
     const labels = this.revenuePerformance.map(p => p.period);
     const actual = this.revenuePerformance.map(p => p.actual);
@@ -287,93 +284,100 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     const forecast = this.revenuePerformance.map(p => p.forecast);
 
     const config: ChartConfiguration = {
-      type: 'line',
+      type: 'bar',
       data: {
         labels,
         datasets: [
+          // Bar charts
           {
-            type: 'bar' as const,
-            label: 'Actual Revenue (bars)',
+            type: 'bar',
+            label: 'Actual',
             data: actual,
-            backgroundColor: primaryBar,
+            backgroundColor: primary,
             borderRadius: 6,
-            barThickness: 18,
-            order: 2,
+            barPercentage: 0.5,
+            categoryPercentage: 0.7,
+            order: 3,
           } as any,
           {
-            type: 'bar' as const,
-            label: 'Budget (bars)',
+            type: 'bar',
+            label: 'Budget',
             data: budget,
-            backgroundColor: successBar,
+            backgroundColor: success,
             borderRadius: 6,
-            barThickness: 18,
-            order: 2,
+            barPercentage: 0.5,
+            categoryPercentage: 0.7,
+            order: 3,
           } as any,
+          // Line charts
           {
-            label: 'Actual Revenue',
+            type: 'line',
+            label: 'Actual (trend)',
             data: actual,
             borderColor: primary,
-            backgroundColor: primaryFill,
+            backgroundColor: 'transparent',
             borderWidth: 2.5,
-            tension: 0.25,
-            fill: true,
+            tension: 0.4,
             pointRadius: 5,
             pointHoverRadius: 7,
             pointBackgroundColor: primary,
-            pointBorderColor: 'rgba(255,255,255,0.9)',
+            pointBorderColor: '#fff',
             pointBorderWidth: 2,
             order: 1,
-          },
+          } as any,
           {
-            label: 'Budget',
+            type: 'line',
+            label: 'Budget (trend)',
             data: budget,
-            borderColor: muted,
+            borderColor: success,
+            backgroundColor: 'transparent',
             borderWidth: 2,
-            tension: 0.25,
+            tension: 0.4,
             pointRadius: 4,
             pointHoverRadius: 6,
-            pointBackgroundColor: muted,
-            pointBorderWidth: 0,
+            pointBackgroundColor: success,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
             borderDash: [6, 4],
             order: 1,
-          },
+          } as any,
           {
+            type: 'line',
             label: 'Forecast',
             data: forecast,
-            borderColor: info,
+            borderColor: warning,
+            backgroundColor: 'transparent',
             borderWidth: 2,
-            tension: 0.25,
+            tension: 0.4,
             pointRadius: 4,
             pointHoverRadius: 6,
-            pointBackgroundColor: info,
-            pointBorderWidth: 0,
+            pointBackgroundColor: warning,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
             borderDash: [3, 3],
             order: 1,
-          },
+          } as any,
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { top: 4, right: 20, bottom: 12, left: 12 } },
+        layout: { padding: { top: 10, right: 20, bottom: 10, left: 10 } },
         plugins: {
           legend: {
             display: true,
             position: 'top',
-            align: 'start',
+            align: 'center',
             labels: {
               color: fg,
-              boxWidth: 24,
+              boxWidth: 14,
               boxHeight: 14,
-              padding: 24,
-              font: { size: 13, weight: 600 },
+              padding: 20,
+              font: { size: 12, weight: 500 },
               usePointStyle: true,
-              filter: (item, chart) => {
-                const idx = item.datasetIndex;
-                if (idx == null) return true;
-                const data = (chart as any)?.data;
-                const ds = data?.datasets?.[idx];
-                return !ds || (ds as any).type !== 'bar';
+              filter: (item) => {
+                // Hide trend lines from legend (show only Actual, Budget, Forecast)
+                return !item.text.includes('trend');
               },
             },
           },
@@ -382,13 +386,17 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             backgroundColor: 'rgba(255,255,255,0.98)',
             titleColor: fg,
             bodyColor: fg,
-            borderColor: border,
+            borderColor: gridColor,
             borderWidth: 1,
-            padding: 14,
-            titleFont: { size: 13, weight: 600 },
-            bodyFont: { size: 13 },
+            padding: 12,
+            titleFont: { size: 12, weight: 600 },
+            bodyFont: { size: 12 },
+            filter: (item) => {
+              // Hide trend lines from tooltip
+              return !item.dataset.label?.includes('trend');
+            },
             callbacks: {
-              label: (item) => ` ${item.dataset.label}: ${Number(item.raw).toFixed(1)}M`,
+              label: (item) => ` ${item.dataset.label}: $${Number(item.raw).toFixed(1)}M`,
             },
           },
         },
@@ -399,20 +407,20 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
               color: muted,
               font: { size: 12, weight: 500 },
               maxRotation: 0,
-              padding: 10,
+              padding: 8,
             },
           },
           y: {
-            min: 3,
-            max: 6,
+            min: 0,
+            max: 7,
             grid: { color: gridColor, drawTicks: false },
             border: { display: false },
             ticks: {
               color: muted,
-              font: { size: 12, weight: 500 },
-              padding: 10,
-              stepSize: 0.5,
-              callback: (v) => `${Number(v).toFixed(1)}`,
+              font: { size: 11, weight: 500 },
+              padding: 8,
+              stepSize: 1,
+              callback: (v) => `$${Number(v)}M`,
             },
           },
         },
