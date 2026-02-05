@@ -98,48 +98,50 @@
 }
 
 .exec-tabs {
-  margin-top: 14px;
+  margin-top: 18px;
+  margin-left: 55px;
   display: flex;
-  gap: 10px;
-  padding: 6px;
-  border: 1px solid rgb(var(--border));
-  border-radius: 999px;
-  background: rgb(var(--bg));
+  gap: 32px;
   width: fit-content;
 }
 
 .exec-tab {
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 500;
   color: rgb(var(--muted));
-  padding: 10px 14px;
+  padding: 8px 0;
   position: relative;
   background: transparent;
   border: 0;
   cursor: pointer;
-  border-radius: 999px;
-  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+  transition: color 200ms ease;
+}
+
+.exec-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  transition: background-color 200ms ease;
 }
 
 .exec-tab:hover {
   color: rgb(var(--fg));
-  background: rgb(var(--card));
 }
 
 .exec-tab:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgb(var(--ring) / 0.20);
 }
 
 .exec-tab-active {
-  color: rgb(var(--fg));
-  background: rgb(var(--card));
-  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
-  border: 1px solid rgb(var(--border));
-  transform: translateY(-1px);
+  color: rgb(var(--primary));
 }
 
 .exec-tab-active::after {
-  content: none;
+  background: rgb(var(--primary));
 }
 
 .exec-pill-row {
@@ -447,8 +449,20 @@
 .exec-card-sm {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   min-height: 0;
+}
+
+.exec-card-sm .exec-mini-title {
+  flex-shrink: 0;
+}
+
+.exec-card-sm .exec-bars,
+.exec-card-sm .exec-table,
+.exec-card-sm .exec-occupancy-chart {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .exec-card {
@@ -509,6 +523,7 @@
   margin-bottom: 12px;
   padding-bottom: 10px;
   border-bottom: 1px solid rgb(var(--border) / 0.8);
+  flex-shrink: 0;
 }
 
 .exec-chart-wrap {
@@ -620,17 +635,25 @@
 }
 
 .exec-card-portfolio {
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .exec-portfolio-header {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .exec-portfolio-header .exec-mini-title {
-  margin-bottom: 2px;
-  padding-bottom: 0;
-  border-bottom: none;
+  margin-bottom: 4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgb(var(--border) / 0.8);
+}
+
+.exec-card-portfolio .exec-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .exec-mini-subtitle {
@@ -640,8 +663,10 @@
 }
 
 .exec-bars {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
+  justify-content: center;
 }
 
 .exec-bar-row {
@@ -686,8 +711,10 @@
 }
 
 .exec-table {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
+  justify-content: center;
 }
 
 .exec-table-head,
@@ -1040,8 +1067,8 @@
 
 /* ----- Revenue Collection Aging ----- */
 .exec-card-aging {
-  border: 1px solid rgb(var(--danger) / 0.4);
-  box-shadow: 0 0 0 1px rgb(var(--danger) / 0.12), 0 1px 3px rgb(var(--shadow) / 0.06);
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
 .exec-aging-list {

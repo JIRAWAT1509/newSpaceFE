@@ -8,6 +8,10 @@
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
+import { getChartPalette, getChartPaletteWithAlpha, getStatusPalette } from '@core/utils/chart-colors';
+
 interface Branch {
   id: string;
   code: string;
