@@ -96,8 +96,8 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
     // Search & Navigation
     'pi-search', 'pi-arrow-right', 'pi-arrow-left', 'pi-arrow-up', 'pi-arrow-down',
     'pi-angle-right', 'pi-angle-left', 'pi-angle-up', 'pi-angle-down',
-    // Energy & Nature
-    'pi-bolt', 'pi-sun', 'pi-moon', 'pi-cloud', 'pi-snow',
+    // Energy & Nature & Utilities
+    'pi-bolt', 'pi-sun', 'pi-moon', 'pi-cloud', 'pi-snow', 'pi-wave-pulse', 'pi-gauge', 'pi-asterisk', 'pi-lightbulb',
     // Status & Feedback
     'pi-star', 'pi-heart', 'pi-thumbs-up', 'pi-thumbs-down', 'pi-check-circle',
     'pi-times-circle', 'pi-info-circle', 'pi-exclamation-triangle', 'pi-question-circle',
@@ -644,12 +644,18 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
   }
 
   resetRentableItemsToDefault(): void {
+    const itemCount = this.rentableItems().length;
+    if (itemCount === 0) {
+      this.showError('ไม่มีรายการ', 'ไม่มีรายการสิ่งที่จะเช่าได้ให้ลบ');
+      return;
+    }
+    
     this.confirmationService.confirm({
-      message: 'คุณต้องการลบรายการสิ่งที่จะเช่าได้ทั้งหมดหรือไม่?',
-      header: 'ยืนยันการรีเซ็ต',
-      icon: 'pi pi-exclamation-triangle',
+      message: `คุณต้องการลบรายการ "สิ่งที่จะเช่าได้" ทั้งหมด ${itemCount} รายการหรือไม่?\n\nการดำเนินการนี้ไม่สามารถย้อนกลับได้`,
+      header: 'ยืนยันการลบรายการทั้งหมด',
+      icon: 'pi pi-trash',
       acceptButtonStyleClass: 'p-button-danger',
-      acceptLabel: 'รีเซ็ต',
+      acceptLabel: 'ลบทั้งหมด',
       rejectLabel: 'ยกเลิก',
         accept: () => {
         try {
@@ -659,10 +665,10 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
           } as Partial<FacilitiesUtilitiesConfig>);
           this.facilitiesConfig = getFacilitiesUtilitiesConfig();
           this.loadRentableItems(); // sync snapshot
-          this.showSuccess('รีเซ็ตสำเร็จ', 'รายการสิ่งที่จะเช่าได้ถูกรีเซ็ตเป็นค่าเริ่มต้นแล้ว');
+          this.showSuccess('ลบสำเร็จ', 'ลบรายการสิ่งที่จะเช่าได้ทั้งหมดแล้ว');
         } catch (error) {
           console.error('Error resetting rentable items:', error);
-          this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถรีเซ็ตรายการได้');
+          this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถลบรายการได้');
         }
       }
     });
@@ -905,7 +911,7 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
 
   resetFacilitiesConfigToDefault(): void {
     this.confirmationService.confirm({
-      message: 'คุณต้องการรีเซ็ตการตั้งค่า Facilities (Utilities) กลับเป็นค่าเริ่มต้นหรือไม่? การเปลี่ยนแปลงทั้งหมดจะถูกลบ',
+      message: 'คุณต้องการรีเซ็ตการตั้งค่า Facilities (Utilities) กลับเป็นค่าเริ่มต้นหรือไม่?\n\n(รายการ "สิ่งที่จะเช่าได้" ที่เพิ่มไว้จะยังคงอยู่)',
       header: 'ยืนยันการรีเซ็ต',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
@@ -913,11 +919,20 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
       rejectLabel: 'ยกเลิก',
       accept: () => {
         try {
-          updateModuleConfig('facilitiesUtilities', DEFAULT_FACILITIES_UTILITIES_CONFIG);
+          // Preserve existing rentable items when resetting
+          const currentRentableItems = this.facilitiesConfig.rentableItems || [];
+          
+          // Reset to default but keep rentable items
+          const resetConfig = {
+            ...DEFAULT_FACILITIES_UTILITIES_CONFIG,
+            rentableItems: currentRentableItems
+          };
+          
+          updateModuleConfig('facilitiesUtilities', resetConfig);
           this.facilitiesConfig = getFacilitiesUtilitiesConfig();
           this.facilitiesChanges = {};
           this.loadRentableItems();
-          this.showSuccess('รีเซ็ตสำเร็จ', 'การตั้งค่า Facilities (Utilities) ถูกรีเซ็ตเป็นค่าเริ่มต้นแล้ว');
+          this.showSuccess('รีเซ็ตสำเร็จ', 'การตั้งค่า Facilities (Utilities) ถูกรีเซ็ตเป็นค่าเริ่มต้นแล้ว\n(รายการสิ่งที่จะเช่าได้ยังคงอยู่)');
         } catch (error) {
           console.error('Error resetting facilities config:', error);
           this.showError('เกิดข้อผิดพลาด', 'ไม่สามารถรีเซ็ตการตั้งค่าได้');

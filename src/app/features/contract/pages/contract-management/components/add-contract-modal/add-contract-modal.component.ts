@@ -1,4 +1,4 @@
-// add-contract-modal.component.ts - WITH EDIT MODE SUPPORT
+// add-contract-modal.component.ts - WITH EDIT MODE & DRAFT SUPPORT
 import { Component, output, signal, input, OnInit, effect, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,6 +8,7 @@ import { ContractDetailTabComponent } from './components/contract-detail-tab/con
 import { ConditionsTabComponent } from './components/conditions-tab/conditions-tab.component';
 import { DocumentTabComponent } from './components/document-tab/document-tab.component';
 import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
+import { DraftContractService, DraftContract } from '@core/services/draft-contract.service';
 
 interface Tab {
   id: string;
@@ -34,10 +35,17 @@ export class AddContractModalComponent implements OnInit {
   // Inputs for edit mode
   mode = input<'add' | 'edit'>('add');
   contractData = input<Contract | null>(null);
+  /** Draft data to continue editing */
+  draftData = input<DraftContract | null>(null);
 
   // Outputs
   close = output<void>();
   save = output<any>();
+  /** Emitted when draft is saved */
+  draftSaved = output<DraftContract>();
+
+  // Current draft ID (if editing a draft)
+  currentDraftId = signal<string | null>(null);
 
   // Forms for each tab
   generalDetailForm!: FormGroup;
@@ -67,10 +75,21 @@ export class AddContractModalComponent implements OnInit {
   messageModalTitle = signal<string>('');
   messageModalMessage = signal<string>('');
 
-  constructor(private fb: FormBuilder) {
+  // Confirm close modal (when clicking outside with unsaved data)
+  showConfirmCloseModal = signal<boolean>(false);
+
+  constructor(
+    private fb: FormBuilder,
+    private draftService: DraftContractService
+  ) {
     // Update modal title when mode changes
     effect(() => {
-      this.modalTitle.set(this.mode() === 'edit' ? 'แก้ไขข้อมูลสัญญา' : 'เพิ่มสัญญาใหม่');
+      const draft = this.draftData();
+      if (draft) {
+        this.modalTitle.set(`แก้ไขแบบร่าง: ${draft.name}`);
+      } else {
+        this.modalTitle.set(this.mode() === 'edit' ? 'แก้ไขข้อมูลสัญญา' : 'เพิ่มสัญญาใหม่');
+      }
     });
 
     // Load contract data when it changes (for edit mode or copy mode)
@@ -78,6 +97,14 @@ export class AddContractModalComponent implements OnInit {
       const contract = this.contractData();
       if (contract && (this.mode() === 'edit' || this.mode() === 'add')) {
         this.loadContractData(contract);
+      }
+    });
+
+    // Load draft data when it changes
+    effect(() => {
+      const draft = this.draftData();
+      if (draft) {
+        this.loadDraftData(draft);
       }
     });
   }
@@ -219,6 +246,88 @@ export class AddContractModalComponent implements OnInit {
     // Tab 4: Documents - file list
   }
 
+  // ==================== DRAFT MANAGEMENT ====================
+
+  /** โหลดข้อมูลจาก Draft */
+  loadDraftData(draft: DraftContract): void {
+    console.log('Loading draft data:', draft);
+    this.currentDraftId.set(draft.id);
+
+    // Load general details
+    if (draft.formData.generalDetails) {
+      this.generalDetailForm.patchValue(draft.formData.generalDetails);
+    }
+
+    // Load conditions
+    if (draft.formData.conditions) {
+      this.conditionsForm.patchValue(draft.formData.conditions);
+    }
+
+    // Load documents
+    if (draft.formData.documents) {
+      this.documentForm.patchValue(draft.formData.documents);
+    }
+
+    // Restore tab state
+    this.activeTabIndex.set(draft.currentTab);
+    draft.completedTabs.forEach(tabIndex => {
+      if (tabIndex < this.tabs.length) {
+        this.tabs[tabIndex].completed = true;
+      }
+    });
+
+    // Contract details will be loaded when the tab is visited
+    if (draft.formData.contractDetails) {
+      this.lastContractDetailValue.set(draft.formData.contractDetails);
+    }
+  }
+
+  /** บันทึกเป็นแบบร่าง */
+  onSaveDraft(): void {
+    const formData = {
+      generalDetails: this.generalDetailForm.value,
+      contractDetails: this.getContractDetailsPayload(),
+      conditions: this.conditionsForm.value,
+      documents: this.documentForm.value
+    };
+
+    const completedTabs = this.tabs
+      .map((tab, index) => tab.completed ? index : -1)
+      .filter(index => index !== -1);
+
+    let draft: DraftContract;
+
+    if (this.currentDraftId()) {
+      // Update existing draft
+      const updated = this.draftService.updateDraft(
+        this.currentDraftId()!,
+        formData,
+        this.activeTabIndex(),
+        completedTabs
+      );
+      if (updated) {
+        draft = updated;
+      } else {
+        // If update failed, create new
+        draft = this.draftService.createDraft(formData, this.activeTabIndex(), completedTabs);
+        this.currentDraftId.set(draft.id);
+      }
+    } else {
+      // Create new draft
+      draft = this.draftService.createDraft(formData, this.activeTabIndex(), completedTabs);
+      this.currentDraftId.set(draft.id);
+    }
+
+    // Emit draft saved event
+    this.draftSaved.emit(draft);
+
+    // Show success message
+    this.showMessage({
+      title: 'บันทึกแบบร่างสำเร็จ',
+      message: `แบบร่าง "${draft.name}" ถูกบันทึกแล้ว คุณสามารถกลับมาแก้ไขต่อได้ภายหลัง`
+    });
+  }
+
   // ==================== TAB NAVIGATION ====================
 
   goToTab(index: number): void {
@@ -271,9 +380,21 @@ export class AddContractModalComponent implements OnInit {
   }
 
   isAllFormsValid(): boolean {
-    return this.generalDetailForm.valid &&
-           (this.conditionsForm.valid || true) &&
-           (this.documentForm.valid || true);
+    // ตรวจสอบทุกฟอร์มที่จำเป็น
+    const generalValid = this.generalDetailForm.valid;
+    const contractDetailValid = this.isContractDetailFormValid();
+    
+    return generalValid && contractDetailValid;
+  }
+
+  /** ตรวจสอบฟอร์มรายละเอียดสัญญา (tab 2) */
+  isContractDetailFormValid(): boolean {
+    const form = this.contractDetailTab?.contractInfoTab?.form;
+    if (!form) {
+      // ถ้ายังไม่ได้เข้า tab นี้ ให้ผ่านไปก่อน
+      return true;
+    }
+    return form.valid;
   }
 
   isTabCompleted(index: number): boolean {
@@ -344,8 +465,57 @@ export class AddContractModalComponent implements OnInit {
     }
   }
 
+  /** ตรวจสอบว่าฟอร์มมีข้อมูลที่กรอกแล้วหรือไม่ */
+  hasUnsavedData(): boolean {
+    // เช็ค generalDetailForm
+    const gv = this.generalDetailForm.value;
+    const hasGeneralData = Object.keys(gv).some(k => {
+      const v = gv[k];
+      return v !== null && v !== undefined && v !== '' && !(Array.isArray(v) && v.length === 0);
+    });
+    if (hasGeneralData) return true;
+
+    // เช็ค conditionsForm
+    const cv = this.conditionsForm.value;
+    const hasConditionsData = Object.keys(cv).some(k => {
+      const v = cv[k];
+      return v !== null && v !== undefined && v !== '' && v !== false;
+    });
+    if (hasConditionsData) return true;
+
+    // เช็ค documentForm
+    const dv = this.documentForm.value;
+    const hasDocData = Object.keys(dv).some(k => {
+      const v = dv[k];
+      return v !== null && v !== undefined && v !== '' && !(Array.isArray(v) && v.length === 0);
+    });
+    if (hasDocData) return true;
+
+    // เช็คว่ามี tab ที่ completed แล้วหรือไม่
+    if (this.tabs.some(t => t.completed)) return true;
+
+    return false;
+  }
+
+  /** คลิกนอก modal หรือปุ่ม X */
   onCancel(): void {
+    if (this.hasUnsavedData()) {
+      // มีข้อมูลที่ยังไม่บันทึก → ขอยืนยันก่อนปิด
+      this.showConfirmCloseModal.set(true);
+    } else {
+      this.close.emit();
+    }
+  }
+
+  /** ยืนยันปิดโดยไม่บันทึก */
+  confirmClose(): void {
+    this.showConfirmCloseModal.set(false);
     this.close.emit();
+  }
+
+  /** ยกเลิกการปิด → กลับไปกรอกต่อ */
+  cancelClose(): void {
+    this.showConfirmCloseModal.set(false);
   }
 
   showMessage(event: { title: string; message: string }): void {
@@ -359,9 +529,18 @@ export class AddContractModalComponent implements OnInit {
   }
 
   markAllAsTouched(): void {
+    // Mark general detail form
     Object.keys(this.generalDetailForm.controls).forEach(key => {
       this.generalDetailForm.get(key)?.markAsTouched();
     });
+    
+    // Mark contract detail form (if exists)
+    const contractForm = this.contractDetailTab?.contractInfoTab?.form;
+    if (contractForm) {
+      Object.keys(contractForm.controls).forEach(key => {
+        contractForm.get(key)?.markAsTouched();
+      });
+    }
   }
 
   // ==================== SUMMARY HELPERS ====================

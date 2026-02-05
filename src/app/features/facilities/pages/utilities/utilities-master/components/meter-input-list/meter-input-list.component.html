@@ -1,29 +1,50 @@
 <!-- meter-input-list.component.html - FINAL CORRECTED -->
 
 <div class="input-list-container">
-  <!-- Header Stats -->
+  <!-- Header Stats - Clean Modern Cards -->
   <div class="header-stats">
-    <div class="stat-item">
-      <i class="pi pi-th-large"></i>
-      <div>
-        <div class="stat-value">{{ totalMeters() }}</div>
-        <div class="stat-label">Total Meters</div>
+    <!-- Total Meters Card -->
+    <div class="stat-card stat-card--blue">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="pi pi-th-large"></i>
+          </div>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ totalMeters() }}</div>
+          <div class="stat-label">Total Meters</div>
+        </div>
       </div>
     </div>
 
-    <div class="stat-item warning">
-      <i class="pi pi-clock"></i>
-      <div>
-        <div class="stat-value">{{ pendingMeters() }}</div>
-        <div class="stat-label">Pending Readings</div>
+    <!-- Pending Readings Card -->
+    <div class="stat-card stat-card--amber">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="pi pi-clock"></i>
+          </div>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ pendingMeters() }}</div>
+          <div class="stat-label">Pending Readings</div>
+        </div>
       </div>
     </div>
 
-    <div class="stat-item success">
-      <i class="pi pi-check-circle"></i>
-      <div>
-        <div class="stat-value">{{ savedCount() }}</div>
-        <div class="stat-label">Saved This Session</div>
+    <!-- Saved This Session Card -->
+    <div class="stat-card stat-card--emerald">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="pi pi-check-circle"></i>
+          </div>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ savedCount() }}</div>
+          <div class="stat-label">Saved This Session</div>
+        </div>
       </div>
     </div>
   </div>
@@ -75,7 +96,7 @@
         {{ sectionTitle() }}
         <span class="meter-count">({{ filteredMeters().length }})</span>
       </h3>
-      <p class="section-hint">กรอกค่ามิเตอร์ในแต่ละการ์ดได้เลย แล้วกดบันทึก (ไม่ต้องคลิกขยาย)</p>
+      <p class="section-hint">กรอกค่ามิเตอร์ในแต่ละการ์ดได้เลย แล้วกดบันทึก</p>
     </div>
 
     @if (filteredMeters().length > 0) {

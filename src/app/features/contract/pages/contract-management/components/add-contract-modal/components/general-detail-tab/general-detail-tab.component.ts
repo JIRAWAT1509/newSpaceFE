@@ -7,6 +7,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { RadioButton } from 'primeng/radiobutton';
+import { DeclineInfoModalComponent, DeclineInfo } from '@shared/components/decline-info-modal/decline-info-modal.component';
 
 interface Section {
   id: string;
@@ -30,7 +31,8 @@ interface SelectorOption {
     DatePicker,
     InputText,
     Textarea,
-    RadioButton
+    RadioButton,
+    DeclineInfoModalComponent
   ],
   templateUrl: './general-detail-tab.component.html',
   styleUrl: './general-detail-tab.component.css'
@@ -42,6 +44,7 @@ export class GeneralDetailTabComponent implements OnInit {
   // Outputs
   selectorOpen = output<{ field: string; options: SelectorOption[] }>();
   messageRequest = output<{ title: string; message: string }>();
+  declineSubmit = output<DeclineInfo>();
 
   // Sections for progress indicator - Updated for Q structure
   sections: Section[] = [
@@ -55,6 +58,12 @@ export class GeneralDetailTabComponent implements OnInit {
   currentSelectorField = signal<string>('');
   selectorSearchText = signal<string>('');
   currentSelectorOptions = signal<SelectorOption[]>([]);
+
+  // Decline modal state
+  showDeclineModal = signal<boolean>(false);
+  declineContractNumber = signal<string>('');
+  declineQuotationNumber = signal<string>('');
+  declineCustomerName = signal<string>('');
 
   // Dropdown options
   representativeOptions = [
@@ -232,7 +241,25 @@ export class GeneralDetailTabComponent implements OnInit {
   // ==================== ACTIONS ====================
 
   openDeclineInfo(): void {
-    this.messageRequest.emit({ title: 'ข้อมูลการ Decline', message: 'ฟีเจอร์นี้จะเปิดโมดอลข้อมูลการ Decline (กำลังพัฒนา)' });
+    // Get form values to populate the modal
+    const formValue = this.form().value;
+    this.declineContractNumber.set(formValue.contractNumberMain || '');
+    this.declineQuotationNumber.set(formValue.quotationNumberMain || '');
+    this.declineCustomerName.set(formValue.customerName || '');
+    this.showDeclineModal.set(true);
+  }
+
+  onDeclineConfirm(info: DeclineInfo): void {
+    this.showDeclineModal.set(false);
+    this.declineSubmit.emit(info);
+    this.messageRequest.emit({ 
+      title: 'บันทึกสำเร็จ', 
+      message: `บันทึกเหตุผลการ Decline เรียบร้อยแล้ว\n\nเหตุผล: ${info.reason}` 
+    });
+  }
+
+  onDeclineCancel(): void {
+    this.showDeclineModal.set(false);
   }
 
   openCustomerDetails(): void {

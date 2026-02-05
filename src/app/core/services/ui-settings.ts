@@ -562,25 +562,25 @@ export const DEFAULT_FACILITIES_UTILITIES_CONFIG: FacilitiesUtilitiesConfig = {
       label: 'Electricity',
       labelTh: 'ไฟฟ้า',
       color: '#FFD700',
-      icon: 'pi-bolt',
+      icon: 'pi-bolt',        // Lightning bolt for electricity
     },
     water: {
       label: 'Water',
       labelTh: 'น้ำ',
       color: '#4CA3FF',
-      icon: 'pi-droplet',
+      icon: 'pi-wave-pulse',  // Wave icon for water
     },
     gas: {
       label: 'Gas',
       labelTh: 'แก๊ส',
       color: '#FF6384',
-      icon: 'pi-fire',
+      icon: 'pi-gauge',       // Gauge icon for gas meter
     },
     ac: {
       label: 'Air Conditioning',
       labelTh: 'แอร์',
       color: '#80E08E',
-      icon: 'pi-sun',
+      icon: 'pi-asterisk',    // Asterisk (snowflake-like) for cooling
     },
   },
   rentableItems: [],

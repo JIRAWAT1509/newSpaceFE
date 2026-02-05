@@ -1,29 +1,47 @@
 <!-- meter-list.component.html - FINAL CORRECTED -->
 
 <div class="meter-list-container">
-  <!-- Header Stats -->
+  <!-- Header Stats - Clean Modern Cards -->
   <div class="header-stats">
-    <div class="stat-item success">
-      <i class="pi pi-check-circle"></i>
-      <div>
-        <div class="stat-value">{{ totalCompleted() }}</div>
-        <div class="stat-label">Total Completed</div>
+    <div class="stat-card stat-card--emerald">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="pi pi-check-circle"></i>
+          </div>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ totalCompleted() }}</div>
+          <div class="stat-label">Total Completed</div>
+        </div>
       </div>
     </div>
 
-    <div class="stat-item primary">
-      <i class="pi pi-calendar"></i>
-      <div>
-        <div class="stat-value">{{ thisMonthCompleted() }}</div>
-        <div class="stat-label">This Month</div>
+    <div class="stat-card stat-card--blue">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="pi pi-calendar"></i>
+          </div>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ thisMonthCompleted() }}</div>
+          <div class="stat-label">This Month</div>
+        </div>
       </div>
     </div>
 
-    <div class="stat-item">
-      <i class="pi pi-chart-line"></i>
-      <div>
-        <div class="stat-value">100%</div>
-        <div class="stat-label">Completion Rate</div>
+    <div class="stat-card stat-card--purple">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="pi pi-chart-line"></i>
+          </div>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">100%</div>
+          <div class="stat-label">Completion Rate</div>
+        </div>
       </div>
     </div>
   </div>
@@ -86,11 +104,9 @@
         @for (meter of filteredMeters(); track meter.id) {
           <app-meter-input-card
             [meter]="meter"
-            [isExpanded]="isCardExpanded(meter.id)"
+            [inlineMode]="true"
             [isCompleted]="true"
             (readingSaved)="onReadingSaved($event)"
-            (cardClicked)="onCardClicked($event)"
-            (backgroundClicked)="onCardBackgroundClicked($event)"
           />
         }
       </div>

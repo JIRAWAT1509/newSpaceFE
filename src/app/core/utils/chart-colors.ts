@@ -140,3 +140,60 @@ export const getChartPaletteWithAlpha = (count: number, alpha: number): string[]
 
   return Array.from({ length: count }, (_, index) => palette[index % palette.length]);
 };
+
+// ==================== METER TYPE COLORS ====================
+// These functions return colors that match the meter type configuration
+// ensuring consistency between filter buttons and charts
+
+import { getMeterTypeLabel, MeterType } from '../models/meter.model';
+
+/**
+ * Get chart colors based on meter type configuration
+ * Order: Electricity, Water, Gas, AC
+ */
+export const getMeterTypeChartColors = (): string[] => {
+  const electricity = getMeterTypeLabel('electricity');
+  const water = getMeterTypeLabel('water');
+  const gas = getMeterTypeLabel('gas');
+  const ac = getMeterTypeLabel('ac');
+  
+  return [electricity.color, water.color, gas.color, ac.color];
+};
+
+/**
+ * Get chart colors with alpha based on meter type configuration
+ */
+export const getMeterTypeChartColorsWithAlpha = (alpha: number): string[] => {
+  const colors = getMeterTypeChartColors();
+  return colors.map(color => hexToRgba(color, alpha));
+};
+
+/**
+ * Get single meter type color
+ */
+export const getMeterTypeColor = (type: MeterType): string => {
+  return getMeterTypeLabel(type).color;
+};
+
+/**
+ * Get single meter type color with alpha
+ */
+export const getMeterTypeColorWithAlpha = (type: MeterType, alpha: number): string => {
+  const color = getMeterTypeLabel(type).color;
+  return hexToRgba(color, alpha);
+};
+
+/**
+ * Convert hex color to rgba
+ */
+const hexToRgba = (hex: string, alpha: number): string => {
+  // Remove # if present
+  hex = hex.replace('#', '');
+  
+  // Parse hex values
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};

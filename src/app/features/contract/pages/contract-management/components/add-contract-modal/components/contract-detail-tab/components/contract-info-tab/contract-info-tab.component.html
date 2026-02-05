@@ -169,9 +169,14 @@
             type="tel"
             pInputText
             formControlName="phone"
-            placeholder="กรอกเบอร์โทรศัพท์"
+            placeholder="กรอกเบอร์โทรศัพท์ (ตัวเลข 9-10 หลัก)"
             class="w-full"
+            [class.ng-invalid]="isFieldInvalid('phone')"
+            maxlength="10"
           />
+          @if (isFieldInvalid('phone')) {
+            <small class="error-text">{{ getPhoneError() }}</small>
+          }
         </div>
 
         <div class="form-group required">
@@ -180,9 +185,13 @@
             type="email"
             pInputText
             formControlName="email"
-            placeholder="กรอกอีเมล"
+            placeholder="กรอกอีเมล (example@email.com)"
             class="w-full"
+            [class.ng-invalid]="isFieldInvalid('email')"
           />
+          @if (isFieldInvalid('email')) {
+            <small class="error-text">{{ getEmailError() }}</small>
+          }
         </div>
 
         <div class="form-group full-width">

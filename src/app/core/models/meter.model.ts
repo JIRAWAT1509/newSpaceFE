@@ -55,29 +55,30 @@ export interface MeterReading {
 }
 
 // Default labels (fallback)
+// Icons reference: https://primeng.org/icons
 const DEFAULT_METER_TYPE_LABELS: Record<MeterType, { TH: string; EN: string; icon: string; color: string }> = {
   electricity: {
     TH: 'ไฟฟ้า',
     EN: 'Electricity',
-    icon: 'pi-bolt',
+    icon: 'pi-bolt',        // Lightning bolt - perfect for electricity
     color: '#FFD700'
   },
   water: {
     TH: 'น้ำ',
     EN: 'Water',
-    icon: 'pi-droplet',
+    icon: 'pi-wave-pulse',  // Wave icon for water
     color: '#4CA3FF'
   },
   gas: {
     TH: 'แก๊ส',
     EN: 'Gas',
-    icon: 'pi-fire',
+    icon: 'pi-gauge',       // Gauge icon for gas meter
     color: '#FF6384'
   },
   ac: {
     TH: 'แอร์',
     EN: 'Air Conditioning',
-    icon: 'pi-sun',
+    icon: 'pi-asterisk',    // Asterisk looks like snowflake for cooling
     color: '#80E08E'
   }
 };

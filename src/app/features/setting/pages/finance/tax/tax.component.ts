@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
+import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 
 // Models
 interface VATTax {
@@ -37,7 +39,9 @@ type TaxType = 'vat' | 'withholding';
     FormsModule,
     ButtonModule,
     DialogModule,
-    InputTextModule
+    InputTextModule,
+    ConfirmationModalComponent,
+    WarningModalComponent
   ],
   templateUrl: './tax.component.html',
   styleUrls: ['./tax.component.css']
@@ -47,6 +51,14 @@ export class TaxComponent implements OnInit {
   isLoading = signal<boolean>(false);
   selectedTaxType = signal<TaxType>('vat');
   searchQuery = signal<string>('');
+
+  // Modal state
+  showConfirmModal = signal<boolean>(false);
+  pendingDeleteId = signal<number | null>(null);
+  pendingDeleteType = signal<'vat' | 'withholding' | null>(null);
+  showMessageModal = signal<boolean>(false);
+  messageTitle = signal<string>('');
+  messageText = signal<string>('');
 
   // VAT Data
   vatTaxes = signal<VATTax[]>([]);
@@ -329,16 +341,51 @@ export class TaxComponent implements OnInit {
   // Delete actions (optional)
   deleteVAT(id: number, event: Event): void {
     event.stopPropagation();
-    if (confirm('คุณต้องการลบรายการนี้หรือไม่?')) {
-      this.vatTaxes.set(this.vatTaxes().filter(t => t.id !== id));
-    }
+    this.pendingDeleteId.set(id);
+    this.pendingDeleteType.set('vat');
+    this.showConfirmModal.set(true);
   }
 
   deleteWithholding(id: number, event: Event): void {
     event.stopPropagation();
-    if (confirm('คุณต้องการลบรายการนี้หรือไม่?')) {
-      this.withholdingTaxes.set(this.withholdingTaxes().filter(t => t.id !== id));
+    this.pendingDeleteId.set(id);
+    this.pendingDeleteType.set('withholding');
+    this.showConfirmModal.set(true);
+  }
+
+  onConfirmDelete(): void {
+    const id = this.pendingDeleteId();
+    const type = this.pendingDeleteType();
+
+    if (id !== null && type) {
+      if (type === 'vat') {
+        this.vatTaxes.set(this.vatTaxes().filter(t => t.id !== id));
+        this.showMessage('ลบสำเร็จ', 'ลบภาษีมูลค่าเพิ่มเรียบร้อยแล้ว');
+      } else {
+        this.withholdingTaxes.set(this.withholdingTaxes().filter(t => t.id !== id));
+        this.showMessage('ลบสำเร็จ', 'ลบภาษีหัก ณ ที่จ่ายเรียบร้อยแล้ว');
+      }
     }
+
+    this.showConfirmModal.set(false);
+    this.pendingDeleteId.set(null);
+    this.pendingDeleteType.set(null);
+  }
+
+  onCancelDelete(): void {
+    this.showConfirmModal.set(false);
+    this.pendingDeleteId.set(null);
+    this.pendingDeleteType.set(null);
+  }
+
+  showMessage(title: string, message: string): void {
+    this.messageTitle.set(title);
+    this.messageText.set(message);
+    this.showMessageModal.set(true);
+  }
+
+  closeMessageModal(): void {
+    this.showMessageModal.set(false);
   }
 
   // Update form fields

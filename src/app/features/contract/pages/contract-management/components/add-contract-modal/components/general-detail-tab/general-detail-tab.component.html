@@ -382,3 +382,13 @@
     </div>
   </div>
 }
+
+<!-- Decline Info Modal -->
+<app-decline-info-modal
+  [isOpen]="showDeclineModal()"
+  [contractNumber]="declineContractNumber()"
+  [quotationNumber]="declineQuotationNumber()"
+  [customerName]="declineCustomerName()"
+  (confirm)="onDeclineConfirm($event)"
+  (cancel)="onDeclineCancel()"
+/>

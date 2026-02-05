@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { MeterType, getMeterTypeLabel } from '@core/models/meter.model';
-import { getChartPalette, getChartPaletteWithAlpha } from '@core/utils/chart-colors';
+import { getChartPalette, getChartPaletteWithAlpha, getMeterTypeChartColors, getMeterTypeChartColorsWithAlpha, getMeterTypeColor, getMeterTypeColorWithAlpha } from '@core/utils/chart-colors';
 import { getFacilitiesUtilitiesConfig } from '@core/services/ui-settings';
 import { interval, Subscription } from 'rxjs';
 
@@ -222,63 +222,65 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
   getConsumptionTrendData(): ChartData {
     const months = this.getMonthLabels();
     const meterType = this.selectedMeterType();
-    const palette = getChartPalette(4);
-    const paletteAlpha = getChartPaletteWithAlpha(4, 0.1);
+    
+    // Use meter type colors for consistency with filter buttons
+    const meterColors = getMeterTypeChartColors();
+    const meterColorsAlpha = getMeterTypeChartColorsWithAlpha(0.1);
 
     const showAllTypes = meterType === 'all' || (typeof meterType === 'string' && meterType.startsWith('rentable_'));
     if (showAllTypes) {
+      const electricityInfo = getMeterTypeLabel('electricity');
+      const waterInfo = getMeterTypeLabel('water');
+      const gasInfo = getMeterTypeLabel('gas');
+      const acInfo = getMeterTypeLabel('ac');
+      
       return {
         labels: months,
         datasets: [
           {
-            label: 'Electricity (kWh)',
+            label: `${electricityInfo.EN} (kWh)`,
             data: this.generateMockData(months.length, 1000, 1500),
-            borderColor: palette[0],
-            backgroundColor: paletteAlpha[0],
+            borderColor: meterColors[0],
+            backgroundColor: meterColorsAlpha[0],
             tension: 0.4
           },
           {
-            label: 'Water (m³)',
+            label: `${waterInfo.EN} (m³)`,
             data: this.generateMockData(months.length, 200, 300),
-            borderColor: palette[1],
-            backgroundColor: paletteAlpha[1],
+            borderColor: meterColors[1],
+            backgroundColor: meterColorsAlpha[1],
             tension: 0.4
           },
           {
-            label: 'Gas (m³)',
+            label: `${gasInfo.EN} (m³)`,
             data: this.generateMockData(months.length, 100, 150),
-            borderColor: palette[2],
-            backgroundColor: paletteAlpha[2],
+            borderColor: meterColors[2],
+            backgroundColor: meterColorsAlpha[2],
             tension: 0.4
           },
           {
-            label: 'AC (kWh)',
+            label: `${acInfo.EN} (kWh)`,
             data: this.generateMockData(months.length, 300, 400),
-            borderColor: palette[3],
-            backgroundColor: paletteAlpha[3],
+            borderColor: meterColors[3],
+            backgroundColor: meterColorsAlpha[3],
             tension: 0.4
           }
         ]
       };
     }
 
-    const meterTypeIndexMap: Record<MeterType, number> = {
-      electricity: 0,
-      water: 1,
-      gas: 2,
-      ac: 3
-    };
-
     const typeKey = meterType as MeterType;
     const typeInfo = getMeterTypeLabel(typeKey);
-    const typeIndex = meterTypeIndexMap[typeKey];
+    const typeColor = getMeterTypeColor(typeKey);
+    const typeColorAlpha = getMeterTypeColorWithAlpha(typeKey, 0.1);
+    
     return {
       labels: months,
       datasets: [{
         label: `${typeInfo.TH} Consumption`,
         data: this.generateMockData(months.length, 500, 1000),
-        borderColor: palette[typeIndex],
-        backgroundColor: paletteAlpha[typeIndex],
+        borderColor: typeColor,
+        backgroundColor: typeColorAlpha,
         tension: 0.4,
         fill: true
       }]
@@ -291,14 +293,20 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
     const ctx = this.typeDistributionChartRef?.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const palette = getChartPalette(4);
+    // Use meter type colors for consistency
+    const meterColors = getMeterTypeChartColors();
+    const electricityInfo = getMeterTypeLabel('electricity');
+    const waterInfo = getMeterTypeLabel('water');
+    const gasInfo = getMeterTypeLabel('gas');
+    const acInfo = getMeterTypeLabel('ac');
+    
     const config: ChartConfiguration = {
       type: 'doughnut',
       data: {
-        labels: ['Electricity', 'Water', 'Gas', 'AC'],
+        labels: [electricityInfo.EN, waterInfo.EN, gasInfo.EN, acInfo.EN],
         datasets: [{
           data: [45, 25, 15, 15],
-          backgroundColor: palette,
+          backgroundColor: meterColors,
           borderWidth: 2,
           borderColor: '#fff'
         }]
@@ -331,7 +339,15 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
     const ctx = this.topConsumersChartRef?.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const palette = getChartPalette(5);
+    // Use green gradient for top consumers (ranking visualization)
+    const topConsumerColors = [
+      '#10B981', // Emerald-500
+      '#34D399', // Emerald-400
+      '#6EE7B7', // Emerald-300
+      '#A7F3D0', // Emerald-200
+      '#D1FAE5', // Emerald-100
+    ];
+    
     const config: ChartConfiguration = {
       type: 'bar',
       data: {
@@ -339,7 +355,7 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
         datasets: [{
           label: 'Consumption',
           data: [1567, 1450, 1123, 987, 789],
-          backgroundColor: palette,
+          backgroundColor: topConsumerColors,
           borderRadius: 8
         }]
       },
@@ -380,7 +396,9 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
     if (!ctx) return;
 
     const months = this.getMonthLabels();
-    const palette = getChartPaletteWithAlpha(1, 0.8);
+    // Use primary blue color for cost chart
+    const primaryColor = '#3B82F6';
+    const primaryColorAlpha = 'rgba(59, 130, 246, 0.8)';
 
     const config: ChartConfiguration = {
       type: 'bar',
@@ -389,7 +407,7 @@ export class AnalyticsChartsComponent implements OnInit, OnDestroy {
         datasets: [{
           label: 'Total Cost (฿)',
           data: this.generateMockData(months.length, 50000, 80000),
-          backgroundColor: palette[0],
+          backgroundColor: primaryColorAlpha,
           borderRadius: 8
         }]
       },
