@@ -369,3 +369,15 @@
     </div>
   </div>
 }
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  type="danger"
+  title="ลบเงื่อนไข"
+  message="คุณต้องการลบเงื่อนไขนี้หรือไม่?"
+  confirmText="ลบ"
+  confirmIcon="pi-trash"
+  (confirm)="onConfirmDelete()"
+  (cancel)="onCancelDelete()"
+/>

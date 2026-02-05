@@ -34,6 +34,8 @@ import { CustomerFiltersComponent } from './../components/customer-filters/custo
 import { CsatChartComponent, CSATTrendData } from './../components/csat-chart/csat-chart.component';
 import { ChurnChartComponent, ChurnData } from './../components/churn-chart/churn-chart.component';
 import { CustomerDetailModalComponent } from './components/customer-detail-modal/customer-detail-modal.component';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
+import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 
 export interface CustomerFilters {
   search: string;
@@ -55,7 +57,9 @@ export interface CustomerFilters {
     CustomerFiltersComponent,
     CsatChartComponent,
     ChurnChartComponent,
-    CustomerDetailModalComponent
+    CustomerDetailModalComponent,
+    ConfirmationModalComponent,
+    WarningModalComponent
   ],
   templateUrl: './customer-master.component.html',
   styleUrl: './customer-master.component.css'
@@ -75,6 +79,13 @@ export class CustomerMasterComponent implements OnInit {
   selectedCustomerId = signal<string | null>(null);
   isDetailModalOpen = signal<boolean>(false);
   detailModalCustomerId = signal<string | null>(null);
+
+  // Modal state
+  showConfirmModal = signal<boolean>(false);
+  pendingDeleteCustomerId = signal<string | null>(null);
+  showMessageModal = signal<boolean>(false);
+  messageTitle = signal<string>('');
+  messageText = signal<string>('');
 
   // Filters
   filters = signal<CustomerFilters>({
@@ -331,10 +342,15 @@ export class CustomerMasterComponent implements OnInit {
   }
 
   deleteCustomer(customerId: string): void {
-    if (!confirm('คุณแน่ใจหรือไม่ที่จะลบลูกค้ารายนี้?')) {
-      return;
-    }
+    this.pendingDeleteCustomerId.set(customerId);
+    this.showConfirmModal.set(true);
+  }
 
+  onConfirmDelete(): void {
+    const customerId = this.pendingDeleteCustomerId();
+    if (!customerId) return;
+
+    this.showConfirmModal.set(false);
     this.isLoading.set(true);
 
     setTimeout(() => {
@@ -346,9 +362,26 @@ export class CustomerMasterComponent implements OnInit {
       this.updateStats();
 
       this.isLoading.set(false);
+      this.pendingDeleteCustomerId.set(null);
 
+      this.showMessage('ลบสำเร็จ', 'ลบข้อมูลลูกค้าเรียบร้อยแล้ว');
       console.log('Customer deleted:', customerId);
     }, 300);
+  }
+
+  onCancelDelete(): void {
+    this.showConfirmModal.set(false);
+    this.pendingDeleteCustomerId.set(null);
+  }
+
+  showMessage(title: string, message: string): void {
+    this.messageTitle.set(title);
+    this.messageText.set(message);
+    this.showMessageModal.set(true);
+  }
+
+  closeMessageModal(): void {
+    this.showMessageModal.set(false);
   }
 
   // ==================== STATS UPDATE ====================
@@ -390,7 +423,7 @@ export class CustomerMasterComponent implements OnInit {
 
   exportCustomers(): void {
     console.log('Exporting customers...', this.filteredCustomers());
-    alert('Export functionality will be implemented in production');
+    this.showMessage('กำลังพัฒนา', 'ฟีเจอร์ส่งออกข้อมูลจะพร้อมใช้งานเร็วๆ นี้');
   }
 
   // Math for template

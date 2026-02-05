@@ -55,9 +55,9 @@
 .meter-card.inline-square {
   @apply flex flex-col rounded-xl border-2 border-gray-200 bg-white;
   @apply transition-all duration-200;
-  width: 280px;
-  min-height: 280px;
-  padding: 1rem;
+  width: 270px;
+  min-height: 260px;
+  padding: 0.875rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -206,6 +206,47 @@
   @apply text-base;
 }
 
+/* ==================== COMPLETED METERS INLINE STYLES ==================== */
+.meter-card.completed-card {
+  @apply border-green-200 bg-green-50/30;
+}
+
+.meter-card.completed-card:hover {
+  @apply border-green-300;
+}
+
+.square-edit-btn {
+  @apply flex items-center justify-center w-9 h-9 rounded-lg border border-blue-300;
+  @apply bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-colors cursor-pointer;
+}
+
+.square-edit-btn i {
+  @apply text-base;
+}
+
+.square-stat-value.highlight {
+  @apply text-green-600 font-bold;
+}
+
+.completed-badge {
+  @apply flex items-center justify-center gap-2 mt-auto pt-3;
+  @apply text-sm font-semibold text-green-600;
+}
+
+.completed-badge i {
+  @apply text-base;
+}
+
+.square-edit-actions {
+  @apply flex gap-2 mt-2;
+}
+
+.cancel-btn {
+  @apply flex items-center justify-center gap-1 px-3 py-2;
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg;
+  @apply text-xs font-semibold transition-all duration-200 border-none cursor-pointer flex-1;
+}
+
 .square-photos-preview {
   @apply flex gap-1 flex-wrap;
 }
@@ -224,9 +265,9 @@
 
 @media (max-width: 640px) {
   .meter-card.inline-square {
-    width: 280px;
-    min-width: 280px;
-    min-height: 280px;
+    width: 270px;
+    min-width: 270px;
+    min-height: 260px;
     justify-self: center;
   }
 

@@ -195,6 +195,17 @@
   @apply disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
+.btn-draft {
+  @apply flex items-center gap-2 px-5 py-2;
+  @apply bg-amber-100 hover:bg-amber-200 text-amber-700;
+  @apply rounded-lg font-medium text-sm border border-amber-300;
+  @apply transition-all;
+}
+
+.btn-draft:hover {
+  @apply shadow-md;
+}
+
 .btn-primary {
   @apply flex items-center gap-2 px-5 py-2;
   @apply bg-blue-600 hover:bg-blue-700 text-white;
@@ -317,4 +328,60 @@
   .footer-right {
     @apply w-full justify-between;
   }
+}
+
+/* ==================== Confirm Close Modal ==================== */
+.confirm-close-backdrop {
+  @apply fixed inset-0 z-[60] flex items-center justify-center;
+  background: rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.15s ease;
+}
+
+.confirm-close-modal {
+  @apply bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  animation: scaleIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.confirm-close-icon {
+  @apply w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.confirm-close-icon i {
+  @apply text-3xl text-amber-600;
+}
+
+.confirm-close-title {
+  @apply text-xl font-bold text-gray-900 mb-2;
+}
+
+.confirm-close-message {
+  @apply text-gray-600 mb-6 leading-relaxed;
+}
+
+.confirm-close-actions {
+  @apply flex gap-3 justify-center;
+}
+
+.confirm-close-actions .btn-cancel {
+  @apply flex items-center gap-2 px-5 py-2.5;
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg;
+  @apply font-medium transition-all duration-200 border-none cursor-pointer;
+}
+
+.confirm-close-actions .btn-confirm {
+  @apply flex items-center gap-2 px-5 py-2.5;
+  @apply bg-red-600 hover:bg-red-700 text-white rounded-lg;
+  @apply font-medium transition-all duration-200 border-none cursor-pointer;
 }

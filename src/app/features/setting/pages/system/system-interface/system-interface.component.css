@@ -908,6 +908,23 @@
   color: rgb(var(--danger-fg));
 }
 
+.btn-danger-outline {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200;
+  background: transparent;
+  color: rgb(var(--danger));
+  border: 1px solid rgb(var(--danger));
+}
+
+.btn-danger-outline:hover {
+  background: rgb(var(--danger));
+  color: rgb(var(--danger-fg));
+}
+
+.btn-danger-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-info {
   background: rgb(var(--info));
   color: rgb(var(--info-fg));

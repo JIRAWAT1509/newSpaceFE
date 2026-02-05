@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-
 // Import all block components
 import { AreaBlockComponent } from './components/area-block/area-block.component';
 import { BuildingBlockComponent } from './components/building-block/building-block.component';
@@ -15,7 +14,6 @@ import { NewCustomerBlockComponent } from './components/new-customer-block/new-c
 import { OutstandingBlockComponent } from './components/outstanding-block/outstanding-block.component';
 import { IncomeBlockComponent } from './components/income-block/income-block.component';
 import { FinancialBlockComponent } from './components/financial-block/financial-block.component';
-
 
 import { ButtonModule } from 'primeng/button';
 
@@ -43,7 +41,6 @@ interface Branch {
     OutstandingBlockComponent,
     IncomeBlockComponent,
     FinancialBlockComponent,
-
     ButtonModule
   ],
   templateUrl: './overview.component.html',

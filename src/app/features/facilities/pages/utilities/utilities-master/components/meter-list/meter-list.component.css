@@ -4,46 +4,112 @@
   @apply space-y-8;
 }
 
-/* Header Stats */
+/* ==================== COMPACT STAT CARDS ==================== */
 .header-stats {
   @apply grid grid-cols-1 md:grid-cols-3 gap-4;
 }
 
-.stat-item {
-  @apply flex items-center gap-4 p-4 bg-white rounded-xl border-2 border-gray-200;
-  @apply transition-all duration-300;
+.stat-card {
+  @apply relative overflow-hidden rounded-xl px-4 py-3;
+  @apply transition-all duration-300 ease-out;
+  min-height: 75px;
 }
 
-.stat-item:hover {
-  @apply shadow-lg -translate-y-1;
+.stat-card:hover {
+  transform: translateY(-2px);
 }
 
-.stat-item.success {
-  @apply border-green-200 bg-green-50;
+.stat-card:hover .stat-icon {
+  transform: scale(1.05);
 }
 
-.stat-item.primary {
-  @apply border-blue-200 bg-blue-50;
+/* Content layout */
+.stat-card-content {
+  @apply relative z-10 flex items-center gap-3;
 }
 
-.stat-item i {
-  @apply text-3xl text-gray-600;
+/* Icon wrapper with glass effect */
+.stat-icon-wrapper {
+  @apply flex-shrink-0;
 }
 
-.stat-item.success i {
-  @apply text-green-600;
+.stat-icon {
+  @apply w-10 h-10 rounded-lg flex items-center justify-center;
+  @apply transition-transform duration-300;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.stat-item.primary i {
-  @apply text-blue-600;
+.stat-icon i {
+  @apply text-lg text-white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stats info */
+.stat-info {
+  @apply flex flex-col;
 }
 
 .stat-value {
-  @apply text-2xl font-bold text-gray-800;
+  @apply text-2xl font-bold text-white leading-none;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  letter-spacing: -0.01em;
 }
 
 .stat-label {
-  @apply text-sm text-gray-600;
+  @apply text-xs font-medium mt-0.5;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==================== CARD VARIANTS ==================== */
+
+/* Emerald Card - Total Completed */
+.stat-card--emerald {
+  background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  box-shadow: 
+    0 4px 15px -4px rgba(16, 185, 129, 0.4),
+    0 2px 4px -1px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.stat-card--emerald:hover {
+  box-shadow: 
+    0 8px 25px -6px rgba(16, 185, 129, 0.5),
+    0 4px 6px -2px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Blue Card - This Month */
+.stat-card--blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+  box-shadow: 
+    0 4px 15px -4px rgba(59, 130, 246, 0.4),
+    0 2px 4px -1px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.stat-card--blue:hover {
+  box-shadow: 
+    0 8px 25px -6px rgba(59, 130, 246, 0.5),
+    0 4px 6px -2px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Purple Card - Completion Rate */
+.stat-card--purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+  box-shadow: 
+    0 4px 15px -4px rgba(139, 92, 246, 0.4),
+    0 2px 4px -1px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.stat-card--purple:hover {
+  box-shadow: 
+    0 8px 25px -6px rgba(139, 92, 246, 0.5),
+    0 4px 6px -2px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* Filter Section */
@@ -124,10 +190,11 @@
   @apply text-lg;
 }
 
-/* Meters Grid - ALWAYS Compact by Default */
+/* Meters Grid - การ์ดขนาด 255px เหมือน All Meters */
 .meters-grid {
-  @apply grid gap-4;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 250px));
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 270px);
+  gap: 1rem;
   justify-content: start;
 }
 
@@ -154,6 +221,31 @@
     @apply grid-cols-1;
   }
 
+  .stat-card {
+    @apply px-3 py-2.5;
+    min-height: 60px;
+  }
+  
+  .stat-card-content {
+    @apply gap-2.5;
+  }
+  
+  .stat-icon {
+    @apply w-9 h-9;
+  }
+  
+  .stat-icon i {
+    @apply text-base;
+  }
+  
+  .stat-value {
+    @apply text-xl;
+  }
+  
+  .stat-label {
+    font-size: 0.65rem;
+  }
+
   .filter-buttons {
     @apply flex-col;
   }
@@ -172,5 +264,6 @@
 
   .meters-grid {
     grid-template-columns: 1fr;
+    justify-items: center;
   }
 }

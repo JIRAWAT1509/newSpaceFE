@@ -97,7 +97,7 @@
 
 /* ==================== Actions Section ==================== */
 .actions-section {
-  @apply px-6 py-3 border-b border-gray-200;
+  @apply pl-2 pr-6 py-3 border-b border-gray-200;
   @apply flex items-center justify-between;
 }
 
@@ -229,6 +229,75 @@
   @apply text-lg font-medium;
 }
 
+/* ==================== Drafts Panel ==================== */
+.drafts-panel {
+  @apply mx-6 my-4 bg-amber-50 border border-amber-200 rounded-xl overflow-hidden;
+}
+
+.drafts-header {
+  @apply flex items-center justify-between px-4 py-3 cursor-pointer;
+  @apply bg-amber-100 hover:bg-amber-200 transition-colors;
+}
+
+.drafts-title {
+  @apply flex items-center gap-2 text-amber-800 font-semibold;
+}
+
+.drafts-title i {
+  @apply text-lg;
+}
+
+.drafts-header > i {
+  @apply text-amber-600;
+}
+
+.drafts-list {
+  @apply p-3 space-y-2;
+}
+
+.draft-item {
+  @apply flex items-center justify-between p-3 bg-white rounded-lg border border-amber-200;
+  @apply hover:border-amber-400 transition-colors;
+}
+
+.draft-info {
+  @apply flex-1 min-w-0;
+}
+
+.draft-name {
+  @apply font-semibold text-gray-800 truncate;
+}
+
+.draft-meta {
+  @apply flex items-center gap-3 text-xs text-gray-500 mt-1;
+}
+
+.draft-progress {
+  @apply px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-medium;
+}
+
+.draft-actions {
+  @apply flex items-center gap-2 ml-3;
+}
+
+.draft-btn {
+  @apply flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium;
+  @apply transition-all;
+}
+
+.draft-btn.continue {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.draft-btn.delete {
+  @apply bg-red-100 hover:bg-red-200 text-red-600;
+  @apply w-8 h-8 p-0 justify-center;
+}
+
+.draft-btn.delete span {
+  @apply hidden;
+}
+
 /* ==================== Modal ==================== */
 .modal-backdrop {
   @apply fixed inset-0 bg-black bg-opacity-50 z-50;
@@ -303,7 +372,7 @@
   }
 
   .actions-section {
-    @apply px-4 py-3 flex-wrap gap-2;
+    @apply pl-2 pr-4 py-3 flex-wrap gap-2;
   }
 
   .actions-left {
@@ -360,7 +429,7 @@
   }
 
   .actions-section {
-    @apply px-3 py-2;
+    @apply pl-2 pr-3 py-2;
   }
 
   .advance-search-btn span {

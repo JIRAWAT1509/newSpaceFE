@@ -199,3 +199,24 @@
     </div>
   </div>
 }
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  type="warning"
+  title="ยกเลิกใบแจ้งหนี้"
+  [message]="'คุณต้องการยกเลิกใบแจ้งหนี้ ' + (pendingCancelInvoice()?.contractNumber || '') + ' หรือไม่?'"
+  confirmText="ยกเลิกใบแจ้งหนี้"
+  confirmIcon="pi-times"
+  (confirm)="onConfirmCancel()"
+  (cancel)="onCancelConfirm()"
+/>
+
+<!-- Message Modal -->
+<app-warning-modal
+  [isOpen]="showMessageModal()"
+  [title]="messageTitle()"
+  [message]="messageText()"
+  buttonText="ตกลง"
+  (onClose)="closeMessageModal()"
+/>

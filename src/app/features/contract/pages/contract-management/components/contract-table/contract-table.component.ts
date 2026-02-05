@@ -1,4 +1,4 @@
-// contract-table.component.ts - WITH EDIT MODE INTEGRATED
+// contract-table.component.ts - WITH EDIT MODE & DRAFT SUPPORT
 import { Component, input, output, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,11 +10,13 @@ import { AdvanceSearchModalComponent } from '../advance-search-modal/advance-sea
 import { AddContractModalComponent } from '../add-contract-modal/add-contract-modal.component';
 import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 import { BulkActionModalComponent, BulkActionType, BulkActionResult } from '../bulk-action-modal/bulk-action-modal.component';
+import { DraftContractService, DraftContract } from '@core/services/draft-contract.service';
+import { ConfirmationModalComponent, ConfirmationType } from '@shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-contract-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, AdvanceSearchModalComponent, AddContractModalComponent, WarningModalComponent, BulkActionModalComponent],
+  imports: [CommonModule, FormsModule, AdvanceSearchModalComponent, AddContractModalComponent, WarningModalComponent, BulkActionModalComponent, ConfirmationModalComponent],
   templateUrl: './contract-table.component.html',
   styleUrl: './contract-table.component.css'
 })
@@ -44,19 +46,31 @@ export class ContractTableComponent {
   // Selection
   selectedIds = signal<string[]>([]);
 
-  // UI State - UPDATED FOR EDIT MODE
+  // UI State - UPDATED FOR EDIT MODE & DRAFTS
   showAdvanceSearchModal = signal<boolean>(false);
   showAddModal = signal<boolean>(false);
   modalMode = signal<'add' | 'edit'>('add');
   selectedContract = signal<Contract | null>(null);
+  selectedDraft = signal<DraftContract | null>(null);
   showBulkActions = signal<boolean>(false);
   activeRowMenu = signal<string | null>(null);
+  showDraftsPanel = signal<boolean>(true); // Show/hide drafts panel
 
   // In-app message modal (replaces browser alert)
   showMessageModal = signal<boolean>(false);
   messageModalTitle = signal<string>('');
   messageModalMessage = signal<string>('');
   private messageModalOnClose?: () => void;
+
+  // Confirmation modal (replaces browser confirm)
+  showConfirmModal = signal<boolean>(false);
+  confirmModalType = signal<ConfirmationType>('warning');
+  confirmModalTitle = signal<string>('');
+  confirmModalMessage = signal<string>('');
+  confirmModalConfirmText = signal<string>('ยืนยัน');
+  confirmModalCancelText = signal<string>('ยกเลิก');
+  confirmModalIcon = signal<string>('pi-check');
+  private confirmModalOnConfirm?: () => void;
 
   // Bulk action modal
   showBulkActionModal = signal<boolean>(false);
@@ -166,7 +180,7 @@ export class ContractTableComponent {
     return selectedCount > 0 && selectedCount < this.filteredData().length;
   });
 
-  constructor() {
+  constructor(public draftService: DraftContractService) {
     // Load saved searches from localStorage
     this.loadSavedSearches();
 
@@ -661,6 +675,43 @@ export class ContractTableComponent {
     this.showAddModal.set(false);
     this.modalMode.set('add');
     this.selectedContract.set(null);
+    this.selectedDraft.set(null);
+  }
+
+  // ==================== DRAFT MANAGEMENT ====================
+
+  /** เปิด/ปิด panel แบบร่าง */
+  toggleDraftsPanel(): void {
+    this.showDraftsPanel.update(v => !v);
+  }
+
+  /** เปิด modal เพื่อกรอกต่อจาก draft */
+  continueDraft(draft: DraftContract): void {
+    this.modalMode.set('add');
+    this.selectedContract.set(null);
+    this.selectedDraft.set(draft);
+    this.showAddModal.set(true);
+  }
+
+  /** ลบ draft */
+  deleteDraft(draft: DraftContract): void {
+    this.openConfirmModal({
+      type: 'danger',
+      title: 'ลบแบบร่าง',
+      message: `คุณต้องการลบแบบร่าง "${draft.name}" หรือไม่?\n\nข้อมูลที่กรอกไว้จะถูกลบทั้งหมดและไม่สามารถกู้คืนได้`,
+      confirmText: 'ลบ',
+      confirmIcon: 'pi-trash',
+      onConfirm: () => {
+        this.draftService.deleteDraft(draft.id);
+        this.openMessageModal('ลบสำเร็จ', `แบบร่าง "${draft.name}" ถูกลบแล้ว`);
+      }
+    });
+  }
+
+  /** เมื่อ draft ถูกบันทึกจาก modal */
+  onDraftSaved(draft: DraftContract): void {
+    // Draft is saved, we can close modal or keep it open
+    console.log('Draft saved:', draft);
   }
 
   saveNewContract(formData: any): void {
@@ -698,6 +749,40 @@ export class ContractTableComponent {
       this.messageModalOnClose();
       this.messageModalOnClose = undefined;
     }
+  }
+
+  // ==================== CONFIRMATION MODAL ====================
+
+  openConfirmModal(options: {
+    type?: ConfirmationType;
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    confirmIcon?: string;
+    onConfirm: () => void;
+  }): void {
+    this.confirmModalType.set(options.type || 'warning');
+    this.confirmModalTitle.set(options.title);
+    this.confirmModalMessage.set(options.message);
+    this.confirmModalConfirmText.set(options.confirmText || 'ยืนยัน');
+    this.confirmModalCancelText.set(options.cancelText || 'ยกเลิก');
+    this.confirmModalIcon.set(options.confirmIcon || 'pi-check');
+    this.confirmModalOnConfirm = options.onConfirm;
+    this.showConfirmModal.set(true);
+  }
+
+  onConfirmModalConfirm(): void {
+    this.showConfirmModal.set(false);
+    if (this.confirmModalOnConfirm) {
+      this.confirmModalOnConfirm();
+      this.confirmModalOnConfirm = undefined;
+    }
+  }
+
+  onConfirmModalCancel(): void {
+    this.showConfirmModal.set(false);
+    this.confirmModalOnConfirm = undefined;
   }
 
   // ==================== HELPERS ====================

@@ -115,6 +115,43 @@
     </div>
   </div>
 
+  <!-- Drafts Panel -->
+  @if (draftService.getDraftCount() > 0) {
+    <div class="drafts-panel">
+      <div class="drafts-header" (click)="toggleDraftsPanel()">
+        <div class="drafts-title">
+          <i class="pi pi-file-edit"></i>
+          <span>แบบร่างสัญญา ({{ draftService.getDraftCount() }})</span>
+        </div>
+        <i class="pi" [ngClass]="showDraftsPanel() ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+      </div>
+      @if (showDraftsPanel()) {
+        <div class="drafts-list">
+          @for (draft of draftService.getDrafts(); track draft.id) {
+            <div class="draft-item">
+              <div class="draft-info">
+                <div class="draft-name">{{ draft.name }}</div>
+                <div class="draft-meta">
+                  <span>แก้ไขล่าสุด: {{ draftService.formatDate(draft.updatedAt) }}</span>
+                  <span class="draft-progress">Tab {{ draft.currentTab + 1 }}/5</span>
+                </div>
+              </div>
+              <div class="draft-actions">
+                <button class="draft-btn continue" (click)="continueDraft(draft)" title="กรอกต่อ">
+                  <i class="pi pi-pencil"></i>
+                  <span>กรอกต่อ</span>
+                </button>
+                <button class="draft-btn delete" (click)="deleteDraft(draft)" title="ลบ">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
   <!-- Table -->
   <div class="table-wrapper">
     <table class="data-table">
@@ -251,13 +288,15 @@
   />
 }
 
-<!-- Add/Edit Contract Modal - UPDATED WITH EDIT MODE SUPPORT -->
+<!-- Add/Edit Contract Modal - WITH EDIT MODE & DRAFT SUPPORT -->
 @if (showAddModal()) {
   <app-add-contract-modal
     [mode]="modalMode()"
     [contractData]="selectedContract()"
+    [draftData]="selectedDraft()"
     (close)="closeAddModal()"
     (save)="saveNewContract($event)"
+    (draftSaved)="onDraftSaved($event)"
   />
 }
 
@@ -277,4 +316,17 @@
   [selectedContracts]="selectedContractsForBulk()"
   (close)="closeBulkActionModal()"
   (confirm)="onBulkActionConfirm($event)"
+/>
+
+<!-- Confirmation Modal (replaces browser confirm) -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  [type]="confirmModalType()"
+  [title]="confirmModalTitle()"
+  [message]="confirmModalMessage()"
+  [confirmText]="confirmModalConfirmText()"
+  [cancelText]="confirmModalCancelText()"
+  [confirmIcon]="confirmModalIcon()"
+  (confirm)="onConfirmModalConfirm()"
+  (cancel)="onConfirmModalCancel()"
 />

@@ -92,14 +92,37 @@ export class ContractInfoTabComponent implements OnInit {
       transferBookingContract: [''],
 
       // Section: ข้อมูลผู้เช่า (ฉบับยืนยัน)
-      contractMaker: [''],
-      legalEntityName: [''],
-      registeredAddress: [''],
+      contractMaker: ['', Validators.required],
+      legalEntityName: ['', Validators.required],
+      registeredAddress: ['', Validators.required],
       documentDeliveryAddress: [''],
-      phone: [''],
-      email: [''],
+      phone: ['', [Validators.required, Validators.pattern(/^[0-9]{9,10}$/)]],
+      email: ['', [Validators.required, Validators.email]],
       contactPerson: ['']
     });
+  }
+
+  // Error message helpers
+  getPhoneError(): string {
+    const phone = this.form.get('phone');
+    if (phone?.errors?.['required']) {
+      return 'กรุณากรอกเบอร์โทรศัพท์';
+    }
+    if (phone?.errors?.['pattern']) {
+      return 'เบอร์โทรศัพท์ไม่ถูกต้อง (ต้องเป็นตัวเลข 9-10 หลัก)';
+    }
+    return '';
+  }
+
+  getEmailError(): string {
+    const email = this.form.get('email');
+    if (email?.errors?.['required']) {
+      return 'กรุณากรอกอีเมล';
+    }
+    if (email?.errors?.['email']) {
+      return 'รูปแบบอีเมลไม่ถูกต้อง';
+    }
+    return '';
   }
 
   // Section Progress

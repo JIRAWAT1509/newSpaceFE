@@ -21,6 +21,8 @@ import { TeamActivityFeedComponent } from './activity-feed/team-activity-feed.co
 import { ActivityListComponent } from './activity-list/activity-list.component';
 import { ActivityDrawerComponent } from './activity-drawer/activity-drawer.component';
 import { ActivityFiltersComponent, ActivityFilters } from './activity-filters/activity-filters.component';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
+import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 
 @Component({
   selector: 'app-activities-section',
@@ -32,6 +34,8 @@ import { ActivityFiltersComponent, ActivityFilters } from './activity-filters/ac
     ActivityListComponent,
     ActivityDrawerComponent,
     ActivityFiltersComponent,
+    ConfirmationModalComponent,
+    WarningModalComponent,
   ],
   templateUrl: './activities-section.component.html',
   styleUrl: './activities-section.component.css'
@@ -48,6 +52,13 @@ export class ActivitiesSectionComponent implements OnInit {
 
   // UI State
   isLoading = signal<boolean>(false);
+
+  // Modal state
+  showConfirmModal = signal<boolean>(false);
+  pendingDeleteActivityId = signal<string | null>(null);
+  showMessageModal = signal<boolean>(false);
+  messageTitle = signal<string>('');
+  messageText = signal<string>('');
   selectedActivityId = signal<string | null>(null);
   isDrawerOpen = signal<boolean>(false);
   drawerMode = signal<'create' | 'edit'>('create');
@@ -347,10 +358,15 @@ export class ActivitiesSectionComponent implements OnInit {
   }
 
   deleteActivity(activityId: string): void {
-    if (!confirm('คุณแน่ใจหรือไม่ที่จะลบกิจกรรมนี้?')) {
-      return;
-    }
+    this.pendingDeleteActivityId.set(activityId);
+    this.showConfirmModal.set(true);
+  }
 
+  onConfirmDelete(): void {
+    const activityId = this.pendingDeleteActivityId();
+    if (!activityId) return;
+
+    this.showConfirmModal.set(false);
     this.isLoading.set(true);
 
     setTimeout(() => {
@@ -360,9 +376,26 @@ export class ActivitiesSectionComponent implements OnInit {
 
       this.isLoading.set(false);
       this.deselectActivity();
+      this.pendingDeleteActivityId.set(null);
 
+      this.showMessage('ลบสำเร็จ', 'ลบกิจกรรมเรียบร้อยแล้ว');
       console.log('Activity deleted:', activityId);
     }, 300);
+  }
+
+  onCancelDelete(): void {
+    this.showConfirmModal.set(false);
+    this.pendingDeleteActivityId.set(null);
+  }
+
+  showMessage(title: string, message: string): void {
+    this.messageTitle.set(title);
+    this.messageText.set(message);
+    this.showMessageModal.set(true);
+  }
+
+  closeMessageModal(): void {
+    this.showMessageModal.set(false);
   }
 
   // ==================== ACTIVITY STATUS UPDATES ====================

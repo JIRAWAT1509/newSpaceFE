@@ -198,3 +198,24 @@
     </div>
   </div>
 }
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  type="danger"
+  title="ลบกลุ่มมิเตอร์"
+  [message]="'คุณต้องการลบกลุ่ม \'' + (pendingDeleteGroup()?.name || '') + '\' หรือไม่?'"
+  confirmText="ลบ"
+  confirmIcon="pi-trash"
+  (confirm)="onConfirmDeleteGroup()"
+  (cancel)="onCancelDeleteGroup()"
+/>
+
+<!-- Message Modal -->
+<app-warning-modal
+  [isOpen]="showMessageModal()"
+  [title]="messageTitle()"
+  [message]="messageText()"
+  buttonText="ตกลง"
+  (onClose)="closeMessageModal()"
+/>

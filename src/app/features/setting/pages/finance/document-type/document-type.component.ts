@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { DocumentTypeFormDrawerComponent } from './components/document-type-form-drawer/document-type-form-drawer.component';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
+import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 
 interface DocumentType {
   OU_CODE: string;
@@ -23,7 +25,9 @@ interface DocumentType {
     CommonModule,
     FormsModule,
     Button,
-    DocumentTypeFormDrawerComponent
+    DocumentTypeFormDrawerComponent,
+    ConfirmationModalComponent,
+    WarningModalComponent
   ],
   templateUrl: './document-type.component.html',
   styleUrl: './document-type.component.css'
@@ -43,6 +47,13 @@ export class DocumentTypeComponent implements OnInit {
 
   // Loading state
   isLoading = signal<boolean>(false);
+
+  // Modal state
+  showConfirmModal = signal<boolean>(false);
+  pendingDeleteDocumentType = signal<DocumentType | null>(null);
+  showMessageModal = signal<boolean>(false);
+  messageTitle = signal<string>('');
+  messageText = signal<string>('');
 
   ngOnInit(): void {
     this.loadDocumentTypes();
@@ -323,7 +334,7 @@ export class DocumentTypeComponent implements OnInit {
     );
 
     if (exists) {
-      alert('รหัสเอกสารนี้มีอยู่แล้ว');
+      this.showMessage('ข้อผิดพลาด', 'รหัสเอกสารนี้มีอยู่แล้ว');
       return;
     }
 
@@ -349,11 +360,15 @@ export class DocumentTypeComponent implements OnInit {
   }
 
   deleteDocumentType(documentType: DocumentType): void {
-    const confirmed = confirm(
-      `คุณต้องการลบประเภทเอกสาร "${documentType.DOC_NAME}" หรือไม่?`
-    );
+    this.pendingDeleteDocumentType.set(documentType);
+    this.showConfirmModal.set(true);
+  }
 
-    if (!confirmed) return;
+  onConfirmDelete(): void {
+    const documentType = this.pendingDeleteDocumentType();
+    if (!documentType) return;
+
+    this.showConfirmModal.set(false);
 
     const updated = this.documentTypes().filter(
       doc => doc.DOC_CODE !== documentType.DOC_CODE
@@ -362,8 +377,24 @@ export class DocumentTypeComponent implements OnInit {
     this.documentTypes.set(updated);
     this.onSearch(); // Refresh filtered list
 
-    // Show success message
+    this.pendingDeleteDocumentType.set(null);
+    this.showMessage('ลบสำเร็จ', `ลบประเภทเอกสาร "${documentType.DOC_NAME}" เรียบร้อยแล้ว`);
     console.log('ลบประเภทเอกสารสำเร็จ:', documentType);
+  }
+
+  onCancelDelete(): void {
+    this.showConfirmModal.set(false);
+    this.pendingDeleteDocumentType.set(null);
+  }
+
+  showMessage(title: string, message: string): void {
+    this.messageTitle.set(title);
+    this.messageText.set(message);
+    this.showMessageModal.set(true);
+  }
+
+  closeMessageModal(): void {
+    this.showMessageModal.set(false);
   }
 
   // ==================== ROW CLICK ====================

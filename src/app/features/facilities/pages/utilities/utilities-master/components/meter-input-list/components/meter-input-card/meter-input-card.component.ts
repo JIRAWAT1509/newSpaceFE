@@ -43,6 +43,8 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   isWarning = signal<boolean>(false);
   warningMessage = signal<string>('');
   isEditing = signal<boolean>(false);
+  /** สำหรับโหมด inline ของ completed meters - คลิกแก้ไขเพื่อเปิดฟอร์ม */
+  isInlineEditing = signal<boolean>(false);
 
   // Config tracking
   private configCheckInterval?: Subscription;
@@ -308,5 +310,57 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
 
     this.isEditing.set(false);
     alert('Reading updated successfully!');
+  }
+
+  // ==================== INLINE EDIT MODE (for completed meters) ====================
+
+  /** เปิดโหมดแก้ไขในการ์ด inline */
+  onInlineEdit(event: Event): void {
+    event.stopPropagation();
+    this.isInlineEditing.set(true);
+    // ตั้งค่าเริ่มต้นเป็นค่าปัจจุบัน
+    this.currentReading.set(this.meter().currentReading);
+  }
+
+  /** ยกเลิกแก้ไขในโหมด inline */
+  onCancelInlineEdit(event: Event): void {
+    event.stopPropagation();
+    this.isInlineEditing.set(false);
+    this.currentReading.set(null);
+    this.hasError.set(false);
+    this.errorMessage.set('');
+    this.isWarning.set(false);
+    this.warningMessage.set('');
+  }
+
+  /** บันทึกการแก้ไขในโหมด inline */
+  onSaveInlineEdit(event: Event): void {
+    event.stopPropagation();
+
+    if (!this.validateReading()) {
+      return;
+    }
+
+    const reading = this.currentReading();
+    if (!reading) return;
+
+    this.isSaving.set(true);
+
+    setTimeout(() => {
+      this.readingSaved.emit({
+        meterId: this.meter().id,
+        reading: reading,
+        photos: this.attachedPhotos()
+      });
+
+      this.showSuccess.set(true);
+      this.isSaving.set(false);
+
+      setTimeout(() => {
+        this.showSuccess.set(false);
+        this.isInlineEditing.set(false);
+        this.currentReading.set(null);
+      }, 1000);
+    }, 500);
   }
 }
