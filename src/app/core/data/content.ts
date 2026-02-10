@@ -268,8 +268,18 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       // --- FINANCE SECTION ---
       {
         name: 'dashboard',
-        icon: 'assets/icons/business-outline.svg',
+        icon: 'pi-chart-bar',
         route: '/finance/master',
+      },
+      {
+        name: 'invoices',
+        icon: 'pi-money-bill',
+        route: '/collection/invoice/daily',
+      },
+      {
+        name: 'finance_receipts',
+        icon: 'pi-receipt',
+        route: '/finance/receipt/daily',
       },
       /* {
         name: 'finance_receipts',
