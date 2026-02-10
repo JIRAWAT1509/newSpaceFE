@@ -5,13 +5,20 @@
 }
 
 .dashboard-container > * + * {
-  margin-top: 3rem; /* 48px */
+  margin-top: 1.5rem;
 }
 
-.stats-grid {
-  margin-bottom: 2rem; /* 48px หลัง stat cards */
+.section-card {
+  @apply rounded-xl border p-4;
+  background: rgb(var(--card));
+  border-color: rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
+.section-title {
+  @apply text-xl font-bold mb-3;
+  color: rgb(var(--fg));
+}
 
 /* Stats Cards */
 .stats-grid {
@@ -32,7 +39,7 @@
 
 /* ✅ เพิ่ม semi-transparent overlay เพื่อเพิ่ม contrast */
 .stat-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -60,7 +67,7 @@
 .stat-card-icon i {
   font-size: 1.25rem;
   color: white;
-  font-family: 'primeicons' !important;
+  font-family: "primeicons" !important;
   line-height: 1 !important;
   display: block !important;
   text-align: center !important;
@@ -228,6 +235,94 @@
 
 .empty-state p {
   @apply text-gray-500;
+}
+
+/* เพิ่มท้ายไฟล์ */
+
+/* Sortable Table Headers */
+.debt-table th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.debt-table th:hover {
+  @apply bg-gray-100;
+}
+
+.debt-table th:last-child {
+  cursor: default;
+}
+
+.debt-table th:last-child:hover {
+  @apply bg-gray-50;
+}
+
+.sort-icon {
+  @apply ml-2 text-gray-400;
+  font-size: 0.875rem;
+}
+
+.debt-table th:hover .sort-icon {
+  @apply text-gray-600;
+}
+
+/* Action Menu Portal */
+.action-menu-portal {
+  position: fixed;
+  z-index: 200;
+}
+
+.action-menu {
+  @apply w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2;
+  animation: slideDown 0.2s ease;
+}
+
+.menu-header {
+  @apply px-4 py-2 text-sm font-semibold text-white bg-blue-500;
+  border-radius: 0.5rem 0.5rem 0 0;
+  margin: -0.5rem -0 0.5rem 0;
+}
+
+.menu-item {
+  @apply w-full flex items-center gap-3 px-4 py-2;
+  @apply text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600;
+  @apply transition-colors duration-200;
+  @apply border-none bg-transparent cursor-pointer;
+}
+
+.menu-item i {
+  @apply text-lg;
+}
+
+.menu-item.danger {
+  @apply hover:bg-red-50 hover:text-red-600;
+}
+
+.menu-overlay {
+  @apply fixed inset-0;
+  z-index: 150;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stat Change Styles */
+.stat-change--up {
+  color: rgba(34, 197, 94, 0.9);
+}
+
+.stat-change--down {
+  color: rgba(239, 68, 68, 0.9);
 }
 
 /* Responsive */

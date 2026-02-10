@@ -165,3 +165,16 @@ export const MOCK_RECEIPTS: Receipt[] = [
     status: 'cancel'
   }
 ];
+
+// finance.mock.ts - แก้ไข ISSUED_DOCUMENTS
+
+export const ISSUED_DOCUMENTS: Record<string, {
+  hasCreditNote: boolean;
+  hasInvoice: boolean;
+  hasCancelInvoice: boolean;  // ✅ เพิ่ม
+}> = {
+  'D001': { hasCreditNote: false, hasInvoice: false, hasCancelInvoice: false },
+  'D002': { hasCreditNote: true, hasInvoice: false, hasCancelInvoice: false },
+  'D003': { hasCreditNote: false, hasInvoice: true, hasCancelInvoice: false },
+  'D004': { hasCreditNote: true, hasInvoice: true, hasCancelInvoice: true }
+};

@@ -1,121 +1,239 @@
 <!-- finance-dashboard.component.html -->
 
 <div class="dashboard-container">
-  <!-- Stats Cards -->
-  <div class="section-card">
-    <h2 class="section-title">Dashboard Overview</h2>
-    <div class="stats-grid">
-      @for (card of statCards(); track card.label) {
-        <article class="stat-card" [style.background]="card.bgGradient">
-          <div class="stat-card-bg"></div>
-          <div class="stat-card-icon">
-            <i class="pi" [ngClass]="card.icon"></i>
+  <!-- Stats Cards Grid -->
+  <div class="stats-grid">
+    @for (card of statCards(); track card.label) {
+      <div class="stat-card" [style.background]="card.bgGradient">
+        <div class="stat-card-icon">
+          <i class="pi" [ngClass]="card.icon"></i>
+        </div>
+        <div class="stat-card-body">
+          <div class="stat-label">{{ card.label }}</div>
+          <div class="stat-value">
+            <span>{{ card.value }}</span>
+            @if (card.unit) {
+              <span class="stat-unit">{{ card.unit }}</span>
+            }
           </div>
-          <div class="stat-card-body">
-            <p class="stat-label">{{ card.label }}</p>
-            <p class="stat-value">
-              {{ card.value }}
-              @if (card.unit) {
-                <span class="stat-unit">{{ card.unit }}</span>
+          @if (card.change !== undefined && card.change !== 0) {
+            <p
+              class="stat-change"
+              [ngClass]="{
+                'stat-change--up': card.change > 0,
+                'stat-change--down': card.change < 0
+              }"
+            >
+              <i class="pi" [ngClass]="getChangeIcon(card.change)"></i>
+              <span>{{ card.change > 0 ? '+' : '' }}{{ card.change }}%</span>
+              @if (card.changeLabel) {
+                <span class="stat-change-hint">{{ card.changeLabel }}</span>
               }
             </p>
+          }
+        </div>
+      </div>
+    }
+  </div>
 
-          </div>
-        </article>
+  <!-- Debt/Receivables List -->
+  <div class="debt-section">
+    <div class="section-header">
+      <h2 class="section-title">รายการหนี้คงค้าง</h2>
+    </div>
+    <div class="table-container">
+      <table class="debt-table">
+        <thead>
+          <tr>
+            <th (click)="sortBy('description')">
+              ชื่อรายละเอียด
+              <i class="pi sort-icon" [ngClass]="getSortIcon('description')"></i>
+            </th>
+            <th (click)="sortBy('customerName')">
+              ชื่อลูกค้า
+              <i class="pi sort-icon" [ngClass]="getSortIcon('customerName')"></i>
+            </th>
+            <th (click)="sortBy('contractFile')">
+              ไฟล์สัญญา
+              <i class="pi sort-icon" [ngClass]="getSortIcon('contractFile')"></i>
+            </th>
+            <th (click)="sortBy('amount')">
+              จำนวนเงิน
+              <i class="pi sort-icon" [ngClass]="getSortIcon('amount')"></i>
+            </th>
+            <th (click)="sortBy('dueDate')">
+              กำหนดวันชำระเงิน
+              <i class="pi sort-icon" [ngClass]="getSortIcon('dueDate')"></i>
+            </th>
+            <th (click)="sortBy('overdueDays')">
+              คงค้างกี่วัน
+              <i class="pi sort-icon" [ngClass]="getSortIcon('overdueDays')"></i>
+            </th>
+            <th (click)="sortBy('status')">
+              สถานะ
+              <i class="pi sort-icon" [ngClass]="getSortIcon('status')"></i>
+            </th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (debt of debts(); track debt.id) {
+            <tr>
+              <td>
+                <div class="debt-description">{{ debt.description }}</div>
+              </td>
+              <td>
+                <div class="customer-name">{{ debt.customerName }}</div>
+              </td>
+              <td>
+                <button class="file-link" (click)="onViewContract(debt)">
+                  <i class="pi pi-file-pdf"></i>
+                  <span>{{ debt.contractFile }}</span>
+                </button>
+              </td>
+              <td>
+                <div class="amount">฿{{ debt.amount.toLocaleString() }}</div>
+              </td>
+              <td>
+                <div class="due-date">{{ debt.dueDate }}</div>
+              </td>
+              <td>
+                <div
+                  class="overdue-days"
+                  [class.critical]="debt.status === 'critical'"
+                >
+                  {{ debt.overdueDays }} วัน
+                </div>
+              </td>
+              <td>
+                <div
+                  class="status-badge"
+                  [ngClass]="getStatusClass(debt.status)"
+                >
+                  <i
+                    class="pi"
+                    [ngClass]="getStatusConfig(debt.status).icon"
+                  ></i>
+                  <span>{{ getStatusConfig(debt.status).label }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button
+                    class="action-btn"
+                    title="ส่งแจ้งเตือน"
+                    (click)="onSendReminder(debt)"
+                  >
+                    <i class="pi pi-send"></i>
+                  </button>
+                  <button
+                    class="action-btn"
+                    title="ดูรายละเอียด"
+                    (click)="onViewDetails(debt)"
+                  >
+                    <i class="pi pi-eye"></i>
+                  </button>
+                  <button
+                    class="action-btn"
+                    title="เพิ่มเติม"
+                    (click)="toggleDebtMenu(debt.id, $event)"
+                  >
+                    <i class="pi pi-ellipsis-v"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (debts().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <h3>ไม่มีรายการหนี้คงค้าง</h3>
+          <p>ไม่พบรายการหนี้ค้างชำระในขณะนี้</p>
+        </div>
       }
     </div>
+  </div>
 
-    <!-- Debt/Receivables List -->
-    <div class="debt-section">
-      <div class="section-header">
-        <h2 class="section-title">รายการหนี้คงค้าง</h2>
-      </div>
+  <!-- ✅ Kebab Menu Dropdown (นอก table) -->
+  @if (showDebtMenu() && currentDebt()) {
+    <div
+      class="action-menu-portal"
+      [style.top.px]="menuPosition().top"
+      [style.left.px]="menuPosition().left"
+    >
+      <div class="action-menu">
+        <button
+          class="menu-item"
+          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบลดหนี้')"
+        >
+          <i class="pi pi-minus-circle"></i>
+          <span>ออกใบลดหนี้</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบเสร็จใบลดหนี้')"
+        >
+          <i class="pi pi-receipt"></i>
+          <span>ออกใบเสร็จใบลดหนี้</span>
+        </button>
+        <button
+          class="menu-item danger"
+          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบยกเลิก')"
+        >
+          <i class="pi pi-ban"></i>
+          <span>ออกใบยกเลิก</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบเสร็จใบยกเลิก')"
+        >
+          <i class="pi pi-times-circle"></i>
+          <span>ออกใบเสร็จใบยกเลิก</span>
+        </button>
+        <!-- <button
+          class="menu-item"
+          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบเสร็จ')"
+        >
+          <i class="pi pi-file-check"></i>
+          <span>ออกใบเสร็จ</span>
+        </button> -->
 
-      <div class="table-container">
-        <table class="debt-table">
-          <thead>
-            <tr>
-              <th>ชื่อรายละเอียด</th>
-              <th>ชื่อลูกค้า</th>
-              <th>ไฟล์สัญญา</th>
-              <th>จำนวนเงิน</th>
-              <th>กำหนดวันชำระเงิน</th>
-              <th>คงค้างกี่วัน</th>
-              <th>สถานะ</th>
-              <th class="text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (debt of debts(); track debt.id) {
-              <tr>
-                <td>
-                  <div class="debt-description">{{ debt.description }}</div>
-                </td>
-                <td>
-                  <div class="customer-name">{{ debt.customerName }}</div>
-                </td>
-                <td>
-                  <button class="file-link" (click)="onViewContract(debt)">
-                    <i class="pi pi-file-pdf"></i>
-                    <span>{{ debt.contractFile }}</span>
-                  </button>
-                </td>
-                <td>
-                  <div class="amount">฿{{ debt.amount.toLocaleString() }}</div>
-                </td>
-                <td>
-                  <div class="due-date">{{ debt.dueDate }}</div>
-                </td>
-                <td>
-                  <div
-                    class="overdue-days"
-                    [class.critical]="debt.status === 'critical'"
-                  >
-                    {{ debt.overdueDays }} วัน
-                  </div>
-                </td>
-                <td>
-                  <div
-                    class="status-badge"
-                    [ngClass]="getStatusClass(debt.status)"
-                  >
-                    <i
-                      class="pi"
-                      [ngClass]="getStatusConfig(debt.status).icon"
-                    ></i>
-                    <span>{{ getStatusConfig(debt.status).label }}</span>
-                  </div>
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button
-                      class="action-btn"
-                      title="ส่งแจ้งเตือน"
-                      (click)="onSendReminder(debt)"
-                    >
-                      <i class="pi pi-send"></i>
-                    </button>
-                    <button class="action-btn" title="ดูรายละเอียด">
-                      <i class="pi pi-eye"></i>
-                    </button>
-                    <button class="action-btn" title="เพิ่มเติม">
-                      <i class="pi pi-ellipsis-v"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-
-        @if (debts().length === 0) {
-          <div class="empty-state">
-            <i class="pi pi-inbox"></i>
-            <h3>ไม่มีรายการหนี้คงค้าง</h3>
-            <p>ไม่พบรายการหนี้ค้างชำระในขณะนี้</p>
-          </div>
-        }
       </div>
     </div>
-  </div>
+  }
 </div>
+<!-- Finance Document Modal -->
+@if (showDocumentModal() && selectedDocumentType() && currentDebt()) {
+  <app-finance-document-modal
+    [documentType]="selectedDocumentType()!"
+    [debtData]="currentDebt()!"
+    (close)="closeDocumentModal()"
+    (submit)="onDocumentSubmit($event)"
+  />
+}
+<app-confirmation-modal
+  [isOpen]="showConfirmationModal()"
+  [type]="'warning'"
+  [title]="confirmationTitle()"
+  [message]="confirmationMessage()"
+  [confirmText]="'ตกลง'"
+  [cancelText]="'ยกเลิก'"
+  [confirmIcon]="'pi-check'"
+  (confirm)="onConfirmationConfirm()"
+  (cancel)="onConfirmationCancel()"
+/>
+
+<!-- Debt Detail Modal -->
+@if (showDetailModal() && currentDebt()) {
+  <app-debt-detail-modal
+    [debt]="currentDebt()!"
+    (close)="closeDetailModal()"
+  />
+}
+
+<!-- Click outside to close menu -->
+@if (showDebtMenu()) {
+  <div class="menu-overlay" (click)="closeDebtMenu()"></div>
+}
