@@ -17,36 +17,36 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   // ============================================
   // SALES MODULE - RESTRUCTURED (5 Pages)
   // ============================================
-  {
-    primary_content: 'sales',
-    secondary_content: [
-      {
-        name: 'sales_dashboard',
-        icon: 'assets/icons/dashboard.svg',
-        route: '/sales/dashboard',
-      },
-      {
-        name: 'customer_management',
-        icon: 'assets/icons/users.svg',
-        route: '/sales/customer',
-      },
-      {
-        name: 'budget_management',
-        icon: 'assets/icons/wallet.svg',
-        route: '/sales/budget',
-      },
-      {
-        name: 'pipeline_management',
-        icon: 'assets/icons/sitemap.svg',
-        route: '/sales/pipeline',
-      },
-      {
-        name: 'activities_management',
-        icon: 'assets/icons/calendar.svg',
-        route: '/sales/activities',
-      },
-    ],
-  },
+  // {
+  //   primary_content: 'sales',
+  //   secondary_content: [
+  //     {
+  //       name: 'sales_dashboard',
+  //       icon: 'assets/icons/dashboard.svg',
+  //       route: '/sales/dashboard',
+  //     },
+  //     {
+  //       name: 'customer_management',
+  //       icon: 'assets/icons/users.svg',
+  //       route: '/sales/customer',
+  //     },
+  //     {
+  //       name: 'budget_management',
+  //       icon: 'assets/icons/wallet.svg',
+  //       route: '/sales/budget',
+  //     },
+  //     {
+  //       name: 'pipeline_management',
+  //       icon: 'assets/icons/sitemap.svg',
+  //       route: '/sales/pipeline',
+  //     },
+  //     {
+  //       name: 'activities_management',
+  //       icon: 'assets/icons/calendar.svg',
+  //       route: '/sales/activities',
+  //     },
+  //   ],
+  // },
 
   // ============================================
   // 2. AREA

@@ -41,7 +41,7 @@
             </a>
 
             <!-- Reserved slot 2: Sales -->
-            <a
+            <!-- <a
               id="nav-item-sales"
               (click)="setActiveMenuItem('sales')"
               class="header-nav-item"
@@ -53,7 +53,7 @@
                 *ngIf="activeMenuItem === 'sales'"
                 class="header-nav-underline bg-secondary"
               ></span>
-            </a>
+            </a> -->
 
             <!-- Remaining nav items (excluding sales, which is already above) -->
             <ng-container *ngFor="let item of navigationItems; let i = index">
