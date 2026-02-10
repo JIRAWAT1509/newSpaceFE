@@ -216,19 +216,25 @@
 
 .btn-save-quotation {
   @apply flex items-center gap-2 px-5 py-2;
-  @apply bg-emerald-600 hover:bg-emerald-700 text-white;
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
   @apply rounded-lg font-medium text-sm;
   @apply transition-colors;
-  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-600;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600;
 }
 
 .btn-success {
   @apply flex items-center gap-2 px-6 py-2;
-  @apply bg-green-600 hover:bg-green-700 text-white;
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
   @apply rounded-lg font-semibold text-sm;
   @apply shadow-sm hover:shadow;
   @apply transition-all;
   @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Disabled-look for save buttons (when form invalid) – still clickable to show errors */
+.btn-disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
 }
 
 /* ==================== SUMMARY SECTION ==================== */
@@ -382,6 +388,6 @@
 
 .confirm-close-actions .btn-confirm {
   @apply flex items-center gap-2 px-5 py-2.5;
-  @apply bg-red-600 hover:bg-red-700 text-white rounded-lg;
+  @apply bg-blue-600 hover:bg-blue-700 text-white rounded-lg;
   @apply font-medium transition-all duration-200 border-none cursor-pointer;
 }

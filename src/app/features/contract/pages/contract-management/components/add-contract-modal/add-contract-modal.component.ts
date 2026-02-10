@@ -68,7 +68,7 @@ export class AddContractModalComponent implements OnInit {
   ];
 
   // Modal title based on mode
-  modalTitle = signal<string>('เพิ่มสัญญาใหม่');
+  modalTitle = signal<string>('สร้างใบเสนอราคา');
 
   // In-app message modal (for child tabs e.g. general-detail)
   showMessageModal = signal<boolean>(false);
@@ -82,35 +82,38 @@ export class AddContractModalComponent implements OnInit {
     private fb: FormBuilder,
     private draftService: DraftContractService
   ) {
+    // Initialize forms FIRST before any effects try to patch data
+    this.initForms();
+
     // Update modal title when mode changes
     effect(() => {
       const draft = this.draftData();
       if (draft) {
         this.modalTitle.set(`แก้ไขแบบร่าง: ${draft.name}`);
       } else {
-        this.modalTitle.set(this.mode() === 'edit' ? 'แก้ไขข้อมูลสัญญา' : 'เพิ่มสัญญาใหม่');
-      }
-    });
-
-    // Load contract data when it changes (for edit mode or copy mode)
-    effect(() => {
-      const contract = this.contractData();
-      if (contract && (this.mode() === 'edit' || this.mode() === 'add')) {
-        this.loadContractData(contract);
-      }
-    });
-
-    // Load draft data when it changes
-    effect(() => {
-      const draft = this.draftData();
-      if (draft) {
-        this.loadDraftData(draft);
+        this.modalTitle.set(this.mode() === 'edit' ? 'แก้ไขข้อมูลสัญญา' : 'สร้างใบเสนอราคา');
       }
     });
   }
 
   ngOnInit(): void {
-    this.initForms();
+    // Re-initialize tabs to clean state for new modal opening
+    this.tabs.forEach(t => t.completed = false);
+    this.activeTabIndex.set(0);
+
+    // Load contract data for edit mode (inputs are guaranteed set by ngOnInit)
+    const contract = this.contractData();
+    if (contract && this.mode() === 'edit') {
+      console.log('[AddContractModal] ngOnInit: loading contract data for edit', contract.CONTRACT_ID);
+      this.loadContractData(contract);
+    }
+
+    // Load draft data if present
+    const draft = this.draftData();
+    if (draft) {
+      console.log('[AddContractModal] ngOnInit: loading draft data', draft.id);
+      this.loadDraftData(draft);
+    }
   }
 
   initForms(): void {
@@ -144,7 +147,11 @@ export class AddContractModalComponent implements OnInit {
       areaFloor: ['', Validators.required],
       areaUnitNumber: ['', Validators.required],
       areaTotal: [''],
-      areaType: ['']
+      areaType: [''],
+
+      // Section D: ข้อมูลผู้ติดต่อ (ชื่อ + เบอร์โทร)
+      contactName: ['', Validators.required],
+      contactPhone: ['', [Validators.required, Validators.pattern(/^[0-9]{9,10}$/)]]
     });
 
     // Tab 3: Conditions (C) - Updated structure
@@ -184,66 +191,85 @@ export class AddContractModalComponent implements OnInit {
   // ==================== LOAD CONTRACT DATA (EDIT MODE) ====================
 
   loadContractData(contract: Contract): void {
-    console.log('Loading contract data for edit:', contract);
+    console.log('[AddContractModal] loadContractData called:', contract.CONTRACT_ID, contract);
+
+    // Helper: convert date string to Date object (for p-datepicker)
+    const toDate = (val: unknown): Date | string => {
+      if (!val) return '';
+      if (val instanceof Date) return val;
+      if (typeof val === 'string' && val.trim()) {
+        const d = new Date(val);
+        return isNaN(d.getTime()) ? val : d;
+      }
+      return '';
+    };
 
     // Map contract data to general detail form
-    this.generalDetailForm.patchValue({
-      branch: contract.BRANCH_CODE,
-      contractType: contract.CONTRACT_TYPE_CODE,
-      contractNumberMain: contract.CONTRACT_NUMBER_MAIN,
-      contractNumberSub: contract.CONTRACT_NUMBER_SUB,
-      quotationStatus: contract.QUOTATION_STATUS,
-      quotationDate: contract.CONTRACT_DATE,
-      quotationLevelDate: (contract as any).QUOTATION_LEVEL_DATE ?? contract.RECORD_DATE ?? '',
-      recordDate: contract.RECORD_DATE,
-      approvalDate: contract.APPROVAL_DATE,
-      intentionLetter: contract.INTENTION_LETTER,
-      transferToBooking: contract.TRANSFER_TO_BOOKING,
+    // Only patch fields that exist in the form definition
+    const generalPatch: Record<string, any> = {
+      branch: contract.BRANCH_CODE || '',
+      contractType: contract.CONTRACT_TYPE_CODE || '',
+      contractNumberMain: contract.CONTRACT_NUMBER_MAIN || '',
+      contractNumberSub: contract.CONTRACT_NUMBER_SUB || '',
+      quotationStatus: contract.QUOTATION_STATUS || '',
+      quotationDate: toDate(contract.CONTRACT_DATE),
+      quotationLevelDate: toDate((contract as any).QUOTATION_LEVEL_DATE || contract.RECORD_DATE),
+      recordDate: toDate(contract.RECORD_DATE),
+      approvalDate: toDate(contract.APPROVAL_DATE),
 
-      contractLocation: contract.CONTRACT_LOCATION,
-      headOfficeAddress: contract.HEAD_OFFICE_ADDRESS,
-      representative: contract.REPRESENTATIVE,
-      branchAddress: contract.BRANCH_ADDRESS,
-      contactPerson: contract.CONTACT_PERSON,
-      contactAddressType: contract.CONTACT_ADDRESS_TYPE,
-      contactAddress: contract.CONTACT_ADDRESS,
+      subCategory: contract.SUB_CATEGORY || '',
+      category: contract.CATEGORY || '',
+      profitCenter: contract.PROFIT_CENTER || '',
+      businessName: contract.BUSINESS_NAME || '',
+      productType1: contract.PRODUCT_TYPE_1 || '',
+      productType2: contract.PRODUCT_TYPE_2 || '',
+      productType3: contract.PRODUCT_TYPE_3 || '',
+      productType4: contract.PRODUCT_TYPE_4 || '',
+      productType5: contract.PRODUCT_TYPE_5 || '',
+      productType6: contract.PRODUCT_TYPE_6 || '',
+    };
 
-      customerId: contract.CUSTOMER_ID,
-      documentAddress: contract.DOCUMENT_ADDRESS,
-      billingAddress: contract.BILLING_ADDRESS,
-      companyName: contract.COMPANY_NAME,
-      authorizedPerson1: contract.AUTHORIZED_PERSON_1,
-      phone1: contract.PHONE_1,
-      position1: contract.POSITION_1,
-      authorizedPerson2: contract.AUTHORIZED_PERSON_2,
-      phone2: contract.PHONE_2,
-      position2: contract.POSITION_2,
+    // Map area info from AREA_DETAILS array → flat form fields
+    const areas = (contract as any).AREA_DETAILS as { BUILDING?: string; FLOOR?: string; UNIT_NUMBER?: string; TOTAL_AREA?: number; STATUS?: string }[] | undefined;
+    if (areas && areas.length > 0) {
+      generalPatch['areaBuilding'] = areas[0].BUILDING ?? '';
+      generalPatch['areaFloor'] = areas[0].FLOOR ?? '';
+      generalPatch['areaUnitNumber'] = areas[0].UNIT_NUMBER ?? '';
+      generalPatch['areaTotal'] = areas[0].TOTAL_AREA ?? '';
+      generalPatch['areaType'] = areas[0].STATUS ?? '';
+    }
 
-      subCategory: contract.SUB_CATEGORY,
-      category: contract.CATEGORY,
-      profitCenter: contract.PROFIT_CENTER,
-      businessName: contract.BUSINESS_NAME,
-      productCategory: contract.PRODUCT_CATEGORY,
-      productType1: contract.PRODUCT_TYPE_1,
-      productType2: contract.PRODUCT_TYPE_2,
-      productType3: contract.PRODUCT_TYPE_3,
-      productType4: contract.PRODUCT_TYPE_4,
-      productType5: contract.PRODUCT_TYPE_5,
-      productType6: contract.PRODUCT_TYPE_6,
+    // Map contact info (fix operator precedence bug)
+    generalPatch['contactName'] = (contract as any).CONTACT_PERSON || '';
+    generalPatch['contactPhone'] = (contract as any).CONTACT_PHONE || '';
 
-      provider1: contract.PROVIDER_1,
-      providerPosition1: contract.PROVIDER_POSITION_1,
-      provider2: contract.PROVIDER_2,
-      providerPosition2: contract.PROVIDER_POSITION_2,
-      witness1: contract.WITNESS_1,
-      witness2: contract.WITNESS_2,
-      contractCreator: contract.CONTRACT_CREATOR
+    this.generalDetailForm.patchValue(generalPatch);
+    console.log('[AddContractModal] generalDetailForm patched, values:', this.generalDetailForm.value);
+
+    // Map conditions from contract → conditionsForm
+    this.conditionsForm.patchValue({
+      durationYears: (contract as any).DURATION_YEARS ?? 0,
+      durationMonths: (contract as any).DURATION_MONTHS ?? 0,
+      durationDays: (contract as any).DURATION_DAYS ?? 0,
+      contractStartDate: toDate((contract as any).START_DATE),
+      contractEndDate: toDate((contract as any).END_DATE),
+      rentRate: (contract as any).MONTHLY_RENT ?? 0,
+      creditTermRent: (contract as any).CREDIT_TERM_RENT ?? 0,
+      creditTermUtility: (contract as any).CREDIT_TERM_UTILITY ?? 0,
+      depositAmount: (contract as any).DEPOSIT_AMOUNT ?? 0
     });
 
-    // TODO: Load data for other tabs (will be implemented with mapping service)
-    // Tab 2: Contract Details - complex arrays (renewal agreements, areas, revenue, etc.)
-    // Tab 3: Conditions - subject, conditions list, internal notes
-    // Tab 4: Documents - file list
+    // Pre-populate contract detail tab (tab 2) data for when user navigates to it
+    this.lastContractDetailValue.set({
+      bookingNumber: (contract as any).BOOKING_NUMBER ?? '',
+      contractMaker: (contract as any).CONTRACT_MAKER ?? '',
+      legalEntityName: (contract as any).LEGAL_ENTITY_NAME ?? '',
+      registeredAddress: (contract as any).REGISTERED_ADDRESS ?? '',
+      documentDeliveryAddress: (contract as any).DOCUMENT_DELIVERY_ADDRESS ?? '',
+      phone: (contract as any).PHONE_DETAIL ?? '',
+      email: (contract as any).EMAIL_DETAIL ?? '',
+      contactPerson: (contract as any).CONTACT_PERSON_DETAIL ?? ''
+    });
   }
 
   // ==================== DRAFT MANAGEMENT ====================
@@ -369,22 +395,62 @@ export class AddContractModalComponent implements OnInit {
   }
 
   isCurrentTabValid(): boolean {
-    switch (this.activeTabIndex()) {
-      case 0: return this.generalDetailForm.valid;
-      case 1: return true; // Contract detail tab – sub-forms validated on submit
-      case 2: return this.conditionsForm.valid || true;
-      case 3: return this.documentForm.valid || true;
-      case 4: return true;
-      default: return false;
-    }
+    // Allow navigating forward from any tab.
+    // User can fill data in any order and come back later.
+    return true;
   }
 
   isAllFormsValid(): boolean {
-    // ตรวจสอบทุกฟอร์มที่จำเป็น
-    const generalValid = this.generalDetailForm.valid;
-    const contractDetailValid = this.isContractDetailFormValid();
-    
-    return generalValid && contractDetailValid;
+    return this.generalDetailForm.valid;
+  }
+
+  /** รวบรวมรายชื่อฟิลด์บังคับที่ยังไม่ได้กรอก */
+  getMissingRequiredFields(): string[] {
+    const missing: string[] = [];
+    const fieldLabels: Record<string, string> = {
+      branch: 'สาขา',
+      contractType: 'ประเภทสัญญา',
+      quotationDate: 'วันที่ใบเสนอราคา',
+      subCategory: 'หมวดหมู่ย่อย',
+      areaBuilding: 'อาคาร',
+      areaFloor: 'ชั้น',
+      areaUnitNumber: 'เลขที่ยูนิต / ห้อง',
+      contactName: 'ชื่อผู้ติดต่อ',
+      contactPhone: 'เบอร์โทรผู้ติดต่อ',
+    };
+
+    Object.keys(fieldLabels).forEach(key => {
+      const ctrl = this.generalDetailForm.get(key);
+      if (ctrl && ctrl.hasError('required') && (!ctrl.value || String(ctrl.value).trim() === '')) {
+        missing.push(fieldLabels[key]);
+      }
+    });
+
+    return missing;
+  }
+
+  /** แสดงข้อความแจ้งเตือนฟิลด์ที่ยังกรอกไม่ครบ หรือกรอกผิดรูปแบบ */
+  showValidationError(): void {
+    const missing = this.getMissingRequiredFields();
+    const errors: string[] = [...missing];
+
+    // เช็ครูปแบบเบอร์โทร
+    const phoneCtrl = this.generalDetailForm.get('contactPhone');
+    if (phoneCtrl && phoneCtrl.value && phoneCtrl.hasError('pattern')) {
+      errors.push('เบอร์โทรผู้ติดต่อ (รูปแบบไม่ถูกต้อง)');
+    }
+
+    if (errors.length > 0) {
+      this.showMessage({
+        title: 'ไม่สามารถบันทึกได้',
+        message: `กรุณาตรวจสอบข้อมูลต่อไปนี้:\n• ${errors.join('\n• ')}`
+      });
+    } else {
+      this.showMessage({
+        title: 'ไม่สามารถบันทึกได้',
+        message: 'กรุณากรอกข้อมูลในฟิลด์ที่จำเป็น (*) ให้ครบถ้วนก่อนบันทึก'
+      });
+    }
   }
 
   /** ตรวจสอบฟอร์มรายละเอียดสัญญา (tab 2) */
@@ -409,18 +475,23 @@ export class AddContractModalComponent implements OnInit {
 
   /** บันทึกเฉพาะรายละเอียดทั่วไป → แสดงในแท็บใบเสนอราคา */
   onSaveQuotationOnly(): void {
-    if (this.generalDetailForm.valid) {
-      const formData = {
-        mode: this.mode(),
-        contractId: this.mode() === 'edit' ? this.contractData()?.CONTRACT_ID : undefined,
-        saveAsQuotationOnly: true,
-        generalDetails: this.generalDetailForm.value,
-        conditions: this.conditionsForm.value,
-        documents: this.documentForm.value
-      };
-      this.save.emit(formData);
-      this.close.emit();
+    if (!this.isAllFormsValid()) {
+      this.markAllAsTouched();
+      this.showValidationError();
+      return;
     }
+    const formData = {
+      mode: this.mode(),
+      contractId: this.mode() === 'edit' ? this.contractData()?.CONTRACT_ID : undefined,
+      draftId: this.currentDraftId() || undefined,
+      saveAsQuotationOnly: true,
+      generalDetails: this.generalDetailForm.value,
+      contractDetails: this.getContractDetailsPayload(),
+      conditions: this.conditionsForm.value,
+      documents: this.documentForm.value
+    };
+    this.save.emit(formData);
+    this.close.emit();
   }
 
   /** ตรวจว่า tab รายละเอียดสัญญา (contract detail) กรอกครบหรือไม่ */
@@ -449,6 +520,7 @@ export class AddContractModalComponent implements OnInit {
       const formData = {
         mode: this.mode(),
         contractId: this.mode() === 'edit' ? this.contractData()?.CONTRACT_ID : undefined,
+        draftId: this.currentDraftId() || undefined,
         saveAsQuotationOnly: false,
         saveAsBooking: true,
         generalDetails: this.generalDetailForm.value,
@@ -462,6 +534,7 @@ export class AddContractModalComponent implements OnInit {
       this.close.emit();
     } else {
       this.markAllAsTouched();
+      this.showValidationError();
     }
   }
 

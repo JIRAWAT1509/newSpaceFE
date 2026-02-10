@@ -75,6 +75,7 @@ export interface CollectionAging {
 }
 
 type ExecTab = 'portfolio' | 'building' | 'collections';
+type RevenueFilterMode = 'overview' | 'by-building' | 'by-category';
 
 Chart.register(...registerables);
 
@@ -108,6 +109,13 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
   assets: string[] = ['Skyline Tower (HQ)', 'Grand Plaza', 'Retail Hub A'];
   selectedAsset: string = this.assets[0];
 
+  // ==================== REVENUE PERFORMANCE FILTER ====================
+  revenueFilterMode: RevenueFilterMode = 'overview';
+  revenueBuildings: string[] = ['ชินวัตร ทาวเวอร์ 3', 'Warehouse Bangphee 1', 'Warehouse Bangphee 2'];
+  selectedRevenueBuilding: string = '';
+  revenueCategories: string[] = ['Office', 'Retail', 'F&B', 'Service', 'Parking'];
+  selectedRevenueCategory: string = '';
+
   // ==================== MOCK DATA (replace with real data when available) ====================
   // MOCK: hero pills
   revenueDeltas: RevenueDelta[] = [
@@ -123,13 +131,11 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     { title: 'AVG LEASE DURATION', value: '3.2 yrs', subLabel: 'New Contracts YTD' },
   ];
 
-  // MOCK: Revenue performance series
-  revenuePerformance: RevenuePerformancePoint[] = [
-    { period: 'Q1', actual: 3.2, budget: 3.0, forecast: 3.3 },
-    { period: 'Q2', actual: 4.1, budget: 3.8, forecast: 4.2 },
-    { period: 'Q3 (YTD)', actual: 5.0, budget: 4.5, forecast: 5.1 },
-    { period: 'Q4 (FCST)', actual: 5.8, budget: 5.2, forecast: 6.0 },
-  ];
+  // MOCK: Revenue performance series (monthly, Jan–Dec 2026)
+  revenueLabels: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  revenueActual: (number | null)[] = [1.2, 1.3, 1.5, 1.4, 1.6, 1.8, 1.7, 1.9, 2.1, null, null, null];
+  revenueBudget: number[] = [1.1, 1.2, 1.3, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1];
+  revenueForecast: (number | null)[] = [null, null, null, null, null, null, null, null, 2.1, 2.3, 2.4, 2.6];
 
   // MOCK: Occupancy donut
   occupancyByBusinessType: BusinessOccupancy[] = [
@@ -166,6 +172,14 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     { type: 'Retail', percent: 28 },
     { type: 'Parking', percent: 18 },
     { type: 'Other', percent: 12 },
+  ];
+
+  // MOCK: Deep-dive portfolio mix (per-building, initialized to default)
+  deepDivePortfolioMix: PortfolioMix[] = [
+    { type: 'Office (45%)', percent: 89 },
+    { type: 'Retail (28%)', percent: 93 },
+    { type: 'F&B (18%)', percent: 87 },
+    { type: 'Service (12%)', percent: 84 },
   ];
 
   // MOCK: Performance index bars (2025 vs 2026)
@@ -246,6 +260,196 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     this.activeTab = tab;
   }
 
+  // ==================== BUILDING DEEP-DIVE DATA MAP ====================
+  private buildingDeepDiveData: Record<string, {
+    revenueMix: BusinessOccupancy[];
+    perf2025: number[];
+    perf2026: number[];
+    portfolioMix: PortfolioMix[];
+  }> = {
+    'Skyline Tower (HQ)': {
+      revenueMix: [
+        { type: 'Commercial', percent: 42 },
+        { type: 'Retail', percent: 28 },
+        { type: 'Parking', percent: 18 },
+        { type: 'Other', percent: 12 },
+      ],
+      perf2025: [2.1, 2.6, 3.0, 2.9],
+      perf2026: [2.4, 2.9, 3.3, 3.2],
+      portfolioMix: [
+        { type: 'Office (45%)', percent: 89 },
+        { type: 'Retail (28%)', percent: 93 },
+        { type: 'F&B (18%)', percent: 87 },
+        { type: 'Service (12%)', percent: 84 },
+      ],
+    },
+    'Grand Plaza': {
+      revenueMix: [
+        { type: 'Commercial', percent: 35 },
+        { type: 'Retail', percent: 38 },
+        { type: 'Parking', percent: 15 },
+        { type: 'Other', percent: 12 },
+      ],
+      perf2025: [1.8, 2.2, 2.5, 2.4],
+      perf2026: [2.1, 2.5, 2.8, 2.7],
+      portfolioMix: [
+        { type: 'Office (30%)', percent: 82 },
+        { type: 'Retail (40%)', percent: 96 },
+        { type: 'F&B (20%)', percent: 91 },
+        { type: 'Service (10%)', percent: 78 },
+      ],
+    },
+    'Retail Hub A': {
+      revenueMix: [
+        { type: 'Commercial', percent: 15 },
+        { type: 'Retail', percent: 52 },
+        { type: 'Parking', percent: 20 },
+        { type: 'Other', percent: 13 },
+      ],
+      perf2025: [1.5, 1.8, 2.1, 1.9],
+      perf2026: [1.7, 2.0, 2.3, 2.2],
+      portfolioMix: [
+        { type: 'Office (10%)', percent: 72 },
+        { type: 'Retail (55%)', percent: 65 },
+        { type: 'F&B (25%)', percent: 88 },
+        { type: 'Service (10%)', percent: 70 },
+      ],
+    },
+  };
+
+  onAssetChange(): void {
+    const data = this.buildingDeepDiveData[this.selectedAsset];
+    if (data) {
+      this.deepDiveRevenueMix = data.revenueMix;
+      this.performanceIndex2025 = data.perf2025;
+      this.performanceIndex2026 = data.perf2026;
+      this.deepDivePortfolioMix = data.portfolioMix;
+      this.deepDivePalette = getChartPalette(this.deepDiveRevenueMix.length);
+      // Rebuild deep-dive charts only
+      this.deepDiveDonutChart?.destroy();
+      this.performanceIndexChart?.destroy();
+      setTimeout(() => {
+        this.initDeepDiveDonutChart();
+        this.initPerformanceIndexChart();
+      }, 0);
+    }
+  }
+
+  // ==================== REVENUE FILTER DATA & METHODS ====================
+
+  private revenueBuildingData: Record<string, {
+    actual: (number | null)[];
+    budget: number[];
+    forecast: (number | null)[];
+  }> = {
+    'ชินวัตร ทาวเวอร์ 3': {
+      actual:   [0.8, 0.9, 1.0, 0.95, 1.1, 1.2, 1.15, 1.3, 1.4, null, null, null],
+      budget:   [0.7, 0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.2, 1.3, 1.35, 1.4],
+      forecast: [null, null, null, null, null, null, null, null, 1.4, 1.5, 1.55, 1.7],
+    },
+    'Warehouse Bangphee 1': {
+      actual:   [0.25, 0.28, 0.30, 0.27, 0.32, 0.35, 0.33, 0.38, 0.42, null, null, null],
+      budget:   [0.24, 0.26, 0.28, 0.28, 0.30, 0.32, 0.34, 0.36, 0.38, 0.40, 0.42, 0.44],
+      forecast: [null, null, null, null, null, null, null, null, 0.42, 0.48, 0.50, 0.55],
+    },
+    'Warehouse Bangphee 2': {
+      actual:   [0.15, 0.15, 0.20, 0.18, 0.18, 0.25, 0.22, 0.22, 0.28, null, null, null],
+      budget:   [0.14, 0.16, 0.17, 0.15, 0.15, 0.18, 0.17, 0.21, 0.20, 0.19, 0.23, 0.25],
+      forecast: [null, null, null, null, null, null, null, null, 0.28, 0.32, 0.35, 0.38],
+    },
+  };
+
+  private revenueCategoryData: Record<string, {
+    actual: (number | null)[];
+    budget: number[];
+    forecast: (number | null)[];
+  }> = {
+    'Office': {
+      actual:   [0.54, 0.59, 0.68, 0.63, 0.72, 0.81, 0.77, 0.86, 0.95, null, null, null],
+      budget:   [0.50, 0.54, 0.59, 0.59, 0.63, 0.68, 0.72, 0.77, 0.81, 0.86, 0.90, 0.95],
+      forecast: [null, null, null, null, null, null, null, null, 0.95, 1.04, 1.08, 1.17],
+    },
+    'Retail': {
+      actual:   [0.34, 0.36, 0.42, 0.39, 0.45, 0.50, 0.48, 0.53, 0.59, null, null, null],
+      budget:   [0.31, 0.34, 0.36, 0.36, 0.39, 0.42, 0.45, 0.48, 0.50, 0.53, 0.56, 0.59],
+      forecast: [null, null, null, null, null, null, null, null, 0.59, 0.64, 0.67, 0.73],
+    },
+    'F&B': {
+      actual:   [0.22, 0.23, 0.27, 0.25, 0.29, 0.32, 0.31, 0.34, 0.38, null, null, null],
+      budget:   [0.20, 0.22, 0.23, 0.23, 0.25, 0.27, 0.29, 0.31, 0.32, 0.34, 0.36, 0.38],
+      forecast: [null, null, null, null, null, null, null, null, 0.38, 0.41, 0.43, 0.47],
+    },
+    'Service': {
+      actual:   [0.07, 0.08, 0.09, 0.09, 0.10, 0.11, 0.10, 0.12, 0.13, null, null, null],
+      budget:   [0.06, 0.07, 0.08, 0.08, 0.08, 0.09, 0.10, 0.10, 0.11, 0.12, 0.12, 0.13],
+      forecast: [null, null, null, null, null, null, null, null, 0.13, 0.14, 0.15, 0.16],
+    },
+    'Parking': {
+      actual:   [0.03, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.05, 0.05, null, null, null],
+      budget:   [0.03, 0.03, 0.03, 0.03, 0.04, 0.04, 0.04, 0.04, 0.05, 0.05, 0.06, 0.06],
+      forecast: [null, null, null, null, null, null, null, null, 0.05, 0.06, 0.06, 0.07],
+    },
+  };
+
+  // Overview data (stored so we can revert)
+  private overviewRevenueData = {
+    actual:   [1.2, 1.3, 1.5, 1.4, 1.6, 1.8, 1.7, 1.9, 2.1, null, null, null] as (number | null)[],
+    budget:   [1.1, 1.2, 1.3, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1],
+    forecast: [null, null, null, null, null, null, null, null, 2.1, 2.3, 2.4, 2.6] as (number | null)[],
+  };
+
+  setRevenueFilter(mode: RevenueFilterMode): void {
+    this.revenueFilterMode = mode;
+    if (mode === 'overview') {
+      this.applyRevenueData(
+        this.overviewRevenueData.actual,
+        this.overviewRevenueData.budget,
+        this.overviewRevenueData.forecast,
+      );
+    } else if (mode === 'by-building') {
+      this.selectedRevenueBuilding = this.revenueBuildings[0];
+      this.applyBuildingRevenueData();
+    } else if (mode === 'by-category') {
+      this.selectedRevenueCategory = this.revenueCategories[0];
+      this.applyCategoryRevenueData();
+    }
+  }
+
+  onRevenueBuildingChange(): void {
+    this.applyBuildingRevenueData();
+  }
+
+  onRevenueCategoryChange(): void {
+    this.applyCategoryRevenueData();
+  }
+
+  private applyBuildingRevenueData(): void {
+    const data = this.revenueBuildingData[this.selectedRevenueBuilding];
+    if (data) {
+      this.applyRevenueData(data.actual, data.budget, data.forecast);
+    }
+  }
+
+  private applyCategoryRevenueData(): void {
+    const data = this.revenueCategoryData[this.selectedRevenueCategory];
+    if (data) {
+      this.applyRevenueData(data.actual, data.budget, data.forecast);
+    }
+  }
+
+  private applyRevenueData(
+    actual: (number | null)[],
+    budget: number[],
+    forecast: (number | null)[]
+  ): void {
+    this.revenueActual = actual;
+    this.revenueBudget = budget;
+    this.revenueForecast = forecast;
+    // Rebuild revenue chart only
+    this.revPerfChart?.destroy();
+    setTimeout(() => this.initRevenuePerformanceChart(), 0);
+  }
+
   // ==================== CHARTS ====================
 
   private initCharts(): void {
@@ -279,83 +483,83 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     const success = this.getCssColor('--success', '#22C55E');
     const warning = this.getCssColor('--warning', '#F59E0B');
 
-    const labels = this.revenuePerformance.map(p => p.period);
-    const actual = this.revenuePerformance.map(p => p.actual);
-    const budget = this.revenuePerformance.map(p => p.budget);
-    const forecast = this.revenuePerformance.map(p => p.forecast);
-
     const config: ChartConfiguration = {
       type: 'bar',
       data: {
-        labels,
+        labels: this.revenueLabels,
         datasets: [
-          // Bar charts
+          // Bars: Actual (null months render no bar)
           {
             type: 'bar',
             label: 'Actual',
-            data: actual,
+            data: this.revenueActual,
             backgroundColor: primary,
-            borderRadius: 6,
-            barPercentage: 0.5,
+            borderRadius: 4,
+            barPercentage: 0.45,
             categoryPercentage: 0.7,
             order: 3,
           } as any,
+          // Bars: Budget
           {
             type: 'bar',
             label: 'Budget',
-            data: budget,
+            data: this.revenueBudget,
             backgroundColor: success,
-            borderRadius: 6,
-            barPercentage: 0.5,
+            borderRadius: 4,
+            barPercentage: 0.45,
             categoryPercentage: 0.7,
             order: 3,
           } as any,
-          // Line charts
+          // Line: Actual trend (breaks at null months)
           {
             type: 'line',
             label: 'Actual (trend)',
-            data: actual,
+            data: this.revenueActual,
             borderColor: primary,
             backgroundColor: 'transparent',
             borderWidth: 2.5,
             tension: 0.4,
-            pointRadius: 5,
-            pointHoverRadius: 7,
+            pointRadius: 4,
+            pointHoverRadius: 6,
             pointBackgroundColor: primary,
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
+            spanGaps: false,
             order: 1,
           } as any,
+          // Line: Budget trend (full year)
           {
             type: 'line',
             label: 'Budget (trend)',
-            data: budget,
+            data: this.revenueBudget,
             borderColor: success,
             backgroundColor: 'transparent',
             borderWidth: 2,
             tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6,
+            pointRadius: 3,
+            pointHoverRadius: 5,
             pointBackgroundColor: success,
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
             borderDash: [6, 4],
             order: 1,
           } as any,
+          // Line: Forecast (starts from last actual → future only)
           {
             type: 'line',
             label: 'Forecast',
-            data: forecast,
+            data: this.revenueForecast,
             borderColor: warning,
             backgroundColor: 'transparent',
-            borderWidth: 2,
+            borderWidth: 2.5,
             tension: 0.4,
             pointRadius: 4,
             pointHoverRadius: 6,
             pointBackgroundColor: warning,
             pointBorderColor: '#fff',
             pointBorderWidth: 2,
-            borderDash: [3, 3],
+            borderDash: [6, 4],
+            spanGaps: false,
             order: 1,
           } as any,
         ],
@@ -363,7 +567,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { top: 10, right: 20, bottom: 10, left: 10 } },
+        layout: { padding: { top: 4, right: 8, bottom: 4, left: 4 } },
         plugins: {
           legend: {
             display: true,
@@ -371,15 +575,12 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             align: 'center',
             labels: {
               color: fg,
-              boxWidth: 14,
-              boxHeight: 14,
-              padding: 20,
+              boxWidth: 12,
+              boxHeight: 12,
+              padding: 14,
               font: { size: 12, weight: 500 },
               usePointStyle: true,
-              filter: (item) => {
-                // Hide trend lines from legend (show only Actual, Budget, Forecast)
-                return !item.text.includes('trend');
-              },
+              filter: (item) => !item.text.includes('trend'),
             },
           },
           tooltip: {
@@ -389,13 +590,10 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             bodyColor: fg,
             borderColor: gridColor,
             borderWidth: 1,
-            padding: 12,
-            titleFont: { size: 12, weight: 600 },
-            bodyFont: { size: 12 },
-            filter: (item) => {
-              // Hide trend lines from tooltip
-              return !item.dataset.label?.includes('trend');
-            },
+            padding: 10,
+            titleFont: { size: 11, weight: 600 },
+            bodyFont: { size: 11 },
+            filter: (item) => !item.dataset.label?.includes('trend'),
             callbacks: {
               label: (item) => ` ${item.dataset.label}: $${Number(item.raw).toFixed(1)}M`,
             },
@@ -406,22 +604,22 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             grid: { display: false },
             ticks: {
               color: muted,
-              font: { size: 12, weight: 500 },
+              font: { size: 11, weight: 500 },
               maxRotation: 0,
-              padding: 8,
+              padding: 4,
             },
           },
           y: {
             min: 0,
-            max: 7,
+            max: 3.0,
             grid: { color: gridColor, drawTicks: false },
             border: { display: false },
             ticks: {
               color: muted,
               font: { size: 11, weight: 500 },
-              padding: 8,
-              stepSize: 1,
-              callback: (v) => `$${Number(v)}M`,
+              padding: 6,
+              stepSize: 0.5,
+              callback: (v) => `$${Number(v).toFixed(1)}M`,
             },
           },
         },

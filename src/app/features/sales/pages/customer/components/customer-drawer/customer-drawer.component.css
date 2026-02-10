@@ -139,7 +139,7 @@ textarea.form-input {
   align-items: center;
   gap: 0.375rem;
   padding: 0.625rem 1rem;
-  background: #10b981;
+  background: #2563eb;
   color: white;
   border: none;
   border-radius: 8px;
@@ -151,7 +151,7 @@ textarea.form-input {
 }
 
 .btn-add-segment:hover {
-  background: #059669;
+  background: #1d4ed8;
 }
 
 .add-segment-form {
@@ -178,12 +178,12 @@ textarea.form-input {
 }
 
 .btn-save-segment {
-  background: #10b981;
+  background: #2563eb;
   color: white;
 }
 
 .btn-save-segment:hover {
-  background: #059669;
+  background: #1d4ed8;
 }
 
 .btn-cancel-segment {
@@ -323,7 +323,7 @@ textarea.form-input {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: #10b981;
+  background: #2563eb;
   color: white;
   border: none;
   border-radius: 8px;
@@ -334,9 +334,9 @@ textarea.form-input {
 }
 
 .btn-save:hover:not(:disabled) {
-  background: #059669;
+  background: #1d4ed8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .btn-save:disabled {

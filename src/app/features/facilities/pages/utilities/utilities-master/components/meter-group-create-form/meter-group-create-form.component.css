@@ -101,15 +101,35 @@
   @apply flex items-center justify-center gap-2;
 }
 
+/* Edit action button - dark pencil, no bg */
 .action-btn {
-  @apply w-8 h-8 flex items-center justify-center;
-  @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50;
-  @apply rounded-lg transition-all duration-200;
-  @apply border-none cursor-pointer;
+  @apply flex items-center justify-center;
+  width: 34px;
+  height: 34px;
+  background-color: transparent;
+  color: #374151;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.action-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
 }
 
+/* Delete action - white icon in coral circle */
 .action-btn.danger {
-  @apply hover:text-red-600 hover:bg-red-50;
+  background-color: #E8847C;
+  color: #ffffff;
+  border-radius: 50%;
+}
+.action-btn.danger:hover {
+  background-color: #D6726A;
+  color: #ffffff;
+}
+.action-btn.danger i {
+  color: #ffffff;
 }
 
 /* Empty State */

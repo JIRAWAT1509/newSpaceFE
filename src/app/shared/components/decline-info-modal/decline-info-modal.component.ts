@@ -297,16 +297,16 @@ export interface DeclineInfo {
     }
 
     .btn-confirm {
-      background: #dc2626;
+      background: #2563eb;
       color: white;
     }
 
     .btn-confirm:hover:not(.disabled) {
-      background: #b91c1c;
+      background: #1d4ed8;
     }
 
     .btn-confirm.disabled {
-      background: #fca5a5;
+      background: #93c5fd;
       cursor: not-allowed;
     }
   `]

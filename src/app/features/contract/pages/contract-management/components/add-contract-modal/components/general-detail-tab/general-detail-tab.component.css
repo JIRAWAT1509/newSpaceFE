@@ -112,6 +112,11 @@
   @apply text-red-600 text-xs mt-1;
 }
 
+.field-error {
+  @apply text-red-500 text-xs mt-1;
+  display: block;
+}
+
 /* ==================== Selector Field ==================== */
 .selector-field {
   @apply relative cursor-pointer;

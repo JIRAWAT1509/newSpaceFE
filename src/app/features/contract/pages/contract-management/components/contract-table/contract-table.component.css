@@ -290,8 +290,19 @@
 }
 
 .draft-btn.delete {
-  @apply bg-red-100 hover:bg-red-200 text-red-600;
+  /* Uses global .sp-delete-btn style via styles.css */
+  background-color: #E8847C !important;
+  color: #ffffff !important;
+  border-radius: 50% !important;
   @apply w-8 h-8 p-0 justify-center;
+}
+
+.draft-btn.delete:hover {
+  background-color: #D6726A !important;
+}
+
+.draft-btn.delete i {
+  color: #ffffff !important;
 }
 
 .draft-btn.delete span {

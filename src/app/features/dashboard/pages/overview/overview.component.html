@@ -84,71 +84,113 @@
     </div>
   </div>
 
-  <!-- ==================== KPI SUMMARY ROW (colored cards) ==================== -->
-  <div class="exec-kpi-row">
-    <div class="exec-kpi-card kpi-occupancy">
-      <div class="exec-kpi-icon tone-success">
-        <i class="pi pi-percentage"></i>
-      </div>
-      <div class="exec-kpi-body">
-        <div class="exec-kpi-title">PORTFOLIO OCCUPANCY</div>
-        <div class="exec-kpi-value">94.2%</div>
-        <div class="exec-kpi-change exec-kpi-change--up">
-          <i class="pi pi-arrow-up"></i>
-          <span>+1.2%</span>
-          <span class="exec-kpi-change-hint">vs last year</span>
-        </div>
+  <!-- ==================== KPI SUMMARY ROW (redesigned) ==================== -->
+  <div class="kpi-row">
+    <div class="kpi-card kpi-card--indigo">
+      <div class="kpi-icon"><i class="pi pi-percentage"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Portfolio Occupancy</div>
+        <div class="kpi-value">94.2%</div>
+        <div class="kpi-change"><i class="pi pi-arrow-up"></i> +1.2% <span class="kpi-change-hint">vs last year</span></div>
       </div>
     </div>
-    <div class="exec-kpi-card kpi-revenue">
-      <div class="exec-kpi-icon tone-primary">
-        <i class="pi pi-dollar"></i>
-      </div>
-      <div class="exec-kpi-body">
-        <div class="exec-kpi-title">ACTUAL YTD REVENUE</div>
-        <div class="exec-kpi-value">$14.2M</div>
-        <div class="exec-kpi-change exec-kpi-change--up">
-          <i class="pi pi-arrow-up"></i>
-          <span>+12%</span>
-          <span class="exec-kpi-change-hint">vs last year</span>
-        </div>
+
+    <div class="kpi-card kpi-card--rose">
+      <div class="kpi-icon"><i class="pi pi-dollar"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Actual YTD Revenue</div>
+        <div class="kpi-value">$14.2M</div>
+        <div class="kpi-change"><i class="pi pi-arrow-up"></i> +12% <span class="kpi-change-hint">vs last year</span></div>
       </div>
     </div>
-    <div class="exec-kpi-card kpi-forecast">
-      <div class="exec-kpi-icon tone-info">
-        <i class="pi pi-compass"></i>
-      </div>
-      <div class="exec-kpi-body">
-        <div class="exec-kpi-title">FORECAST (DEC 2026)</div>
-        <div class="exec-kpi-value">$18.1M</div>
-        <div class="exec-kpi-change exec-kpi-change--up">
-          <i class="pi pi-check"></i>
-          <span>On Track</span>
-        </div>
+
+    <div class="kpi-card kpi-card--cyan">
+      <div class="kpi-icon"><i class="pi pi-compass"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Forecast (Dec 2026)</div>
+        <div class="kpi-value">$18.1M</div>
+        <div class="kpi-change"><i class="pi pi-check"></i> On Track</div>
       </div>
     </div>
-    <div class="exec-kpi-card kpi-lease">
-      <div class="exec-kpi-icon tone-warning">
-        <i class="pi pi-calendar"></i>
-      </div>
-      <div class="exec-kpi-body">
-        <div class="exec-kpi-title">AVG LEASE DURATION</div>
-        <div class="exec-kpi-value">3.2 yrs</div>
-        <div class="exec-kpi-change exec-kpi-change--up">
-          <i class="pi pi-arrow-up"></i>
-          <span>+0.4</span>
-          <span class="exec-kpi-change-hint">vs last year</span>
-        </div>
+
+    <div class="kpi-card kpi-card--emerald">
+      <div class="kpi-icon"><i class="pi pi-calendar"></i></div>
+      <div class="kpi-body">
+        <div class="kpi-label">Avg Lease Duration</div>
+        <div class="kpi-value">3.2 <span class="kpi-value-unit">yrs</span></div>
+        <div class="kpi-change"><i class="pi pi-arrow-up"></i> +0.4 <span class="kpi-change-hint">vs last year</span></div>
       </div>
     </div>
   </div>
 
   <!-- ==================== MAIN ANALYTICS GRID ==================== -->
   <div class="exec-main-grid">
-    <!-- Left: Revenue Performance (structure like Building Performance Deep-Dive) -->
+    <!-- Left: Revenue Performance with filters -->
     <div class="exec-card exec-card-lg">
       <div class="exec-rev-head">
         <div class="exec-card-title">Revenue Performance: Actual vs Budget &amp; Forecast</div>
+        <div class="rev-filter-bar">
+          <div class="rev-filter-tabs">
+            <button
+              type="button"
+              class="rev-filter-tab"
+              [class.rev-filter-tab-active]="revenueFilterMode === 'overview'"
+              (click)="setRevenueFilter('overview')"
+            >
+              Overview
+            </button>
+            <button
+              type="button"
+              class="rev-filter-tab"
+              [class.rev-filter-tab-active]="revenueFilterMode === 'by-building'"
+              (click)="setRevenueFilter('by-building')"
+            >
+              By Building
+            </button>
+            <button
+              type="button"
+              class="rev-filter-tab"
+              [class.rev-filter-tab-active]="revenueFilterMode === 'by-category'"
+              (click)="setRevenueFilter('by-category')"
+            >
+              By Category
+            </button>
+          </div>
+
+          <!-- Building dropdown (shown only when "By Building" is selected) -->
+          @if (revenueFilterMode === 'by-building') {
+            <div class="rev-filter-select-wrap">
+              <select
+                [(ngModel)]="selectedRevenueBuilding"
+                (ngModelChange)="onRevenueBuildingChange()"
+                class="rev-filter-select"
+                aria-label="Select Building"
+              >
+                @for (b of revenueBuildings; track b) {
+                  <option [value]="b">{{ b }}</option>
+                }
+              </select>
+              <i class="pi pi-chevron-down rev-filter-select-chevron" aria-hidden="true"></i>
+            </div>
+          }
+
+          <!-- Category dropdown (shown only when "By Category" is selected) -->
+          @if (revenueFilterMode === 'by-category') {
+            <div class="rev-filter-select-wrap">
+              <select
+                [(ngModel)]="selectedRevenueCategory"
+                (ngModelChange)="onRevenueCategoryChange()"
+                class="rev-filter-select"
+                aria-label="Select Category"
+              >
+                @for (c of revenueCategories; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+              <i class="pi pi-chevron-down rev-filter-select-chevron" aria-hidden="true"></i>
+            </div>
+          }
+        </div>
       </div>
       <div class="exec-rev-body">
         <div class="exec-chart-wrap exec-chart-rev">
@@ -224,13 +266,14 @@
       <div class="exec-deep-head">
         <div>
           <div class="exec-card-title">Building Performance Deep-Dive</div>
-          <div class="exec-deep-sub">Asset: Skyline Tower (HQ)</div>
+          <div class="exec-deep-sub">Asset: {{ selectedAsset }}</div>
         </div>
 
         <div class="exec-asset-select">
           <div class="exec-select-wrap">
             <select
               [(ngModel)]="selectedAsset"
+              (ngModelChange)="onAssetChange()"
               class="exec-select"
               aria-label="Select Asset"
             >
@@ -273,7 +316,7 @@
               <div class="exec-mini-subtitle">Mix &amp; Occupancy</div>
             </div>
             <div class="exec-bars compact">
-              @for (mix of portfolioMix; track mix.type; let i = $index) {
+              @for (mix of deepDivePortfolioMix; track mix.type; let i = $index) {
                 <div class="exec-bar-row">
                   <div class="exec-bar-label">{{ mix.type }}</div>
                   <div class="exec-bar-track">

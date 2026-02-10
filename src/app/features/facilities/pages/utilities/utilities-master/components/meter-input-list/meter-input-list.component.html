@@ -49,43 +49,44 @@
     </div>
   </div>
 
-  <!-- Group Dropdown Filter -->
-  <div class="filter-section">
-    <h3 class="filter-title">Filter by Group</h3>
-    <p-select
-      [options]="groupDropdownOptions()"
-      (onChange)="onGroupChange($event)"
-      placeholder="All Groups"
-      [showClear]="true"
-      styleClass="w-full md:w-80"
-    ></p-select>
-  </div>
+  <!-- Filters: Group + Meter Type in ONE ROW -->
+  <div class="filter-section filter-row">
+    <div class="filter-group-col">
+      <h3 class="filter-title">Filter by Group</h3>
+      <p-select
+        [options]="groupDropdownOptions()"
+        (onChange)="onGroupChange($event)"
+        placeholder="All Groups"
+        [showClear]="true"
+        styleClass="w-full"
+      ></p-select>
+    </div>
 
-  <!-- Meter Type Filter Buttons -->
-  <div class="filter-section">
-    <h3 class="filter-title">Filter by Meter Type</h3>
-    <div class="filter-buttons">
-      @for (option of filterOptions(); track option.type) {
-        <button
-          class="filter-btn"
-          [class.active]="isFilterSelected(option.type)"
-          [style.border-color]="isFilterSelected(option.type) ? option.color : '#e5e7eb'"
-          (click)="selectFilter(option.type)"
-        >
-          <div
-            class="filter-icon"
-            [style.background-color]="option.color"
+    <div class="filter-type-col">
+      <h3 class="filter-title">Filter by Meter Type</h3>
+      <div class="filter-buttons">
+        @for (option of filterOptions(); track option.type) {
+          <button
+            class="filter-btn"
+            [class.active]="isFilterSelected(option.type)"
+            [style.border-color]="isFilterSelected(option.type) ? option.color : '#e5e7eb'"
+            (click)="selectFilter(option.type)"
           >
-            <i class="pi" [ngClass]="option.icon"></i>
-          </div>
-          <span>{{ option.label }}</span>
-          @if (option.type !== 'all') {
-            <span class="filter-count">
-              {{ getMeterCountByType(option.type) }}
-            </span>
-          }
-        </button>
-      }
+            <div
+              class="filter-icon"
+              [style.background-color]="option.color"
+            >
+              <i class="pi" [ngClass]="option.icon"></i>
+            </div>
+            <span>{{ option.label }}</span>
+            @if (option.type !== 'all') {
+              <span class="filter-count">
+                {{ getMeterCountByType(option.type) }}
+              </span>
+            }
+          </button>
+        }
+      </div>
     </div>
   </div>
 

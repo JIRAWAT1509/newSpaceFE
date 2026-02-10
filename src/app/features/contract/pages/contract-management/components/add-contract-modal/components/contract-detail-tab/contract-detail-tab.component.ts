@@ -1,5 +1,5 @@
 // contract-detail-tab.component.ts
-import { Component, signal, ViewChild } from '@angular/core';
+import { Component, signal, input, ViewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ContractInfoTabComponent } from './components/contract-info-tab/contract-info-tab.component';
@@ -27,7 +27,8 @@ interface SubTab {
   styleUrl: './contract-detail-tab.component.css'
 })
 export class ContractDetailTabComponent {
-  // No form input needed - sub-components manage their own forms
+  /** ข้อมูลที่เคยกรอกไว้ สำหรับ pre-populate เมื่อเข้า tab นี้ */
+  initialData = input<Record<string, unknown>>({});
 
   @ViewChild(ContractInfoTabComponent) contractInfoTab?: ContractInfoTabComponent;
 
@@ -39,6 +40,26 @@ export class ContractDetailTabComponent {
     { id: 'deposit', label: 'เงินประกัน' },
     { id: 'decoration', label: 'การตกแต่งสถานที่/รายละเอียดร้านค้า' }
   ];
+
+  constructor() {
+    // When initialData changes and the contract info tab exists, patch the form
+    effect(() => {
+      const data = this.initialData();
+      if (data && Object.keys(data).length > 0 && this.contractInfoTab?.form) {
+        this.contractInfoTab.form.patchValue(data);
+      }
+    });
+  }
+
+  ngAfterViewInit(): void {
+    // Patch form with initial data once the view child is available
+    const data = this.initialData();
+    if (data && Object.keys(data).length > 0 && this.contractInfoTab?.form) {
+      setTimeout(() => {
+        this.contractInfoTab!.form.patchValue(data);
+      });
+    }
+  }
 
   switchSubTab(index: number): void {
     this.activeSubTabIndex.set(index);

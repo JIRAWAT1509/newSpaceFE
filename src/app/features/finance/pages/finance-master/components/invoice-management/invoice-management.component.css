@@ -170,15 +170,30 @@
   @apply flex items-center justify-center gap-2;
 }
 
+/* Edit action button - system consistent (PrimeNG-like) */
 .action-btn {
   @apply w-8 h-8 flex items-center justify-center;
-  @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50;
-  @apply rounded-lg transition-all duration-200;
-  @apply border-none cursor-pointer;
+  background-color: transparent;
+  color: #3b82f6;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.action-btn:hover {
+  background-color: #eff6ff;
+  color: #2563eb;
 }
 
+/* Delete/Cancel action - system consistent (PrimeNG-like) */
 .action-btn.danger {
-  @apply hover:text-red-600 hover:bg-red-50;
+  background-color: transparent;
+  color: #ef4444;
+  border-radius: 50%;
+}
+.action-btn.danger:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
 }
 
 /* Drawer */

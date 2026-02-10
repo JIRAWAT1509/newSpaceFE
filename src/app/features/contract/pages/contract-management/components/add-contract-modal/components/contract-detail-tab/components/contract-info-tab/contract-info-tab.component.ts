@@ -92,12 +92,13 @@ export class ContractInfoTabComponent implements OnInit {
       transferBookingContract: [''],
 
       // Section: ข้อมูลผู้เช่า (ฉบับยืนยัน)
-      contractMaker: ['', Validators.required],
-      legalEntityName: ['', Validators.required],
-      registeredAddress: ['', Validators.required],
+      // Only name and phone are soft-required; other fields are optional at this stage
+      contractMaker: [''],
+      legalEntityName: [''],
+      registeredAddress: [''],
       documentDeliveryAddress: [''],
-      phone: ['', [Validators.required, Validators.pattern(/^[0-9]{9,10}$/)]],
-      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.pattern(/^[0-9]{9,10}$/)]],
+      email: ['', [Validators.email]],
       contactPerson: ['']
     });
   }
@@ -151,7 +152,7 @@ export class ContractInfoTabComponent implements OnInit {
       case 'booking':
         return [];
       case 'tenant':
-        return ['contractMaker', 'legalEntityName', 'registeredAddress', 'phone', 'email'];
+        return ['contractMaker', 'phone'];
       default:
         return [];
     }

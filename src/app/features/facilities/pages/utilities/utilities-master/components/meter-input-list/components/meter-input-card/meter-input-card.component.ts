@@ -11,12 +11,13 @@ import {
   ExpectedRangeResult
 } from '@core/utils/meter-range.util';
 import { getFacilitiesUtilitiesConfig } from '@core/services/ui-settings';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-meter-input-card',
   standalone: true,
-  imports: [CommonModule, FormsModule, InputText],
+  imports: [CommonModule, FormsModule, InputText, ConfirmationModalComponent],
   templateUrl: './meter-input-card.component.html',
   styleUrl: './meter-input-card.component.css'
 })
@@ -45,6 +46,13 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   isEditing = signal<boolean>(false);
   /** สำหรับโหมด inline ของ completed meters - คลิกแก้ไขเพื่อเปิดฟอร์ม */
   isInlineEditing = signal<boolean>(false);
+
+  // Confirmation modal state (for out-of-range readings)
+  showConfirmModal = signal<boolean>(false);
+  confirmTitle = signal<string>('');
+  confirmMessage = signal<string>('');
+  private pendingSaveMode = signal<'normal' | 'edit' | 'inline'>('normal');
+  private pendingSaveEvent = signal<Event | null>(null);
 
   // Config tracking
   private configCheckInterval?: Subscription;
@@ -252,6 +260,20 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     const reading = this.currentReading();
     if (!reading) return;
 
+    // ถ้าเกิน expected range → แสดง confirm popup
+    if (this.isOutOfRange()) {
+      this.showRangeConfirmation('normal', event);
+      return;
+    }
+
+    this.doSave();
+  }
+
+  /** บันทึกจริง (หลังผ่าน validation/confirmation แล้ว) */
+  private doSave(): void {
+    const reading = this.currentReading();
+    if (!reading) return;
+
     this.isSaving.set(true);
 
     setTimeout(() => {
@@ -302,6 +324,20 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     const reading = this.currentReading();
     if (!reading) return;
 
+    // ถ้าเกิน expected range → แสดง confirm popup
+    if (this.isOutOfRange()) {
+      this.showRangeConfirmation('edit', event);
+      return;
+    }
+
+    this.doSaveEdit();
+  }
+
+  /** บันทึกแก้ไขจริง */
+  private doSaveEdit(): void {
+    const reading = this.currentReading();
+    if (!reading) return;
+
     this.readingSaved.emit({
       meterId: this.meter().id,
       reading: reading,
@@ -309,7 +345,6 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     });
 
     this.isEditing.set(false);
-    alert('Reading updated successfully!');
   }
 
   // ==================== INLINE EDIT MODE (for completed meters) ====================
@@ -344,6 +379,20 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     const reading = this.currentReading();
     if (!reading) return;
 
+    // ถ้าเกิน expected range → แสดง confirm popup
+    if (this.isOutOfRange()) {
+      this.showRangeConfirmation('inline', event);
+      return;
+    }
+
+    this.doSaveInlineEdit();
+  }
+
+  /** บันทึก inline จริง */
+  private doSaveInlineEdit(): void {
+    const reading = this.currentReading();
+    if (!reading) return;
+
     this.isSaving.set(true);
 
     setTimeout(() => {
@@ -362,5 +411,43 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
         this.currentReading.set(null);
       }, 1000);
     }, 500);
+  }
+
+  // ==================== CONFIRMATION MODAL ====================
+
+  /** แสดง popup ยืนยันเมื่อค่าเกิน expected range */
+  private showRangeConfirmation(mode: 'normal' | 'edit' | 'inline', event: Event): void {
+    const reading = this.currentReading()!;
+    const info = this.getExpectedRangeInfo();
+    const unit = this.meter().unit || '';
+
+    this.pendingSaveMode.set(mode);
+    this.pendingSaveEvent.set(event);
+    this.confirmTitle.set('ค่ามิเตอร์เกิน Expected Range');
+    this.confirmMessage.set(
+      `ค่าที่กรอก: ${reading.toLocaleString()} ${unit}\n` +
+      `Expected range: ${info.min.toLocaleString()} - ${(info.max ?? 0).toLocaleString()} ${unit}\n\n` +
+      `คุณต้องการบันทึกค่านี้หรือไม่?`
+    );
+    this.showConfirmModal.set(true);
+  }
+
+  /** ยืนยันบันทึก (กดตกลงใน popup) */
+  onConfirmSave(): void {
+    this.showConfirmModal.set(false);
+    const mode = this.pendingSaveMode();
+
+    if (mode === 'normal') {
+      this.doSave();
+    } else if (mode === 'edit') {
+      this.doSaveEdit();
+    } else if (mode === 'inline') {
+      this.doSaveInlineEdit();
+    }
+  }
+
+  /** ยกเลิก (กดยกเลิกใน popup) */
+  onCancelConfirm(): void {
+    this.showConfirmModal.set(false);
   }
 }

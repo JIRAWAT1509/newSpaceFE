@@ -99,136 +99,134 @@ html[data-icon-style='outline'] .pi {
   font-weight: 400;
 }
 
-/* ==================== STANDARD ACTION BUTTONS ==================== */
-/* Edit Button - Dark pencil icon, no background */
+/* ==================== STANDARD ACTION ICON BUTTONS ==================== */
+/*
+ * Universal edit/delete icon button styles.
+ *
+ *  EDIT  → dark pencil icon, no background (transparent)
+ *  DELETE → white trash icon inside a soft coral circle
+ *
+ * Usage (HTML buttons):
+ *   <button class="sp-edit-btn" ...><i class="pi pi-pencil"></i></button>
+ *   <button class="sp-delete-btn" ...><i class="pi pi-trash"></i></button>
+ *
+ * PrimeNG <p-button> are auto-matched via attribute selectors.
+ */
+
+/* ---- EDIT ---- */
+.sp-edit-btn,
 .action-btn-edit,
-.btn-edit,
+.btn-icon-edit,
+.square-edit-btn,
 .p-button[icon="pi pi-pencil"],
-.p-button[icon*="pi-pencil"] {
-  background-color: transparent !important;
-  border: none !important;
-  color: #374151 !important;
-  padding: 0.5rem !important;
-  border-radius: 6px !important;
-  transition: all 0.2s !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px !important;
-}
-
-.action-btn-edit:hover,
-.btn-edit:hover,
-.p-button[icon="pi pi-pencil"]:hover,
-.p-button[icon*="pi-pencil"]:hover {
-  background-color: #f3f4f6 !important;
-  color: #1f2937 !important;
-}
-
-.action-btn-edit i,
-.btn-edit i,
-.p-button[icon="pi pi-pencil"] i,
-.p-button[icon*="pi-pencil"] i {
-  color: inherit !important;
-  font-size: 1rem !important;
-}
-
-/* Delete Button - White trash icon in red circle */
-.action-btn-delete,
-.btn-delete,
-.p-button[icon="pi pi-trash"],
-.p-button[icon*="pi-trash"] {
-  background-color: #ef4444 !important;
-  border: none !important;
-  color: #ffffff !important;
-  padding: 0.5rem !important;
-  border-radius: 50% !important;
-  transition: all 0.2s !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px !important;
-}
-
-.action-btn-delete:hover,
-.btn-delete:hover,
-.p-button[icon="pi pi-trash"]:hover,
-.p-button[icon*="pi-trash"]:hover {
-  background-color: #dc2626 !important;
-  color: #ffffff !important;
-}
-
-.action-btn-delete i,
-.btn-delete i,
-.p-button[icon="pi pi-trash"] i,
-.p-button[icon*="pi-trash"] i {
-  color: #ffffff !important;
-  font-size: 1rem !important;
-}
-
-/* Override PrimeNG button styles for edit/delete */
+.p-button[icon*="pi-pencil"],
 .p-button.p-button-text[icon="pi pi-pencil"],
 .p-button.p-button-text[icon*="pi-pencil"],
 .p-button[icon="pi pi-pencil"][text],
-.p-button[icon*="pi-pencil"][text] {
-  background-color: transparent !important;
-  border: none !important;
-  color: #374151 !important;
-}
-
-.p-button.p-button-text[icon="pi pi-pencil"]:hover,
-.p-button.p-button-text[icon*="pi-pencil"]:hover,
-.p-button[icon="pi pi-pencil"][text]:hover,
-.p-button[icon*="pi-pencil"][text]:hover {
-  background-color: #f3f4f6 !important;
-  color: #1f2937 !important;
-}
-
-.p-button.p-button-text[icon="pi pi-trash"],
-.p-button.p-button-text[icon*="pi-trash"],
-.p-button[icon="pi pi-trash"][text],
-.p-button[icon*="pi-trash"][text] {
-  background-color: #ef4444 !important;
-  border: none !important;
-  color: #ffffff !important;
-  border-radius: 50% !important;
-}
-
-.p-button.p-button-text[icon="pi pi-trash"]:hover,
-.p-button.p-button-text[icon*="pi-trash"]:hover,
-.p-button[icon="pi pi-trash"][text]:hover,
-.p-button[icon*="pi-trash"][text]:hover {
-  background-color: #dc2626 !important;
-  color: #ffffff !important;
-}
-
-/* Override PrimeNG rounded button styles */
+.p-button[icon*="pi-pencil"][text],
 .p-button[rounded][icon="pi pi-pencil"],
 .p-button[rounded][icon*="pi-pencil"] {
   background-color: transparent !important;
   border: none !important;
   color: #374151 !important;
+  padding: 0.5rem !important;
+  border-radius: 6px !important;
+  transition: all 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  cursor: pointer !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
+.sp-edit-btn:hover,
+.action-btn-edit:hover,
+.btn-icon-edit:hover,
+.square-edit-btn:hover,
+.p-button[icon="pi pi-pencil"]:hover,
+.p-button[icon*="pi-pencil"]:hover,
+.p-button.p-button-text[icon="pi pi-pencil"]:hover,
+.p-button.p-button-text[icon*="pi-pencil"]:hover,
+.p-button[icon="pi pi-pencil"][text]:hover,
+.p-button[icon*="pi-pencil"][text]:hover,
 .p-button[rounded][icon="pi pi-pencil"]:hover,
 .p-button[rounded][icon*="pi-pencil"]:hover {
   background-color: #f3f4f6 !important;
   color: #1f2937 !important;
 }
 
+.sp-edit-btn i,
+.action-btn-edit i,
+.btn-icon-edit i,
+.square-edit-btn i {
+  color: inherit !important;
+  font-size: 1rem !important;
+}
+
+/* ---- DELETE ---- */
+.sp-delete-btn,
+.action-btn-delete,
+.btn-icon-delete,
+.draft-btn.delete,
+.btn-danger-small,
+.p-button[icon="pi pi-trash"],
+.p-button[icon*="pi-trash"],
+.p-button.p-button-text[icon="pi pi-trash"],
+.p-button.p-button-text[icon*="pi-trash"],
+.p-button[icon="pi pi-trash"][text],
+.p-button[icon*="pi-trash"][text],
 .p-button[rounded][icon="pi pi-trash"],
 .p-button[rounded][icon*="pi-trash"] {
-  background-color: #ef4444 !important;
+  background-color: #E8847C !important;
   border: none !important;
+  color: #ffffff !important;
+  padding: 0.5rem !important;
+  border-radius: 50% !important;
+  transition: all 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  cursor: pointer !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.sp-delete-btn:hover,
+.action-btn-delete:hover,
+.btn-icon-delete:hover,
+.draft-btn.delete:hover,
+.btn-danger-small:hover,
+.p-button[icon="pi pi-trash"]:hover,
+.p-button[icon*="pi-trash"]:hover,
+.p-button.p-button-text[icon="pi pi-trash"]:hover,
+.p-button.p-button-text[icon*="pi-trash"]:hover,
+.p-button[icon="pi pi-trash"][text]:hover,
+.p-button[icon*="pi-trash"][text]:hover,
+.p-button[rounded][icon="pi pi-trash"]:hover,
+.p-button[rounded][icon*="pi-trash"]:hover {
+  background-color: #D6726A !important;
   color: #ffffff !important;
 }
 
-.p-button[rounded][icon="pi pi-trash"]:hover,
-.p-button[rounded][icon*="pi-trash"]:hover {
-  background-color: #dc2626 !important;
+.sp-delete-btn i,
+.action-btn-delete i,
+.btn-icon-delete i,
+.draft-btn.delete i,
+.btn-danger-small i {
   color: #ffffff !important;
+  font-size: 0.875rem !important;
+}
+
+/* ---- EDIT + DELETE in action pairs (table rows) ---- */
+.sp-action-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }

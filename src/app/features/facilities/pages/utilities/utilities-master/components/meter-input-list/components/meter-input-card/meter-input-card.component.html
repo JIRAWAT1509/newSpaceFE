@@ -465,3 +465,16 @@
     }
   </div>
 }
+
+<!-- Confirmation Modal: ค่าเกิน expected range -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  type="warning"
+  [title]="confirmTitle()"
+  [message]="confirmMessage()"
+  confirmText="ยืนยันบันทึก"
+  cancelText="ยกเลิก"
+  confirmIcon="pi-check"
+  (confirm)="onConfirmSave()"
+  (cancel)="onCancelConfirm()"
+/>

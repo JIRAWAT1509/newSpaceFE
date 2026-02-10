@@ -220,266 +220,135 @@ header {
 }
 
 /* ============================================
-   Universal Search Styles - No Background
+   Universal Search – Simple Bar (no dropdown)
    ============================================ */
 
-.universal-search-wrapper {
-  position: relative;
-  width: 100%;
+.usearch-root {
+  width: 240px;
 }
 
-.universal-search-container {
+@media (min-width: 1024px) {
+  .usearch-root {
+    width: 300px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .usearch-root {
+    width: 340px;
+  }
+}
+
+/* -- Search Bar -- */
+.usearch-bar {
   position: relative;
   display: flex;
   align-items: center;
-  width: 100%;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  transition: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  height: 38px;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border-radius: 10px;
+  cursor: text;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  overflow: visible;
 }
 
-.universal-search-container::before {
-  display: none;
+.usearch-bar:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.38) !important;
 }
 
-.universal-search-container:hover::before {
-  display: none;
+.usearch-bar:focus-within {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
-.universal-search-container:focus-within {
-  border: none;
-  box-shadow: none;
-}
-
-.universal-search-container:focus-within::before {
-  display: none;
-}
-
-.universal-search-icon {
+/* Search icon – ensure it's visible */
+.usearch-bar__icon {
   position: absolute;
-  left: 16px;
-  width: 18px;
-  height: 18px;
-  color: rgb(var(--muted));
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px !important;
+  color: rgba(255, 255, 255, 0.85) !important;
   pointer-events: none;
-  transition: color 0.2s ease, transform 0.2s ease;
-  z-index: 1;
+  z-index: 2;
+  line-height: 1;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
 }
 
-.universal-search-container:focus-within .universal-search-icon {
-  color: rgb(var(--primary));
-  transform: scale(1.1);
+.usearch-bar:focus-within .usearch-bar__icon {
+  color: #ffffff !important;
 }
 
-.universal-search-input {
-  width: 100%;
-  padding: 12px 16px 12px 48px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgb(var(--fg));
+/* Override global primeng-overrides that force white bg on all inputs */
+.usearch-bar__input,
+.usearch-bar input,
+.usearch-bar input[type="text"],
+.usearch-bar input.usearch-bar__input {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 36px 0 38px !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  color: #ffffff !important;
   background: transparent !important;
+  background-color: transparent !important;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
-  transition: none;
+  letter-spacing: 0.01em;
+  border-radius: 10px !important;
 }
 
-.universal-search-input::placeholder {
-  color: rgb(var(--muted));
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+.usearch-bar__input:focus,
+.usearch-bar input:focus,
+.usearch-bar input[type="text"]:focus {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
-.universal-search-container:focus-within .universal-search-input::placeholder {
-  opacity: 0.5;
+.usearch-bar__input::placeholder,
+.usearch-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.55) !important;
+  font-weight: 400 !important;
 }
 
-.universal-search-clear {
+.usearch-bar:focus-within .usearch-bar__input::placeholder,
+.usearch-bar:focus-within input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Clear button */
+.usearch-bar__clear {
   position: absolute;
-  right: 12px;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   margin: 0;
-  color: rgb(var(--muted));
-  background: transparent;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 1;
+  transition: all 0.15s ease;
+  z-index: 2;
 }
 
-.universal-search-clear:hover {
-  color: rgb(var(--fg));
-  background: rgba(var(--muted), 0.1);
-  transform: scale(1.1);
-}
-
-.universal-search-clear:active {
-  transform: scale(0.95);
-}
-
-.universal-search-hint {
-  position: absolute;
-  right: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-
-.universal-search-container:not(:focus-within) .universal-search-hint {
-  opacity: 1;
-}
-
-.universal-search-container:focus-within .universal-search-hint,
-.universal-search-container:has(.universal-search-clear) .universal-search-hint {
-  opacity: 0;
-}
-
-.universal-search-key {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: rgb(var(--muted));
-  background: rgba(var(--muted), 0.1);
-  border: 1px solid rgba(var(--border), 0.5);
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-/* Mobile: Universal Search bar (แบบ Figma - พื้นขาว มีขอบ) */
-.universal-search-mobile .universal-search-container {
-  background: rgba(255, 255, 255, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
-  padding: 10px 14px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-
-.universal-search-mobile .universal-search-input {
-  padding: 10px 36px 10px 44px;
-  font-size: 15px;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 10px;
-}
-
-.universal-search-mobile .universal-search-icon {
-  left: 14px;
-  width: 20px;
-  height: 20px;
-  color: rgb(var(--muted));
-}
-
-.universal-search-mobile .universal-search-container:focus-within {
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
-  border-color: rgba(255, 255, 255, 0.8);
-}
-
-/* Search bar section - no background, sits on white page background */
-.search-bar-section {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Large Search Bar Variant - no white background, no border */
-.universal-search-large .universal-search-container {
-  border-radius: 16px;
-  padding: 10px 12px;
-  border: none;
-  background: transparent;
-  box-shadow: none;
-}
-
-/* Input styling - seamless inside floating bar */
-.universal-search-large .universal-search-input {
-  padding: 12px 18px 12px 50px;
-  font-size: 15px;
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  box-shadow: none;
-  transition: all 0.2s ease;
-}
-
-.universal-search-large .universal-search-input:hover {
-  border-color: transparent;
-}
-
-.universal-search-large .universal-search-input:focus {
-  outline: none;
-  border-color: transparent;
-  box-shadow: none;
-}
-
-.universal-search-large .universal-search-icon {
-  left: 18px;
-  width: 20px;
-  height: 20px;
-}
-
-.universal-search-large .universal-search-clear {
-  right: 14px;
-  width: 30px;
-  height: 30px;
-}
-
-.universal-search-large .universal-search-key {
-  min-width: 26px;
-  height: 26px;
-  font-size: 12px;
-  border: none;
-  box-shadow: none;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .universal-search-input {
-    padding: 10px 14px 10px 44px;
-    font-size: 14px;
-  }
-
-  .universal-search-icon {
-    left: 14px;
-    width: 16px;
-    height: 16px;
-  }
-
-  .universal-search-clear {
-    right: 10px;
-    width: 24px;
-    height: 24px;
-  }
-
-  .universal-search-hint {
-    display: none;
-  }
-}
-
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-  .universal-search-container::before {
-    display: none;
-  }
-
-  .universal-search-container:focus-within {
-    box-shadow: none;
-    border: none;
-  }
+.usearch-bar__clear:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.28) !important;
 }

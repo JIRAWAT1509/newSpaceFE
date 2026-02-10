@@ -257,8 +257,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border: none;
   border-radius: 6px;
   background: transparent;
@@ -272,14 +272,26 @@
   transform: translateY(-1px);
 }
 
-.action-btn.edit:hover {
-  background: #dbeafe;
+.action-btn.edit {
+  background-color: transparent;
+  border: none;
   color: #3b82f6;
+  border-radius: 50%;
+}
+.action-btn.edit:hover {
+  background: #eff6ff;
+  color: #2563eb;
 }
 
-.action-btn.delete:hover {
-  background: #fee2e2;
+.action-btn.delete {
+  background-color: transparent;
+  border: none;
   color: #ef4444;
+  border-radius: 50%;
+}
+.action-btn.delete:hover {
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 .action-btn i {

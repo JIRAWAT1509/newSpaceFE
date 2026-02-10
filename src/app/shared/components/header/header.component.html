@@ -3,7 +3,7 @@
 <header class="fixed top-0 left-0 right-0 z-50">
   <!-- Main Header -->
   <div
-    class="bg-gradient-to-r from-primary via-primary to-secondary py-2.5 md:py-3 md:pb-6 shadow-lg relative">
+    class="bg-gradient-to-r from-primary via-primary to-secondary py-2.5 md:py-3 shadow-lg relative">
     <!-- Row 1: Logo + Right actions -->
     <div class="flex items-center justify-between px-4 sm:px-6 md:px-8 gap-3 min-h-[52px] md:min-h-14">
       <!-- Left: Hamburger (mobile) + Logo -->
@@ -25,67 +25,76 @@
         </h1>
       </div>
 
-      <!-- Center: Navigation (desktop only) -->
-      <div class="flex-1 pl-0 md:pl-[var(--sidebar-width)] min-w-0 hidden md:block">
+      <!-- Center: Navigation (desktop only) – fixed position, no sidebar shift -->
+      <div class="flex-1 min-w-0 hidden md:block">
         <div class="content-container">
-          <nav class="flex items-center gap-4 lg:gap-5 overflow-x-auto scrollbar-hide">
+          <nav class="flex items-center gap-4 lg:gap-5 overflow-x-auto scrollbar-hide ml-12 lg:ml-16">
+            <!-- Reserved slot 1: Home -->
             <a
-              *ngFor="let item of navigationItems; let i = index"
-              [id]="'nav-item-' + i"
-              (click)="setActiveMenuItem(item.primary_content)"
-              [class.header-nav-item-active]="activeMenuItem === item.primary_content"
+              id="nav-item-home"
+              (click)="onHomeClick()"
               class="header-nav-item"
+              [class.header-nav-item-active]="activeMenuItem === '__home__'"
             >
-              <i class="header-nav-icon" [ngClass]="getNavIcon(item.primary_content)"></i>
-              <span class="header-nav-label">{{ translateNav(item.primary_content) }}</span>
+              <i class="header-nav-icon pi pi-home"></i>
+              <span class="header-nav-label">Home</span>
+            </a>
+
+            <!-- Reserved slot 2: Sales -->
+            <a
+              id="nav-item-sales"
+              (click)="setActiveMenuItem('sales')"
+              class="header-nav-item"
+              [class.header-nav-item-active]="activeMenuItem === 'sales'"
+            >
+              <i class="header-nav-icon pi pi-chart-line"></i>
+              <span class="header-nav-label">{{ translateNav('sales') }}</span>
               <span
-                *ngIf="activeMenuItem === item.primary_content"
+                *ngIf="activeMenuItem === 'sales'"
                 class="header-nav-underline bg-secondary"
               ></span>
             </a>
+
+            <!-- Remaining nav items (excluding sales, which is already above) -->
+            <ng-container *ngFor="let item of navigationItems; let i = index">
+              <a
+                *ngIf="item.primary_content !== 'sales'"
+                [id]="'nav-item-' + i"
+                (click)="setActiveMenuItem(item.primary_content)"
+                [class.header-nav-item-active]="activeMenuItem === item.primary_content"
+                class="header-nav-item"
+              >
+                <i class="header-nav-icon" [ngClass]="getNavIcon(item.primary_content)"></i>
+                <span class="header-nav-label">{{ translateNav(item.primary_content) }}</span>
+                <span
+                  *ngIf="activeMenuItem === item.primary_content"
+                  class="header-nav-underline bg-secondary"
+                ></span>
+              </a>
+            </ng-container>
           </nav>
         </div>
       </div>
 
       <!-- Right: User Menu -->
       <div class="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
-          <!-- Search/Greeting Container - smaller on mobile -->
-          <div class="w-20 sm:w-32 md:w-64 relative h-9 md:h-9 flex-shrink-0 min-w-0">
-            <div *ngIf="!isScrolled"
-              class="absolute top-0 left-0 w-full h-full flex items-center justify-end text-primary-foreground text-xs sm:text-sm md:text-base font-medium drop-shadow-md"
-              [@slideDownSmallFaded]>
-              <span class="truncate">{{ texts.greeting }}, {{ username }}!</span>
-            </div>
-
-            <div *ngIf="isScrolled" class="absolute top-0 left-0 w-full hidden md:block" [@slideDownSmall]>
-              <div class="universal-search-wrapper">
-                <div class="universal-search-container">
-                  <svg
-                    class="universal-search-icon"
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <input 
-                    type="text" 
-                    [(ngModel)]="searchQuery" 
-                    (keyup.enter)="onSearch()"
-                    [placeholder]="texts.searchPlaceholder"
-                    class="universal-search-input"
-                  />
-                  @if (searchQuery) {
-                    <button 
-                      (click)="searchQuery = ''"
-                      class="universal-search-clear"
-                      type="button"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  }
-                </div>
-              </div>
+          <!-- Universal Search - always visible in top menu (desktop) -->
+          <div class="hidden md:block flex-shrink-0 min-w-0 usearch-root">
+            <div class="usearch-bar">
+              <i class="pi pi-search usearch-bar__icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="searchQuery"
+                (keyup.enter)="onSearchGlobal()"
+                placeholder="Search..."
+                class="usearch-bar__input"
+                autocomplete="off"
+              />
+              @if (searchQuery) {
+                <button (click)="clearSearchSimple()" class="usearch-bar__clear" type="button">
+                  <i class="pi pi-times"></i>
+                </button>
+              }
             </div>
           </div>
 
@@ -153,63 +162,7 @@
       </div>
     </div>
 
-    <!-- Mobile only: Universal Search bar (เหมือน Figma - แถบค้นหาด้านล่าง header) -->
-    <div class="md:hidden px-4 pb-3 pt-1">
-      <div class="universal-search-wrapper universal-search-mobile">
-        <div class="universal-search-container">
-          <svg class="universal-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            [(ngModel)]="searchQuery"
-            (keyup.enter)="onSearch()"
-            [placeholder]="texts.searchPlaceholder"
-            class="universal-search-input"
-          />
-          @if (searchQuery) {
-            <button (click)="searchQuery = ''" class="universal-search-clear" type="button">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-          }
-        </div>
-      </div>
-    </div>
-
-    <!-- Large Search Bar (desktop only) - floating below header, centered -->
-    <div *ngIf="!isScrolled" class="hidden md:block absolute left-1/2 -translate-x-1/2 -bottom-[4.75rem] z-10 w-full max-w-4xl px-4 md:px-6"
-      [@slideDown]>
-      <div class="search-bar-section">
-        <div class="universal-search-wrapper universal-search-large">
-          <div class="universal-search-container">
-            <svg
-              class="universal-search-icon"
-              fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input 
-              type="text" 
-              [(ngModel)]="searchQuery" 
-              (keyup.enter)="onSearch()"
-              [placeholder]="texts.searchPlaceholder"
-              class="universal-search-input"
-            />
-            @if (searchQuery) {
-              <button 
-                (click)="searchQuery = ''"
-                class="universal-search-clear"
-                type="button"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            }
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- All floating/mobile search bars removed – only the permanent top-menu search remains -->
   </div>
 </header>
 

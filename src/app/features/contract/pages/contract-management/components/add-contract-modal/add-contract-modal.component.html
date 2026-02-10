@@ -38,7 +38,7 @@
       }
 
       @if (activeTabIndex() === 1) {
-        <app-contract-detail-tab />
+        <app-contract-detail-tab [initialData]="lastContractDetailValue()" />
       }
 
       @if (activeTabIndex() === 2) {
@@ -189,6 +189,21 @@
               </div>
             </div>
 
+            <!-- Section D: ข้อมูลผู้ติดต่อ -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">D. ข้อมูลผู้ติดต่อ</h4>
+
+              <div class="summary-item">
+                <span class="summary-label">ชื่อผู้ติดต่อ:</span>
+                <span class="summary-value">{{ getFormValue('contactName') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">เบอร์โทรผู้ติดต่อ:</span>
+                <span class="summary-value">{{ getFormValue('contactPhone') || '-' }}</span>
+              </div>
+            </div>
+
             <!-- ข้อมูลใบจอง -->
             <div class="summary-group">
               <h4 class="summary-group-title">ข้อมูลใบจอง</h4>
@@ -321,13 +336,6 @@
             <span>ย้อนกลับ</span>
           </button>
         }
-        <!-- Save as Draft button - visible on all tabs except summary -->
-        @if (mode() !== 'edit' && activeTabIndex() < tabs.length - 1) {
-          <button type="button" class="btn-draft" (click)="onSaveDraft()">
-            <i class="pi pi-file-edit"></i>
-            <span>บันทึกแบบร่าง</span>
-          </button>
-        }
       </div>
 
       <div class="footer-right">
@@ -335,17 +343,24 @@
           ยกเลิก
         </button>
 
-        @if (activeTabIndex() === 0) {
-          <button
-            type="button"
-            class="btn-save-quotation"
-            [disabled]="!generalDetailForm.valid"
-            (click)="onSaveQuotationOnly()"
-          >
-            <i class="pi pi-save"></i>
-            <span>บันทึก</span>
+        <!-- Save as Draft button - visible on all tabs -->
+        @if (mode() !== 'edit') {
+          <button type="button" class="btn-save-quotation" (click)="onSaveDraft()">
+            <i class="pi pi-file-edit"></i>
+            <span>บันทึกแบบร่าง</span>
           </button>
         }
+
+        <!-- Save (quotation) button - disabled until required fields filled -->
+        <button
+          type="button"
+          class="btn-save-quotation"
+          [class.btn-disabled]="!isAllFormsValid()"
+          (click)="onSaveQuotationOnly()"
+        >
+          <i class="pi pi-save"></i>
+          <span>{{ mode() === 'edit' ? 'บันทึกการแก้ไข' : 'บันทึก' }}</span>
+        </button>
 
         @if (activeTabIndex() < tabs.length - 1) {
           <button
@@ -360,11 +375,11 @@
           <button
             type="button"
             class="btn-success"
+            [class.btn-disabled]="!isAllFormsValid()"
             (click)="onSubmit()"
-            [disabled]="!isAllFormsValid()"
           >
             <i class="pi pi-check"></i>
-            <span>{{ mode() === 'edit' ? 'บันทึกการแก้ไข' : 'บันทึกสัญญา' }}</span>
+            <span>บันทึกสัญญา</span>
           </button>
         }
       </div>

@@ -110,7 +110,7 @@
     <div class="actions-right">
       <button class="action-btn add-btn" (click)="openAddModal()">
         <i class="pi pi-plus"></i>
-        <span>เพิ่ม</span>
+        <span>สร้างใบเสนอราคา</span>
       </button>
     </div>
   </div>
@@ -188,7 +188,7 @@
               <div class="contract-number-cell">
                 <div
                   class="status-dot"
-                  [style.background-color]="getStatusColor(item.STATUS)"
+                  [style.background-color]="getStatusDotColor(item)"
                 ></div>
                 <div class="contract-info">
                   <div class="contract-number">{{ item.CONTRACT_NUMBER }}</div>
@@ -199,7 +199,7 @@
             <td>{{ getContractTypeLabel(item.CONTRACT_TYPE) }}</td>
             <td>{{ formatDate(item.START_DATE) }}</td>
             <td>{{ formatDate(item.END_DATE) }}</td>
-            <td>{{ item.BOOKING_NUMBER || '-' }}</td>
+            <td>{{ item.BOOKING_NUMBER || item.QUOTATION_NUMBER || '-' }}</td>
             <td>{{ item.CUSTOMER_ID || '-' }}</td>
             <td class="actions-col">
               <button class="row-actions-btn" (click)="showRowActions(item.CONTRACT_ID)">
@@ -329,4 +329,14 @@
   [confirmIcon]="confirmModalIcon()"
   (confirm)="onConfirmModalConfirm()"
   (cancel)="onConfirmModalCancel()"
+/>
+
+<!-- Decline Info Modal (เด้งตอนกดยกเลิกสัญญา ให้กรอกเหตุผล) -->
+<app-decline-info-modal
+  [isOpen]="showDeclineModal()"
+  [contractNumber]="declineContractNumber()"
+  [quotationNumber]="declineQuotationNumber()"
+  [customerName]="declineCustomerName()"
+  (confirm)="onDeclineConfirm($event)"
+  (cancel)="onDeclineCancel()"
 />

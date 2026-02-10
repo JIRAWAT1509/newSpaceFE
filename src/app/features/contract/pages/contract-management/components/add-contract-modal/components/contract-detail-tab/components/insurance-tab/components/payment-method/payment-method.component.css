@@ -39,8 +39,21 @@
 }
 
 .btn-icon-delete-sm {
-  @apply w-6 h-6 flex items-center justify-center;
-  @apply text-red-600 hover:bg-red-50 rounded transition-colors text-xs;
+  /* System consistent small: red trash icon (PrimeNG-like) */
+  @apply flex items-center justify-center;
+  width: 26px;
+  height: 26px;
+  background-color: transparent;
+  color: #ef4444;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.75rem;
+}
+.btn-icon-delete-sm:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
 }
 
 .w-16 {

@@ -156,8 +156,22 @@
 }
 
 .btn-icon-delete {
-  @apply w-8 h-8 flex items-center justify-center;
-  @apply text-red-600 hover:bg-red-50 rounded transition-colors;
+  /* Consistent: white trash in coral circle */
+  @apply flex items-center justify-center;
+  width: 34px;
+  height: 34px;
+  background-color: #E8847C;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-icon-delete:hover {
+  background-color: #D6726A;
+}
+.btn-icon-delete i {
+  color: #ffffff;
 }
 
 .checkbox-label {

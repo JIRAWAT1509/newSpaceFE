@@ -492,25 +492,41 @@
   color: white;
 }
 
-/* Edit/Delete Actions */
+/* Edit/Delete Actions - Consistent across system (PrimeNG-like) */
 .btn-edit {
-  border-color: #6b7280;
-  color: #374151;
+  background: transparent;
+  border: none;
+  color: #3b82f6;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .btn-edit:hover {
-  background: #6b7280;
-  color: white;
+  background: #eff6ff;
+  color: #2563eb;
 }
 
 .btn-delete {
-  border-color: #ef4444;
-  color: #991b1b;
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .btn-delete:hover {
-  background: #ef4444;
-  color: white;
+  background: #fef2f2;
+  color: #dc2626;
 }
 
 /* ==================== STATUS DIALOG ==================== */

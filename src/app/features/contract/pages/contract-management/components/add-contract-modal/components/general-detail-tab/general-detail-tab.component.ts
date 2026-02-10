@@ -1,5 +1,5 @@
 // general-detail-tab.component.ts
-import { Component, input, output, OnInit, signal } from '@angular/core';
+import { Component, inject, input, output, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -8,6 +8,7 @@ import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { RadioButton } from 'primeng/radiobutton';
 import { DeclineInfoModalComponent, DeclineInfo } from '@shared/components/decline-info-modal/decline-info-modal.component';
+import { AreaDataService, FloorWithAreas } from '@core/services/area/area-data.service';
 
 interface Section {
   id: string;
@@ -38,6 +39,9 @@ interface SelectorOption {
   styleUrl: './general-detail-tab.component.css'
 })
 export class GeneralDetailTabComponent implements OnInit {
+  // Inject AreaDataService
+  private areaDataService = inject(AreaDataService);
+
   // Input from parent
   form = input.required<FormGroup>();
 
@@ -50,8 +54,13 @@ export class GeneralDetailTabComponent implements OnInit {
   sections: Section[] = [
     { id: 'header', name: 'ข้อมูลอ้างอิงเอกสาร', letter: 'A' },
     { id: 'products', name: 'ข้อมูลสินค้า/บริการ (ต้นทาง)', letter: 'B' },
-    { id: 'area', name: 'ข้อมูลพื้นที่ (จากใบเสนอราคา)', letter: 'C' }
+    { id: 'area', name: 'ข้อมูลพื้นที่ (จากใบเสนอราคา)', letter: 'C' },
+    { id: 'contact', name: 'ข้อมูลผู้ติดต่อ', letter: 'D' }
   ];
+
+  // Track selected building/floor for cascading filters
+  private selectedBuildingId = signal<string>('');
+  private selectedFloorId = signal<string>('');
 
   // Selector modal state
   showSelectorModal = signal<boolean>(false);
@@ -117,6 +126,8 @@ export class GeneralDetailTabComponent implements OnInit {
         return ['subCategory'];
       case 'area':
         return ['areaBuilding', 'areaFloor', 'areaUnitNumber'];
+      case 'contact':
+        return ['contactName', 'contactPhone'];
       default:
         return [];
     }
@@ -142,7 +153,6 @@ export class GeneralDetailTabComponent implements OnInit {
   }
 
   getSelectorOptions(field: string): SelectorOption[] {
-    // Mock data - replace with actual data from service
     switch (field) {
       case 'branch':
         return [
@@ -172,27 +182,65 @@ export class GeneralDetailTabComponent implements OnInit {
           { label: 'อาหารและเครื่องดื่ม', value: 'CAT001' },
           { label: 'เครื่องใช้ไฟฟ้า', value: 'CAT002' }
         ];
-      case 'areaBuilding':
+      case 'areaBuilding': {
+        // ดึงข้อมูลจาก AreaDataService
+        const building = this.areaDataService.building();
         return [
-          { label: 'อาคาร A', value: 'BLD001' },
-          { label: 'อาคาร B', value: 'BLD002' },
-          { label: 'อาคาร C', value: 'BLD003' }
+          { label: `${building.nameTh} (${building.code})`, value: building.id }
         ];
-      case 'areaFloor':
-        return [
-          { label: 'ชั้น 1', value: 'FLR001' },
-          { label: 'ชั้น 2', value: 'FLR002' },
-          { label: 'ชั้น 3', value: 'FLR003' }
-        ];
+      }
+      case 'areaFloor': {
+        // ดึงชั้นตาม building จาก AreaDataService
+        const floors = this.areaDataService.getFloors();
+        return floors.map(floor => ({
+          label: floor.floorNameTh || floor.floorNameEn || `ชั้น ${floor.floorNumber}`,
+          value: floor.id
+        }));
+      }
+      case 'areaUnitNumber': {
+        // ดึงห้องจาก AreaDataService ตามชั้นที่เลือก
+        const floorId = this.selectedFloorId();
+        if (!floorId) return [];
+        const floor = this.areaDataService.getFloorById(floorId);
+        if (!floor) return [];
+        const areas = this.areaDataService.getAreasForCurrentContext(floor);
+        const activeAreas = areas.filter(a => a.isActive && !a.isDeleted);
+        return activeAreas.map(area => ({
+          label: `${area.roomNumber} (${area.size} ตร.ม., ${this.mapAreaType(area.type)}, ${this.mapAreaStatus(area.status)})`,
+          value: area.id
+        }));
+      }
       case 'areaType':
         return [
-          { label: 'Retail', value: 'retail' },
+          { label: 'Retail (Open Plan)', value: 'open-plan' },
           { label: 'Kiosk', value: 'kiosk' },
+          { label: 'Log', value: 'log' },
           { label: 'Food Court', value: 'foodcourt' }
         ];
       default:
         return [];
     }
+  }
+
+  /** แปลง area type เป็นชื่อไทย */
+  private mapAreaType(type: string): string {
+    const types: Record<string, string> = {
+      'open-plan': 'Open Plan',
+      'kiosk': 'Kiosk',
+      'log': 'Log'
+    };
+    return types[type] || type;
+  }
+
+  /** แปลง area status เป็นชื่อไทย */
+  private mapAreaStatus(status: string): string {
+    const statuses: Record<string, string> = {
+      'leased': 'เช่าอยู่',
+      'vacant': 'ว่าง',
+      'quotation': 'ใบเสนอราคา',
+      'unallocated': 'ยังไม่จัดสรร'
+    };
+    return statuses[status] || status;
   }
 
   getSelectorTitle(): string {
@@ -208,6 +256,7 @@ export class GeneralDetailTabComponent implements OnInit {
       productCategory: 'เลือกหมวดสินค้า/บริการ',
       areaBuilding: 'เลือกอาคาร',
       areaFloor: 'เลือกชั้น',
+      areaUnitNumber: 'เลือกห้อง / ยูนิต (จาก Area Management)',
       areaType: 'เลือกประเภทพื้นที่'
     };
     return titles[field] || 'เลือก';
@@ -225,9 +274,67 @@ export class GeneralDetailTabComponent implements OnInit {
   selectSelectorItem(item: SelectorOption): void {
     const field = this.currentSelectorField();
     const control = this.form().get(field);
-    if (control) {
-      control.setValue(item.label);
-      control.markAsTouched();
+
+    if (field === 'areaUnitNumber') {
+      // เมื่อเลือกห้อง → auto-fill ข้อมูลจาก AreaDataService
+      const floorId = this.selectedFloorId();
+      const floor = floorId ? this.areaDataService.getFloorById(floorId) : null;
+      const areas = floor ? this.areaDataService.getAreasForCurrentContext(floor) : [];
+      const selectedArea = areas.find(a => a.id === item.value);
+
+      if (selectedArea && control) {
+        control.setValue(selectedArea.roomNumber);
+        control.markAsTouched();
+
+        // Auto-fill พื้นที่รวม
+        const areaTotalControl = this.form().get('areaTotal');
+        if (areaTotalControl) {
+          areaTotalControl.setValue(selectedArea.size);
+          areaTotalControl.markAsTouched();
+        }
+
+        // Auto-fill ประเภทพื้นที่
+        const areaTypeControl = this.form().get('areaType');
+        if (areaTypeControl) {
+          areaTypeControl.setValue(this.mapAreaType(selectedArea.type));
+          areaTypeControl.markAsTouched();
+        }
+      }
+    } else if (field === 'areaBuilding') {
+      // เมื่อเลือก building → set label, track ID, and clear dependent fields
+      this.selectedBuildingId.set(item.value);
+      if (control) {
+        control.setValue(item.label);
+        control.markAsTouched();
+      }
+      // Reset floor and unit when building changes
+      this.selectedFloorId.set('');
+      const floorControl = this.form().get('areaFloor');
+      const unitControl = this.form().get('areaUnitNumber');
+      const totalControl = this.form().get('areaTotal');
+      const typeControl = this.form().get('areaType');
+      if (floorControl) floorControl.setValue('');
+      if (unitControl) unitControl.setValue('');
+      if (totalControl) totalControl.setValue('');
+      if (typeControl) typeControl.setValue('');
+    } else if (field === 'areaFloor') {
+      // เมื่อเลือก floor → set label, track ID, and clear unit
+      this.selectedFloorId.set(item.value);
+      if (control) {
+        control.setValue(item.label);
+        control.markAsTouched();
+      }
+      const unitControl = this.form().get('areaUnitNumber');
+      const totalControl = this.form().get('areaTotal');
+      const typeControl = this.form().get('areaType');
+      if (unitControl) unitControl.setValue('');
+      if (totalControl) totalControl.setValue('');
+      if (typeControl) typeControl.setValue('');
+    } else {
+      if (control) {
+        control.setValue(item.label);
+        control.markAsTouched();
+      }
     }
     this.closeSelectorModal();
   }
@@ -260,6 +367,13 @@ export class GeneralDetailTabComponent implements OnInit {
 
   onDeclineCancel(): void {
     this.showDeclineModal.set(false);
+  }
+
+  /** อนุญาตเฉพาะตัวเลขในช่องเบอร์โทร */
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9]/g, '');
+    this.form().get('contactPhone')?.setValue(input.value, { emitEvent: false });
   }
 
   openCustomerDetails(): void {

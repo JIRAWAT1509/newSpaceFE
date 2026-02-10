@@ -151,7 +151,7 @@ export class ContractManagementComponent implements OnInit {
           ? this.mapContractTypeCode(general.contractType)
           : 'QUOTATION_AGREEMENT';
 
-    const displayName = general.businessName || contractDetails.legalEntityName || general.companyName || 'N/A';
+    const displayName = general.contactName || general.businessName || contractDetails.legalEntityName || general.companyName || 'N/A';
 
     return {
       CONTRACT_ID: formData.contractId || `CNT-${Date.now()}`,
@@ -178,23 +178,61 @@ export class ContractManagementComponent implements OnInit {
       CONTRACT_NUMBER_MAIN: general.contractNumberMain,
       CONTRACT_NUMBER_SUB: general.contractNumberSub,
       QUOTATION_STATUS: general.quotationStatus,
+      QUOTATION_LEVEL_DATE: toDateStr(general.quotationLevelDate),
       CONTRACT_DATE: toDateStr(general.quotationDate) || new Date().toISOString().split('T')[0],
-      RECORD_DATE: general.recordDate,
-      APPROVAL_DATE: general.approvalDate,
+      RECORD_DATE: toDateStr(general.recordDate),
+      APPROVAL_DATE: toDateStr(general.approvalDate),
       
       SUB_CATEGORY: general.subCategory || '',
+      CATEGORY: general.category || '',
+      PROFIT_CENTER: general.profitCenter || '',
+      BUSINESS_NAME: general.businessName || '',
+      PRODUCT_TYPE_1: general.productType1 || '',
+      PRODUCT_TYPE_2: general.productType2 || '',
+      PRODUCT_TYPE_3: general.productType3 || '',
+      PRODUCT_TYPE_4: general.productType4 || '',
+      PRODUCT_TYPE_5: general.productType5 || '',
+      PRODUCT_TYPE_6: general.productType6 || '',
       CUSTOMER_ID: general.customerId || '',
       AUTHORIZED_PERSON_1: general.authorizedPerson1 || '',
       PHONE_1: general.phone1 || '',
       POSITION_1: general.position1 || '',
       
+      // Contact info (page 1)
+      CONTACT_PERSON: general.contactName || '',
+      CONTACT_PHONE: general.contactPhone || '',
+      
+      // From contractDetails (tab 2)
+      BOOKING_NUMBER: contractDetails.bookingNumber || '',
+      CONTRACT_MAKER: contractDetails.contractMaker || '',
+      LEGAL_ENTITY_NAME: contractDetails.legalEntityName || '',
+      REGISTERED_ADDRESS: contractDetails.registeredAddress || '',
+      DOCUMENT_DELIVERY_ADDRESS: contractDetails.documentDeliveryAddress || '',
+      PHONE_DETAIL: contractDetails.phone || '',
+      EMAIL_DETAIL: contractDetails.email || '',
+      CONTACT_PERSON_DETAIL: contractDetails.contactPerson || '',
+      
       // From conditions
       DURATION_YEARS: conditions.durationYears || 0,
+      DURATION_MONTHS: conditions.durationMonths || 0,
+      DURATION_DAYS: conditions.durationDays || 0,
       START_DATE: toDateStr(conditions.contractStartDate) || '',
       END_DATE: toDateStr(conditions.contractEndDate) || '',
       CREDIT_TERM_RENT: conditions.creditTermRent || 0,
       CREDIT_TERM_UTILITY: conditions.creditTermUtility || 0,
       
+      // Area details (mapped from flat form fields → AREA_DETAILS array)
+      AREA_DETAILS: general.areaBuilding ? [{
+        BUILDING: general.areaBuilding || '',
+        FLOOR: general.areaFloor || '',
+        UNIT_NUMBER: general.areaUnitNumber || '',
+        STATUS: general.areaType || '',
+        ZONE: '',
+        WIDTH: 0,
+        LENGTH: 0,
+        TOTAL_AREA: Number(general.areaTotal) || 0
+      }] : [],
+
       // All other required fields with reasonable defaults
     } as any as Contract; // Use 'as any as Contract' to bypass strict type check for now
   }
@@ -211,25 +249,13 @@ export class ContractManagementComponent implements OnInit {
     return typeMap[code] || 'QUOTATION_AGREEMENT';
   }
 
-  /** ยกเลิกใบเสนอราคา/สัญญาจอง/สัญญาเช่า: เรียก API แล้วอัปเดตสถานะท้องถิ่น */
+  /** ยกเลิกใบเสนอราคา/สัญญาจอง/สัญญาเช่า: ลบออกจากรายการทันที */
   onContractCancelRequest(payload: { contract: Contract; cancelType: CancelType }): void {
-    const { contract, cancelType } = payload;
+    const { contract } = payload;
     const id = contract.CONTRACT_ID;
 
-    const apiCall =
-      cancelType === 'quotation'
-        ? this.contractService.cancelQuotation(id)
-        : cancelType === 'booking'
-          ? this.contractService.cancelBooking(id)
-          : this.contractService.terminateLease(id);
-
-    apiCall.subscribe(res => {
-      this.contractsList.update(list =>
-        list.map(c =>
-          c.CONTRACT_ID === id ? { ...c, STATUS: 'TERMINATED' as const } : c
-        )
-      );
-      this.contractService.saveContracts(this.contractsList());
-    });
+    // ลบสัญญาออกจากรายการเลย (ไม่แสดงในตารางอีก)
+    this.contractsList.update(list => list.filter(c => c.CONTRACT_ID !== id));
+    this.contractService.saveContracts(this.contractsList());
   }
 }

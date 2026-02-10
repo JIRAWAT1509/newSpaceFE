@@ -42,7 +42,7 @@ export type ConfirmationType = 'warning' | 'danger' | 'info' | 'success';
               <i class="pi pi-times"></i>
               <span>{{ cancelText() }}</span>
             </button>
-            <button class="btn-confirm" [class]="type()" (click)="onConfirm()">
+            <button class="btn-confirm" (click)="onConfirm()">
               <i class="pi" [ngClass]="confirmIcon()"></i>
               <span>{{ confirmText() }}</span>
             </button>
@@ -125,29 +125,14 @@ export type ConfirmationType = 'warning' | 'danger' | 'info' | 'success';
     .btn-cancel {
       @apply flex items-center justify-center gap-2 px-6 py-2.5;
       @apply bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg;
-      @apply font-medium transition-all duration-200 border-none cursor-pointer;
+      @apply font-medium text-sm transition-all duration-200 border-none cursor-pointer;
     }
 
     .btn-confirm {
       @apply flex items-center justify-center gap-2 px-6 py-2.5;
-      @apply text-white rounded-lg;
-      @apply font-medium transition-all duration-200 border-none cursor-pointer;
-    }
-
-    .btn-confirm.danger {
-      @apply bg-red-600 hover:bg-red-700;
-    }
-
-    .btn-confirm.warning {
-      @apply bg-amber-600 hover:bg-amber-700;
-    }
-
-    .btn-confirm.success {
-      @apply bg-green-600 hover:bg-green-700;
-    }
-
-    .btn-confirm.info {
-      @apply bg-blue-600 hover:bg-blue-700;
+      @apply bg-blue-600 hover:bg-blue-700 text-white rounded-lg;
+      @apply font-medium text-sm transition-all duration-200 border-none cursor-pointer;
+      @apply shadow-sm hover:shadow;
     }
   `]
 })

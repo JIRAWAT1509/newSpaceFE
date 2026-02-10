@@ -216,12 +216,25 @@
 }
 
 .square-edit-btn {
-  @apply flex items-center justify-center w-9 h-9 rounded-lg border border-blue-300;
-  @apply bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-colors cursor-pointer;
+  /* Consistent edit icon: dark pencil, no bg */
+  @apply flex items-center justify-center;
+  width: 34px;
+  height: 34px;
+  background-color: transparent;
+  border: none;
+  color: #374151;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.square-edit-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
 }
 
 .square-edit-btn i {
   @apply text-base;
+  color: inherit;
 }
 
 .square-stat-value.highlight {
@@ -337,10 +350,20 @@
 }
 
 .settings-btn {
-  @apply w-10 h-10 flex items-center justify-center;
-  @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50;
-  @apply rounded-lg transition-all duration-200;
-  @apply border-none cursor-pointer;
+  /* Consistent edit icon: dark pencil, no bg */
+  @apply flex items-center justify-center;
+  width: 34px;
+  height: 34px;
+  background-color: transparent;
+  border: none;
+  color: #374151;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.settings-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
 }
 
 /* Meter Details */

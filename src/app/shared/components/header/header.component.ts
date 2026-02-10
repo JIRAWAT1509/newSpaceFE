@@ -1,8 +1,8 @@
 // header.component.ts - UPDATED with logo navigation
 
-import { Component, HostListener, OnInit, effect, input } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, effect, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router'; // Add Router import
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
   trigger,
@@ -24,6 +24,60 @@ import { NAVIGATION_TEXTS } from '@assets/language/navigation.text';
 import { NavigationService } from '@core/services/navigation.service';
 import { HeaderService } from '@core/services/header.service';
 import { getLabelOverride } from '@core/services/ui-settings';
+
+export interface SearchResultItem {
+  title: string;
+  category: string;
+  route: string;
+  icon: string;
+  keywords: string[];
+}
+
+/** All searchable pages in the system */
+const SEARCHABLE_ITEMS: SearchResultItem[] = [
+  // Dashboard
+  { title: 'Dashboard Overview', category: 'Home > Dashboard', route: '/dashboard/overview', icon: 'pi-chart-bar', keywords: ['dashboard', 'overview', 'home', 'หน้าแรก', 'แดชบอร์ด', 'ภาพรวม'] },
+
+  // Sales
+  { title: 'Sales Dashboard', category: 'Sales > Dashboard', route: '/sales/dashboard', icon: 'pi-chart-line', keywords: ['sales', 'dashboard', 'การขาย', 'แดชบอร์ด'] },
+  { title: 'Customer Management', category: 'Sales > Customer', route: '/sales/customer', icon: 'pi-users', keywords: ['customer', 'management', 'ลูกค้า', 'จัดการลูกค้า', 'ผู้เช่า'] },
+  { title: 'Budget Management', category: 'Sales > Budget', route: '/sales/budget', icon: 'pi-wallet', keywords: ['budget', 'งบประมาณ', 'งบ'] },
+  { title: 'Pipeline Management', category: 'Sales > Pipeline', route: '/sales/pipeline', icon: 'pi-sitemap', keywords: ['pipeline', 'ไปป์ไลน์', 'lead', 'โอกาส'] },
+  { title: 'Activities Management', category: 'Sales > Activities', route: '/sales/activities', icon: 'pi-calendar', keywords: ['activities', 'กิจกรรม', 'นัดหมาย', 'activity'] },
+
+  // Area
+  { title: 'Area Layout Master', category: 'Area > Layout', route: '/area/layout/master', icon: 'pi-map', keywords: ['area', 'layout', 'master', 'พื้นที่', 'แผนผัง', 'ตึก', 'building', 'floor', 'ชั้น', 'ห้อง', 'room'] },
+
+  // Contract
+  { title: 'Contract Management', category: 'Contract > Management', route: '/contract/management', icon: 'pi-file-edit', keywords: ['contract', 'สัญญา', 'management', 'ใบเสนอราคา', 'quotation', 'สัญญาจอง', 'booking', 'lease'] },
+
+  // Finance
+  { title: 'Finance Master', category: 'Finance > Master', route: '/finance/master', icon: 'pi-wallet', keywords: ['finance', 'การเงิน', 'invoice', 'ใบแจ้งหนี้', 'ใบเสร็จ', 'receipt'] },
+
+  // Facilities
+  { title: 'Utilities Management', category: 'Facilities > Utilities', route: '/facilities/utilities/master', icon: 'pi-cog', keywords: ['facilities', 'utilities', 'meter', 'มิเตอร์', 'สาธารณูปโภค', 'ไฟฟ้า', 'น้ำ', 'electric', 'water'] },
+
+  // Reports
+  { title: 'All Reports', category: 'Report > All', route: '/reports', icon: 'pi-chart-bar', keywords: ['report', 'รายงาน', 'reports'] },
+  { title: 'Area Reports', category: 'Report > Area', route: '/reports/category/area', icon: 'pi-chart-bar', keywords: ['report', 'area', 'รายงานพื้นที่'] },
+  { title: 'Service Reports', category: 'Report > Service', route: '/reports/category/service', icon: 'pi-chart-bar', keywords: ['report', 'service', 'รายงานบริการ'] },
+  { title: 'Contract Reports', category: 'Report > Contract', route: '/reports/category/contract', icon: 'pi-chart-bar', keywords: ['report', 'contract', 'รายงานสัญญา'] },
+  { title: 'Budget Reports', category: 'Report > Budget', route: '/reports/category/budget', icon: 'pi-chart-bar', keywords: ['report', 'budget', 'รายงานงบประมาณ'] },
+  { title: 'Finance Reports', category: 'Report > Finance', route: '/reports/category/finance', icon: 'pi-chart-bar', keywords: ['report', 'finance', 'รายงานการเงิน'] },
+  { title: 'Collection Reports', category: 'Report > Collection', route: '/reports/category/collection', icon: 'pi-chart-bar', keywords: ['report', 'collection', 'รายงานเก็บเงิน'] },
+
+  // Settings
+  { title: 'User Account Management', category: 'Setting > User', route: '/setting/user-accounts/data', icon: 'pi-user-edit', keywords: ['user', 'account', 'ผู้ใช้', 'บัญชี', 'setting', 'ตั้งค่า'] },
+  { title: 'Roles & Permissions', category: 'Setting > User', route: '/setting/user-accounts/roles', icon: 'pi-lock', keywords: ['role', 'permission', 'สิทธิ์', 'บทบาท'] },
+  { title: 'Company Information', category: 'Setting > Company', route: '/setting/company/data', icon: 'pi-building', keywords: ['company', 'บริษัท', 'สาขา', 'branch'] },
+  { title: 'Bank Information', category: 'Setting > Company', route: '/setting/company/bank', icon: 'pi-credit-card', keywords: ['bank', 'ธนาคาร'] },
+  { title: 'Contract Preparation Data', category: 'Setting > System', route: '/setting/system/contract', icon: 'pi-sliders-h', keywords: ['contract', 'preparation', 'profit center', 'business type', 'ตั้งค่าสัญญา'] },
+  { title: 'Finance Document Type', category: 'Setting > Finance', route: '/setting/system/finance/document-type', icon: 'pi-file', keywords: ['document', 'type', 'ประเภทเอกสาร', 'finance'] },
+  { title: 'Finance Basic Data', category: 'Setting > Finance', route: '/setting/system/finance/basic', icon: 'pi-database', keywords: ['finance', 'basic', 'พื้นฐาน'] },
+  { title: 'Finance Revenue Data', category: 'Setting > Finance', route: '/setting/system/finance/revenue', icon: 'pi-money-bill', keywords: ['revenue', 'รายได้'] },
+  { title: 'Finance Tax Data', category: 'Setting > Finance', route: '/setting/system/finance/tax', icon: 'pi-percentage', keywords: ['tax', 'ภาษี', 'vat', 'wht'] },
+  { title: 'Interface Configuration', category: 'Setting > System', route: '/setting/system/interface', icon: 'pi-link', keywords: ['interface', 'configuration', 'api', 'ftp', 'rpa'] },
+];
 
 @Component({
   selector: 'app-header',
@@ -78,7 +132,7 @@ import { getLabelOverride } from '@core/services/ui-settings';
     ]),
   ],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   isMobile = input<boolean>(false);
 
   // Navigation data
@@ -154,9 +208,18 @@ export class HeaderComponent implements OnInit {
   }
 
   /**
-   * NEW: Navigate to home page when logo is clicked
+   * Navigate to home page when logo is clicked
    */
   onLogoClick(): void {
+    this.router.navigate(['/dashboard/overview']);
+    this.navigationService.setSidebarExpanded(false);
+  }
+
+  /**
+   * Home button in nav bar – navigate to dashboard overview
+   */
+  onHomeClick(): void {
+    this.activeMenuItem = '__home__';
     this.router.navigate(['/dashboard/overview']);
     this.navigationService.setSidebarExpanded(false);
   }
@@ -183,8 +246,51 @@ export class HeaderComponent implements OnInit {
     }
   }
 
-  onSearch(): void {
+  // ========== Universal Search Methods ==========
+
+  /** Press Enter → navigate to the best matching page */
+  onSearchGlobal(): void {
+    const query = this.searchQuery.trim().toLowerCase();
+    if (!query) return;
+
+    const match = this.findBestMatch(query);
+    if (match) {
+      this.router.navigate([match.route]);
+      this.searchQuery = '';
+    }
     this.searchService.setSearchQuery(this.searchQuery);
+  }
+
+  clearSearchSimple(): void {
+    this.searchQuery = '';
+  }
+
+  private findBestMatch(query: string): SearchResultItem | null {
+    const terms = query.split(/\s+/).filter(t => t.length > 0);
+
+    const scored = SEARCHABLE_ITEMS
+      .map(item => {
+        let score = 0;
+        const titleLower = item.title.toLowerCase();
+        const categoryLower = item.category.toLowerCase();
+        const keywordsJoined = item.keywords.join(' ').toLowerCase();
+
+        for (const term of terms) {
+          if (titleLower.includes(term)) score += 10;
+          if (titleLower.startsWith(term)) score += 5;
+          if (categoryLower.includes(term)) score += 3;
+          if (keywordsJoined.includes(term)) score += 5;
+        }
+        return { item, score };
+      })
+      .filter(r => r.score > 0)
+      .sort((a, b) => b.score - a.score);
+
+    return scored.length > 0 ? scored[0].item : null;
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup if needed
   }
 
   toggleLanguageDropdown(): void {
