@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Select } from 'primeng/select';
 import { MeterInputCardComponent } from './components/meter-input-card/meter-input-card.component';
 import { Meter, MeterType, MeterGroup, getMeterTypeLabel } from '@core/models/meter.model';
-import { MOCK_METERS, MOCK_METER_GROUPS } from '@core/data/meter.mock';
+import { MeterService } from '@core/services/meter.service';
 import { getFacilitiesUtilitiesConfig } from '@core/services/ui-settings';
 import { interval, Subscription } from 'rxjs';
 
@@ -16,6 +16,8 @@ import { interval, Subscription } from 'rxjs';
   styleUrl: './meter-input-list.component.css'
 })
 export class MeterInputListComponent implements OnInit, OnDestroy {
+  constructor(private meterService: MeterService) {}
+
   // State
   meters = signal<Meter[]>([]);
   groups = signal<MeterGroup[]>([]);
@@ -165,11 +167,23 @@ export class MeterInputListComponent implements OnInit, OnDestroy {
   }
 
   loadMeters(): void {
-    this.meters.set(MOCK_METERS);
+    this.meterService.getMeters().subscribe({
+      next: (list) => this.meters.set(list),
+      error: (err) => {
+        console.error('[MeterInputList] loadMeters failed', err);
+        this.meters.set([]);
+      }
+    });
   }
 
   loadGroups(): void {
-    this.groups.set(MOCK_METER_GROUPS);
+    this.meterService.getGroups().subscribe({
+      next: (list) => this.groups.set(list),
+      error: (err) => {
+        console.error('[MeterInputList] loadGroups failed', err);
+        this.groups.set([]);
+      }
+    });
   }
 
   selectFilter(type: MeterType | 'all' | string): void {
@@ -220,21 +234,22 @@ export class MeterInputListComponent implements OnInit, OnDestroy {
   }
 
   onReadingSaved(data: { meterId: string; reading: number; photos: string[] }): void {
-    console.log('Reading saved:', data);
-
-    // Update saved count
-    this.savedCount.update(count => count + 1);
-
-    // Remove meter from list (it will go to completed tab)
-    this.meters.update(meters =>
-      meters.filter(m => m.id !== data.meterId)
-    );
-
-    // Auto-expand next card
-    this.expandNextCard();
-
-    // TODO: Call API to save reading
-    // this.meterService.saveReading(data).subscribe(...)
+    this.meterService.saveReading(data).subscribe({
+      next: (result) => {
+        if (result.success) {
+          this.savedCount.update(count => count + 1);
+          this.meters.update(meters =>
+            meters.filter(m => m.id !== data.meterId)
+          );
+          this.expandNextCard();
+        } else {
+          console.warn('[MeterInputList] saveReading reported failure', result.message);
+        }
+      },
+      error: (err) => {
+        console.error('[MeterInputList] saveReading failed', err);
+      }
+    });
   }
 
   expandNextCard(): void {

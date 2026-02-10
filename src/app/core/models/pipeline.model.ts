@@ -1,162 +1,91 @@
-// src/app/core/models/pipeline.model.ts
+// pipeline.model.ts (UPDATED - URGENT FILTER)
+import { DateTime } from 'luxon';
+
+// Hot filters (SIMPLIFIED - combined overdue + near-due into 'urgent')
+export type HotFilter = 'all' | 'urgent' | 'high-priority' | 'medium-priority' | 'low-priority';
+
+// Rest of the file remains the same...
+export type StageSortBy =
+  | 'due-date'
+  | 'value-high'
+  | 'value-low'
+  | 'priority'
+  | 'created-date'
+  | 'customer-name'
+  | 'days-in-stage';
 
 export interface PipelineStage {
   id: string;
   name: string;
-  order: number;
-  forecastWinRate: number; // Default/Forecast win rate for the stage (0-100)
-  defaultDueDays: number; // Default days until due for new deals
   color: string;
-  isClosedWon: boolean;
-  isClosedLost: boolean;
+  forecastWinRate: number;
+  defaultDueDays: number;
+  order: number;
 }
 
 export interface Deal {
   id: string;
   title: string;
-
-  // Customer info
   customerId: string;
   customerName: string;
   companyName?: string;
-
-  // Stage & status
   stageId: string;
   stageName: string;
-
-  // Financial
-  value: number; // Deal value in THB
-  actualWinRate: number; // Actual win rate for THIS specific deal (0-100), manually configurable
-  weightedValue: number; // value * actualWinRate / 100
-
-  // Dates
+  value: number;
+  actualWinRate: number;
+  weightedValue: number;
   createdAt: string;
   movedToStageAt: string;
   dueDate: string;
-  closedAt?: string;
-
-  // Related data (from your existing system)
   areaId?: string;
   areaName?: string;
   buildingId?: string;
   buildingName?: string;
   floorNumber?: number;
-  contractId?: string;
-
-  // Contact info
   contactPerson: string;
   contactPhone: string;
   contactEmail: string;
-
-  // Classification
   tags: string[];
-  priority: 'low' | 'medium' | 'high';
+  priority: 'high' | 'medium' | 'low';
   notes: string;
-
-  // Ownership
   ownerId: string;
   ownerName: string;
-
-  // Activity tracking
   lastActivityAt: string;
-  lastActivityType?: 'note' | 'email' | 'call' | 'meeting';
+  lastActivityType: string;
   daysInStage: number;
   daysUntilDue: number;
-
-  // Additional tracking
   attachmentCount: number;
   activityCount: number;
-  nextAction?: string;
-}
-
-export interface DealActivity {
-  id: string;
-  dealId: string;
-  type: 'note' | 'email' | 'call' | 'meeting' | 'stage_change' | 'value_change' | 'win_rate_change';
-  description: string;
-  createdAt: string;
-  createdBy: string;
-  createdByName: string;
-  metadata?: Record<string, any>;
 }
 
 export interface StageMetrics {
   stageId: string;
   stageName: string;
-
-  // Deal counts
   totalDeals: number;
-
-  // Financial metrics
   totalValue: number;
   totalWeightedValue: number;
   averageDealValue: number;
-
-  // Win rates
-  forecastWinRate: number; // From stage configuration
-  actualWinRate: number; // Average of all deals' actualWinRate in this stage
-
-  // Time metrics
+  forecastWinRate: number;
+  actualWinRate: number;
   averageDaysInStage: number;
-
-  // Conversion (historical)
-  conversionRate?: number; // % of deals that moved to next stage
 }
 
 export interface PipelineMetrics {
-  // Overall counts
   totalDeals: number;
-
-  // Financial
   totalValue: number;
   totalWeightedValue: number;
   averageDealValue: number;
-
-  // Time & status
   averageDealAge: number;
   overdueDealCount: number;
-  nearDueDealCount: number; // Due in 1-2 days
-
-  // Activity
+  nearDueDealCount: number;
   dealsAddedThisWeek: number;
   dealsAddedThisMonth: number;
   dealsWonThisMonth: number;
   dealsLostThisMonth: number;
-
-  // Performance
-  winRate: number; // Historical win rate
-  averageTimeToClose: number; // Days
-
-  // Per-stage metrics
+  winRate: number;
+  averageTimeToClose: number;
   stageMetrics: StageMetrics[];
 }
-
-export interface PipelineConfig {
-  stages: PipelineStage[];
-  minStages: number; // 5
-  maxStages: number; // 7
-  defaultCardsPerPage: number; // 8
-  minCardsPerPage: number; // 4
-  maxCardsPerPage: number; // 15
-}
-
-export type HotFilter =
-  | 'all'
-  | 'overdue'
-  | 'near-due'
-  | 'high-priority'
-  | 'medium-priority'
-  | 'low-priority'
-  | 'my-deals';
-
-export type StageSortBy =
-  | 'due-date'
-  | 'value'
-  | 'probability'
-  | 'name'
-  | 'priority'
-  | 'created-date'
-  | 'days-in-stage';
 
 export interface StageViewConfig {
   stageId: string;
@@ -166,119 +95,38 @@ export interface StageViewConfig {
   cardsPerPage: number;
 }
 
-// Helper functions
-export function calculateDaysUntilDue(dueDate: string): number {
-  const due = new Date(dueDate);
-  const now = new Date();
-  const diff = due.getTime() - now.getTime();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+export function calculateWeightedValue(value: number, winRate: number): number {
+  return (value * winRate) / 100;
 }
 
 export function calculateDaysInStage(movedToStageAt: string): number {
-  const moved = new Date(movedToStageAt);
-  const now = new Date();
-  const diff = now.getTime() - moved.getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+  const movedDate = DateTime.fromISO(movedToStageAt);
+  const now = DateTime.now();
+  return Math.floor(now.diff(movedDate, 'days').days);
 }
 
-export function getDueStatus(daysUntilDue: number): 'overdue' | 'warning' | 'ok' {
+export function calculateDaysUntilDue(dueDate: string): number {
+  const due = DateTime.fromISO(dueDate);
+  const now = DateTime.now();
+  return Math.floor(due.diff(now, 'days').days);
+}
+
+export function getDueStatus(daysUntilDue: number): 'overdue' | 'warning' | 'normal' {
   if (daysUntilDue < 0) return 'overdue';
   if (daysUntilDue <= 2) return 'warning';
-  return 'ok';
-}
-
-export function calculateWeightedValue(value: number, actualWinRate: number): number {
-  return (value * actualWinRate) / 100;
-}
-
-export function addDaysToDate(date: Date, days: number): Date {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
+  return 'normal';
 }
 
 export function calculateAverageWinRate(deals: Deal[]): number {
   if (deals.length === 0) return 0;
-  const sum = deals.reduce((acc, deal) => acc + deal.actualWinRate, 0);
-  return Math.round(sum / deals.length);
+  const total = deals.reduce((sum, d) => sum + d.actualWinRate, 0);
+  return Math.round(total / deals.length);
 }
 
 export const DEFAULT_STAGES: PipelineStage[] = [
-  {
-    id: 'stage-1',
-    name: 'Prospect',
-    order: 1,
-    forecastWinRate: 15,
-    defaultDueDays: 7,
-    color: '#9CA3AF',
-    isClosedWon: false,
-    isClosedLost: false
-  },
-  {
-    id: 'stage-2',
-    name: 'Site Visit',
-    order: 2,
-    forecastWinRate: 30,
-    defaultDueDays: 7,
-    color: '#3B82F6',
-    isClosedWon: false,
-    isClosedLost: false
-  },
-  {
-    id: 'stage-3',
-    name: 'Quotation',
-    order: 3,
-    forecastWinRate: 50,
-    defaultDueDays: 14,
-    color: '#F59E0B',
-    isClosedWon: false,
-    isClosedLost: false
-  },
-  {
-    id: 'stage-4',
-    name: 'Negotiation',
-    order: 4,
-    forecastWinRate: 70,
-    defaultDueDays: 10,
-    color: '#8B5CF6',
-    isClosedWon: false,
-    isClosedLost: false
-  },
-  {
-    id: 'stage-5',
-    name: 'Closing',
-    order: 5,
-    forecastWinRate: 90,
-    defaultDueDays: 7,
-    color: '#10B981',
-    isClosedWon: true,
-    isClosedLost: false
-  }
+  { id: 'stage-001', name: 'Lead', color: '#9ca3af', forecastWinRate: 15, defaultDueDays: 7, order: 0 },
+  { id: 'stage-002', name: 'Prospect', color: '#60a5fa', forecastWinRate: 30, defaultDueDays: 14, order: 1 },
+  { id: 'stage-003', name: 'Quotation', color: '#fbbf24', forecastWinRate: 50, defaultDueDays: 7, order: 2 },
+  { id: 'stage-004', name: 'Negotiation', color: '#fb923c', forecastWinRate: 70, defaultDueDays: 7, order: 3 },
+  { id: 'stage-005', name: 'Contract', color: '#34d399', forecastWinRate: 90, defaultDueDays: 14, order: 4 }
 ];
-
-export const PRIORITY_COLORS = {
-  low: '#6B7280',
-  medium: '#F59E0B',
-  high: '#EF4444'
-};
-
-export const PRIORITY_LABELS = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High'
-};
-
-export const PRIORITY_LABELS_TH = {
-  low: 'ต่ำ',
-  medium: 'ปานกลาง',
-  high: 'สูง'
-};
-
-export const DEFAULT_CONFIG: PipelineConfig = {
-  stages: DEFAULT_STAGES,
-  minStages: 5,
-  maxStages: 7,
-  defaultCardsPerPage: 8,
-  minCardsPerPage: 4,
-  maxCardsPerPage: 15
-};

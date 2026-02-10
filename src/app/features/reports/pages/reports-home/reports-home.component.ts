@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { REPORT_CATEGORIES, REPORT_ITEMS, ReportItem } from '../../reports.data';
+import { BookmarkService } from '@core/services/bookmark.service'; // ✅ เพิ่ม
+import { NavigationSecondary } from '@core/models/navigation.model'; // ✅ เพิ่ม
 
 @Component({
   selector: 'app-reports-home',
@@ -17,13 +19,14 @@ export class ReportsHomeComponent implements OnInit {
   selectedCategoryId = 'all';
   favoritesOnly = false;
   searchQuery = '';
-  private bookmarks = new Set<string>();
-  private readonly bookmarkKey = 'space_report_bookmarks';
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private bookmarkService: BookmarkService // ✅ inject
+  ) {}
 
   ngOnInit(): void {
-    this.loadBookmarks();
     this.route.paramMap.subscribe((params) => {
       const category = params.get('category');
       this.selectedCategoryId = category || 'all';
@@ -38,7 +41,7 @@ export class ReportsHomeComponent implements OnInit {
       );
     }
     if (this.favoritesOnly) {
-      result = result.filter((item) => this.bookmarks.has(item.id));
+      result = result.filter((item) => this.isBookmarked(item.id));
     }
     if (this.searchQuery.trim()) {
       const query = this.searchQuery.trim().toLowerCase();
@@ -73,43 +76,29 @@ export class ReportsHomeComponent implements OnInit {
     );
   }
 
+  // ✅ ใช้ BookmarkService แทน
   isBookmarked(reportId: string): boolean {
-    return this.bookmarks.has(reportId);
+    return this.bookmarkService.isBookmarked(`/reports/${reportId}`);
   }
 
+  // ✅ Toggle bookmark และเพิ่มเข้า sidebar
   toggleBookmark(report: ReportItem, event: MouseEvent): void {
     event.stopPropagation();
-    if (this.bookmarks.has(report.id)) {
-      this.bookmarks.delete(report.id);
-    } else {
-      this.bookmarks.add(report.id);
-    }
-    this.persistBookmarks();
+
+    // สร้าง NavigationSecondary object
+    const bookmarkItem: NavigationSecondary = {
+      name: report.title,
+      icon: 'pi-file-export', // ใช้ PrimeNG icon
+      route: `/reports/${report.id}`,
+      isBookmark: true
+    };
+
+    this.bookmarkService.toggleBookmark(bookmarkItem);
   }
 
   openReport(report: ReportItem): void {
     if (report.route) {
       this.router.navigate([report.route]);
     }
-  }
-
-  private loadBookmarks(): void {
-    const raw = localStorage.getItem(this.bookmarkKey);
-    if (!raw) {
-      return;
-    }
-    try {
-      const parsed = JSON.parse(raw) as string[];
-      this.bookmarks = new Set(parsed);
-    } catch {
-      this.bookmarks = new Set();
-    }
-  }
-
-  private persistBookmarks(): void {
-    localStorage.setItem(
-      this.bookmarkKey,
-      JSON.stringify(Array.from(this.bookmarks))
-    );
   }
 }

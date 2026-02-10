@@ -31,11 +31,14 @@
     <!-- Tab Content -->
     <div class="modal-body">
       @if (activeTabIndex() === 0) {
-        <app-general-detail-tab [form]="generalDetailForm" />
+        <app-general-detail-tab
+          [form]="generalDetailForm"
+          (messageRequest)="showMessage($event)"
+        />
       }
 
       @if (activeTabIndex() === 1) {
-        <app-contract-detail-tab />
+        <app-contract-detail-tab [initialData]="lastContractDetailValue()" />
       }
 
       @if (activeTabIndex() === 2) {
@@ -81,7 +84,7 @@
               </div>
 
               <div class="summary-item">
-                <span class="summary-label">วันที่ระดับ Quotation:</span>
+                <span class="summary-label">วันที่สถานะใบเสนอราคา:</span>
                 <span class="summary-value">{{ formatDate(getFormValue('quotationLevelDate')) || '-' }}</span>
               </div>
 
@@ -183,6 +186,21 @@
               <div class="summary-item">
                 <span class="summary-label">ประเภทพื้นที่:</span>
                 <span class="summary-value">{{ getFormValue('areaType') || '-' }}</span>
+              </div>
+            </div>
+
+            <!-- Section D: ข้อมูลผู้ติดต่อ -->
+            <div class="summary-group">
+              <h4 class="summary-group-title">D. ข้อมูลผู้ติดต่อ</h4>
+
+              <div class="summary-item">
+                <span class="summary-label">ชื่อผู้ติดต่อ:</span>
+                <span class="summary-value">{{ getFormValue('contactName') || '-' }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">เบอร์โทรผู้ติดต่อ:</span>
+                <span class="summary-value">{{ getFormValue('contactPhone') || '-' }}</span>
               </div>
             </div>
 
@@ -325,6 +343,25 @@
           ยกเลิก
         </button>
 
+        <!-- Save as Draft button - visible on all tabs -->
+        @if (mode() !== 'edit') {
+          <button type="button" class="btn-save-quotation" (click)="onSaveDraft()">
+            <i class="pi pi-file-edit"></i>
+            <span>บันทึกแบบร่าง</span>
+          </button>
+        }
+
+        <!-- Save (quotation) button - disabled until required fields filled -->
+        <button
+          type="button"
+          class="btn-save-quotation"
+          [class.btn-disabled]="!isAllFormsValid()"
+          (click)="onSaveQuotationOnly()"
+        >
+          <i class="pi pi-save"></i>
+          <span>{{ mode() === 'edit' ? 'บันทึกการแก้ไข' : 'บันทึก' }}</span>
+        </button>
+
         @if (activeTabIndex() < tabs.length - 1) {
           <button
             type="button"
@@ -338,14 +375,46 @@
           <button
             type="button"
             class="btn-success"
+            [class.btn-disabled]="!isAllFormsValid()"
             (click)="onSubmit()"
-            [disabled]="!isAllFormsValid()"
           >
             <i class="pi pi-check"></i>
-            <span>{{ mode() === 'edit' ? 'บันทึกการแก้ไข' : 'บันทึกสัญญา' }}</span>
+            <span>บันทึกสัญญา</span>
           </button>
         }
       </div>
     </div>
   </div>
+
+  <!-- In-app message modal (e.g. from general-detail-tab) -->
+  <app-warning-modal
+    [isOpen]="showMessageModal()"
+    [title]="messageModalTitle()"
+    [message]="messageModalMessage()"
+    buttonText="ตกลง"
+    (onClose)="closeMessageModal()"
+  />
+
+  <!-- Confirm close modal (when clicking outside with unsaved data) -->
+  @if (showConfirmCloseModal()) {
+    <div class="confirm-close-backdrop" (click)="cancelClose()">
+      <div class="confirm-close-modal" (click)="$event.stopPropagation()">
+        <div class="confirm-close-icon">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+        <h3 class="confirm-close-title">ยังไม่ได้บันทึกข้อมูล</h3>
+        <p class="confirm-close-message">คุณมีข้อมูลที่กรอกแล้วแต่ยังไม่ได้บันทึก ต้องการปิดหน้าต่างนี้หรือไม่?</p>
+        <div class="confirm-close-actions">
+          <button class="btn-cancel" (click)="cancelClose()">
+            <i class="pi pi-arrow-left"></i>
+            <span>กลับไปกรอกต่อ</span>
+          </button>
+          <button class="btn-confirm" (click)="confirmClose()">
+            <i class="pi pi-times"></i>
+            <span>ปิดโดยไม่บันทึก</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

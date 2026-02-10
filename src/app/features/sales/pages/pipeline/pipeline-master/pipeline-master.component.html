@@ -51,15 +51,37 @@
       [stages]="stages()"
       [dealsByStage]="dealsByStage()"
       [stageViewConfigs]="stageViewConfigs()"
-      [stageMetrics]="stageMetrics()"
       (stageSortChange)="onStageSortChange($event)"
       (stagePageChange)="onStagePageChange($event)"
-      (stageCardsPerPageChange)="onStageCardsPerPageChange($event)"
       (stageSettings)="onStageSettings($event)"
       (dealClicked)="onDealClicked($event)"
       (dealMenuClicked)="onDealMenuClicked($event)"
       (dealMoved)="onDealMoved($event)"
     />
   </div>
+
+  <!-- Add Deal Modal -->
+  <app-add-deal-modal
+    #addDealModal
+    (save)="onAddDealSave($event)"
+  />
+
+  <!-- Edit Deal Modal -->
+  <app-edit-deal-modal
+    #editDealModal
+    (save)="onEditDealSave($event)"
+  />
+
+  <!-- Stage Config Modal -->
+  <app-stage-config-modal
+    #stageConfigModal
+    (save)="onStageConfigSave($event)"
+  />
+
+  <!-- Deal Detail Modal -->
+  <app-deal-detail-modal
+    #dealDetailModal
+    (action)="onDealDetailAction($event)"
+  />
 
 </div>

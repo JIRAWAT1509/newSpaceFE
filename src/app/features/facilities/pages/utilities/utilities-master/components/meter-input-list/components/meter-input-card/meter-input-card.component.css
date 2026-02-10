@@ -51,6 +51,248 @@
   @apply text-red-600;
 }
 
+/* ==================== INLINE MODE - การ์ดสี่เหลี่ยมจัตุรัส (กรอกได้เลยโดยไม่ต้องขยาย) ==================== */
+.meter-card.inline-square {
+  @apply flex flex-col rounded-xl border-2 border-gray-200 bg-white;
+  @apply transition-all duration-200;
+  width: 270px;
+  min-height: 260px;
+  padding: 0.875rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.meter-card.inline-square:hover {
+  @apply border-gray-300;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.square-header {
+  @apply flex items-center justify-between gap-2 mb-3 pb-2 border-b border-gray-100;
+}
+
+.square-header-left {
+  @apply flex items-center gap-3 min-w-0 flex-1;
+}
+
+.square-header .compact-icon {
+  @apply w-11 h-11 rounded-lg flex items-center justify-center text-white text-lg flex-shrink-0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.square-header .square-camera {
+  @apply flex-shrink-0;
+}
+
+.square-title-block {
+  @apply flex flex-col gap-0.5 min-w-0;
+}
+
+.square-room {
+  @apply font-bold text-gray-900 text-sm;
+}
+
+.square-tenant {
+  @apply text-xs text-gray-600 truncate;
+}
+
+.square-stats {
+  @apply grid grid-cols-2 gap-x-3 gap-y-2 mb-3;
+}
+
+.square-stat {
+  @apply flex flex-col gap-0.5;
+}
+
+.square-stat-label {
+  @apply text-xs text-gray-500;
+}
+
+.square-stat-value {
+  @apply text-sm font-bold text-gray-800;
+}
+
+.square-stat-value.positive {
+  @apply text-green-600;
+}
+
+.square-input-section {
+  @apply flex flex-col gap-1.5 mt-auto;
+}
+
+.square-input-label {
+  @apply text-xs font-medium text-gray-700;
+}
+
+.square-input-label .required {
+  @apply text-red-500;
+}
+
+.square-input-row {
+  @apply flex items-center gap-2;
+}
+
+.square-input {
+  @apply flex-1 min-w-0 px-3 py-2 rounded-lg border border-gray-300 text-sm;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+.square-input.error {
+  @apply border-red-500 ring-1 ring-red-500;
+}
+
+.square-input.success {
+  @apply border-green-500 bg-green-50;
+}
+
+.square-save {
+  @apply flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium flex-shrink-0;
+  @apply bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.square-save.saving {
+  @apply opacity-80;
+}
+
+.square-save.success {
+  @apply bg-green-600 hover:bg-green-600;
+}
+
+.square-error {
+  @apply text-xs text-red-600 flex items-center gap-1;
+}
+
+.square-range {
+  /* ลดขนาดให้พอดี 1 บรรทัดใน 280×280 */
+  /* ห้ามตัดข้อความ: แสดงครบ (ถ้าพื้นที่ไม่พอให้ wrap ได้) */
+  @apply text-[10px] leading-snug text-gray-500 flex items-start gap-1;
+}
+
+.square-range i {
+  @apply text-[10px] flex-shrink-0;
+}
+
+.square-range span {
+  /* ลดขนาด “Expected range: …” ให้เล็กลงมาก ๆ เฉพาะบรรทัดนี้ */
+  @apply text-[8.5px] leading-tight break-words;
+}
+
+.square-range.warning {
+  @apply text-amber-600;
+}
+
+.square-warning {
+  @apply mt-1;
+}
+
+.warning-message.square-warning {
+  @apply flex items-center gap-2 text-xs text-amber-700;
+  @apply bg-amber-50 px-3 py-2 rounded-lg;
+}
+
+.warning-message.square-warning i {
+  @apply text-amber-600;
+}
+
+.square-photo-row {
+  @apply flex items-center gap-2 flex-wrap mt-2 pt-2 border-t border-gray-100;
+}
+
+.square-camera {
+  @apply flex items-center justify-center w-9 h-9 rounded-lg border border-gray-300;
+  @apply bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors cursor-pointer;
+}
+
+.square-camera i {
+  @apply text-base;
+}
+
+/* ==================== COMPLETED METERS INLINE STYLES ==================== */
+.meter-card.completed-card {
+  @apply border-green-200 bg-green-50/30;
+}
+
+.meter-card.completed-card:hover {
+  @apply border-green-300;
+}
+
+.square-edit-btn {
+  /* Consistent edit icon: dark pencil, no bg */
+  @apply flex items-center justify-center;
+  width: 34px;
+  height: 34px;
+  background-color: transparent;
+  border: none;
+  color: #374151;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.square-edit-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.square-edit-btn i {
+  @apply text-base;
+  color: inherit;
+}
+
+.square-stat-value.highlight {
+  @apply text-green-600 font-bold;
+}
+
+.completed-badge {
+  @apply flex items-center justify-center gap-2 mt-auto pt-3;
+  @apply text-sm font-semibold text-green-600;
+}
+
+.completed-badge i {
+  @apply text-base;
+}
+
+.square-edit-actions {
+  @apply flex gap-2 mt-2;
+}
+
+.cancel-btn {
+  @apply flex items-center justify-center gap-1 px-3 py-2;
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg;
+  @apply text-xs font-semibold transition-all duration-200 border-none cursor-pointer flex-1;
+}
+
+.square-photos-preview {
+  @apply flex gap-1 flex-wrap;
+}
+
+.square-photo-thumb {
+  @apply relative w-10 h-10 rounded overflow-hidden border border-gray-200;
+}
+
+.square-photo-thumb img {
+  @apply w-full h-full object-cover;
+}
+
+.remove-photo.small {
+  @apply absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 hover:opacity-100 transition-opacity text-xs;
+}
+
+@media (max-width: 640px) {
+  .meter-card.inline-square {
+    width: 270px;
+    min-width: 270px;
+    min-height: 260px;
+    justify-self: center;
+  }
+
+  .square-input-row {
+    @apply flex-col items-stretch;
+  }
+
+  .square-save {
+    @apply justify-center;
+  }
+}
+
 /* ==================== NORMAL MODE (Expanded: 500px x 400px) ==================== */
 .meter-card.normal {
   @apply relative bg-white rounded-xl p-6 border-2 border-gray-200;
@@ -108,10 +350,20 @@
 }
 
 .settings-btn {
-  @apply w-10 h-10 flex items-center justify-center;
-  @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50;
-  @apply rounded-lg transition-all duration-200;
-  @apply border-none cursor-pointer;
+  /* Consistent edit icon: dark pencil, no bg */
+  @apply flex items-center justify-center;
+  width: 34px;
+  height: 34px;
+  background-color: transparent;
+  border: none;
+  color: #374151;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.settings-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
 }
 
 /* Meter Details */
@@ -227,6 +479,11 @@ input:disabled {
   @apply bg-blue-50 px-3 py-2 rounded-lg;
 }
 
+.expected-range span {
+  /* ลดขนาดข้อความ Expected range / Minimum allowed ในโหมดขยาย */
+  @apply text-[10px] leading-tight;
+}
+
 .expected-range.warning {
   @apply bg-yellow-50 text-yellow-700;
 }
@@ -239,6 +496,16 @@ input:disabled {
 .error-message {
   @apply flex items-center gap-2 text-sm text-red-600;
   @apply bg-red-50 px-3 py-2 rounded-lg;
+}
+
+/* Warning Message (allow save) */
+.warning-message {
+  @apply flex items-center gap-2 text-sm text-amber-700;
+  @apply bg-amber-50 px-3 py-2 rounded-lg;
+}
+
+.warning-message i {
+  @apply text-amber-600;
 }
 
 /* Photo Section */

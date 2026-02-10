@@ -42,7 +42,46 @@
       (viewMonthly)="onViewMonthlyBreakdown($event)"
     ></app-company-budget-card>
 
-    <!-- Teams Section -->
+    <!-- ==================== NEW KANBAN BOARD ==================== -->
+    <div class="kanban-section">
+      <div class="section-header">
+        <h3 class="section-title">Teams</h3>
+        <button class="btn-add-team" (click)="openAddTeamModal()">
+          <i class="pi pi-plus"></i>
+          <span>Add Team</span>
+        </button>
+      </div>
+
+      @if (selectedCompany()!.teams.length > 0) {
+        <div class="kanban-container">
+          <app-budget-kanban-board
+            [teams]="selectedCompany()!.teams"
+            [teamViewConfigs]="teamViewConfigs()"
+            (teamSortChange)="onTeamSortChange($event)"
+            (teamPageChange)="onTeamPageChange($event)"
+            (teamCardsPerPageChange)="onTeamCardsPerPageChange($event)"
+            (editTeam)="onEditTeam($event)"
+            (deleteTeam)="onDeleteTeam($event)"
+            (addMember)="onAddMember($event)"
+            (editMember)="onEditMember($event)"
+            (memberMoved)="onMemberMoved($event)"
+          />
+        </div>
+      } @else {
+        <div class="empty-state">
+          <i class="pi pi-users"></i>
+          <h3>No Teams Yet</h3>
+          <p>Create your first team to start allocating budgets</p>
+          <button class="btn-add-empty" (click)="openAddTeamModal()">
+            <i class="pi pi-plus"></i>
+            <span>Add First Team</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- ==================== OLD TEAMS LIST (COMMENTED) ==================== -->
+    <!--
     <div class="teams-section">
       <div class="section-header">
         <h3 class="section-title">Teams</h3>
@@ -52,7 +91,6 @@
         </button>
       </div>
 
-      <!-- Teams List -->
       @if (selectedCompany()!.teams.length > 0) {
         <div class="teams-list">
           @for (team of selectedCompany()!.teams; track team.id) {
@@ -82,11 +120,12 @@
         </div>
       }
     </div>
+    -->
 
     <!-- Budget Summary -->
-    <app-budget-summary
+    <!-- <app-budget-summary
       [company]="selectedCompany()!"
-    ></app-budget-summary>
+    ></app-budget-summary> -->
 
   } @else {
     <!-- No Company Selected -->

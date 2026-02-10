@@ -277,7 +277,7 @@ export class CustomerMasterComponent implements OnInit {
       this.isLoading.set(false);
       this.closeDrawer();
 
-      console.log('Customer created:', newCustomer);
+      ////console.log('Customer created:', newCustomer);
     }, 500);
   }
 
@@ -326,7 +326,7 @@ export class CustomerMasterComponent implements OnInit {
       this.isLoading.set(false);
       this.closeDrawer();
 
-      console.log('Customer updated:', customerId);
+      ////console.log('Customer updated:', customerId);
     }, 500);
   }
 
@@ -347,7 +347,7 @@ export class CustomerMasterComponent implements OnInit {
 
       this.isLoading.set(false);
 
-      console.log('Customer deleted:', customerId);
+      ////console.log('Customer deleted:', customerId);
     }, 300);
   }
 
@@ -389,7 +389,7 @@ export class CustomerMasterComponent implements OnInit {
   // ==================== EXPORT ====================
 
   exportCustomers(): void {
-    console.log('Exporting customers...', this.filteredCustomers());
+    ////console.log('Exporting customers...', this.filteredCustomers());
     alert('Export functionality will be implemented in production');
   }
 

@@ -1,20 +1,25 @@
-<!-- kanban-board.component.html -->
+<!-- kanban-board.component.html (FIXED - USES STAGE-COLUMN) -->
 
 <div class="kanban-board">
 
   @for (stage of stages(); track stage.id) {
     <app-stage-column
       [stage]="stage"
-      [deals]="getDealsForStage(stage.id)"
-      [viewConfig]="getViewConfigForStage(stage.id)"
-      [stageMetrics]="getMetricsForStage(stage.id)"
-      (sortChange)="onStageSortChange(stage.id, $event)"
-      (pageChange)="onStagePageChange(stage.id, $event)"
-      (cardsPerPageChange)="onStageCardsPerPageChange(stage.id, $event)"
-      (stageSettings)="onStageSettings(stage.id)"
-      (dealClicked)="onDealClicked($event)"
-      (dealMenuClicked)="onDealMenuClicked($event)"
-      (dealDropped)="onDealDropped($event, stage.id)"
+      [deals]="getStageDeals(stage.id)"
+      [viewConfig]="getStageConfig(stage.id)"
+      [metrics]="getStageMetrics(stage.id)"
+      [isDraggingGlobal]="isDragging()"
+      [globalMousePosition]="currentMousePosition()"
+      [currentDragDealId]="currentDragDealId"
+      (sortChange)="onSortChange(stage.id, $event)"
+      (pageChange)="onPageChange(stage.id, $event)"
+      (cardsPerPageChange)="onCardsPerPageChange(stage.id, $event)"
+      (settingsClick)="onSettingsClick(stage.id)"
+      (dealClick)="onDealClick($event)"
+      (dealMenuClick)="onDealMenu($event)"
+      (dealDragStart)="onDealDragStart($event)"
+      (dealDragEnd)="onDealDragEnd(stage.id)"
+      (dealDrop)="onDealDrop($event)"
     />
   }
 

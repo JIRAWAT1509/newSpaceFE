@@ -43,3 +43,6 @@ Thumbs.db
 
 **/environments/
 
+*.json
+*.json
+angular.json

@@ -97,7 +97,7 @@
 
 /* ==================== Actions Section ==================== */
 .actions-section {
-  @apply px-6 py-3 border-b border-gray-200;
+  @apply pl-2 pr-6 py-3 border-b border-gray-200;
   @apply flex items-center justify-between;
 }
 
@@ -129,11 +129,11 @@
   @apply text-sm text-gray-600 font-medium;
 }
 
-/* Bulk Actions Menu */
+/* Bulk Actions Menu - เปิดขึ้นด้านบน ไม่บังตาราง */
 .bulk-actions-menu {
-  @apply absolute top-full left-0 mt-2 z-10;
+  @apply absolute bottom-full left-0 mb-2 z-20;
   @apply bg-white rounded-lg shadow-lg border border-gray-200;
-  @apply py-1 min-w-[200px];
+  @apply py-1 min-w-[220px];
 }
 
 .menu-item {
@@ -229,6 +229,86 @@
   @apply text-lg font-medium;
 }
 
+/* ==================== Drafts Panel ==================== */
+.drafts-panel {
+  @apply mx-6 my-4 bg-amber-50 border border-amber-200 rounded-xl overflow-hidden;
+}
+
+.drafts-header {
+  @apply flex items-center justify-between px-4 py-3 cursor-pointer;
+  @apply bg-amber-100 hover:bg-amber-200 transition-colors;
+}
+
+.drafts-title {
+  @apply flex items-center gap-2 text-amber-800 font-semibold;
+}
+
+.drafts-title i {
+  @apply text-lg;
+}
+
+.drafts-header > i {
+  @apply text-amber-600;
+}
+
+.drafts-list {
+  @apply p-3 space-y-2;
+}
+
+.draft-item {
+  @apply flex items-center justify-between p-3 bg-white rounded-lg border border-amber-200;
+  @apply hover:border-amber-400 transition-colors;
+}
+
+.draft-info {
+  @apply flex-1 min-w-0;
+}
+
+.draft-name {
+  @apply font-semibold text-gray-800 truncate;
+}
+
+.draft-meta {
+  @apply flex items-center gap-3 text-xs text-gray-500 mt-1;
+}
+
+.draft-progress {
+  @apply px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-medium;
+}
+
+.draft-actions {
+  @apply flex items-center gap-2 ml-3;
+}
+
+.draft-btn {
+  @apply flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium;
+  @apply transition-all;
+}
+
+.draft-btn.continue {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.draft-btn.delete {
+  /* Uses global .sp-delete-btn style via styles.css */
+  background-color: #E8847C !important;
+  color: #ffffff !important;
+  border-radius: 50% !important;
+  @apply w-8 h-8 p-0 justify-center;
+}
+
+.draft-btn.delete:hover {
+  background-color: #D6726A !important;
+}
+
+.draft-btn.delete i {
+  color: #ffffff !important;
+}
+
+.draft-btn.delete span {
+  @apply hidden;
+}
+
 /* ==================== Modal ==================== */
 .modal-backdrop {
   @apply fixed inset-0 bg-black bg-opacity-50 z-50;
@@ -275,27 +355,99 @@
   @apply font-medium text-sm transition-colors;
 }
 
-/* ==================== Responsive ==================== */
+/* ==================== Responsive - Mobile ==================== */
 @media (max-width: 768px) {
+  .contract-table-container {
+    min-height: 400px;
+    height: auto;
+  }
+
   .search-section {
-    @apply px-4 py-3;
+    @apply px-4 py-3 gap-2;
+  }
+
+  .search-bar {
+    @apply flex-col items-stretch gap-2;
+  }
+
+  .search-input-wrapper {
+    min-width: 0;
+  }
+
+  .advance-search-btn {
+    @apply w-full justify-center;
+  }
+
+  .advance-search-btn span {
+    @apply text-sm;
   }
 
   .actions-section {
-    @apply px-4 py-2 flex-col items-stretch gap-2;
+    @apply pl-2 pr-4 py-3 flex-wrap gap-2;
   }
 
-  .actions-left,
+  .actions-left {
+    @apply flex-wrap;
+  }
+
   .actions-right {
-    @apply justify-between;
+    @apply w-full sm:w-auto;
+  }
+
+  .action-btn.add-btn {
+    @apply w-full sm:w-auto justify-center;
+  }
+
+  .table-wrapper {
+    @apply overflow-x-auto overflow-y-auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .data-table {
+    min-width: 720px;
     @apply text-xs;
   }
 
   .data-table th,
   .data-table td {
-    @apply px-2 py-2;
+    @apply px-2 py-2.5 whitespace-nowrap;
+  }
+
+  .contract-number-cell {
+    @apply gap-2 min-w-0 max-w-[140px];
+  }
+
+  .contract-number {
+    @apply truncate block;
+  }
+
+  .company-name {
+    @apply truncate block;
+  }
+
+  .bulk-actions-menu {
+    min-width: 200px;
+  }
+
+  .row-actions-menu {
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-section {
+    @apply px-3 py-2;
+  }
+
+  .actions-section {
+    @apply pl-2 pr-3 py-2;
+  }
+
+  .advance-search-btn span {
+    font-size: 0.8125rem;
+  }
+
+  .filter-tag {
+    @apply px-2 py-1 text-xs;
   }
 }

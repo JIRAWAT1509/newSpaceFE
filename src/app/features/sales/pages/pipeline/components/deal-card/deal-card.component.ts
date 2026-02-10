@@ -1,7 +1,7 @@
-// deal-card.component.ts
-import { Component, input, output } from '@angular/core';
+// deal-card.component.ts (FIXED CLICK AND DROP)
+import { Component, input, output, signal, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Deal, getDueStatus } from '@core/models/pipeline.model';
+import { Deal } from '@core/models/pipeline.model';
 
 @Component({
   selector: 'app-deal-card',
@@ -11,134 +11,228 @@ import { Deal, getDueStatus } from '@core/models/pipeline.model';
   styleUrl: './deal-card.component.css'
 })
 export class DealCardComponent {
+  private elementRef = inject(ElementRef);
+
   // Inputs
   deal = input.required<Deal>();
 
   // Outputs
-  clicked = output<void>();
-  menuClicked = output<void>();
+  cardClick = output<string>();
+  menuClick = output<string>();
+  dragStart = output<{ dealId: string; event: MouseEvent }>();
+  dragging = output<MouseEvent>();
+  dragEnd = output<MouseEvent>();
+
+  // State
+  isHolding = signal(false);
+  isDragging = signal(false);
+
+  private pressTimer: any = null;
+  private canDrag = false;
+  private dragGhost: HTMLElement | null = null;
+  private mouseDownX = 0;
+  private mouseDownY = 0;
+  private mouseDownTime = 0;
+
+  // Handle card mouse down
+  onCardMouseDown(event: MouseEvent): void {
+    // Ignore if clicking menu button
+    const target = event.target as HTMLElement;
+    if (target.closest('.card-menu-btn')) {
+      return;
+    }
+
+    // Prevent text selection
+    event.preventDefault();
+
+    this.mouseDownX = event.clientX;
+    this.mouseDownY = event.clientY;
+    this.mouseDownTime = Date.now();
+    this.canDrag = false;
+    this.isHolding.set(true);
+
+    ////console.log('⏱️ Hold started - 500ms timer');
+
+    // Start 500ms timer
+    this.pressTimer = setTimeout(() => {
+      this.canDrag = true;
+      this.isHolding.set(false);
+      ////console.log('✅ Can drag now!');
+    }, 500);
+
+    // Add global listeners
+    document.addEventListener('mousemove', this.onDocumentMouseMove);
+    document.addEventListener('mouseup', this.onDocumentMouseUp);
+  }
+
+  // Handle document mouse move
+  private onDocumentMouseMove = (event: MouseEvent): void => {
+    const deltaX = Math.abs(event.clientX - this.mouseDownX);
+    const deltaY = Math.abs(event.clientY - this.mouseDownY);
+
+    // If still holding (before 500ms)
+    if (this.isHolding()) {
+      // Cancel if moved way too far
+      if (deltaX > 30 || deltaY > 30) {
+        ////console.log('❌ Moved too far during hold - canceling');
+        this.cancelPress();
+      }
+      return;
+    }
+
+    // After 500ms, can drag
+    if (this.canDrag && (deltaX > 5 || deltaY > 5)) {
+      if (!this.isDragging()) {
+        // Start dragging
+        this.isDragging.set(true);
+        this.createDragGhost(event);
+        this.dragStart.emit({
+          dealId: this.deal().id,
+          event
+        });
+        ////console.log('🎯 Dragging started:', this.deal().id);
+      } else {
+        // Update ghost position
+        this.updateDragGhost(event);
+        this.dragging.emit(event);
+      }
+    }
+  };
+
+  // Create drag ghost
+  private createDragGhost(event: MouseEvent): void {
+    const card = this.elementRef.nativeElement.querySelector('.deal-card');
+    if (!card) return;
+
+    // Clone the card
+    this.dragGhost = card.cloneNode(true) as HTMLElement;
+    this.dragGhost.classList.add('drag-ghost');
+    this.dragGhost.style.position = 'fixed';
+    this.dragGhost.style.width = card.clientWidth + 'px';
+    this.dragGhost.style.pointerEvents = 'none';
+    this.dragGhost.style.zIndex = '10000';
+
+    // Position at mouse
+    this.updateDragGhost(event);
+
+    document.body.appendChild(this.dragGhost);
+    ////console.log('👻 Drag ghost created');
+  }
+
+  // Update drag ghost position
+  private updateDragGhost(event: MouseEvent): void {
+    if (this.dragGhost) {
+      this.dragGhost.style.left = (event.clientX + 10) + 'px';
+      this.dragGhost.style.top = (event.clientY + 10) + 'px';
+    }
+  }
+
+  // Remove drag ghost
+  private removeDragGhost(): void {
+    if (this.dragGhost && this.dragGhost.parentNode) {
+      this.dragGhost.parentNode.removeChild(this.dragGhost);
+      this.dragGhost = null;
+      ////console.log('👻 Drag ghost removed');
+    }
+  }
+
+  // Handle document mouse up
+  private onDocumentMouseUp = (event: MouseEvent): void => {
+    const duration = Date.now() - this.mouseDownTime;
+    const wasDragging = this.isDragging();
+    const deltaX = Math.abs(event.clientX - this.mouseDownX);
+    const deltaY = Math.abs(event.clientY - this.mouseDownY);
+
+    ////console.log('🖱️ Mouse up - Duration:', duration + 'ms', 'Dragging:', wasDragging, 'Moved:', deltaX + 'px');
+
+    if (wasDragging) {
+      // Was dragging - end drag
+      this.dragEnd.emit(event);
+      this.removeDragGhost();
+      ////console.log('🎯 Drag ended');
+    } else {
+      // Not dragging - check if it's a click
+      // Accept as click if: duration < 500ms OR (duration >= 500ms but didn't move much)
+      if (deltaX < 10 && deltaY < 10) {
+        this.onCardClick();
+        ////console.log('👆 Click - opening modal');
+      } else {
+        ////console.log('❌ Moved too much - not a click');
+      }
+    }
+
+    // Cleanup
+    this.cancelPress();
+    document.removeEventListener('mousemove', this.onDocumentMouseMove);
+    document.removeEventListener('mouseup', this.onDocumentMouseUp);
+  };
+
+  // Cancel press
+  private cancelPress(): void {
+    if (this.pressTimer) {
+      clearTimeout(this.pressTimer);
+      this.pressTimer = null;
+    }
+    this.isHolding.set(false);
+    this.isDragging.set(false);
+    this.canDrag = false;
+    this.removeDragGhost();
+  }
 
   // Handle card click
   onCardClick(): void {
-    this.clicked.emit();
+    this.cardClick.emit(this.deal().id);
   }
 
-  // Handle menu click (prevent card click)
+  // Handle menu click
   onMenuClick(event: Event): void {
     event.stopPropagation();
-    this.menuClicked.emit();
-  }
-
-  // Get customer initials for avatar
-  getCustomerInitials(): string {
-    const name = this.deal().customerName;
-    if (!name) return '?';
-
-    // For Thai names, take first character
-    const firstChar = name.charAt(0);
-    return firstChar.toUpperCase();
-  }
-
-  // Get owner initials for avatar
-  getOwnerInitials(): string {
-    const name = this.deal().ownerName;
-    if (!name) return '?';
-
-    // For English names, take first letter of first and last name
-    const parts = name.split(' ');
-    if (parts.length >= 2) {
-      return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
-    }
-    return name.charAt(0).toUpperCase();
-  }
-
-  // Get due status
-  getDueStatusClass(): 'overdue' | 'warning' | 'ok' {
-    return getDueStatus(this.deal().daysUntilDue);
-  }
-
-  // Get due status text
-  getDueStatusText(): string {
-    const days = this.deal().daysUntilDue;
-    const status = this.getDueStatusClass();
-
-    if (status === 'overdue') {
-      return `Overdue ${Math.abs(days)} days`;
-    }
-    if (status === 'warning') {
-      return `Due in ${days} day${days === 1 ? '' : 's'}`;
-    }
-    return `${days} days left`;
-  }
-
-  // Get due status icon
-  getDueStatusIcon(): string {
-    const status = this.getDueStatusClass();
-    if (status === 'overdue') return '🔴';
-    if (status === 'warning') return '⚠️';
-    return '✓';
+    this.menuClick.emit(this.deal().id);
   }
 
   // Format currency
-  formatCurrency(amount: number): string {
-    if (amount >= 1000000) {
-      return `฿${(amount / 1000000).toFixed(1)}M`;
+  formatCurrency(value: number): string {
+    if (value >= 1000000) {
+      return `฿${(value / 1000000).toFixed(2)}M`;
     }
-    if (amount >= 1000) {
-      return `฿${(amount / 1000).toFixed(0)}K`;
+    if (value >= 1000) {
+      return `฿${(value / 1000).toFixed(0)}K`;
     }
-    return `฿${amount.toLocaleString()}`;
+    return `฿${value.toLocaleString()}`;
   }
 
-  // Get priority badge class
-  getPriorityClass(): string {
-    return this.deal().priority;
+  // Format due date
+  formatDueDate(): string {
+    const daysUntilDue = this.deal().daysUntilDue;
+
+    if (daysUntilDue < 0) {
+      return `${Math.abs(daysUntilDue)}d overdue`;
+    } else if (daysUntilDue === 0) {
+      return 'Due today';
+    } else if (daysUntilDue === 1) {
+      return 'Due tomorrow';
+    } else {
+      return `Due in ${daysUntilDue}d`;
+    }
   }
 
-  // Get priority label
-  getPriorityLabel(): string {
-    const priority = this.deal().priority;
-    const labels: Record<string, string> = {
-      high: 'High',
-      medium: 'Medium',
-      low: 'Low'
-    };
-    return labels[priority] || priority;
+  // Get due date class
+  getDueDateClass(): string {
+    const daysUntilDue = this.deal().daysUntilDue;
+
+    if (daysUntilDue < 0) {
+      return 'overdue';
+    } else if (daysUntilDue <= 2) {
+      return 'warning';
+    } else {
+      return 'normal';
+    }
   }
 
-  // Get priority icon
-  getPriorityIcon(): string {
-    const priority = this.deal().priority;
-    if (priority === 'high') return '🔴';
-    if (priority === 'medium') return '🟡';
-    return '⚪';
-  }
-
-  // Get last activity text
-  getLastActivityText(): string {
-    const type = this.deal().lastActivityType;
-    if (!type) return 'No activity';
-
-    const labels: Record<string, string> = {
-      note: '📝 Note',
-      email: '✉️ Email',
-      call: '📞 Call',
-      meeting: '🤝 Meeting'
-    };
-    return labels[type] || type;
-  }
-
-  // Format time ago
-  getTimeAgo(): string {
-    const lastActivity = new Date(this.deal().lastActivityAt);
-    const now = new Date();
-    const diffMs = now.getTime() - lastActivity.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return lastActivity.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  // Cleanup
+  ngOnDestroy(): void {
+    this.cancelPress();
+    document.removeEventListener('mousemove', this.onDocumentMouseMove);
+    document.removeEventListener('mouseup', this.onDocumentMouseUp);
   }
 }

@@ -1,5 +1,4 @@
 <!-- invoice-management.component.html -->
-
 <div class="invoice-container">
   <!-- Header with Actions -->
   <div class="content-header">
@@ -7,41 +6,54 @@
       <h2 class="page-title">ตารางรายการสัญญาที่พร้อมเรียกเก็บในเดือนนี้</h2>
       <p class="page-subtitle">เลือกรายการเพื่อออกใบแจ้งหนี้</p>
     </div>
-
     <!-- Top Right Actions -->
-    <div class="header-actions">
-      <!-- Bulk Actions (shown when items selected) -->
-      @if (showBulkActions()) {
-        <div class="bulk-action-group">
-          <span class="selected-count">เลือกแล้ว {{ getSelectedCount() }} รายการ</span>
+    <div class="header-actions" style="display: flex; align-items: center; gap: 12px;">
 
-          <!-- Split Button with Dropdown -->
-          <div class="split-button-wrapper">
-            <button class="btn btn-primary" (click)="toggleActionDropdown()">
-              <span>ดูประวัติ การออกใบแจ้งหนี้</span>
-              <i class="pi" [ngClass]="showActionDropdown() ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+      <!-- Split Button with Dropdown (always shown) -->
+      <div class="split-button-wrapper" style="position: relative;">
+        <button
+          class="btn btn-primary"
+          (click)="toggleActionDropdown()"
+          style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; white-space: nowrap;">
+          <span>ดูประวัติ การออกใบแจ้งหนี้</span>
+          <i class="pi" [ngClass]="showActionDropdown() ? 'pi-chevron-up' : 'pi-chevron-down'" style="font-size: 12px;"></i>
+        </button>
+        @if (showActionDropdown()) {
+          <div class="dropdown-menu" style="position: absolute; top: 100%; right: 0; margin-top: 8px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 250px; z-index: 1000;">
+            <button
+              class="dropdown-item"
+              (click)="onIssueInvoice('ออกใบแจ้งหนี้')"
+              style="display: block; width: 100%; padding: 12px 16px; text-align: left; border: none; background: transparent; cursor: pointer; font-size: 14px; transition: background 0.2s;"
+              onmouseover="this.style.background='#f5f5f5'"
+              onmouseout="this.style.background='transparent'">
+              ออกใบแจ้งหนี้
             </button>
-
-            @if (showActionDropdown()) {
-              <div class="dropdown-menu">
-                <button class="dropdown-item" (click)="onIssueInvoice('ออกใบแจ้งหนี้')">
-                  ออกใบแจ้งหนี้
-                </button>
-                <button class="dropdown-item" (click)="onIssueInvoice('ออกใบแจ้งหนี้ + พิมพ์เอกสาร')">
-                  ออกใบแจ้งหนี้ + พิมพ์เอกสาร
-                </button>
-                <button class="dropdown-item" (click)="onIssueInvoice('ออกใบแจ้งหนี้ + ส่งอีเมล')">
-                  ออกใบแจ้งหนี้ + ส่งอีเมล
-                </button>
-              </div>
-            }
+            <button
+              class="dropdown-item"
+              (click)="onIssueInvoice('ออกใบแจ้งหนี้ + พิมพ์เอกสาร')"
+              style="display: block; width: 100%; padding: 12px 16px; text-align: left; border: none; background: transparent; cursor: pointer; font-size: 14px; transition: background 0.2s;"
+              onmouseover="this.style.background='#f5f5f5'"
+              onmouseout="this.style.background='transparent'">
+              ออกใบแจ้งหนี้ + พิมพ์เอกสาร
+            </button>
+            <button
+              class="dropdown-item"
+              (click)="onIssueInvoice('ออกใบแจ้งหนี้ + ส่งอีเมล')"
+              style="display: block; width: 100%; padding: 12px 16px; text-align: left; border: none; background: transparent; cursor: pointer; font-size: 14px; transition: background 0.2s;"
+              onmouseover="this.style.background='#f5f5f5'"
+              onmouseout="this.style.background='transparent'">
+              ออกใบแจ้งหนี้ + ส่งอีเมล
+            </button>
           </div>
-        </div>
-      }
+        }
+      </div>
 
       <!-- Create Button (always shown) -->
-      <button class="btn btn-create" (click)="openCreateDrawer()">
-        <i class="pi pi-plus"></i>
+      <button
+        class="btn btn-create"
+        (click)="openCreateDrawer()"
+        style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; white-space: nowrap;">
+        <i class="pi pi-plus" style="font-size: 14px;"></i>
         <span>สร้างใบแจ้งหนี้ - อื่นๆ Manual</span>
       </button>
     </div>
@@ -116,6 +128,32 @@
       </tbody>
     </table>
   </div>
+
+<!-- Bottom Action Bar (shown when items selected) -->
+@if (showBulkActions()) {
+  <div class="bottom-action-bar" style="position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 2px solid #e0e0e0; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 1000;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <span style="color: #666; font-size: 14px; font-weight: 500;">
+        เลือกแล้ว <strong style="color: #6366f1;">{{ getSelectedCount() }}</strong> รายการ
+      </span>
+    </div>
+    <div style="display: flex; gap: 12px;">
+      <button
+        class="btn btn-secondary"
+        (click)="toggleSelectAll($event)"
+        style="padding: 10px 20px; background: #f3f4f6; color: #374151; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+        ยกเลิกการเลือก
+      </button>
+      <button
+        class="btn btn-primary"
+        onclick="alert('ออกใบแจ้งหนี้แล้ว')"
+        style="padding: 10px 24px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+        ออกใบแจ้งหนี้
+      </button>
+    </div>
+  </div>
+}
+
 </div>
 
 <!-- Create Invoice Drawer (Right Side) -->
@@ -128,34 +166,28 @@
         <i class="pi pi-times"></i>
       </button>
     </div>
-
     <div class="drawer-content">
       <!-- Form Fields (Mock) -->
       <div class="form-group">
         <label>ลูกค้า</label>
         <input type="text" placeholder="Placeholder..." />
       </div>
-
       <div class="form-group">
         <label>ชื่อกิจการ</label>
         <input type="text" placeholder="Placeholder..." />
       </div>
-
       <div class="form-group">
         <label>เลขที่สัญญาเช่า บ. หลัก</label>
         <input type="text" placeholder="Placeholder..." />
       </div>
-
       <div class="form-group">
         <label>อาคาร:</label>
         <input type="text" placeholder="Placeholder..." />
       </div>
-
       <div class="form-group">
         <label>หมวดสินค้า/บริการ:</label>
         <input type="text" placeholder="Placeholder..." />
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label>ประเภทสัญญา</label>
@@ -166,21 +198,18 @@
           <input type="text" placeholder="Placeholder..." />
         </div>
       </div>
-
       <div class="form-group">
         <label class="toggle-label">
           <span>สัญญาหลัก</span>
           <input type="checkbox" />
         </label>
       </div>
-
       <div class="form-group">
         <label class="toggle-label">
           <span>สัญญาเสริม</span>
           <input type="checkbox" />
         </label>
       </div>
-
       <div class="form-group">
         <label class="toggle-label">
           <span>Discount</span>
@@ -188,7 +217,6 @@
         </label>
       </div>
     </div>
-
     <div class="drawer-footer">
       <button class="btn btn-secondary" (click)="closeCreateDrawer()">
         ยกเลิก
@@ -199,3 +227,24 @@
     </div>
   </div>
 }
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  type="warning"
+  title="ยกเลิกใบแจ้งหนี้"
+  [message]="'คุณต้องการยกเลิกใบแจ้งหนี้ ' + (pendingCancelInvoice()?.contractNumber || '') + ' หรือไม่?'"
+  confirmText="ยกเลิกใบแจ้งหนี้"
+  confirmIcon="pi-times"
+  (confirm)="onConfirmCancel()"
+  (cancel)="onCancelConfirm()"
+/>
+
+<!-- Message Modal -->
+<app-warning-modal
+  [isOpen]="showMessageModal()"
+  [title]="messageTitle()"
+  [message]="messageText()"
+  buttonText="ตกลง"
+  (onClose)="closeMessageModal()"
+/>

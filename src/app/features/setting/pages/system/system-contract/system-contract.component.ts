@@ -1,6 +1,6 @@
 // system-contract.component.ts
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
@@ -10,12 +10,14 @@ import { CostCenterFormDrawerComponent } from './components/cost-center-form-dra
 import { BusinessFormDrawerComponent } from './components/business-form-drawer/business-form-drawer.component';
 import { SignerFormDrawerComponent } from './components/signer-form-drawer/signer-form-drawer.component';
 import { ContractTypeWizardComponent } from './components/contract-type-wizard/contract-type-wizard.component';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
+import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 
 @Component({
   selector: 'app-system-contract',
   standalone: true,
   imports: [CommonModule, FormsModule, Button, Dialog, Select, CostCenterFormDrawerComponent, BusinessFormDrawerComponent, SignerFormDrawerComponent ,
-    ContractTypeWizardComponent  ],
+    ContractTypeWizardComponent, ConfirmationModalComponent, WarningModalComponent],
   templateUrl: './system-contract.component.html',
   styleUrl: './system-contract.component.css'
 })
@@ -46,6 +48,15 @@ selectedItem: any = null;
   contractTypes: any[] = [];
   signers: any[] = [];
   costCenters: any[] = [];
+
+  // ==================== CONFIRMATION MODAL STATE ====================
+  showConfirmModal = signal<boolean>(false);
+  confirmModalTitle = signal<string>('');
+  confirmModalMessage = signal<string>('');
+  private pendingDeleteAction: (() => void) | null = null;
+  showMessageModal = signal<boolean>(false);
+  messageTitle = signal<string>('');
+  messageText = signal<string>('');
 
   // ==================== MODAL VISIBILITY FLAGS ====================
   // profitCenterModalVisible: boolean = false;
@@ -771,29 +782,30 @@ selectedSigner: any = null;
   // }
 
   deleteItem(item: any): void {
-    if (!confirm('คุณต้องการลบรายการนี้หรือไม่?')) {
-      return;
-    }
-
-    switch (this.activeSubCategory) {
-      case 'profit':
-        this.profitCenters = this.profitCenters.filter(
-          (p) => p.COST_CENTER_CODE !== item.COST_CENTER_CODE
-        );
-        break;
-      case 'main-business':
-        this.mainBusinessTypes = this.mainBusinessTypes.filter(
-          (p) => p.BUS_TYPE_CODE !== item.BUS_TYPE_CODE
-        );
-        break;
-      case 'sub-business':
-        this.subBusinessTypes = this.subBusinessTypes.filter(
-          (p) => p.BUS_SUBTYPE_CODE !== item.BUS_SUBTYPE_CODE
-        );
-        break;
-    }
-
-    this.updateCounts();
+    this.confirmModalTitle.set('ลบรายการ');
+    this.confirmModalMessage.set('คุณต้องการลบรายการนี้หรือไม่?');
+    this.pendingDeleteAction = () => {
+      switch (this.activeSubCategory) {
+        case 'profit':
+          this.profitCenters = this.profitCenters.filter(
+            (p) => p.COST_CENTER_CODE !== item.COST_CENTER_CODE
+          );
+          break;
+        case 'main-business':
+          this.mainBusinessTypes = this.mainBusinessTypes.filter(
+            (p) => p.BUS_TYPE_CODE !== item.BUS_TYPE_CODE
+          );
+          break;
+        case 'sub-business':
+          this.subBusinessTypes = this.subBusinessTypes.filter(
+            (p) => p.BUS_SUBTYPE_CODE !== item.BUS_SUBTYPE_CODE
+          );
+          break;
+      }
+      this.updateCounts();
+      this.showMessage('ลบสำเร็จ', 'ลบรายการเรียบร้อยแล้ว');
+    };
+    this.showConfirmModal.set(true);
   }
 
   openAddDrawer(): void {
@@ -916,14 +928,16 @@ onContractTypeWizardSave(event: any): void {
 
 
   deleteContractType(item: any): void {
-    if (!confirm('คุณต้องการลบรายการนี้หรือไม่?')) {
-      return;
-    }
-
-    this.contractTypes = this.contractTypes.filter(
-      (p) => p.TYPE_CODE !== item.TYPE_CODE
-    );
-    this.updateCounts();
+    this.confirmModalTitle.set('ลบประเภทสัญญา');
+    this.confirmModalMessage.set('คุณต้องการลบประเภทสัญญานี้หรือไม่?');
+    this.pendingDeleteAction = () => {
+      this.contractTypes = this.contractTypes.filter(
+        (p) => p.TYPE_CODE !== item.TYPE_CODE
+      );
+      this.updateCounts();
+      this.showMessage('ลบสำเร็จ', 'ลบประเภทสัญญาเรียบร้อยแล้ว');
+    };
+    this.showConfirmModal.set(true);
   }
 
   // ==================== SIGNER OPERATIONS ====================
@@ -996,12 +1010,14 @@ onContractTypeWizardSave(event: any): void {
   // }
 
   deleteSigner(item: any): void {
-    if (!confirm('คุณต้องการลบรายการนี้หรือไม่?')) {
-      return;
-    }
-
-    this.signers = this.signers.filter((p) => p.SEQ !== item.SEQ);
-    this.updateCounts();
+    this.confirmModalTitle.set('ลบผู้ลงนาม');
+    this.confirmModalMessage.set('คุณต้องการลบผู้ลงนามนี้หรือไม่?');
+    this.pendingDeleteAction = () => {
+      this.signers = this.signers.filter((p) => p.SEQ !== item.SEQ);
+      this.updateCounts();
+      this.showMessage('ลบสำเร็จ', 'ลบผู้ลงนามเรียบร้อยแล้ว');
+    };
+    this.showConfirmModal.set(true);
   }
 
   openAddSignerDrawer(): void {
@@ -1119,17 +1135,19 @@ closeCostCenterDrawer(): void {
 
 
   deleteCostCenter(item: any): void {
-    if (!confirm('คุณต้องการลบรายการนี้หรือไม่?')) {
-      return;
-    }
-
-    this.costCenters = this.costCenters.filter(
-      (p) =>
-        !(
-          p.COST_CENTER_CODE === item.COST_CENTER_CODE && p.IO === item.IO
-        )
-    );
-    this.updateCounts();
+    this.confirmModalTitle.set('ลบศูนย์ต้นทุน');
+    this.confirmModalMessage.set('คุณต้องการลบศูนย์ต้นทุนนี้หรือไม่?');
+    this.pendingDeleteAction = () => {
+      this.costCenters = this.costCenters.filter(
+        (p) =>
+          !(
+            p.COST_CENTER_CODE === item.COST_CENTER_CODE && p.IO === item.IO
+          )
+      );
+      this.updateCounts();
+      this.showMessage('ลบสำเร็จ', 'ลบศูนย์ต้นทุนเรียบร้อยแล้ว');
+    };
+    this.showConfirmModal.set(true);
   }
 
   // ==================== UTILITIES ====================
@@ -1149,6 +1167,30 @@ closeCostCenterDrawer(): void {
     }
 
     return dateString;
+  }
+
+  // ==================== MODAL HANDLERS ====================
+  onConfirmDelete(): void {
+    this.showConfirmModal.set(false);
+    if (this.pendingDeleteAction) {
+      this.pendingDeleteAction();
+      this.pendingDeleteAction = null;
+    }
+  }
+
+  onCancelDelete(): void {
+    this.showConfirmModal.set(false);
+    this.pendingDeleteAction = null;
+  }
+
+  showMessage(title: string, message: string): void {
+    this.messageTitle.set(title);
+    this.messageText.set(message);
+    this.showMessageModal.set(true);
+  }
+
+  closeMessageModal(): void {
+    this.showMessageModal.set(false);
   }
 
 }

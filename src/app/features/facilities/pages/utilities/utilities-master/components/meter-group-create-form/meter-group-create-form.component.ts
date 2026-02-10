@@ -4,11 +4,13 @@ import { CommonModule } from '@angular/common';
 import { MeterGroup, Meter } from '@core/models/meter.model';
 import { MOCK_METERS } from '@core/data/meter.mock';
 import { MeterCreateFormComponent } from '../meter-create-form/meter-create-form.component';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
+import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 
 @Component({
   selector: 'app-meter-group-create-form',
   standalone: true,
-  imports: [CommonModule, MeterCreateFormComponent],
+  imports: [CommonModule, MeterCreateFormComponent, ConfirmationModalComponent, WarningModalComponent],
   templateUrl: './meter-group-create-form.component.html',
   styleUrl: './meter-group-create-form.component.css'
 })
@@ -23,6 +25,13 @@ export class MeterGroupCreateFormComponent implements OnInit {
   groupName = signal<string>('');
   groupDescription = signal<string>('');
   selectedMeterIds = signal<Set<string>>(new Set());
+
+  // Modal state
+  showConfirmModal = signal<boolean>(false);
+  pendingDeleteGroup = signal<MeterGroup | null>(null);
+  showMessageModal = signal<boolean>(false);
+  messageTitle = signal<string>('');
+  messageText = signal<string>('');
 
   ngOnInit(): void {
     this.loadGroups();
@@ -112,7 +121,8 @@ export class MeterGroupCreateFormComponent implements OnInit {
     };
 
     console.log('Saving group:', groupData);
-    alert(`Mock: ${this.editingGroup() ? 'Updated' : 'Created'} group "${groupData.name}"`);
+    const action = this.editingGroup() ? 'แก้ไข' : 'สร้าง';
+    this.showMessage('บันทึกสำเร็จ', `${action}กลุ่ม "${groupData.name}" เรียบร้อยแล้ว`);
 
     // TODO: Call API
     this.closeGroupDrawer();
@@ -120,12 +130,35 @@ export class MeterGroupCreateFormComponent implements OnInit {
   }
 
   deleteGroup(group: MeterGroup): void {
-    if (confirm(`Delete group "${group.name}"?`)) {
+    this.pendingDeleteGroup.set(group);
+    this.showConfirmModal.set(true);
+  }
+
+  onConfirmDeleteGroup(): void {
+    const group = this.pendingDeleteGroup();
+    if (group) {
       console.log('Deleting group:', group);
-      alert(`Mock: Deleted group "${group.name}"`);
+      this.showMessage('ลบสำเร็จ', `กลุ่ม "${group.name}" ถูกลบแล้ว`);
       // TODO: Call API
       this.loadGroups();
     }
+    this.showConfirmModal.set(false);
+    this.pendingDeleteGroup.set(null);
+  }
+
+  onCancelDeleteGroup(): void {
+    this.showConfirmModal.set(false);
+    this.pendingDeleteGroup.set(null);
+  }
+
+  showMessage(title: string, message: string): void {
+    this.messageTitle.set(title);
+    this.messageText.set(message);
+    this.showMessageModal.set(true);
+  }
+
+  closeMessageModal(): void {
+    this.showMessageModal.set(false);
   }
 
   // Meter Management

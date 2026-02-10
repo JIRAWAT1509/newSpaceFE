@@ -1,91 +1,112 @@
 <!-- meter-input-list.component.html - FINAL CORRECTED -->
 
 <div class="input-list-container">
-  <!-- Header Stats -->
+  <!-- Header Stats - Clean Modern Cards -->
   <div class="header-stats">
-    <div class="stat-item">
-      <i class="pi pi-th-large"></i>
-      <div>
-        <div class="stat-value">{{ totalMeters() }}</div>
-        <div class="stat-label">Total Meters</div>
-      </div>
-    </div>
-
-    <div class="stat-item warning">
-      <i class="pi pi-clock"></i>
-      <div>
-        <div class="stat-value">{{ pendingMeters() }}</div>
-        <div class="stat-label">Pending Readings</div>
-      </div>
-    </div>
-
-    <div class="stat-item success">
-      <i class="pi pi-check-circle"></i>
-      <div>
-        <div class="stat-value">{{ savedCount() }}</div>
-        <div class="stat-label">Saved This Session</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Group Dropdown Filter -->
-  <div class="filter-section">
-    <h3 class="filter-title">Filter by Group</h3>
-    <p-select
-      [options]="groupDropdownOptions()"
-      (onChange)="onGroupChange($event)"
-      placeholder="All Groups"
-      [showClear]="true"
-      styleClass="w-full md:w-80"
-    ></p-select>
-  </div>
-
-  <!-- Meter Type Filter Buttons -->
-  <div class="filter-section">
-    <h3 class="filter-title">Filter by Meter Type</h3>
-    <div class="filter-buttons">
-      @for (option of filterOptions(); track option.type) {
-        <button
-          class="filter-btn"
-          [class.active]="isFilterSelected(option.type)"
-          [style.border-color]="isFilterSelected(option.type) ? option.color : '#e5e7eb'"
-          (click)="selectFilter(option.type)"
-        >
-          <div
-            class="filter-icon"
-            [style.background-color]="option.color"
-          >
-            <i class="pi" [ngClass]="option.icon"></i>
+    <!-- Total Meters Card -->
+    <div class="stat-card stat-card--blue">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="pi pi-th-large"></i>
           </div>
-          <span>{{ option.label }}</span>
-          @if (option.type !== 'all') {
-            <span class="filter-count">
-              {{ getMeterCountByType(option.type) }}
-            </span>
-          }
-        </button>
-      }
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ totalMeters() }}</div>
+          <div class="stat-label">Total Meters</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Readings Card -->
+    <div class="stat-card stat-card--amber">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="pi pi-clock"></i>
+          </div>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ pendingMeters() }}</div>
+          <div class="stat-label">Pending Readings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved This Session Card -->
+    <div class="stat-card stat-card--emerald">
+      <div class="stat-card-content">
+        <div class="stat-icon-wrapper">
+          <div class="stat-icon">
+            <i class="pi pi-check-circle"></i>
+          </div>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ savedCount() }}</div>
+          <div class="stat-label">Saved This Session</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Meters Grid -->
+  <!-- Filters: Group + Meter Type in ONE ROW -->
+  <div class="filter-section filter-row">
+    <div class="filter-group-col">
+      <h3 class="filter-title">Filter by Group</h3>
+      <p-select
+        [options]="groupDropdownOptions()"
+        (onChange)="onGroupChange($event)"
+        placeholder="All Groups"
+        [showClear]="true"
+        styleClass="w-full"
+      ></p-select>
+    </div>
+
+    <div class="filter-type-col">
+      <h3 class="filter-title">Filter by Meter Type</h3>
+      <div class="filter-buttons">
+        @for (option of filterOptions(); track option.type) {
+          <button
+            class="filter-btn"
+            [class.active]="isFilterSelected(option.type)"
+            [style.border-color]="isFilterSelected(option.type) ? option.color : '#e5e7eb'"
+            (click)="selectFilter(option.type)"
+          >
+            <div
+              class="filter-icon"
+              [style.background-color]="option.color"
+            >
+              <i class="pi" [ngClass]="option.icon"></i>
+            </div>
+            <span>{{ option.label }}</span>
+            @if (option.type !== 'all') {
+              <span class="filter-count">
+                {{ getMeterCountByType(option.type) }}
+              </span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Meters List: กรอกได้เลยโดยไม่ต้องขยาย -->
   <div class="meters-section">
     <div class="section-header">
       <h3 class="section-title">
         {{ sectionTitle() }}
         <span class="meter-count">({{ filteredMeters().length }})</span>
       </h3>
+      <p class="section-hint">กรอกค่ามิเตอร์ในแต่ละการ์ดได้เลย แล้วกดบันทึก</p>
     </div>
 
     @if (filteredMeters().length > 0) {
-      <div class="meters-grid">
+      <div class="meters-list">
         @for (meter of filteredMeters(); track meter.id) {
           <app-meter-input-card
             [meter]="meter"
-            [isExpanded]="isCardExpanded(meter.id)"
+            [inlineMode]="true"
             (readingSaved)="onReadingSaved($event)"
-            (cardClicked)="onCardClicked($event)"
-            (backgroundClicked)="onCardBackgroundClicked($event)"
           />
         }
       </div>

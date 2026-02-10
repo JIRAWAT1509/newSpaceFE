@@ -1,0 +1,101 @@
+/* budget-kanban-board.component.css */
+
+/* ==================== KANBAN BOARD CONTAINER ==================== */
+.budget-kanban-board {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 720px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+/* Custom scrollbar for horizontal scroll */
+.budget-kanban-board::-webkit-scrollbar {
+  height: 8px;
+}
+
+.budget-kanban-board::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.budget-kanban-board::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.budget-kanban-board::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* ==================== EMPTY BOARD ==================== */
+.empty-board {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-board h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 12px 0;
+}
+
+.empty-board p {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1600px) {
+  .budget-kanban-board {
+    gap: 12px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .budget-kanban-board {
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .budget-kanban-board {
+    gap: 8px;
+    padding: 8px;
+    min-height: 600px;
+  }
+
+  .empty-board {
+    padding: 40px 20px;
+  }
+
+  .empty-icon {
+    font-size: 60px;
+  }
+
+  .empty-board h3 {
+    font-size: 20px;
+  }
+
+  .empty-board p {
+    font-size: 14px;
+  }
+}

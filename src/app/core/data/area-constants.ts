@@ -8,25 +8,25 @@ export const AREA_STATUS_LABELS: AreaStatusLabel[] = [
     id: 'unallocated',
     labelTh: 'ยังไม่พร้อม',
     labelEn: 'Unallocated',
-    color: '#FF6384'
+    color: 'rgb(var(--danger))'
   },
   {
     id: 'quotation',
     labelTh: 'คำใบเสนอราคา',
     labelEn: 'Quotation',
-    color: '#4CA3FF'
+    color: 'rgb(var(--info))'
   },
   {
     id: 'leased',
     labelTh: 'เช่า',
     labelEn: 'Leased',
-    color: '#FFD05F'
+    color: 'rgb(var(--warning))'
   },
   {
     id: 'vacant',
     labelTh: 'ว่าง',
     labelEn: 'Vacant',
-    color: '#80E08E'
+    color: 'rgb(var(--success))'
   }
 ];
 
@@ -64,7 +64,7 @@ export const MOVE_OUT_CATEGORIES = [
 // Helper function to get status color
 export function getStatusColor(status: AreaStatus): string {
   const label = AREA_STATUS_LABELS.find(s => s.id === status);
-  return label?.color || '#9CA3AF';
+  return label?.color || 'rgb(var(--muted))';
 }
 
 // Helper function to get status label (Thai)

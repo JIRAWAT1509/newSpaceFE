@@ -1,0 +1,65 @@
+<!-- stage-pagination.component.html -->
+
+<div class="pagination-container">
+
+  <!-- Showing X-Y of Z deals -->
+  <div class="pagination-info">
+    <span class="info-text">
+      Showing {{ startIndex() }}-{{ endIndex() }} of {{ totalDeals() }} deals
+    </span>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination-controls">
+
+    <!-- Previous Button -->
+    <button
+      class="pagination-btn pagination-prev"
+      [disabled]="!canGoPrevious()"
+      (click)="previousPage()"
+      title="Previous page"
+      type="button"
+    >
+      <span class="btn-icon">←</span>
+      <span class="btn-label">Prev</span>
+    </button>
+
+    <!-- Page Selector Dropdown -->
+    <div class="pagination-page-selector">
+      <p-select
+        [ngModel]="currentPage()"
+        (ngModelChange)="onPageChange($event)"
+        [options]="pageOptions()"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="page-select"
+      ></p-select>
+    </div>
+
+    <!-- Next Button -->
+    <button
+      class="pagination-btn pagination-next"
+      [disabled]="!canGoNext()"
+      (click)="nextPage()"
+      title="Next page"
+      type="button"
+    >
+      <span class="btn-label">Next</span>
+      <span class="btn-icon">→</span>
+    </button>
+
+  </div>
+
+  <!-- Cards Per Page Selector -->
+  <div class="pagination-per-page">
+    <p-select
+      [ngModel]="cardsPerPage()"
+      (ngModelChange)="onCardsPerPageChange($event)"
+      [options]="cardsPerPageOptions"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="per-page-select"
+    ></p-select>
+  </div>
+
+</div>

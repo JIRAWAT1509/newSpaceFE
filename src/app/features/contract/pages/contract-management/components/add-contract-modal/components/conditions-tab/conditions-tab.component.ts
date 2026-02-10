@@ -6,6 +6,7 @@ import { Select } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
 
 interface Section {
   id: string;
@@ -27,7 +28,8 @@ interface ContractCondition {
     Select,
     DatePicker,
     InputText,
-    Textarea
+    Textarea,
+    ConfirmationModalComponent
   ],
   templateUrl: './conditions-tab.component.html',
   styleUrl: './conditions-tab.component.css'
@@ -48,6 +50,10 @@ export class ConditionsTabComponent implements OnInit {
   showConditionDrawer = signal<boolean>(false);
   editingIndex = signal<number | null>(null);
   conditionList = signal<ContractCondition[]>([]);
+
+  // Confirmation modal state
+  showConfirmModal = signal<boolean>(false);
+  pendingDeleteIndex = signal<number | null>(null);
 
   // Dropdown options
   yesNoOptions = [
@@ -179,9 +185,22 @@ export class ConditionsTabComponent implements OnInit {
   }
 
   removeCondition(index: number): void {
-    if (confirm('คุณต้องการลบเงื่อนไขนี้หรือไม่?')) {
+    this.pendingDeleteIndex.set(index);
+    this.showConfirmModal.set(true);
+  }
+
+  onConfirmDelete(): void {
+    const index = this.pendingDeleteIndex();
+    if (index !== null) {
       this.conditionList.update(list => list.filter((_, i) => i !== index));
     }
+    this.showConfirmModal.set(false);
+    this.pendingDeleteIndex.set(null);
+  }
+
+  onCancelDelete(): void {
+    this.showConfirmModal.set(false);
+    this.pendingDeleteIndex.set(null);
   }
 
   closeDrawer(): void {

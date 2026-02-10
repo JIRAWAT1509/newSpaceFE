@@ -666,13 +666,13 @@
                 @if (rentableItems().length > 0) {
                   <div class="rentable-items-actions">
                     <button 
-                      class="btn-secondary" 
+                      class="btn-danger-outline" 
                       (click)="resetRentableItemsToDefault()"
                       [disabled]="isSaving()"
                       type="button"
                     >
-                      <i class="pi pi-refresh"></i>
-                      <span>รีเซ็ตรายการสิ่งที่จะเช่าได้</span>
+                      <i class="pi pi-trash"></i>
+                      <span>ลบรายการทั้งหมด ({{ rentableItems().length }})</span>
                     </button>
                   </div>
                 }

@@ -1,17 +1,23 @@
-// contract-table.component.ts - WITH EDIT MODE INTEGRATED
+// contract-table.component.ts - WITH EDIT MODE & DRAFT SUPPORT
 import { Component, input, output, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Contract, CONTRACT_STATUS_LABELS } from '@core/models/contract.model';
 import { SearchFilter, SavedSearch, SearchFieldType, SEARCH_FIELD_CONFIG } from '@core/models/contract-search.model';
-import { fromDateString } from '@core/utils/date-utils';
+import type { CancelType } from '@core/services/contract.service';
+import { formatDateForDisplay } from '@core/utils/date-utils';
 import { AdvanceSearchModalComponent } from '../advance-search-modal/advance-search-modal.component';
 import { AddContractModalComponent } from '../add-contract-modal/add-contract-modal.component';
+import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
+import { BulkActionModalComponent, BulkActionType, BulkActionResult } from '../bulk-action-modal/bulk-action-modal.component';
+import { DraftContractService, DraftContract } from '@core/services/draft-contract.service';
+import { ConfirmationModalComponent, ConfirmationType } from '@shared/components/confirmation-modal/confirmation-modal.component';
+import { DeclineInfoModalComponent, DeclineInfo } from '@shared/components/decline-info-modal/decline-info-modal.component';
 
 @Component({
   selector: 'app-contract-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, AdvanceSearchModalComponent, AddContractModalComponent],
+  imports: [CommonModule, FormsModule, AdvanceSearchModalComponent, AddContractModalComponent, WarningModalComponent, BulkActionModalComponent, ConfirmationModalComponent, DeclineInfoModalComponent],
   templateUrl: './contract-table.component.html',
   styleUrl: './contract-table.component.css'
 })
@@ -27,6 +33,9 @@ export class ContractTableComponent {
   // Outputs to sync state back to parent
   searchTextChange = output<string>();
   filtersChange = output<SearchFilter[]>();
+  contractSaved = output<any>();
+  contractCopied = output<Contract>();
+  contractCancelRequest = output<{ contract: Contract; cancelType: CancelType }>();
 
   // Local search (syncs with shared)
   simpleSearchText = signal<string>('');
@@ -38,13 +47,44 @@ export class ContractTableComponent {
   // Selection
   selectedIds = signal<string[]>([]);
 
-  // UI State - UPDATED FOR EDIT MODE
+  // UI State - UPDATED FOR EDIT MODE & DRAFTS
   showAdvanceSearchModal = signal<boolean>(false);
   showAddModal = signal<boolean>(false);
   modalMode = signal<'add' | 'edit'>('add');
   selectedContract = signal<Contract | null>(null);
-  showBulkActions = false;
+  selectedDraft = signal<DraftContract | null>(null);
+  showBulkActions = signal<boolean>(false);
   activeRowMenu = signal<string | null>(null);
+  showDraftsPanel = signal<boolean>(true); // Show/hide drafts panel
+
+  // In-app message modal (replaces browser alert)
+  showMessageModal = signal<boolean>(false);
+  messageModalTitle = signal<string>('');
+  messageModalMessage = signal<string>('');
+  private messageModalOnClose?: () => void;
+
+  // Confirmation modal (replaces browser confirm)
+  showConfirmModal = signal<boolean>(false);
+  confirmModalType = signal<ConfirmationType>('warning');
+  confirmModalTitle = signal<string>('');
+  confirmModalMessage = signal<string>('');
+  confirmModalConfirmText = signal<string>('ยืนยัน');
+  confirmModalCancelText = signal<string>('ยกเลิก');
+  confirmModalIcon = signal<string>('pi-check');
+  private confirmModalOnConfirm?: () => void;
+
+  // Decline info modal (เด้งตอนกดยกเลิกสัญญา)
+  showDeclineModal = signal<boolean>(false);
+  declineContractNumber = signal<string>('');
+  declineQuotationNumber = signal<string>('');
+  declineCustomerName = signal<string>('');
+  private pendingCancelContract: Contract | null = null;
+  private pendingCancelType: CancelType | null = null;
+
+  // Bulk action modal
+  showBulkActionModal = signal<boolean>(false);
+  currentBulkAction = signal<BulkActionType>('terminate');
+  selectedContractsForBulk = signal<Contract[]>([]);
 
   // Filtered data
   filteredData = computed<Contract[]>(() => {
@@ -149,7 +189,7 @@ export class ContractTableComponent {
     return selectedCount > 0 && selectedCount < this.filteredData().length;
   });
 
-  constructor() {
+  constructor(public draftService: DraftContractService) {
     // Load saved searches from localStorage
     this.loadSavedSearches();
 
@@ -169,7 +209,16 @@ export class ContractTableComponent {
         setTimeout(() => document.addEventListener('click', handler, { once: true }), 0);
       }
     });
+
+    // Close bulk actions menu when clicking outside
+    effect(() => {
+      if (this.showBulkActions()) {
+        const handler = () => this.showBulkActions.set(false);
+        setTimeout(() => document.addEventListener('click', handler, { once: true }), 0);
+      }
+    });
   }
+
 
   // ==================== SEARCH ====================
 
@@ -302,8 +351,154 @@ export class ContractTableComponent {
 
   onBulkAction(action: string): void {
     console.log('Bulk action:', action, 'on', this.selectedIds());
-    this.showBulkActions = false;
-    alert(`Bulk ${action} for ${this.selectedIds().length} items`);
+    this.showBulkActions.set(false);
+
+    // Get selected contracts
+    const selectedContracts = this.filteredData().filter(c => 
+      this.selectedIds().includes(c.CONTRACT_ID)
+    );
+
+    if (selectedContracts.length === 0) {
+      this.openMessageModal('ไม่มีรายการที่เลือก', 'กรุณาเลือกสัญญาอย่างน้อย 1 รายการ');
+      return;
+    }
+
+    // Map action string to BulkActionType
+    const actionMap: Record<string, BulkActionType> = {
+      'terminate': 'terminate',
+      'discount': 'discount',
+      'renew': 'renew',
+      'extend': 'extend',
+      'edit': 'edit'
+    };
+
+    const bulkAction = actionMap[action];
+    if (!bulkAction) {
+      this.openMessageModal('ไม่รองรับ', `ไม่รองรับการดำเนินการ: ${action}`);
+      return;
+    }
+
+    // Open bulk action modal
+    this.selectedContractsForBulk.set(selectedContracts);
+    this.currentBulkAction.set(bulkAction);
+    this.showBulkActionModal.set(true);
+    this.showBulkActions.set(false);
+  }
+
+  closeBulkActionModal(): void {
+    this.showBulkActionModal.set(false);
+  }
+
+  onBulkActionConfirm(result: BulkActionResult): void {
+    console.log('Bulk action confirmed:', result);
+    this.showBulkActionModal.set(false);
+
+    // Handle different actions
+    switch (result.action) {
+      case 'terminate':
+        this.handleBulkTerminate(result);
+        break;
+      case 'discount':
+        this.handleBulkDiscount(result);
+        break;
+      case 'renew':
+        this.handleBulkRenew(result);
+        break;
+      case 'extend':
+        this.handleBulkExtend(result);
+        break;
+      case 'edit':
+        this.handleBulkEdit(result);
+        break;
+    }
+
+    // Clear selection after action
+    this.selectedIds.set([]);
+  }
+
+  private handleBulkTerminate(result: BulkActionResult): void {
+    const data = result.data;
+    const dateStr = data.terminationDate ? new Date(data.terminationDate).toLocaleDateString('th-TH') : '-';
+    const reasonLabels: Record<string, string> = {
+      'tenant_request': 'ผู้เช่าขอยกเลิก',
+      'breach': 'ผิดสัญญา',
+      'expiry': 'ครบกำหนดสัญญา',
+      'renovation': 'ปรับปรุงพื้นที่',
+      'other': 'อื่นๆ'
+    };
+
+    this.openMessageModal(
+      'ยกเลิกสัญญาสำเร็จ',
+      `ยกเลิกสัญญา ${result.contractIds.length} รายการแล้ว\n` +
+      `วันที่มีผล: ${dateStr}\n` +
+      `เหตุผล: ${reasonLabels[data.reason] || data.reason}\n` +
+      `${data.refundDeposit ? 'คืนเงินมัดจำ' : 'ไม่คืนเงินมัดจำ'}`
+    );
+
+    // TODO: Call API to terminate contracts
+    // this.contractService.bulkTerminate(result).subscribe(...)
+  }
+
+  private handleBulkDiscount(result: BulkActionResult): void {
+    const data = result.data;
+    const applyToLabels: Record<string, string> = {
+      'both': 'ค่าเช่าและค่าบริการ',
+      'rent': 'ค่าเช่า',
+      'service': 'ค่าบริการ'
+    };
+
+    const discountText = data.discountType === 'percentage' 
+      ? `${data.discountValue}%`
+      : `${data.discountValue.toLocaleString()} บาท`;
+
+    this.openMessageModal(
+      'ให้ส่วนลดสำเร็จ',
+      `ให้ส่วนลด ${result.contractIds.length} สัญญาแล้ว\n` +
+      `ส่วนลด: ${discountText}\n` +
+      `ใช้กับ: ${applyToLabels[data.applyTo]}`
+    );
+
+    // TODO: Call API
+  }
+
+  private handleBulkRenew(result: BulkActionResult): void {
+    const data = result.data;
+    const duration = [];
+    if (data.durationYears > 0) duration.push(`${data.durationYears} ปี`);
+    if (data.durationMonths > 0) duration.push(`${data.durationMonths} เดือน`);
+
+    this.openMessageModal(
+      'ต่อสัญญาสำเร็จ',
+      `ต่อสัญญา ${result.contractIds.length} รายการแล้ว\n` +
+      `ระยะเวลา: ${duration.join(' ')}`
+    );
+
+    // TODO: Call API
+  }
+
+  private handleBulkExtend(result: BulkActionResult): void {
+    const data = result.data;
+    const extension = [];
+    if (data.extensionMonths > 0) extension.push(`${data.extensionMonths} เดือน`);
+    if (data.extensionDays > 0) extension.push(`${data.extensionDays} วัน`);
+
+    this.openMessageModal(
+      'ขยายระยะเวลาสำเร็จ',
+      `ขยายระยะเวลา ${result.contractIds.length} สัญญาแล้ว\n` +
+      `ขยาย: ${extension.join(' ')}`
+    );
+
+    // TODO: Call API
+  }
+
+  private handleBulkEdit(result: BulkActionResult): void {
+    // For edit, we open the edit modal for the single selected contract
+    const contractId = result.contractIds[0];
+    const contract = this.filteredData().find(c => c.CONTRACT_ID === contractId);
+    
+    if (contract) {
+      this.openEditModal(contract);
+    }
   }
 
   showRowActions(id: string): void {
@@ -318,18 +513,201 @@ export class ContractTableComponent {
       case 'edit':
         this.openEditModal(contract);
         break;
-      case 'copy-booking':
-        alert(`คัดลอกสัญญาเช่าไปเป็นสัญญาจอง: ${contract.CONTRACT_NUMBER}`);
+      case 'copy-contract':
+        this.copyContractImmediately(contract);
         break;
-      case 'copy-quotation':
-        alert(`คัดลอกสัญญาเช่าไปเป็นใบเสนอราคา: ${contract.CONTRACT_NUMBER}`);
+      case 'transfer-to-booking':
+        this.transferToBooking(contract);
+        break;
+      case 'transfer-to-lease':
+        this.transferToLease(contract);
+        break;
+      case 'copy-to-booking':
+        this.copyLeaseToBooking(contract);
+        break;
+      case 'copy-to-quotation':
+        this.copyLeaseToQuotation(contract);
+        break;
+      case 'copy-booking-to-quotation':
+        this.copyBookingToQuotation(contract);
+        break;
+      case 'cancel-quotation':
+        this.cancelQuotation(contract);
+        break;
+      case 'cancel-booking':
+        this.cancelBooking(contract);
         break;
       case 'addendum':
-        alert(`ยกเลิกสัญญา + addendum: ${contract.CONTRACT_NUMBER}`);
+        this.openAddendum(contract);
         break;
       default:
-        alert(`${action} for ${contract.CONTRACT_NUMBER}`);
+        this.openMessageModal('ดำเนินการ', `${action}: ${contract.CONTRACT_NUMBER}`);
     }
+  }
+
+  /** ป้ายชื่อปุ่มคัดลอกตามประเภท */
+  getCopyContractLabel(): string {
+    switch (this.contractType()) {
+      case 'quotation': return 'คัดลอกใบเสนอราคา';
+      case 'booking': return 'คัดลอกสัญญาจอง';
+      case 'lease': return 'คัดลอกสัญญาเช่า';
+      default: return 'คัดลอกสัญญา';
+    }
+  }
+
+  private newContractNumber(): string {
+    return `AUTO-${Date.now()}`;
+  }
+
+  /** คัดลอกสัญญาทันที: สร้างสัญญาใหม่เหมือนเดิม แต่เลขที่ไม่ซ้ำ (ไม่เปิดโมดอล) */
+  copyContractImmediately(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_NUMBER_MAIN: contract.CONTRACT_NUMBER_MAIN ? newNumber : undefined,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB ? `${newNumber}-SUB` : undefined
+    };
+    this.contractCopied.emit(copy);
+    this.openMessageModal('คัดลอกสัญญาเรียบร้อย', `สร้างสัญญาใหม่เลขที่: ${newNumber}`);
+  }
+
+  /** ใบเสนอราคา → โอนเป็นสัญญาจอง (ใช้เลขเดียวกับใบเสนอราคา) */
+  transferToBooking(contract: Contract): void {
+    // ใช้เลขเดียวกับใบเสนอราคาเดิม
+    const sameNumber = contract.CONTRACT_NUMBER;
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: sameNumber,
+      CONTRACT_TYPE: 'DEPOSIT_AGREEMENT',
+      STATUS: 'ACTIVE',
+      CONTRACT_NUMBER_MAIN: contract.CONTRACT_NUMBER_MAIN || sameNumber,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB || '',
+      BOOKING_NUMBER: sameNumber,
+      QUOTATION_NUMBER: sameNumber
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('โอนเป็นสัญญาจองเรียบร้อย', `เลขที่สัญญาจอง: ${sameNumber}\nอ้างอิงใบเสนอราคา: ${sameNumber}`);
+  }
+
+  /** สัญญาจอง → โอนเป็นสัญญาเช่า (สร้างสัญญาเช่าจากสัญญาจอง) */
+  transferToLease(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_TYPE: 'LEASE_AGREEMENT',
+      BOOKING_NUMBER: contract.CONTRACT_NUMBER ?? contract.BOOKING_NUMBER,
+      CONTRACT_NUMBER_MAIN: contract.CONTRACT_NUMBER_MAIN,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('โอนเป็นสัญญาเช่าเรียบร้อย', `เลขที่สัญญาเช่า: ${newNumber}`);
+  }
+
+  /** สัญญาเช่า → คัดลอกไปเป็นสัญญาจอง */
+  copyLeaseToBooking(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_TYPE: 'DEPOSIT_AGREEMENT',
+      CONTRACT_NUMBER_MAIN: contract.CONTRACT_NUMBER_MAIN,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB ? `${newNumber}-SUB` : undefined,
+      BOOKING_NUMBER: newNumber
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('คัดลอกเป็นสัญญาจองเรียบร้อย', `เลขที่สัญญาจอง: ${newNumber}`);
+  }
+
+  /** สัญญาเช่า → คัดลอกไปเป็นใบเสนอราคา */
+  copyLeaseToQuotation(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_TYPE: 'QUOTATION_AGREEMENT',
+      CONTRACT_NUMBER_MAIN: newNumber,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB ? `${newNumber}-SUB` : undefined,
+      BOOKING_NUMBER: undefined
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('คัดลอกเป็นใบเสนอราคาเรียบร้อย', `เลขที่ใบเสนอราคา: ${newNumber}`);
+  }
+
+  /** สัญญาจอง → คัดลอกไปเป็นใบเสนอราคา */
+  copyBookingToQuotation(contract: Contract): void {
+    const newNumber = this.newContractNumber();
+    const copy: Contract = {
+      ...contract,
+      CONTRACT_ID: `CNT-${Date.now()}`,
+      CONTRACT_NUMBER: newNumber,
+      CONTRACT_TYPE: 'QUOTATION_AGREEMENT',
+      CONTRACT_NUMBER_MAIN: newNumber,
+      CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB ? `${newNumber}-SUB` : undefined,
+      BOOKING_NUMBER: undefined
+    } as Contract;
+    this.contractCopied.emit(copy);
+    this.openMessageModal('คัดลอกสัญญาจองไปเป็นใบเสนอราคาเรียบร้อย', `เลขที่ใบเสนอราคา: ${newNumber}`);
+  }
+
+  /** ยกเลิกใบเสนอราคา: เปิด Decline Info Modal ให้กรอกเหตุผล */
+  cancelQuotation(contract: Contract): void {
+    this.openDeclineModal(contract, 'quotation');
+  }
+
+  /** ยกเลิกสัญญาจอง: เปิด Decline Info Modal ให้กรอกเหตุผล */
+  cancelBooking(contract: Contract): void {
+    this.openDeclineModal(contract, 'booking');
+  }
+
+  /** ยกเลิกสัญญาเช่า: เปิด Decline Info Modal ให้กรอกเหตุผล */
+  openAddendum(contract: Contract): void {
+    this.openDeclineModal(contract, 'lease');
+  }
+
+  /** เปิด Decline Info Modal พร้อมข้อมูลสัญญา */
+  private openDeclineModal(contract: Contract, cancelType: CancelType): void {
+    this.pendingCancelContract = contract;
+    this.pendingCancelType = cancelType;
+    this.declineContractNumber.set(contract.CONTRACT_NUMBER || '');
+    this.declineQuotationNumber.set(contract.CONTRACT_NUMBER_MAIN || contract.CONTRACT_NUMBER || '');
+    this.declineCustomerName.set(contract.TENANT_NAME_TH || '');
+    this.showDeclineModal.set(true);
+  }
+
+  /** เมื่อกรอกเหตุผลแล้วกดยืนยัน Decline */
+  onDeclineConfirm(info: DeclineInfo): void {
+    this.showDeclineModal.set(false);
+    if (this.pendingCancelContract && this.pendingCancelType) {
+      const contract = this.pendingCancelContract;
+      const cancelType = this.pendingCancelType;
+      this.contractCancelRequest.emit({ contract, cancelType });
+
+      const labelMap: Record<string, string> = {
+        quotation: 'ใบเสนอราคา',
+        booking: 'สัญญาจอง',
+        lease: 'สัญญาเช่า',
+      };
+      this.openMessageModal(
+        'ยกเลิกสำเร็จ',
+        `${labelMap[cancelType]} ${contract.CONTRACT_NUMBER} ถูกยกเลิกแล้ว\n\nเหตุผล: ${info.reason}`
+      );
+    }
+    this.pendingCancelContract = null;
+    this.pendingCancelType = null;
+  }
+
+  /** เมื่อกดยกเลิกใน Decline Modal */
+  onDeclineCancel(): void {
+    this.showDeclineModal.set(false);
+    this.pendingCancelContract = null;
+    this.pendingCancelType = null;
   }
 
   openAddModal(): void {
@@ -348,42 +726,125 @@ export class ContractTableComponent {
     this.showAddModal.set(false);
     this.modalMode.set('add');
     this.selectedContract.set(null);
+    this.selectedDraft.set(null);
+  }
+
+  // ==================== DRAFT MANAGEMENT ====================
+
+  /** เปิด/ปิด panel แบบร่าง */
+  toggleDraftsPanel(): void {
+    this.showDraftsPanel.update(v => !v);
+  }
+
+  /** เปิด modal เพื่อกรอกต่อจาก draft */
+  continueDraft(draft: DraftContract): void {
+    this.modalMode.set('add');
+    this.selectedContract.set(null);
+    this.selectedDraft.set(draft);
+    this.showAddModal.set(true);
+  }
+
+  /** ลบ draft */
+  deleteDraft(draft: DraftContract): void {
+    this.openConfirmModal({
+      type: 'danger',
+      title: 'ลบแบบร่าง',
+      message: `คุณต้องการลบแบบร่าง "${draft.name}" หรือไม่?\n\nข้อมูลที่กรอกไว้จะถูกลบทั้งหมดและไม่สามารถกู้คืนได้`,
+      confirmText: 'ลบ',
+      confirmIcon: 'pi-trash',
+      onConfirm: () => {
+        this.draftService.deleteDraft(draft.id);
+        this.openMessageModal('ลบสำเร็จ', `แบบร่าง "${draft.name}" ถูกลบแล้ว`);
+      }
+    });
+  }
+
+  /** เมื่อ draft ถูกบันทึกจาก modal */
+  onDraftSaved(draft: DraftContract): void {
+    // Draft is saved, we can close modal or keep it open
+    console.log('Draft saved:', draft);
   }
 
   saveNewContract(formData: any): void {
     const mode = formData.mode || 'add';
 
-    if (mode === 'edit') {
-      console.log('Updating contract:', formData.contractId, formData);
-      alert(`สัญญาถูกแก้ไขเรียบร้อยแล้ว!\nเลขที่สัญญา: ${formData.contractId}`);
-    } else {
-      console.log('Creating new contract:', formData);
-      alert(`สัญญาใหม่ถูกบันทึกแล้ว!`);
+    // ลบแบบร่างที่เกี่ยวข้อง ถ้ามี draftId
+    if (formData.draftId) {
+      this.draftService.deleteDraft(formData.draftId);
+      console.log('Draft deleted after final save:', formData.draftId);
     }
 
     this.closeAddModal();
+    this.contractSaved.emit(formData);
 
-    // TODO: Call API to save/update contract
-    // if (mode === 'edit') {
-    //   this.contractService.updateContract(formData).subscribe(...)
-    // } else {
-    //   this.contractService.createContract(formData).subscribe(...)
-    // }
+    if (mode === 'edit') {
+      console.log('Updating contract:', formData.contractId, formData);
+      this.openMessageModal('บันทึกสำเร็จ', `สัญญาถูกแก้ไขเรียบร้อยแล้ว\nเลขที่สัญญา: ${formData.contractId}`);
+    } else {
+      const draftRemoved = formData.draftId ? '\n(แบบร่างถูกลบแล้ว)' : '';
+      const msg = formData.saveAsQuotationOnly
+        ? `บันทึกใบเสนอราคาแล้ว แสดงในแท็บใบเสนอราคา${draftRemoved}`
+        : formData.saveAsBooking
+          ? `บันทึกสัญญาจองแล้ว แสดงในแท็บสัญญาจอง${draftRemoved}`
+          : `สัญญาใหม่ถูกบันทึกแล้ว${draftRemoved}`;
+      console.log('Creating new contract:', formData);
+      this.openMessageModal('บันทึกสำเร็จ', msg);
+    }
+  }
+
+  openMessageModal(title: string, message: string, onClose?: () => void): void {
+    this.messageModalTitle.set(title);
+    this.messageModalMessage.set(message);
+    this.messageModalOnClose = onClose;
+    this.showMessageModal.set(true);
+  }
+
+  closeMessageModal(): void {
+    this.showMessageModal.set(false);
+    if (this.messageModalOnClose) {
+      this.messageModalOnClose();
+      this.messageModalOnClose = undefined;
+    }
+  }
+
+  // ==================== CONFIRMATION MODAL ====================
+
+  openConfirmModal(options: {
+    type?: ConfirmationType;
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    confirmIcon?: string;
+    onConfirm: () => void;
+  }): void {
+    this.confirmModalType.set(options.type || 'warning');
+    this.confirmModalTitle.set(options.title);
+    this.confirmModalMessage.set(options.message);
+    this.confirmModalConfirmText.set(options.confirmText || 'ยืนยัน');
+    this.confirmModalCancelText.set(options.cancelText || 'ยกเลิก');
+    this.confirmModalIcon.set(options.confirmIcon || 'pi-check');
+    this.confirmModalOnConfirm = options.onConfirm;
+    this.showConfirmModal.set(true);
+  }
+
+  onConfirmModalConfirm(): void {
+    this.showConfirmModal.set(false);
+    if (this.confirmModalOnConfirm) {
+      this.confirmModalOnConfirm();
+      this.confirmModalOnConfirm = undefined;
+    }
+  }
+
+  onConfirmModalCancel(): void {
+    this.showConfirmModal.set(false);
+    this.confirmModalOnConfirm = undefined;
   }
 
   // ==================== HELPERS ====================
 
-  formatDate(dateString: string): string {
-    try {
-      const date = fromDateString(dateString);
-      return date.toLocaleDateString('th-TH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      });
-    } catch {
-      return dateString;
-    }
+  formatDate(dateValue: unknown): string {
+    return formatDateForDisplay(dateValue, 'th-TH');
   }
 
   getStatusColor(status: string): string {
@@ -393,13 +854,39 @@ export class ContractTableComponent {
     );
   }
 
+  /** สีจุดสถานะ: สัญญาจอง (DEPOSIT_AGREEMENT) = น้ำเงิน */
+  getStatusDotColor(item: Contract): string {
+    if (item.CONTRACT_TYPE === 'DEPOSIT_AGREEMENT') {
+      return '#3B82F6'; // blue for booking (สัญญาจอง)
+    }
+    return this.getStatusColor(item.STATUS);
+  }
+
+  getContractNumberColumnLabel(): string {
+    switch (this.contractType()) {
+      case 'quotation': return 'เลขที่ใบเสนอราคา';
+      case 'booking': return 'เลขที่สัญญาจอง';
+      case 'lease': return 'เลขที่สัญญาเช่า';
+      default: return 'เลขที่สัญญา';
+    }
+  }
+
+  getEditBulkActionLabel(): string {
+    switch (this.contractType()) {
+      case 'quotation': return 'แก้ไขใบเสนอราคา เดี่ยว';
+      case 'booking': return 'แก้ไขสัญญาจอง เดี่ยว';
+      case 'lease': return 'แก้ไขสัญญาเช่า เดี่ยว';
+      default: return 'แก้ไขสัญญา เดี่ยว';
+    }
+  }
+
   getContractTypeLabel(type: string): string {
     const CONTRACT_TYPE_LABELS = {
       'LEASE_AGREEMENT': 'สัญญาเช่า',
       'LEASE_RENEWAL': 'ต่อสัญญาเช่า',
       'LEASE_AMENDMENT': 'แก้ไขสัญญา',
       'LEASE_TERMINATION': 'เลิกสัญญา',
-      'DEPOSIT_AGREEMENT': 'สัญญามัดจำ',
+      'DEPOSIT_AGREEMENT': 'สัญญาจอง',
       'QUOTATION_AGREEMENT': 'ใบเสนอราคา',
       'MAINTENANCE_AGREEMENT': 'สัญญาบำรุงรักษา',
       'ADDENDUM': 'ภาคผนวก',

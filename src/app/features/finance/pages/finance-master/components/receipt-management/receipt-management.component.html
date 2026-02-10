@@ -18,7 +18,7 @@
   <div class="content-header">
     <div>
       <h2 class="page-title">
-        {{ isActiveSubTab('issue') ? 'รายการออกใบแจ้งหนี้' : 'รายการออกใบเสร็จ' }}
+        {{ isActiveSubTab('issue') ? 'ประวัติการออกใบแจ้งหนี้' : 'ประวัติการออกใบเสร็จ' }}
       </h2>
       <p class="page-subtitle">จัดการและติดตามเอกสาร</p>
     </div>
@@ -35,10 +35,6 @@
           <button class="bulk-btn" (click)="onBulkPrint()">
             <i class="pi pi-print"></i>
             <span>พิมพ์เอกสาร</span>
-          </button>
-          <button class="bulk-btn" (click)="onBulkAction()">
-            <i class="pi pi-check"></i>
-            <span>คลิก</span>
           </button>
         </div>
       </div>
@@ -57,13 +53,13 @@
               (change)="toggleSelectAll($event)"
             />
           </th>
-          <th>เลขที่สัญญาเช่า</th>
-          <th>ชื่อลูกค้า</th>
-          <th>รายการเรียกเก็บหลัก</th>
-          <th>ยอดเงิน (รวมภาษี)</th>
-          <th>วันที่เริ่มต้นเรียกเก็บ</th>
-          <th>สถานะ</th>
-          <th class="text-center">Actions</th>
+          <th>{{ isActiveSubTab('issue') ? 'เลขที่ใบแจ้งหนี้' : 'เลขที่ใบเสร็จ' }} <i class="pi pi-sort"></i></th>
+          <th>ชื่อลูกค้า <i class="pi pi-sort"></i></th>
+          <th>รายการเรียกเก็บหลัก <i class="pi pi-sort"></i></th>
+          <th>ยอดเงิน (รวมภาษี) <i class="pi pi-sort"></i></th>
+          <th>วันที่เริ่มต้นเรียกเก็บ <i class="pi pi-sort"></i></th>
+          <th>สถานะ <i class="pi pi-sort"></i></th>
+          <th class="text-center">Actions <i class="pi pi-sort"></i></th>
         </tr>
       </thead>
       <tbody>
@@ -118,63 +114,14 @@
                   <i class="pi pi-send"></i>
                 </button>
 
-                <!-- Menu Button with Dropdown -->
-                <div class="menu-wrapper">
-                  <button
-                    class="action-btn menu-btn"
-                    title="เพิ่มเติม"
-                    (click)="toggleRowMenu(receipt.id)"
-                  >
-                    <i class="pi pi-ellipsis-v"></i>
-                  </button>
-
-                  @if (isRowMenuOpen(receipt.id)) {
-                    <div class="action-menu">
-                      <button
-                        class="menu-item"
-                        (click)="onMenuAction(receipt, 'Preview ใบแจ้งหนี้')"
-                      >
-                        <i class="pi pi-eye"></i>
-                        <span>Preview ใบแจ้งหนี้</span>
-                      </button>
-                      <button
-                        class="menu-item"
-                        (click)="onMenuAction(receipt, 'ออกใบลดหนี้')"
-                      >
-                        <i class="pi pi-minus-circle"></i>
-                        <span>ออกใบลดหนี้</span>
-                      </button>
-                      <button
-                        class="menu-item"
-                        (click)="onMenuAction(receipt, 'พิมพ์เอกสาร (PDF)')"
-                      >
-                        <i class="pi pi-file-pdf"></i>
-                        <span>พิมพ์เอกสาร (PDF)</span>
-                      </button>
-                      <button
-                        class="menu-item"
-                        (click)="onMenuAction(receipt, 'ส่งทางอีเมล')"
-                      >
-                        <i class="pi pi-envelope"></i>
-                        <span>ส่งทางอีเมล</span>
-                      </button>
-                      <button
-                        class="menu-item"
-                        (click)="onMenuAction(receipt, 'ออกใบเสร็จ')"
-                      >
-                        <i class="pi pi-receipt"></i>
-                        <span>ออกใบเสร็จ</span>
-                      </button>
-                      <button
-                        class="menu-item danger"
-                        (click)="onMenuAction(receipt, 'ใบยกเลิก')"
-                      >
-                        <i class="pi pi-times-circle"></i>
-                        <span>ใบยกเลิก</span>
-                      </button>
-                    </div>
-                  }
-                </div>
+                <!-- Menu Button (ไม่มี dropdown ในนี้แล้ว) -->
+                <button
+                  class="action-btn menu-btn"
+                  title="เพิ่มเติม"
+                  (click)="toggleRowMenu(receipt.id, $event)"
+                >
+                  <i class="pi pi-ellipsis-v"></i>
+                </button>
               </div>
             </td>
           </tr>
@@ -182,6 +129,60 @@
       </tbody>
     </table>
   </div>
+
+  <!-- ✅ Dropdown Menu (ย้ายออกมานอก table) -->
+  @if (showRowMenu() && currentReceipt()) {
+    <div
+      class="action-menu-portal"
+      [style.top.px]="menuPosition().top"
+      [style.left.px]="menuPosition().left"
+    >
+      <div class="action-menu">
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentReceipt()!, 'Preview ใบแจ้งหนี้')"
+        >
+          <i class="pi pi-eye"></i>
+          <span>Preview ใบแจ้งหนี้</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentReceipt()!, 'ออกใบลดหนี้')"
+        >
+          <i class="pi pi-minus-circle"></i>
+          <span>ออกใบลดหนี้</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentReceipt()!, 'พิมพ์เอกสาร (PDF)')"
+        >
+          <i class="pi pi-file-pdf"></i>
+          <span>พิมพ์เอกสาร (PDF)</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentReceipt()!, 'ส่งทางอีเมล')"
+        >
+          <i class="pi pi-envelope"></i>
+          <span>ส่งทางอีเมล</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentReceipt()!, 'ออกใบเสร็จ')"
+        >
+          <i class="pi pi-receipt"></i>
+          <span>ออกใบเสร็จ</span>
+        </button>
+        <button
+          class="menu-item danger"
+          (click)="onMenuAction(currentReceipt()!, 'ใบยกเลิก')"
+        >
+          <i class="pi pi-times-circle"></i>
+          <span>ใบยกเลิก</span>
+        </button>
+      </div>
+    </div>
+  }
 </div>
 
 <!-- Click outside to close menu -->

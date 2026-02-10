@@ -31,15 +31,21 @@
   <!-- Tab Content -->
   <div class="tab-content">
     @if (isActiveTab('dashboard')) {
+      <div class="tab-panel">
       <app-finance-dashboard />
+      </div>
     }
 
     @if (isActiveTab('invoices')) {
+      <div class="tab-panel">
       <app-invoice-management />
+      </div>
     }
 
     @if (isActiveTab('receipts')) {
+      <div class="tab-panel">
       <app-receipt-management />
+      </div>
     }
   </div>
 </div>

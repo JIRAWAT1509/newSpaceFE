@@ -187,33 +187,29 @@
   font-size: 0.875rem;
 }
 
-/* Edit/Delete buttons now use global styles from styles.css */
-/* Override for document-type specific styling */
+/* Edit/Delete buttons - Consistent system style (PrimeNG-like) */
 .action-btn.action-btn-edit {
   background-color: transparent !important;
   border: none !important;
-  color: #374151 !important;
+  color: #3b82f6 !important;
+  border-radius: 50% !important;
 }
 
 .action-btn.action-btn-edit:hover {
-  background-color: #f3f4f6 !important;
-  color: #1f2937 !important;
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
 }
 
 .action-btn.action-btn-delete {
-  background-color: #ef4444 !important;
+  background-color: transparent !important;
   border: none !important;
-  color: #ffffff !important;
+  color: #ef4444 !important;
   border-radius: 50% !important;
 }
 
 .action-btn.action-btn-delete:hover {
-  background-color: #dc2626 !important;
-  color: #ffffff !important;
-}
-
-.action-btn.action-btn-delete i {
-  color: #ffffff !important;
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
 }
 
 /* ==================== EMPTY STATE ==================== */

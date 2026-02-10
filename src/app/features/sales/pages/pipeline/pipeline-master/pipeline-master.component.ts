@@ -1,6 +1,7 @@
-// pipeline-master.component.ts
-import { Component, signal, computed, OnInit } from '@angular/core';
+// pipeline-master.component.ts (UPDATED WITH DETAILED LOGGING)
+import { Component, signal, computed, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DateTime } from 'luxon';
 import {
   Deal,
   PipelineStage,
@@ -12,13 +13,16 @@ import {
   calculateWeightedValue,
   calculateDaysInStage,
   calculateDaysUntilDue,
-  getDueStatus,
   calculateAverageWinRate
 } from '@core/models/pipeline.model';
 import { MOCK_DEALS, MOCK_STAGES } from '@core/data/pipeline.mock';
 import { PipelineMetricsComponent } from '../components/pipeline-metrics/pipeline-metrics.component';
 import { PipelineFiltersComponent, FilterState } from '../components/pipeline-filters/pipeline-filters.component';
 import { KanbanBoardComponent } from '../components/kanban-board/kanban-board.component';
+import { AddDealModalComponent, AddDealData } from '../components/add-deal-modal/add-deal-modal.component';
+import { EditDealModalComponent, EditDealData } from '../components/edit-deal-modal/edit-deal-modal.component';
+import { StageConfigModalComponent, StageConfigData } from '../components/stage-config-modal/stage-config-modal.component';
+import { DealDetailModalComponent, DealDetailAction } from '../components/deal-detail-modal/deal-detail-modal.component';
 
 @Component({
   selector: 'app-pipeline-master',
@@ -27,13 +31,22 @@ import { KanbanBoardComponent } from '../components/kanban-board/kanban-board.co
     CommonModule,
     PipelineMetricsComponent,
     PipelineFiltersComponent,
-    KanbanBoardComponent
+    KanbanBoardComponent,
+    AddDealModalComponent,
+    EditDealModalComponent,
+    StageConfigModalComponent,
+    DealDetailModalComponent
   ],
   templateUrl: './pipeline-master.component.html',
   styleUrl: './pipeline-master.component.css'
 })
 export class PipelineMasterComponent implements OnInit {
-  // ==================== STATE ====================
+
+  // View children
+  @ViewChild(AddDealModalComponent) addDealModal!: AddDealModalComponent;
+  @ViewChild(EditDealModalComponent) editDealModal!: EditDealModalComponent;
+  @ViewChild(StageConfigModalComponent) stageConfigModal!: StageConfigModalComponent;
+  @ViewChild('dealDetailModal') dealDetailModal!: DealDetailModalComponent;
 
   // Core data
   deals = signal<Deal[]>([...MOCK_DEALS]);
@@ -45,12 +58,13 @@ export class PipelineMasterComponent implements OnInit {
   selectedOwner = signal<string | null>(null);
   selectedPriority = signal<string | null>(null);
 
-  // Stage view configs (pagination & sorting per stage)
+  // Stage view configs
   stageViewConfigs = signal<Map<string, StageViewConfig>>(new Map());
 
-  // ==================== COMPUTED PROPERTIES ====================
+  // Deal ID counter
+  private nextDealId = signal(11);
 
-  // Filtered deals based on hot filter + search + dropdowns
+  // Filtered deals
   filteredDeals = computed(() => {
     let deals = this.deals();
     const hotFilter = this.activeHotFilter();
@@ -58,11 +72,9 @@ export class PipelineMasterComponent implements OnInit {
     const owner = this.selectedOwner();
     const priority = this.selectedPriority();
 
-    // Apply hot filter
-    if (hotFilter === 'overdue') {
-      deals = deals.filter(d => d.daysUntilDue < 0);
-    } else if (hotFilter === 'near-due') {
-      deals = deals.filter(d => d.daysUntilDue >= 0 && d.daysUntilDue <= 2);
+    // Hot filter - COMBINED URGENT FILTER
+    if (hotFilter === 'urgent') {
+      deals = deals.filter(d => d.daysUntilDue <= 2); // overdue OR near-due
     } else if (hotFilter === 'high-priority') {
       deals = deals.filter(d => d.priority === 'high');
     } else if (hotFilter === 'medium-priority') {
@@ -71,7 +83,6 @@ export class PipelineMasterComponent implements OnInit {
       deals = deals.filter(d => d.priority === 'low');
     }
 
-    // Apply search
     if (search) {
       deals = deals.filter(d =>
         d.title.toLowerCase().includes(search) ||
@@ -81,15 +92,8 @@ export class PipelineMasterComponent implements OnInit {
       );
     }
 
-    // Apply owner filter
-    if (owner) {
-      deals = deals.filter(d => d.ownerName === owner);
-    }
-
-    // Apply priority filter
-    if (priority) {
-      deals = deals.filter(d => d.priority === priority);
-    }
+    if (owner) deals = deals.filter(d => d.ownerName === owner);
+    if (priority) deals = deals.filter(d => d.priority === priority);
 
     return deals;
   });
@@ -97,25 +101,17 @@ export class PipelineMasterComponent implements OnInit {
   // Deals grouped by stage
   dealsByStage = computed(() => {
     const map = new Map<string, Deal[]>();
-    const stages = this.stages();
-    const deals = this.filteredDeals();
-
-    stages.forEach(stage => {
-      const stageDeals = deals.filter(d => d.stageId === stage.id);
-      map.set(stage.id, stageDeals);
+    this.stages().forEach(stage => {
+      map.set(stage.id, this.filteredDeals().filter(d => d.stageId === stage.id));
     });
-
     return map;
   });
 
   // Stage metrics
   stageMetrics = computed(() => {
     const map = new Map<string, StageMetrics>();
-    const stages = this.stages();
-    const dealsByStage = this.dealsByStage();
-
-    stages.forEach(stage => {
-      const deals = dealsByStage.get(stage.id) || [];
+    this.stages().forEach(stage => {
+      const deals = this.dealsByStage().get(stage.id) || [];
       const totalValue = deals.reduce((sum, d) => sum + d.value, 0);
       const totalWeightedValue = deals.reduce((sum, d) => sum + d.weightedValue, 0);
       const actualWinRate = calculateAverageWinRate(deals);
@@ -135,7 +131,6 @@ export class PipelineMasterComponent implements OnInit {
         averageDaysInStage: Math.round(averageDaysInStage)
       });
     });
-
     return map;
   });
 
@@ -149,21 +144,18 @@ export class PipelineMasterComponent implements OnInit {
     const overdueDealCount = filteredDeals.filter(d => d.daysUntilDue < 0).length;
     const nearDueDealCount = filteredDeals.filter(d => d.daysUntilDue >= 0 && d.daysUntilDue <= 2).length;
 
-    // Calculate deals added this week
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     const dealsAddedThisWeek = allDeals.filter(d => new Date(d.createdAt) >= oneWeekAgo).length;
 
-    // Calculate deals added this month
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
     const dealsAddedThisMonth = allDeals.filter(d => new Date(d.createdAt) >= oneMonthAgo).length;
 
-    // Calculate average deal age
     const totalDaysInStage = filteredDeals.reduce((sum, d) => sum + d.daysInStage, 0);
     const averageDealAge = filteredDeals.length > 0 ? Math.round(totalDaysInStage / filteredDeals.length) : 0;
 
-    const metrics: PipelineMetrics = {
+    return {
       totalDeals: filteredDeals.length,
       totalValue,
       totalWeightedValue,
@@ -173,41 +165,34 @@ export class PipelineMasterComponent implements OnInit {
       nearDueDealCount,
       dealsAddedThisWeek,
       dealsAddedThisMonth,
-      dealsWonThisMonth: 0, // TODO: Track closed deals
+      dealsWonThisMonth: 0,
       dealsLostThisMonth: 0,
-      winRate: 42, // Mock value - should be calculated from historical data
-      averageTimeToClose: 45, // Mock value
+      winRate: 42,
+      averageTimeToClose: 45,
       stageMetrics: []
-    };
-
-    return metrics;
+    } as PipelineMetrics;
   });
 
-  // Get unique owners for filter
+  // Unique owners & tags
   uniqueOwners = computed(() => {
     const owners = new Set<string>();
     this.deals().forEach(d => owners.add(d.ownerName));
     return Array.from(owners).sort();
   });
 
-  // Get unique tags for filter
   uniqueTags = computed(() => {
     const tags = new Set<string>();
     this.deals().forEach(d => d.tags.forEach(t => tags.add(t)));
     return Array.from(tags).sort();
   });
 
-  // ==================== LIFECYCLE ====================
-
   ngOnInit(): void {
     this.initializeStageViewConfigs();
     this.updateAllDealsCalculations();
   }
 
-  // Initialize stage view configs with defaults
   private initializeStageViewConfigs(): void {
     const configs = new Map<string, StageViewConfig>();
-
     this.stages().forEach(stage => {
       configs.set(stage.id, {
         stageId: stage.id,
@@ -217,11 +202,9 @@ export class PipelineMasterComponent implements OnInit {
         cardsPerPage: 8
       });
     });
-
     this.stageViewConfigs.set(configs);
   }
 
-  // Update all deal calculations (days in stage, days until due, etc.)
   private updateAllDealsCalculations(): void {
     this.deals.update(deals =>
       deals.map(deal => ({
@@ -233,128 +216,268 @@ export class PipelineMasterComponent implements OnInit {
     );
   }
 
-  // ==================== EVENT HANDLERS ====================
-
-  // Hot filter change
+  // Event handlers
   onHotFilterChange(filter: HotFilter): void {
     this.activeHotFilter.set(filter);
   }
 
-  // Filter change from filters component
   onFilterChange(filterState: FilterState): void {
     this.searchQuery.set(filterState.search);
     this.selectedOwner.set(filterState.owner);
     this.selectedPriority.set(filterState.priority);
   }
 
-  // Stage sort change
   onStageSortChange(event: { stageId: string; sortBy: StageSortBy }): void {
     const configs = new Map(this.stageViewConfigs());
     const config = configs.get(event.stageId);
-
     if (config) {
-      configs.set(event.stageId, {
-        ...config,
-        sortBy: event.sortBy,
-        currentPage: 1 // Reset to page 1 when sorting changes
-      });
+      configs.set(event.stageId, { ...config, sortBy: event.sortBy, currentPage: 1 });
       this.stageViewConfigs.set(configs);
     }
   }
 
-  // Stage page change
   onStagePageChange(event: { stageId: string; page: number }): void {
     const configs = new Map(this.stageViewConfigs());
     const config = configs.get(event.stageId);
-
     if (config) {
-      configs.set(event.stageId, {
-        ...config,
-        currentPage: event.page
-      });
+      configs.set(event.stageId, { ...config, currentPage: event.page });
       this.stageViewConfigs.set(configs);
     }
   }
 
-  // Stage cards per page change
-  onStageCardsPerPageChange(event: { stageId: string; cardsPerPage: number }): void {
-    const configs = new Map(this.stageViewConfigs());
-    const config = configs.get(event.stageId);
-
-    if (config) {
-      configs.set(event.stageId, {
-        ...config,
-        cardsPerPage: event.cardsPerPage,
-        currentPage: 1 // Reset to page 1 when cards per page changes
-      });
-      this.stageViewConfigs.set(configs);
-    }
-  }
-
-  // Stage settings clicked
   onStageSettings(stageId: string): void {
-    console.log('Stage settings clicked:', stageId);
-    // TODO: Open stage config modal
+    // Create a map of stage ID to deal count
+    const dealCounts = new Map<string, number>();
+    for (const [stageId, deals] of this.dealsByStage().entries()) {
+      dealCounts.set(stageId, deals.length);
+    }
+
+    this.stageConfigModal.open(this.stages(), dealCounts);
   }
 
-  // Deal clicked
   onDealClicked(dealId: string): void {
-    console.log('Deal clicked:', dealId);
-    // TODO: Open deal detail modal
+    const deal = this.deals().find(d => d.id === dealId);
+    if (deal && this.dealDetailModal) {
+      this.dealDetailModal.open(deal, this.stages());
+    }
   }
 
-  // Deal menu clicked
   onDealMenuClicked(dealId: string): void {
-    console.log('Deal menu clicked:', dealId);
-    // TODO: Open context menu or quick actions
+    const deal = this.deals().find(d => d.id === dealId);
+    if (deal) this.dealDetailModal.open(deal, this.stages());
   }
 
-  // Deal moved between stages
   onDealMoved(event: { dealId: string; fromStageId: string; toStageId: string }): void {
+    console.log('');
+    console.log('🎯 PIPELINE-MASTER: onDealMoved called');
+    console.log('   - Deal ID:', event.dealId);
+    console.log('   - From Stage ID:', event.fromStageId);
+    console.log('   - To Stage ID:', event.toStageId);
+
     const { dealId, fromStageId, toStageId } = event;
 
-    if (fromStageId === toStageId) return;
+    if (fromStageId === toStageId) {
+      console.log('⚠️ PIPELINE-MASTER: Same stage - no change needed');
+      return;
+    }
 
+    const fromStage = this.stages().find(s => s.id === fromStageId);
     const toStage = this.stages().find(s => s.id === toStageId);
-    if (!toStage) return;
 
-    // Update deal's stage and related fields
+    if (!toStage) {
+      console.error('❌ PIPELINE-MASTER: Target stage not found!', toStageId);
+      return;
+    }
+
+    const dealBefore = this.deals().find(d => d.id === dealId);
+
+    if (!dealBefore) {
+      console.error('❌ PIPELINE-MASTER: Deal not found!', dealId);
+      return;
+    }
+
+    console.log('✅ PIPELINE-MASTER: Deal found:', dealBefore.title);
+    console.log('   - Current Stage:', dealBefore.stageName);
+    console.log('   - Target Stage:', toStage.name);
+    console.log('   - Updating deal...');
+
     this.deals.update(deals =>
       deals.map(deal => {
         if (deal.id === dealId) {
-          const now = new Date().toISOString();
-          const newDueDate = new Date();
-          newDueDate.setDate(newDueDate.getDate() + toStage.defaultDueDays);
+          const now = DateTime.now().toISO();
+          const newDueDate = DateTime.now().plus({ days: toStage.defaultDueDays });
 
-          return {
+          const updatedDeal = {
             ...deal,
             stageId: toStageId,
             stageName: toStage.name,
             movedToStageAt: now,
-            dueDate: newDueDate.toISOString(),
-            actualWinRate: toStage.forecastWinRate, // Update to stage's forecast
+            dueDate: newDueDate.toISO(),
+            actualWinRate: toStage.forecastWinRate,
             weightedValue: calculateWeightedValue(deal.value, toStage.forecastWinRate),
             daysInStage: 0,
             daysUntilDue: toStage.defaultDueDays,
-            lastActivityAt: now
+            lastActivityAt: now,
+            lastActivityType: 'stage_change'
+          };
+
+          console.log('✅ PIPELINE-MASTER: Deal updated successfully');
+          console.log('   - New Stage:', updatedDeal.stageName);
+          console.log('   - New Win Rate:', updatedDeal.actualWinRate + '%');
+
+          return updatedDeal;
+        }
+        return deal;
+      })
+    );
+
+    console.log('✅ PIPELINE-MASTER: deals signal updated');
+    console.log('');
+  }
+
+  // Modal handlers
+  onAddDeal(): void {
+    this.addDealModal.open(this.stages());
+  }
+
+  onAddDealSave(dealData: AddDealData): void {
+    const now = DateTime.now();
+    const dueDate = now.plus({ days: dealData.defaultDueDays });
+
+    const newDeal: Deal = {
+      id: `deal-${String(this.nextDealId()).padStart(3, '0')}`,
+      title: dealData.title,
+      customerId: dealData.customerId,
+      customerName: dealData.customerName,
+      companyName: dealData.companyName,
+      stageId: dealData.stageId,
+      stageName: dealData.stageName,
+      value: dealData.value,
+      actualWinRate: dealData.actualWinRate,
+      weightedValue: calculateWeightedValue(dealData.value, dealData.actualWinRate),
+      createdAt: now.toISO(),
+      movedToStageAt: now.toISO(),
+      dueDate: dueDate.toISO(),
+      areaId: dealData.areaId,
+      areaName: dealData.areaName,
+      buildingId: dealData.buildingId,
+      buildingName: dealData.buildingName,
+      floorNumber: dealData.floorNumber,
+      contactPerson: dealData.contactPerson,
+      contactPhone: dealData.contactPhone,
+      contactEmail: dealData.contactEmail,
+      tags: dealData.tags,
+      priority: dealData.priority,
+      notes: dealData.notes,
+      ownerId: 'user-current',
+      ownerName: 'Current User',
+      lastActivityAt: now.toISO(),
+      lastActivityType: 'note',
+      daysInStage: 0,
+      daysUntilDue: dealData.defaultDueDays,
+      attachmentCount: 0,
+      activityCount: 1
+    };
+
+    this.deals.update(deals => [...deals, newDeal]);
+    this.nextDealId.update(id => id + 1);
+    console.log('New deal added:', newDeal);
+  }
+
+  onEditDealSave(dealData: EditDealData): void {
+    const now = DateTime.now();
+
+    this.deals.update(deals =>
+      deals.map(deal => {
+        if (deal.id === dealData.dealId) {
+          const stageChanged = dealData.stageChanged;
+
+          return {
+            ...deal,
+            customerId: dealData.customerId,
+            customerName: dealData.customerName,
+            companyName: dealData.companyName,
+            stageId: dealData.stageId,
+            stageName: dealData.stageName,
+            title: dealData.title,
+            value: dealData.value,
+            actualWinRate: dealData.actualWinRate,
+            weightedValue: calculateWeightedValue(dealData.value, dealData.actualWinRate),
+            areaId: dealData.areaId,
+            areaName: dealData.areaName,
+            buildingId: dealData.buildingId,
+            buildingName: dealData.buildingName,
+            floorNumber: dealData.floorNumber,
+            tags: dealData.tags,
+            priority: dealData.priority,
+            notes: dealData.notes,
+            contactPerson: dealData.contactPerson,
+            contactPhone: dealData.contactPhone,
+            contactEmail: dealData.contactEmail,
+            movedToStageAt: stageChanged ? now.toISO() : deal.movedToStageAt,
+            daysInStage: stageChanged ? 0 : calculateDaysInStage(deal.movedToStageAt),
+            lastActivityAt: now.toISO(),
+            lastActivityType: stageChanged ? 'stage_change' : 'note'
           };
         }
         return deal;
       })
     );
 
-    console.log(`Deal ${dealId} moved from ${fromStageId} to ${toStageId}`);
+    console.log('Deal updated:', dealData.dealId);
   }
 
-  // Add deal (for future modal integration)
-  onAddDeal(): void {
-    console.log('Add deal clicked');
-    // TODO: Open add deal modal
-  }
-
-  // Configure stages (for future modal integration)
   onConfigureStages(): void {
-    console.log('Configure stages clicked');
-    // TODO: Open stage config modal
+    // Create a map of stage ID to deal count
+    const dealCounts = new Map<string, number>();
+    for (const [stageId, deals] of this.dealsByStage().entries()) {
+      dealCounts.set(stageId, deals.length);
+    }
+
+    this.stageConfigModal.open(this.stages(), dealCounts);
+  }
+
+  onStageConfigSave(configData: StageConfigData): void {
+    this.stages.set(configData.stages);
+
+    this.deals.update(deals =>
+      deals.map(deal => {
+        const stage = configData.stages.find(s => s.id === deal.stageId);
+        if (stage) {
+          return { ...deal, stageName: stage.name };
+        }
+        return deal;
+      })
+    );
+
+    this.initializeStageViewConfigs();
+    console.log('Stages configuration updated:', configData.stages);
+  }
+
+  onDealDetailAction(action: DealDetailAction): void {
+    if (action.type === 'edit') {
+      const deal = this.deals().find(d => d.id === action.dealId);
+      if (deal) this.editDealModal.open(deal, this.stages());
+    } else if (action.type === 'delete') {
+      this.deals.update(deals => deals.filter(d => d.id !== action.dealId));
+      console.log('Deal deleted:', action.dealId);
+    } else if (action.type === 'change-stage') {
+      // Handle stage change from detail modal
+      const toStageId = action.data?.toStageId;
+      if (toStageId) {
+        const deal = this.deals().find(d => d.id === action.dealId);
+        if (deal) {
+          this.onDealMoved({
+            dealId: action.dealId,
+            fromStageId: deal.stageId,
+            toStageId: toStageId
+          });
+        }
+      }
+    } else if (action.type === 'won' || action.type === 'lost') {
+      console.log(`Deal marked as ${action.type}:`, action.dealId);
+    } else if (action.type === 'add-note') {
+      console.log('Note added:', action.data);
+    }
   }
 }

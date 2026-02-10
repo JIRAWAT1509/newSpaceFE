@@ -73,7 +73,7 @@
           }
         </div>
 
-        <!-- Row 2 -->
+        <!-- Row 2: ระบบเจน AUTO ให้ แก้ไขไม่ได้ -->
         <div class="form-group required">
           <label>เลขที่ใบเสนอราคา (น.หลัก)</label>
           <input
@@ -81,7 +81,8 @@
             pInputText
             formControlName="contractNumberMain"
             placeholder="AUTO"
-            class="w-full"
+            readonly
+            class="w-full field-auto"
           />
         </div>
 
@@ -92,29 +93,25 @@
             pInputText
             formControlName="contractNumberSub"
             placeholder="AUTO"
-            class="w-full"
+            readonly
+            class="w-full field-auto"
           />
         </div>
 
         <!-- Row 3 -->
         <div class="form-group">
           <label>สถานะใบเสนอราคา</label>
-          <div class="input-with-button">
-            <input
-              type="text"
-              pInputText
-              formControlName="quotationStatus"
-              readonly
-              class="flex-1"
-            />
-            <button type="button" class="action-btn" (click)="openDeclineInfo()">
-              ข้อมูลการ Decline
-            </button>
-          </div>
+          <input
+            type="text"
+            pInputText
+            formControlName="quotationStatus"
+            readonly
+            class="w-full field-auto"
+          />
         </div>
 
         <div class="form-group">
-          <label>วันที่ระดับ Quotation</label>
+          <label>วันที่สถานะใบเสนอราคา</label>
           <p-datepicker
             formControlName="quotationLevelDate"
             [showIcon]="true"
@@ -278,9 +275,6 @@
             />
             <i class="pi pi-search selector-icon"></i>
           </div>
-          @if (isFieldInvalid('areaBuilding')) {
-            <small class="error-msg">กรุณาเลือกอาคาร</small>
-          }
         </div>
 
         <div class="form-group required">
@@ -296,23 +290,21 @@
             />
             <i class="pi pi-search selector-icon"></i>
           </div>
-          @if (isFieldInvalid('areaFloor')) {
-            <small class="error-msg">กรุณาเลือกชั้น</small>
-          }
         </div>
 
         <div class="form-group required">
           <label>เลขที่ยูนิต / ห้อง</label>
-          <input
-            type="text"
-            pInputText
-            formControlName="areaUnitNumber"
-            placeholder="กรอกเลขที่ยูนิต/ห้อง"
-            class="w-full"
-          />
-          @if (isFieldInvalid('areaUnitNumber')) {
-            <small class="error-msg">กรุณากรอกเลขที่ยูนิต/ห้อง</small>
-          }
+          <div class="selector-field" (click)="openSelector('areaUnitNumber')">
+            <input
+              type="text"
+              pInputText
+              formControlName="areaUnitNumber"
+              placeholder="เลือกห้อง (ดึงจาก Area Management)"
+              readonly
+              class="w-full"
+            />
+            <i class="pi pi-search selector-icon"></i>
+          </div>
         </div>
 
         <div class="form-group">
@@ -341,6 +333,40 @@
             />
             <i class="pi pi-search selector-icon"></i>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section D: ข้อมูลผู้ติดต่อ -->
+    <div class="form-section subsection" id="section-contact">
+      <h4 class="section-title">D. ข้อมูลผู้ติดต่อ</h4>
+
+      <div class="form-grid-2">
+        <div class="form-group required">
+          <label>ชื่อผู้ติดต่อ</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="contactName"
+            placeholder="กรอกชื่อผู้ติดต่อ"
+            class="w-full"
+          />
+        </div>
+
+        <div class="form-group required">
+          <label>เบอร์โทรผู้ติดต่อ</label>
+          <input
+            type="tel"
+            pInputText
+            formControlName="contactPhone"
+            placeholder="กรอกเบอร์โทร (ตัวเลข 9-10 หลัก)"
+            class="w-full"
+            maxlength="10"
+            (input)="onPhoneInput($event)"
+          />
+          @if (form().get('contactPhone')?.touched && form().get('contactPhone')?.hasError('pattern')) {
+            <small class="field-error">รูปแบบเบอร์โทรไม่ถูกต้อง (ต้องเป็นตัวเลข 9-10 หลัก)</small>
+          }
         </div>
       </div>
     </div>
@@ -380,3 +406,5 @@
     </div>
   </div>
 }
+
+<!-- Decline Info Modal ถูกย้ายไปอยู่ที่ contract-table เพื่อเด้งตอนกดยกเลิกสัญญาแทน -->

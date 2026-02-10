@@ -5,6 +5,7 @@ import { Building } from '../../models/building.model';
 import { Floor, FloorPlanVersion } from '../../models/floor.model';
 import { Area, AreaStatus } from '../../models/area.model';
 import { getCompleteBuildingData } from '../../data/area-index';
+import { getAreaAvailabilityConfig, getModuleColor, getModuleLabel, getModuleLabelEn } from '../ui-settings';
 
 // Extended Building interface with floors
 export interface BuildingWithFloors extends Building {
@@ -299,43 +300,100 @@ export class AreaDataService {
     // Calculate total for percentages (only active areas)
     const total = areas.filter(a => a.isActive).length;
 
+    // Get module config with fallback
+    const areaConfig = getAreaAvailabilityConfig();
+    
+    // Helper to get color with fallback to CSS variables
+    const getStatusColor = (statusId: AreaStatus): string => {
+      const configColor = getModuleColor('areaAvailability', statusId);
+      if (configColor && configColor !== '#000000') {
+        // Convert hex to rgb format
+        const hex = configColor.replace('#', '');
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+      // Fallback to CSS variables
+      const fallbackMap: Record<AreaStatus, string> = {
+        unallocated: 'rgb(var(--danger))',
+        quotation: 'rgb(var(--info))',
+        leased: 'rgb(var(--warning))',
+        vacant: 'rgb(var(--success))',
+      };
+      return fallbackMap[statusId] || 'rgb(var(--muted))';
+    };
+    
+    // Helper to get label with fallback
+    const getStatusLabel = (statusId: AreaStatus, isTh: boolean): string => {
+      if (isTh) {
+        // Get Thai label
+        const configLabel = getModuleLabel('areaAvailability', statusId);
+        if (configLabel && configLabel !== statusId) {
+          return configLabel;
+        }
+        // Fallback to defaults
+        const fallbackLabels: Record<AreaStatus, string> = {
+          unallocated: 'ยังไม่พร้อม',
+          quotation: 'คำใบเสนอราคา',
+          leased: 'เช่า',
+          vacant: 'ว่าง',
+        };
+        return fallbackLabels[statusId] || statusId;
+      } else {
+        // Get English label
+        const configLabelEn = getModuleLabelEn('areaAvailability', statusId);
+        if (configLabelEn && configLabelEn !== statusId) {
+          return configLabelEn;
+        }
+        // Fallback to defaults
+        const fallbackLabels: Record<AreaStatus, string> = {
+          unallocated: 'Unallocated',
+          quotation: 'Quotation',
+          leased: 'Leased',
+          vacant: 'Vacant',
+        };
+        return fallbackLabels[statusId] || statusId;
+      }
+    };
+    
     // Build distribution array (4 statuses only)
     const distribution: StatusDistribution[] = [
       {
         id: 'unallocated',
-        label: 'Unallocated',
-        labelTh: 'ยังไม่พร้อม',
+        label: getStatusLabel('unallocated', false),
+        labelTh: getStatusLabel('unallocated', true),
         count: statusCounts.get('unallocated')!.count,
         percentage: total > 0 ? (statusCounts.get('unallocated')!.count / total) * 100 : 0,
         warningCount: statusCounts.get('unallocated')!.warningCount,
-        color: '#FF6384'
+        color: getStatusColor('unallocated')
       },
       {
         id: 'quotation',
-        label: 'Quotation',
-        labelTh: 'คำใบเสนอราคา',
+        label: getStatusLabel('quotation', false),
+        labelTh: getStatusLabel('quotation', true),
         count: statusCounts.get('quotation')!.count,
         percentage: total > 0 ? (statusCounts.get('quotation')!.count / total) * 100 : 0,
         warningCount: statusCounts.get('quotation')!.warningCount,
-        color: '#4CA3FF'
+        color: getStatusColor('quotation')
       },
       {
         id: 'leased',
-        label: 'Leased',
-        labelTh: 'เช่า',
+        label: getStatusLabel('leased', false),
+        labelTh: getStatusLabel('leased', true),
         count: statusCounts.get('leased')!.count,
         percentage: total > 0 ? (statusCounts.get('leased')!.count / total) * 100 : 0,
         warningCount: statusCounts.get('leased')!.warningCount,
-        color: '#FFD05F'
+        color: getStatusColor('leased')
       },
       {
         id: 'vacant',
-        label: 'Vacant',
-        labelTh: 'ว่าง',
+        label: getStatusLabel('vacant', false),
+        labelTh: getStatusLabel('vacant', true),
         count: statusCounts.get('vacant')!.count,
         percentage: total > 0 ? (statusCounts.get('vacant')!.count / total) * 100 : 0,
         warningCount: statusCounts.get('vacant')!.warningCount,
-        color: '#80E08E'
+        color: getStatusColor('vacant')
       }
     ];
 

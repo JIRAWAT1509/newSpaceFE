@@ -1,0 +1,323 @@
+/* bulk-action-modal.component.css */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgb(var(--border));
+}
+
+.header-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+/* ใช้โทนฟ้าน้ำเงินให้สอดคล้องกับระบบ */
+.header-icon.terminate,
+.header-icon.discount,
+.header-icon.renew,
+.header-icon.extend,
+.header-icon.edit {
+  background: rgb(var(--primary) / 0.12);
+  color: rgb(var(--primary));
+}
+
+.modal-title {
+  flex: 1;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgb(var(--foreground));
+  margin: 0;
+}
+
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgb(var(--muted) / 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(var(--muted-foreground));
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgb(var(--muted) / 0.2);
+  color: rgb(var(--foreground));
+}
+
+/* Selected Summary */
+.selected-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgb(var(--info) / 0.05);
+  color: rgb(var(--info));
+  font-size: 0.875rem;
+}
+
+.selected-summary i {
+  font-size: 1rem;
+}
+
+/* Contracts Preview */
+.contracts-preview {
+  padding: 12px 24px;
+  border-bottom: 1px solid rgb(var(--border));
+}
+
+.preview-label {
+  font-size: 0.75rem;
+  color: rgb(var(--muted-foreground));
+  margin-bottom: 8px;
+}
+
+.preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.contract-chip {
+  padding: 4px 10px;
+  background: rgb(var(--primary) / 0.1);
+  color: rgb(var(--primary));
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.more-count {
+  padding: 4px 10px;
+  background: rgb(var(--muted) / 0.1);
+  color: rgb(var(--muted-foreground));
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+/* Body */
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(var(--foreground));
+}
+
+.form-group.required label::after {
+  content: ' *';
+  color: rgb(var(--danger));
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px 12px;
+  border: 1px solid rgb(var(--border));
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: rgb(var(--primary));
+  box-shadow: 0 0 0 3px rgb(var(--primary) / 0.1);
+}
+
+/* Edit Notice */
+.edit-notice {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: rgb(var(--muted) / 0.05);
+  border-radius: 8px;
+  border: 1px solid rgb(var(--border));
+}
+
+.edit-notice i {
+  font-size: 1.5rem;
+  color: rgb(var(--info));
+  flex-shrink: 0;
+}
+
+.notice-content {
+  flex: 1;
+}
+
+.notice-content p {
+  margin: 0 0 4px 0;
+  font-size: 0.875rem;
+  color: rgb(var(--foreground));
+}
+
+.notice-content .success-text {
+  color: rgb(var(--primary));
+}
+
+.notice-content .warning-text {
+  color: rgb(var(--warning));
+}
+
+/* Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid rgb(var(--border));
+  background: rgb(var(--muted) / 0.02);
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  border: 1px solid rgb(var(--border));
+  background: white;
+  color: rgb(var(--foreground));
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgb(var(--muted) / 0.1);
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  background: rgb(var(--primary));
+  color: white;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ปุ่มยืนยันทั้งหมดใช้ธีมฟ้าน้ำเงินเดียวกัน */
+.btn-primary.terminate,
+.btn-primary.discount,
+.btn-primary.renew,
+.btn-primary.extend,
+.btn-primary.edit {
+  background: rgb(var(--primary));
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .modal-content {
+    max-width: 95%;
+    margin: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* PrimeNG Overrides */
+:host ::ng-deep {
+  .p-datepicker,
+  .p-select {
+    width: 100%;
+  }
+
+  .p-datepicker .p-inputtext,
+  .p-select .p-select-label {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+  }
+
+  .p-inputtextarea {
+    resize: vertical;
+  }
+}

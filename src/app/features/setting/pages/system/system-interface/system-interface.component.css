@@ -908,6 +908,23 @@
   color: rgb(var(--danger-fg));
 }
 
+.btn-danger-outline {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200;
+  background: transparent;
+  color: rgb(var(--danger));
+  border: 1px solid rgb(var(--danger));
+}
+
+.btn-danger-outline:hover {
+  background: rgb(var(--danger));
+  color: rgb(var(--danger-fg));
+}
+
+.btn-danger-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-info {
   background: rgb(var(--info));
   color: rgb(var(--info-fg));
@@ -1495,23 +1512,27 @@
   transform: translateX(20px);
 }
 
+/* Consistent delete: white trash in coral circle */
 .btn-danger-small {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: rgba(var(--danger), 0.1);
-  border: 1px solid rgba(var(--danger), 0.3);
-  border-radius: 0.5rem;
-  color: rgb(var(--danger));
+  width: 34px;
+  height: 34px;
+  background-color: #E8847C;
+  border: none;
+  border-radius: 50%;
+  color: #ffffff;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .btn-danger-small:hover {
-  background: rgba(var(--danger), 0.2);
-  border-color: rgb(var(--danger));
+  background-color: #D6726A;
+}
+
+.btn-danger-small i {
+  color: #ffffff;
 }
 
 .btn-primary {

@@ -1,0 +1,129 @@
+<!-- team-column.component.html -->
+
+<div class="team-column">
+
+  <!-- Team Header -->
+  <div class="team-header">
+    <div class="team-header-top">
+      <div class="team-info">
+        <h3 class="team-name">{{ team().name }}</h3>
+        <span class="team-count">{{ team().members.length }}</span>
+      </div>
+      <div class="team-actions">
+        <button
+          class="team-action-btn"
+          (click)="onEditTeam()"
+          title="Edit team"
+        >
+          <i class="pi pi-pencil"></i>
+        </button>
+        <button
+          class="team-action-btn danger"
+          (click)="onDeleteTeam()"
+          title="Delete team"
+        >
+          <i class="pi pi-trash"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Team Leader Info -->
+    <div class="team-leader">
+      <i class="pi pi-user"></i>
+      <span>Leader: {{ team().leaderName }}</span>
+    </div>
+
+    <!-- Team Budget Bar -->
+    <div class="team-budget">
+      <app-budget-bar
+        [actual]="team().budget.actual"
+        [forecast]="team().budget.forecast"
+        [size]="'small'"
+        [showLabel]="true"
+        [showValues]="true"
+        [showPercentage]="true"
+        [label]="'Team Budget'"
+      ></app-budget-bar>
+    </div>
+
+    <!-- Sort Dropdown -->
+    <div class="team-sort">
+      <p-select
+        [(ngModel)]="viewConfig().sortBy"
+        (ngModelChange)="onSortChange($event)"
+        [options]="sortOptions"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="sort-select"
+      >
+        <ng-template let-option pTemplate="item">
+          <div class="sort-option">
+            <span>{{ option.label }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+    </div>
+  </div>
+
+  <!-- Members List (Scrollable) -->
+  <div
+    class="members-list"
+    [class.drag-over]="isDragOver()"
+  >
+    @for (member of paginatedMembers(); track member.id) {
+      <app-budget-member-card
+        [member]="member"
+        (cardClick)="onMemberClick($event)"
+        (menuClick)="onMemberMenu($event)"
+        (dragStart)="onMemberDragStart($event)"
+        (dragEnd)="onMemberDragEnd($event)"
+      />
+    }
+
+    <!-- Unallocated Budget Card -->
+    @if (hasUnallocatedBudget()) {
+      <div class="unallocated-budget-card">
+        <div class="unallocated-header">
+          <div class="unallocated-icon">💰</div>
+          <div class="unallocated-title">Unallocated Budget</div>
+        </div>
+        <div class="unallocated-amount">{{ formatCurrency(unallocatedBudget()) }}</div>
+        <div class="unallocated-hint">Available for allocation</div>
+      </div>
+    }
+
+    @if (team().members.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <div class="empty-text">No members in this team</div>
+        <button class="btn-add-first" (click)="onAddMember()">
+          <i class="pi pi-plus"></i>
+          <span>Add First Member</span>
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Add Member Button (when has members) -->
+  @if (team().members.length > 0) {
+    <div class="add-member-section">
+      <button class="btn-add-member" (click)="onAddMember()">
+        <i class="pi pi-plus"></i>
+        <span>Add Member</span>
+      </button>
+    </div>
+  }
+
+  <!-- Pagination Component -->
+  @if (team().members.length > 0) {
+    <app-stage-pagination
+      [currentPage]="viewConfig().currentPage"
+      [totalPages]="totalPages()"
+      [totalDeals]="team().members.length"
+      [cardsPerPage]="viewConfig().cardsPerPage"
+      (pageChange)="onPageChange($event)"
+      (cardsPerPageChange)="onCardsPerPageChange($event)"
+    />
+  }
+
+</div>

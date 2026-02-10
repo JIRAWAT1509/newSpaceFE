@@ -237,8 +237,7 @@ export class AreaBlockComponent implements OnInit {
     };
 
     try {
-      this.chart = new Chart(ctx, config) as any;
-
+      this.chart = new Chart(ctx, config);
       console.log('Chart created successfully');
     } catch (error) {
       console.error('Error creating chart:', error);

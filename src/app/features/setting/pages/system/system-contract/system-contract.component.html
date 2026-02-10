@@ -1103,3 +1103,24 @@
   (save)="onSaveCostCenter($event)"
 ></app-cost-center-form-drawer>
 
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  type="danger"
+  [title]="confirmModalTitle()"
+  [message]="confirmModalMessage()"
+  confirmText="ลบ"
+  confirmIcon="pi-trash"
+  (confirm)="onConfirmDelete()"
+  (cancel)="onCancelDelete()"
+/>
+
+<!-- Message Modal -->
+<app-warning-modal
+  [isOpen]="showMessageModal()"
+  [title]="messageTitle()"
+  [message]="messageText()"
+  buttonText="ตกลง"
+  (onClose)="closeMessageModal()"
+/>
+

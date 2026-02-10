@@ -189,7 +189,7 @@ export class ActivitiesSectionComponent implements OnInit {
       this.roles.set([...MOCK_ROLES]);
 
       this.isLoading.set(false);
-      console.log('Activities data loaded:', this.activities().length);
+      ////console.log('Activities data loaded:', this.activities().length);
     }, 500);
   }
 
@@ -201,7 +201,7 @@ export class ActivitiesSectionComponent implements OnInit {
   }
 
   refreshTeamActivityFeed(): void {
-    console.log('Team activity feed refreshed');
+    ////console.log('Team activity feed refreshed');
   }
 
   // ==================== FILTER MANAGEMENT ====================
@@ -323,7 +323,7 @@ export class ActivitiesSectionComponent implements OnInit {
       this.isLoading.set(false);
       this.closeDrawer();
 
-      console.log('Activity created:', newActivity);
+      ////console.log('Activity created:', newActivity);
     }, 500);
   }
 
@@ -342,7 +342,7 @@ export class ActivitiesSectionComponent implements OnInit {
       this.isLoading.set(false);
       this.closeDrawer();
 
-      console.log('Activity updated:', activityId);
+      ////console.log('Activity updated:', activityId);
     }, 500);
   }
 
@@ -361,7 +361,7 @@ export class ActivitiesSectionComponent implements OnInit {
       this.isLoading.set(false);
       this.deselectActivity();
 
-      console.log('Activity deleted:', activityId);
+      ////console.log('Activity deleted:', activityId);
     }, 300);
   }
 
@@ -407,7 +407,7 @@ export class ActivitiesSectionComponent implements OnInit {
       }
 
       this.isLoading.set(false);
-      console.log('Activity status updated:', activityId, status);
+      ////console.log('Activity status updated:', activityId, status);
     }, 500);
   }
 

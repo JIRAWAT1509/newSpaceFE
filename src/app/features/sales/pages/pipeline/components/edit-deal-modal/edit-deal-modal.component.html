@@ -1,1 +1,195 @@
-<p>edit-deal-modal works!</p>
+<!-- edit-deal-modal.component.html (FIXED FOR ANGULAR 20.3 SIGNALS) -->
+
+@if (visible()) {
+  <div class="modal-overlay" (click)="onClose()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="header-content">
+          <h2 class="modal-title">
+            <span class="title-icon">✏️</span>
+            <span>Edit Deal</span>
+          </h2>
+          <p class="modal-subtitle">Update deal information and settings</p>
+        </div>
+        <button class="btn-close" (click)="onClose()">
+          <span>✕</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+
+        <!-- Customer Selection -->
+        <div class="form-group">
+          <label class="form-label">
+            Customer <span class="required">*</span>
+          </label>
+          <p-select
+            [ngModel]="selectedCustomerId()"
+            (ngModelChange)="selectedCustomerId.set($event)"
+            [options]="customerOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select customer..."
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <!-- Deal Title -->
+        <div class="form-group">
+          <label class="form-label">
+            Deal Title <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            pInputText
+            class="w-full"
+            placeholder="e.g., Cafe Space - Sukhumvit Area"
+            [ngModel]="dealTitle()"
+            (ngModelChange)="dealTitle.set($event)"
+          />
+        </div>
+
+        <!-- Deal Value -->
+        <div class="form-group">
+          <label class="form-label">
+            Deal Value (฿) <span class="required">*</span>
+          </label>
+          <p-inputNumber
+            [ngModel]="dealValue()"
+            (ngModelChange)="dealValue.set($event || 0)"
+            [min]="0"
+            [showButtons]="true"
+            mode="currency"
+            currency="THB"
+            locale="th-TH"
+            styleClass="w-full"
+            placeholder="฿0"
+          ></p-inputNumber>
+        </div>
+
+        <!-- Win Rate Section -->
+        <div class="form-group">
+          <label class="form-label">
+            Manual Win Rate Override
+          </label>
+
+          <div class="win-rate-section">
+            <div class="win-rate-display">
+              <div class="rate-label">Current Win Rate</div>
+              <div class="rate-value">{{ actualWinRate() }}%</div>
+              @if (stageWinRate() !== actualWinRate()) {
+                <div class="rate-note">(Stage default: {{ stageWinRate() }}%)</div>
+              }
+            </div>
+
+            <div class="slider-container">
+              <p-slider
+                [ngModel]="actualWinRate()"
+                (ngModelChange)="actualWinRate.set($event)"
+                [min]="0"
+                [max]="100"
+                [step]="5"
+                styleClass="w-full"
+              ></p-slider>
+              <div class="slider-labels">
+                <span>0%</span>
+                <span>25%</span>
+                <span>50%</span>
+                <span>75%</span>
+                <span>100%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-content">
+              <p class="info-title">About Win Rate</p>
+              <p class="info-text">Adjust this to override the stage's default win rate. This affects the weighted value calculation.</p>
+              @if (dealValue() > 0) {
+                <p class="info-calculation">
+                  <strong>Weighted Value:</strong> {{ formatCurrency(dealValue() * actualWinRate() / 100) }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Area/Location -->
+        <div class="form-group">
+          <label class="form-label">Area/Location</label>
+          <p-select
+            [ngModel]="selectedAreaId()"
+            (ngModelChange)="selectedAreaId.set($event)"
+            [options]="areaOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select area..."
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-group">
+          <label class="form-label">Tags</label>
+          <p-multiSelect
+            [ngModel]="selectedTags()"
+            (ngModelChange)="selectedTags.set($event)"
+            [options]="tagOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select tags..."
+            styleClass="w-full"
+          ></p-multiSelect>
+        </div>
+
+        <!-- Priority -->
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <p-select
+            [ngModel]="selectedPriority()"
+            (ngModelChange)="selectedPriority.set($event)"
+            [options]="priorityOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select priority..."
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea
+            pTextarea
+            class="w-full"
+            rows="3"
+            placeholder="Add any additional notes about this deal..."
+            [ngModel]="notes()"
+            (ngModelChange)="notes.set($event)"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="onClose()">
+          <span>Cancel</span>
+        </button>
+        <button
+          class="btn-save"
+          (click)="onSave()"
+          [disabled]="!isFormValid()"
+        >
+          <span class="btn-icon">💾</span>
+          <span class="btn-label">Save Changes</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

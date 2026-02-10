@@ -1,6 +1,7 @@
 export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
   en: {
     // --- Main Categories ---
+    bookmarks: 'Bookmarks',
     area_management: 'Area Management',
     area_allocation: 'Area Allocation',
     area_maintenance: 'Area Maintenance',
@@ -39,6 +40,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_budget: 'Budget',
     report_finance: 'Finance',
     report_collection: 'Collection',
+    dashboard: 'Dashboard',
 
     // --- Sub-menu Items ---
     view_all_areas: 'View All Areas',
@@ -183,6 +185,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
   },
   th: {
     // --- Main Categories ---
+    bookmarks: 'บุ๊กมาร์ก',
     area_management: 'การจัดการพื้นที่',
     area_allocation: 'การจัดสรรพื้นที่',
     area_maintenance: 'การบำรุงรักษาพื้นที่',
@@ -335,6 +338,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     budget_alerts: 'แจ้งเตือนงบประมาณ',
     budget_settings: 'ตั้งค่างบประมาณ',
     main_dashboard: 'แดชบอร์ดหลัก',
+    dashboard: 'แดชบอร์ด',
     quick_stats: 'สถิติเร็ว',
     recent_activity: 'กิจกรรมล่าสุด',
     notifications: 'การแจ้งเตือน',
@@ -517,6 +521,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     budget_alerts: '预算警报',
     budget_settings: '预算设置',
     main_dashboard: '主仪表板',
+    dashboard: '仪表板',
     quick_stats: '快速统计',
     recent_activity: '最近活动',
     notifications: '通知',

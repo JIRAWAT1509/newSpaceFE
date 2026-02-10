@@ -35,23 +35,44 @@
 
 <app-header
   #headerRef
-  [style.--sidebar-width]="isSidebarExpanded() ? '18rem' : '5rem'"
+  [style.--sidebar-width]="isMobile() ? '0' : (isSidebarExpanded() ? '16rem' : '5rem')"
+  [isMobile]="isMobile()"
 ></app-header>
 
-<div class="flex h-screen overflow-hidden bg-bg min-w-0">
-  <app-sidebar
-    class="h-full flex-shrink-0 transition-all duration-300"
-    [style.padding-top.px]="headerHeight()"
+<!-- Backdrop when sidebar open on mobile -->
+@if (isMobile() && isSidebarExpanded()) {
+  <div
+    class="sidebar-backdrop"
+    (click)="closeSidebar()"
+    role="button"
+    tabindex="0"
+    aria-label="Close menu"
+  ></div>
+}
+
+<div class="app-layout">
+  <div
+    class="sidebar-wrapper"
+    [class.sidebar-mobile-overlay]="isMobile()"
+    [class.sidebar-mobile-open]="isMobile() && isSidebarExpanded()"
+    [style.padding-top.px]="isMobile() ? headerHeight() : headerHeight()"
   >
-  </app-sidebar>
+    <app-sidebar
+      class="h-full flex-shrink-0 transition-all duration-300"
+      [style.padding-top.px]="isMobile() ? 0 : 0"
+      [isMobileOverlay]="isMobile()"
+    >
+    </app-sidebar>
+  </div>
 
   <div class="flex-1 flex flex-col overflow-hidden min-w-0">
     <main
       (scroll)="onContentScroll($event)"
       class="flex-1 overflow-x-hidden overflow-y-auto transition-all duration-300"
       [style.padding-top.px]="headerHeight()"
+      [class.main-with-bottom-nav]="isMobile()"
     >
-      <div class="container mx-auto px-4 py-8">
+      <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4 md:pt-4 md:pb-8 max-w-[1600px]">
         <router-outlet />
       </div>
     </main>

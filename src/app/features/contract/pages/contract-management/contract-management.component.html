@@ -1,13 +1,14 @@
 <!-- contract-management.component.html -->
 
 <div class="contract-management-container">
-  <!-- Header -->
+  <!-- Page title (นอกการ์ด) -->
   <div class="page-header">
     <h1 class="page-title">Contract Management</h1>
   </div>
 
-  <!-- Tabs -->
-  <p-tabs [(value)]="activeTab" styleClass="contract-tabs">
+  <!-- Content ในการ์ด -->
+  <div class="content-card">
+  <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" styleClass="contract-tabs">
     <p-tablist>
       <p-tab value="quotation">
         <div class="tab-header">
@@ -41,6 +42,9 @@
           [sharedFilters]="sharedFilters()"
           (searchTextChange)="onSearchUpdate($event)"
           (filtersChange)="onFiltersUpdate($event)"
+          (contractSaved)="onContractSaved($event)"
+          (contractCopied)="onContractCopied($event)"
+          (contractCancelRequest)="onContractCancelRequest($event)"
         />
       </p-tabpanel>
 
@@ -53,6 +57,9 @@
           [sharedFilters]="sharedFilters()"
           (searchTextChange)="onSearchUpdate($event)"
           (filtersChange)="onFiltersUpdate($event)"
+          (contractSaved)="onContractSaved($event)"
+          (contractCopied)="onContractCopied($event)"
+          (contractCancelRequest)="onContractCancelRequest($event)"
         />
       </p-tabpanel>
 
@@ -65,8 +72,12 @@
           [sharedFilters]="sharedFilters()"
           (searchTextChange)="onSearchUpdate($event)"
           (filtersChange)="onFiltersUpdate($event)"
+          (contractSaved)="onContractSaved($event)"
+          (contractCopied)="onContractCopied($event)"
+          (contractCancelRequest)="onContractCancelRequest($event)"
         />
       </p-tabpanel>
     </p-tabpanels>
   </p-tabs>
+  </div>
 </div>

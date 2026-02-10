@@ -1,0 +1,67 @@
+<!-- budget-member-card.component.html -->
+
+<div
+  class="member-card"
+  [class.holding]="isHolding()"
+  [class.dragging]="isDragging()"
+  [class.leader]="member().role === 'leader'"
+  (mousedown)="onCardMouseDown($event)"
+>
+  <!-- Card Header -->
+  <div class="card-header">
+    <div class="member-avatar" [style.background]="getAvatarColor()">
+      {{ getInitials() }}
+    </div>
+
+    <div class="header-actions">
+      <button
+        class="card-menu-btn"
+        (click)="onMenuClick($event)"
+        title="More options"
+      >
+        ⋮
+      </button>
+    </div>
+  </div>
+
+  <!-- Member Name -->
+  <div class="card-name">{{ member().name }}</div>
+
+  <!-- Member Role -->
+  <div class="card-role" [class.is-leader]="member().role === 'leader'">
+    @if (member().role === 'leader') {
+      <span class="role-icon">👑</span>
+      <span class="role-text">Team Leader</span>
+    } @else {
+      <span class="role-icon">👤</span>
+      <span class="role-text">Member</span>
+    }
+  </div>
+
+  <!-- Budget Values -->
+  <div class="card-budget-values">
+    <span class="budget-actual">{{ formatCurrency(member().budget.actual) }}</span>
+    <span class="budget-separator">/</span>
+    <span class="budget-forecast">{{ formatCurrency(member().budget.forecast) }}</span>
+  </div>
+
+  <!-- Budget Bar -->
+  <div class="card-budget-bar">
+    <app-budget-bar
+      [actual]="member().budget.actual"
+      [forecast]="member().budget.forecast"
+      [size]="'small'"
+      [showLabel]="false"
+      [showValues]="false"
+      [showPercentage]="true"
+    ></app-budget-bar>
+  </div>
+
+  <!-- Hold Indicator (shows during long press) -->
+  @if (isHolding()) {
+    <div class="hold-indicator">
+      <div class="hold-progress"></div>
+    </div>
+  }
+
+</div>

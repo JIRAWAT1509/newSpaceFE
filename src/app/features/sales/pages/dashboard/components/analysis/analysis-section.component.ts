@@ -23,7 +23,7 @@ export class AnalysisSectionComponent implements OnInit {
     // Simulate API call
     setTimeout(() => {
       this.isLoading.set(false);
-      console.log('Analysis data loaded');
+      ////console.log('Analysis data loaded');
     }, 500);
   }
 }

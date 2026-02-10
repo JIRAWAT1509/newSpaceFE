@@ -13,22 +13,19 @@
     </button>
   </div>
 
-  <!-- Sub-Tab Content -->
+  <!-- Sub-Tab Content: ใช้ [hidden] แทน @if เพื่อให้ฟอร์มอยู่ใน DOM เสมอ (ใช้เก็บค่าตอนกดถัดไป) -->
   <div class="sub-tab-content">
-    @if (activeSubTabIndex() === 0) {
+    <div [hidden]="activeSubTabIndex() !== 0">
       <app-contract-info-tab #contractInfoTab />
-    }
-
-    @if (activeSubTabIndex() === 1) {
+    </div>
+    <div [hidden]="activeSubTabIndex() !== 1">
       <app-revenue-tab />
-    }
-
-    @if (activeSubTabIndex() === 2) {
+    </div>
+    <div [hidden]="activeSubTabIndex() !== 2">
       <app-insurance-tab />
-    }
-
-    @if (activeSubTabIndex() === 3) {
+    </div>
+    <div [hidden]="activeSubTabIndex() !== 3">
       <app-decoration-tab />
-    }
+    </div>
   </div>
 </div>

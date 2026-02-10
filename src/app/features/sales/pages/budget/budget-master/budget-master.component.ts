@@ -21,8 +21,12 @@ import { MOCK_COMPANIES, AVAILABLE_USERS } from '@core/data/budget.mock';
 // Components
 import { CompanySelectorComponent } from '../components/company-selector/company-selector.component';
 import { CompanyBudgetCardComponent } from '../components/company-budget-card/company-budget-card.component';
-import { TeamCardComponent } from '../components/team-card/team-card.component';
+// import { TeamCardComponent } from '../components/team-card/team-card.component'; // OLD - COMMENTED
 import { BudgetSummaryComponent } from '../components/budget-summary/budget-summary.component';
+
+// NEW KANBAN COMPONENTS
+import { BudgetKanbanBoardComponent } from '../components/budget-kanban-board/budget-kanban-board.component';
+import { TeamSortBy, TeamViewConfig } from '../components/team-column/team-column.component';
 
 // Modals
 import { AddCompanyModalComponent, AddCompanyData } from '../components/add-company-modal/add-company-modal.component';
@@ -38,8 +42,9 @@ import { MonthlyBreakdownModalComponent } from '../components/monthly-breakdown-
     CommonModule,
     CompanySelectorComponent,
     CompanyBudgetCardComponent,
-    TeamCardComponent,
+    // TeamCardComponent, // OLD - COMMENTED
     BudgetSummaryComponent,
+    BudgetKanbanBoardComponent, // NEW
     AddCompanyModalComponent,
     AddTeamModalComponent,
     AddMemberModalComponent,
@@ -54,7 +59,10 @@ export class BudgetMasterComponent {
   companies = signal<Company[]>([...MOCK_COMPANIES]);
   selectedCompanyId = signal<string | null>(null);
   viewMode = signal<ViewMode>('yearly');
-  expandedTeamIds = signal<Set<string>>(new Set());
+  // expandedTeamIds = signal<Set<string>>(new Set()); // OLD - COMMENTED
+
+  // NEW: Team view configs for kanban board
+  teamViewConfigs = signal<Map<string, TeamViewConfig>>(new Map());
 
   // ==================== MODAL STATE ====================
   isAddCompanyModalOpen = signal<boolean>(false);
@@ -123,14 +131,33 @@ export class BudgetMasterComponent {
     // Select first company by default
     if (this.companies().length > 0) {
       this.selectedCompanyId.set(this.companies()[0].id);
+      this.initializeTeamViewConfigs();
     }
+  }
+
+  // Initialize team view configs for kanban board
+  private initializeTeamViewConfigs(): void {
+    const company = this.selectedCompany();
+    if (!company) return;
+
+    const configs = new Map<string, TeamViewConfig>();
+    company.teams.forEach(team => {
+      configs.set(team.id, {
+        teamId: team.id,
+        sortBy: 'name',
+        currentPage: 1,
+        cardsPerPage: 8
+      });
+    });
+    this.teamViewConfigs.set(configs);
   }
 
   // ==================== COMPANY ACTIONS ====================
 
   onCompanyChange(companyId: string): void {
     this.selectedCompanyId.set(companyId);
-    this.expandedTeamIds.set(new Set()); // Collapse all teams
+    // this.expandedTeamIds.set(new Set()); // OLD - COMMENTED
+    this.initializeTeamViewConfigs(); // NEW
   }
 
   onViewModeChange(mode: ViewMode): void {
@@ -174,7 +201,40 @@ export class BudgetMasterComponent {
     this.isMonthlyBreakdownModalOpen.set(true);
   }
 
-  // ==================== TEAM ACTIONS ====================
+  // ==================== TEAM ACTIONS (NEW KANBAN) ====================
+
+  onTeamSortChange(event: { teamId: string; sortBy: TeamSortBy }): void {
+    this.teamViewConfigs.update(configs => {
+      const newConfigs = new Map(configs);
+      const config = newConfigs.get(event.teamId);
+      if (config) {
+        newConfigs.set(event.teamId, { ...config, sortBy: event.sortBy });
+      }
+      return newConfigs;
+    });
+  }
+
+  onTeamPageChange(event: { teamId: string; page: number }): void {
+    this.teamViewConfigs.update(configs => {
+      const newConfigs = new Map(configs);
+      const config = newConfigs.get(event.teamId);
+      if (config) {
+        newConfigs.set(event.teamId, { ...config, currentPage: event.page });
+      }
+      return newConfigs;
+    });
+  }
+
+  onTeamCardsPerPageChange(event: { teamId: string; cardsPerPage: number }): void {
+    this.teamViewConfigs.update(configs => {
+      const newConfigs = new Map(configs);
+      const config = newConfigs.get(event.teamId);
+      if (config) {
+        newConfigs.set(event.teamId, { ...config, cardsPerPage: event.cardsPerPage, currentPage: 1 });
+      }
+      return newConfigs;
+    });
+  }
 
   openAddTeamModal(): void {
     this.isAddTeamModalOpen.set(true);
@@ -203,7 +263,7 @@ export class BudgetMasterComponent {
           userId: data.leaderId,
           name: leader.name,
           role: 'leader',
-          budget: calculateBudgetAllocation(0, 0) // Leader budget set to 0 initially
+          budget: calculateBudgetAllocation(0, 0)
         }
       ],
       monthlyBreakdown: []
@@ -217,9 +277,23 @@ export class BudgetMasterComponent {
       )
     );
 
+    // Add view config for new team
+    this.teamViewConfigs.update(configs => {
+      const newConfigs = new Map(configs);
+      newConfigs.set(newTeam.id, {
+        teamId: newTeam.id,
+        sortBy: 'name',
+        currentPage: 1,
+        cardsPerPage: 8
+      });
+      return newConfigs;
+    });
+
     this.closeAddTeamModal();
   }
 
+  // OLD EXPAND/COLLAPSE - COMMENTED
+  /*
   onToggleTeamExpand(teamId: string): void {
     this.expandedTeamIds.update(expanded => {
       const newSet = new Set(expanded);
@@ -231,6 +305,7 @@ export class BudgetMasterComponent {
       return newSet;
     });
   }
+  */
 
   onEditTeam(teamId: string): void {
     const company = this.selectedCompany();
@@ -254,8 +329,17 @@ export class BudgetMasterComponent {
           : c
       )
     );
+
+    // Remove view config for deleted team
+    this.teamViewConfigs.update(configs => {
+      const newConfigs = new Map(configs);
+      newConfigs.delete(teamId);
+      return newConfigs;
+    });
   }
 
+  // OLD MOVE UP/DOWN - COMMENTED (Not needed in kanban view)
+  /*
   onMoveTeamUp(teamId: string): void {
     const company = this.selectedCompany();
     if (!company) return;
@@ -289,6 +373,7 @@ export class BudgetMasterComponent {
       })
     );
   }
+  */
 
   // ==================== MEMBER ACTIONS ====================
 
@@ -342,6 +427,8 @@ export class BudgetMasterComponent {
     this.isEditBudgetModalOpen.set(true);
   }
 
+  // OLD REMOVE MEMBER - COMMENTED (Replaced by drag-drop)
+  /*
   onRemoveMember({ teamId, memberId }: { teamId: string; memberId: string }): void {
     const company = this.selectedCompany();
     if (!company) return;
@@ -360,6 +447,60 @@ export class BudgetMasterComponent {
         };
       })
     );
+  }
+  */
+
+  // NEW: Handle member moved between teams via drag-drop
+  onMemberMoved(event: { memberId: string; fromTeamId: string; toTeamId: string }): void {
+    const company = this.selectedCompany();
+    if (!company) return;
+
+    console.log('📋 BUDGET-MASTER: Processing member move');
+    console.log('   - Member ID:', event.memberId);
+    console.log('   - From Team:', event.fromTeamId);
+    console.log('   - To Team:', event.toTeamId);
+
+    // Find the member in the source team
+    const fromTeam = company.teams.find(t => t.id === event.fromTeamId);
+    const member = fromTeam?.members.find(m => m.id === event.memberId);
+
+    if (!member) {
+      console.error('❌ BUDGET-MASTER: Member not found!');
+      return;
+    }
+
+    // Don't move team leaders
+    if (member.role === 'leader') {
+      alert('Cannot move team leader to another team!');
+      console.log('⚠️ BUDGET-MASTER: Attempted to move team leader - blocked');
+      return;
+    }
+
+    console.log('✅ BUDGET-MASTER: Moving member:', member.name);
+
+    // Update companies: remove from source, add to target
+    this.companies.update(companies =>
+      companies.map(c => {
+        if (c.id !== company.id) return c;
+        return {
+          ...c,
+          teams: c.teams.map(t => {
+            // Remove from source team
+            if (t.id === event.fromTeamId) {
+              return { ...t, members: t.members.filter(m => m.id !== event.memberId) };
+            }
+            // Add to target team
+            if (t.id === event.toTeamId) {
+              return { ...t, members: [...t.members, member] };
+            }
+            return t;
+          }),
+          updatedAt: new Date().toISOString()
+        };
+      })
+    );
+
+    console.log('✅ BUDGET-MASTER: Member moved successfully!');
   }
 
   // ==================== EDIT BUDGET ====================
@@ -494,9 +635,12 @@ export class BudgetMasterComponent {
 
   // ==================== HELPERS ====================
 
+  // OLD - COMMENTED
+  /*
   isTeamExpanded(teamId: string): boolean {
     return this.expandedTeamIds().has(teamId);
   }
+  */
 
   getCurrentTeamName(): string {
     const company = this.selectedCompany();

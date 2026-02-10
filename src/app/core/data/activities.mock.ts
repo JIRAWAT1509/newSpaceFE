@@ -10,7 +10,7 @@ export interface ActivityRequirement {
   description?: string;
 }
 
-export interface ActivityFile {
+export interface ActivityFile {     
   id: string;
   name: string;
   size: number;

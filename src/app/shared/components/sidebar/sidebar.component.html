@@ -1,124 +1,173 @@
 <aside
   class="bg-gradient-to-b from-primary via-primary to-secondary text-primary-foreground h-full flex flex-col transition-all duration-[300ms] ease-in-out overflow-x-hidden"
-  [class.w-72]="isExpanded() || isHovering"
-  [class.w-20]="!isExpanded() && !isHovering"
+  [class.w-full]="isMobileOverlay()"
+  [class.w-64]="!isMobileOverlay() && (isExpanded() || isHovering)"
+  [class.w-20]="!isMobileOverlay() && !isExpanded() && !isHovering"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
 >
   <nav class="flex-grow pt-6">
     <ul>
-      <li *ngFor="let item of currentSecondaryNav" class="mb-2 px-3">
-  <!-- ✅ ถ้ามี route ให้ถือว่าเป็นลิงก์ก่อนเลย แม้จะมี sub -->
-  <ng-container *ngIf="item.route; else accordionBlock">
-    <a
-      [routerLink]="item.route"
-      (click)="handleDirectLinkClick()"
-      class="group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/10 relative"
-      [class.border-r-4]="!isExpanded() && !isHovering && isItemActive(item)"
-      [class.border-secondary]="!isExpanded() && !isHovering && isItemActive(item)"
-      [class.bg-white/15]="isItemHighlighted(item)"
-      [class.shadow-md]="isItemHighlighted(item)"
-    >
-      <div
-        class="sidebar-icon"
-        [ngClass]="{
-          'sidebar-icon-active': isItemHighlighted(item) || isItemActive(item)
-        }"
-      >
-        <img
-          [src]="item.icon"
-          alt=""
-          class="w-5 h-5 flex-shrink-0 transition-all duration-200"
-          [ngClass]="{
-            'brightness-0 invert drop-shadow-md': isItemActive(item),
-            'opacity-70 group-hover:brightness-0 group-hover:invert': !isItemActive(item)
-          }"
-        />
-      </div>
+      @for (item of displayNav; track item) {
+        <li class="mb-2 px-3">
 
-      <div *ngIf="isExpanded() || isHovering" [@fadeInOut] class="w-full ml-1">
-        <span
-          class="font-medium text-sm whitespace-nowrap transition-colors duration-200 drop-shadow-md"
-          [ngClass]="{
-            'text-primary-foreground': isItemHighlighted(item),
-            'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)
-          }"
-        >
-          {{ translate(item.name) }}
-        </span>
-      </div>
-    </a>
-  </ng-container>
+          <!-- Divider -->
+          @if (item.isDivider) {
+            <div class="my-4 border-t border-primary-foreground/20"></div>
+          }
 
-  <!-- ⬇️ fallback: ถ้าไม่มี route ค่อยเป็น accordion -->
-  <ng-template #accordionBlock>
-    <div
-      class="group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/10 relative"
-      [class.border-r-4]="!isExpanded() && !isHovering && isItemActive(item)"
-      [class.border-secondary]="!isExpanded() && !isHovering && isItemActive(item)"
-      [class.bg-white/15]="isItemHighlighted(item)"
-      [class.shadow-md]="isItemHighlighted(item)"
-      (click)="handleItemClick(item.name)"
-    >
-      <div
-        class="sidebar-icon"
-        [ngClass]="{
-          'sidebar-icon-active': isItemHighlighted(item) || isItemActive(item)
-        }"
-      >
-        <img
-          [src]="item.icon"
-          alt=""
-          class="w-5 h-5 flex-shrink-0 transition-all duration-200"
-          [ngClass]="{
-            'brightness-0 invert drop-shadow-md': isItemActive(item),
-            'opacity-70 group-hover:brightness-0 group-hover:invert': !isItemActive(item)
-          }"
-        />
-      </div>
+          <!-- ถ้ามี route -->
+          @if (!item.isDivider && item.route) {
+            <a
+              [routerLink]="item.route"
+              (click)="handleDirectLinkClick()"
+              class="group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/10 relative"
+              [class.border-r-4]="!isExpanded() && !isHovering && isItemActive(item)"
+              [class.border-secondary]="!isExpanded() && !isHovering && isItemActive(item)"
+              [class.bg-white/15]="isItemHighlighted(item)"
+              [class.shadow-md]="isItemHighlighted(item)"
+              [class.bg-yellow-500/10]="item.isBookmark"
+            >
+              <div
+                class="sidebar-icon"
+                [ngClass]="{
+                  'sidebar-icon-active': isItemHighlighted(item) || isItemActive(item)
+                }"
+              >
+                <!-- PrimeNG icon -->
+                @if (isPrimeIcon(item.icon)) {
+                  <i
+                    [class]="'pi ' + item.icon + ' text-lg'"
+                    [ngClass]="{
+                      'text-yellow-300 drop-shadow-md': item.isBookmark,
+                      'brightness-0 invert drop-shadow-md': !item.isBookmark && isItemActive(item),
+                      'opacity-70 group-hover:brightness-0 group-hover:invert': !item.isBookmark && !isItemActive(item)
+                    }"
+                  ></i>
+                }
 
-      <div *ngIf="isExpanded() || isHovering" class="flex justify-between items-center w-full ml-1" [@fadeInOut]>
-        <span
-          class="font-medium text-sm whitespace-nowrap transition-colors duration-200 drop-shadow-md"
-          [ngClass]="{
-            'text-primary-foreground': isItemHighlighted(item),
-            'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)
-          }"
-        >
-          {{ translate(item.name) }}
-        </span>
+                <!-- SVG icon -->
+                @if (!isPrimeIcon(item.icon)) {
+                  <img
+                    [src]="item.icon"
+                    alt=""
+                    class="w-5 h-5 flex-shrink-0 transition-all duration-200"
+                    [ngClass]="{
+                      'brightness-0 invert drop-shadow-md': isItemActive(item),
+                      'opacity-70 group-hover:brightness-0 group-hover:invert': !isItemActive(item)
+                    }"
+                  />
+                }
+              </div>
 
-        <svg
-          class="w-4 h-4 transition-transform duration-200"
-          [class.rotate-180]="openAccordion === item.name"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </div>
-    </div>
+              @if (isExpanded() || isHovering) {
+                <div [@fadeInOut] class="w-full min-w-0 ml-1 flex-1 flex items-center justify-between">
+                  <span
+                    class="font-medium text-sm transition-colors duration-200 drop-shadow-md break-words"
+                    style="word-break: break-word; white-space: normal;"
+                    [ngClass]="{
+                      'text-primary-foreground': isItemHighlighted(item),
+                      'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)
+                    }"
+                  >
+                    {{ translate(item.name) }}
+                  </span>
+                </div>
+              }
+            </a>
+          }
+          @else {
+            <!-- Accordion -->
+            @if (!item.isDivider) {
+              <div
+                class="group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/10 relative"
+                [class.border-r-4]="!isExpanded() && !isHovering && isItemActive(item)"
+                [class.border-secondary]="!isExpanded() && !isHovering && isItemActive(item)"
+                [class.bg-white/15]="isItemHighlighted(item)"
+                [class.shadow-md]="isItemHighlighted(item)"
+                (click)="handleItemClick(item.name)"
+              >
+                <div
+                  class="sidebar-icon"
+                  [ngClass]="{
+                    'sidebar-icon-active': isItemHighlighted(item) || isItemActive(item)
+                  }"
+                >
+                  <!-- ✅ เพิ่มการรองรับ PrimeNG icon ใน accordion -->
+                  @if (isPrimeIcon(item.icon)) {
+                    <i
+                      [class]="'pi ' + item.icon + ' text-lg'"
+                      [ngClass]="{
+                        'brightness-0 invert drop-shadow-md': isItemActive(item),
+                        'opacity-70 group-hover:brightness-0 group-hover:invert': !isItemActive(item)
+                      }"
+                    ></i>
+                  }
 
-    <div *ngIf="(isExpanded() || isHovering) && openAccordion === item.name" [@slideInOut]>
-      <ul class="pl-12 pr-3 py-2 space-y-1">
-        <li *ngFor="let subItem of item.sub">
-          <a
-            [routerLink]="subItem.route"
-            (click)="onSubItemClick(subItem)"
-            class="block py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-150 text-primary-foreground/80 hover:bg-white/10 hover:text-primary-foreground"
-            [ngClass]="{
-              'bg-white/15 text-primary-foreground shadow-md': activeSubRoute() === subItem.route
-            }"
-          >
-            {{ translate(subItem.name) }}
-          </a>
+                  @if (!isPrimeIcon(item.icon)) {
+                    <img
+                      [src]="item.icon"
+                      alt=""
+                      class="w-5 h-5 flex-shrink-0 transition-all duration-200"
+                      [ngClass]="{
+                        'brightness-0 invert drop-shadow-md': isItemActive(item),
+                        'opacity-70 group-hover:brightness-0 group-hover:invert': !isItemActive(item)
+                      }"
+                    />
+                  }
+                </div>
+
+                @if (isExpanded() || isHovering) {
+                  <div class="flex justify-between items-center w-full min-w-0 ml-1 flex-1" [@fadeInOut]>
+                    <span
+                      class="font-medium text-sm transition-colors duration-200 drop-shadow-md break-words"
+                      style="word-break: break-word; white-space: normal;"
+                      [ngClass]="{
+                        'text-primary-foreground': isItemHighlighted(item),
+                        'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)
+                      }"
+                    >
+                      {{ translate(item.name) }}
+                    </span>
+
+                    <svg
+                      class="w-4 h-4 flex-shrink-0 transition-transform duration-200"
+                      [class.rotate-180]="openAccordion === item.name"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                }
+              </div>
+
+              <!-- Sub items -->
+              @if ((isExpanded() || isHovering) && openAccordion === item.name) {
+                <div [@slideInOut]>
+                  <ul class="pl-12 pr-3 py-2 space-y-1">
+                    @for (subItem of item.sub; track subItem) {
+                      <li>
+                        <a
+                          [routerLink]="subItem.route"
+                          (click)="onSubItemClick(subItem)"
+                          class="block py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-150 text-primary-foreground/80 hover:bg-white/10 hover:text-primary-foreground"
+                          [ngClass]="{
+                            'bg-white/15 text-primary-foreground shadow-md': activeSubRoute() === subItem.route
+                          }"
+                        >
+                          {{ translate(subItem.name) }}
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            }
+          }
         </li>
-      </ul>
-    </div>
-  </ng-template>
-</li>
-
+      }
     </ul>
   </nav>
 </aside>

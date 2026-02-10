@@ -6,10 +6,14 @@ import { MOCK_FINANCE_STATS, MOCK_DEBTS } from '@core/data/finance.mock';
 
 interface StatCard {
   label: string;
-  value: number;
   color: string;
   icon: string;
-  bgGradient: string;
+  bgGradient?: string;
+  value: string | number;
+  unit?: string;
+  change?: number;
+  changeLabel?: string;
+  tone?: 'primary' | 'warning' | 'info' | 'success';
 }
 
 @Component({
@@ -90,4 +94,14 @@ export class FinanceDashboardComponent implements OnInit {
     console.log('Send reminder:', debt);
     alert(`Mock: Send reminder to ${debt.customerName}`);
   }
+
+   isPositiveChange(change: number): boolean {
+    return change > 0;
+  }
+
+  getChangeIcon(change: number): string {
+  if (change > 0) return 'pi-arrow-up';
+  if (change < 0) return 'pi-arrow-down';
+  return 'pi-minus';
+}
 }

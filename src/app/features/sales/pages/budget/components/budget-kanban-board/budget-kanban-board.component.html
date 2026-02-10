@@ -1,0 +1,34 @@
+<!-- budget-kanban-board.component.html -->
+
+<div class="budget-kanban-board">
+
+  @for (team of teams(); track team.id) {
+    <app-team-column
+      [team]="team"
+      [viewConfig]="getTeamConfig(team.id)"
+      [isDraggingGlobal]="isDragging()"
+      [globalMousePosition]="currentMousePosition()"
+      [currentDragMemberId]="currentDragMemberId"
+      (sortChange)="onSortChange(team.id, $event)"
+      (pageChange)="onPageChange(team.id, $event)"
+      (cardsPerPageChange)="onCardsPerPageChange(team.id, $event)"
+      (editTeam)="onEditTeam(team.id)"
+      (deleteTeam)="onDeleteTeam(team.id)"
+      (addMember)="onAddMember(team.id)"
+      (memberClick)="onMemberClick(team.id, $event)"
+      (memberMenuClick)="onMemberMenu(team.id, $event)"
+      (memberDragStart)="onMemberDragStart(team.id, $event)"
+      (memberDragEnd)="onMemberDragEnd(team.id)"
+      (memberDrop)="onMemberDrop($event)"
+    />
+  }
+
+  @if (teams().length === 0) {
+    <div class="empty-board">
+      <div class="empty-icon">📊</div>
+      <h3>No Teams Yet</h3>
+      <p>Create your first team to start managing budgets</p>
+    </div>
+  }
+
+</div>

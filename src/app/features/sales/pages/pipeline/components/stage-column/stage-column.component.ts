@@ -1,17 +1,11 @@
-// stage-column.component.ts
-import { Component, input, output, computed } from '@angular/core';
+// stage-column.component.ts (FIXED DROP DETECTION)
+import { Component, input, output, computed, signal, ElementRef, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
-import {
-  Deal,
-  PipelineStage,
-  StageMetrics,
-  StageSortBy,
-  StageViewConfig
-} from '@core/models/pipeline.model';
-import { DealCardComponent } from '../deal-card/deal-card.component';
+import { Deal, PipelineStage, StageMetrics, StageSortBy, StageViewConfig } from '@core/models/pipeline.model';
 import { StagePaginationComponent } from '../stage-pagination/stage-pagination.component';
+import { DealCardComponent } from '../deal-card/deal-card.component';
+import { Select } from 'primeng/select';
+import { FormsModule } from '@angular/forms';
 
 interface SortOption {
   label: string;
@@ -21,116 +15,159 @@ interface SortOption {
 @Component({
   selector: 'app-stage-column',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    Select,
-    DealCardComponent,
-    StagePaginationComponent
-  ],
+  imports: [CommonModule, StagePaginationComponent, DealCardComponent, Select, FormsModule],
   templateUrl: './stage-column.component.html',
   styleUrl: './stage-column.component.css'
 })
 export class StageColumnComponent {
+  private elementRef = inject(ElementRef);
+
   // Inputs
   stage = input.required<PipelineStage>();
   deals = input.required<Deal[]>();
   viewConfig = input.required<StageViewConfig>();
-  stageMetrics = input.required<StageMetrics>();
+  metrics = input.required<StageMetrics>();
+  isDraggingGlobal = input<boolean>(false); // Global drag state from kanban-board
+  globalMousePosition = input<{ x: number; y: number } | null>(null); // Global mouse position during drag
+  currentDragDealId = input<string | null>(null); // Currently dragging deal ID
 
   // Outputs
   sortChange = output<StageSortBy>();
   pageChange = output<number>();
   cardsPerPageChange = output<number>();
-  stageSettings = output<void>();
-  dealClicked = output<string>();
-  dealMenuClicked = output<string>();
-  dealDropped = output<string>(); // Emits dealId when dropped in this column
+  settingsClick = output<void>();
+  dealClick = output<string>();
+  dealMenuClick = output<string>();
+  dealDragStart = output<string>();
+  dealDragEnd = output<void>();
+  dealDrop = output<{ dealId: string; targetStageId: string }>();
+
+  // Drag state
+  isDragOver = signal(false);
+  private wasOver = false; // Track previous state to detect drop
+
+  constructor() {
+    // Watch global mouse position and check if over this column's deals-list
+    effect(() => {
+      const mousePos = this.globalMousePosition();
+      const isDragging = this.isDraggingGlobal();
+      const dragDealId = this.currentDragDealId();
+
+      // If drag just ended and we were over this column, emit drop
+      if (!isDragging && this.wasOver && dragDealId) {
+        ////console.log('🎯 Effect detected drop on:', this.stage().name, 'deal:', dragDealId);
+        this.dealDrop.emit({
+          dealId: dragDealId,
+          targetStageId: this.stage().id
+        });
+        this.wasOver = false;
+        this.isDragOver.set(false);
+        return;
+      }
+
+      // Reset if not dragging
+      if (!isDragging || !mousePos) {
+        this.isDragOver.set(false);
+        this.wasOver = false;
+        return;
+      }
+
+      // Get deals-list element for this column
+      const dealsListElement = this.elementRef.nativeElement.querySelector('.deals-list');
+      if (!dealsListElement) {
+        this.isDragOver.set(false);
+        this.wasOver = false;
+        return;
+      }
+
+      const rect = dealsListElement.getBoundingClientRect();
+      const isOver = (
+        mousePos.x >= rect.left &&
+        mousePos.x <= rect.right &&
+        mousePos.y >= rect.top &&
+        mousePos.y <= rect.bottom
+      );
+
+      // Only log state changes
+      if (isOver !== this.isDragOver()) {
+        if (isOver) {
+          ////console.log('✅ Mouse OVER:', this.stage().name);
+        } else if (this.isDragOver()) {
+          ////console.log('❌ Mouse LEFT:', this.stage().name);
+        }
+      }
+
+      this.wasOver = isOver;
+      this.isDragOver.set(isOver);
+    });
+  }
 
   // Sort options
   sortOptions: SortOption[] = [
-    { label: '📅 Due Date', value: 'due-date' },
-    { label: '💰 Value', value: 'value' },
-    { label: '📊 Probability', value: 'probability' },
-    { label: '🔤 Name', value: 'name' },
-    { label: '🚨 Priority', value: 'priority' },
-    { label: '📆 Created Date', value: 'created-date' },
-    { label: '🕐 Days in Stage', value: 'days-in-stage' }
+    { label: 'Due Date', value: 'dueDate' as StageSortBy },
+    { label: 'Value (High-Low)', value: 'valueDesc' as StageSortBy },
+    { label: 'Value (Low-High)', value: 'valueAsc' as StageSortBy },
+    { label: 'Win Rate (High-Low)', value: 'winRateDesc' as StageSortBy },
+    { label: 'Win Rate (Low-High)', value: 'winRateAsc' as StageSortBy },
+    { label: 'Recent First', value: 'recent' as StageSortBy },
+    { label: 'Oldest First', value: 'oldest' as StageSortBy }
   ];
 
   // Computed: Sorted deals
   sortedDeals = computed(() => {
     const deals = [...this.deals()];
-    const sortBy = this.viewConfig().sortBy;
-    const sortOrder = this.viewConfig().sortOrder;
+    const sortBy = this.viewConfig().sortBy as StageSortBy;
 
-    deals.sort((a, b) => {
-      let comparison = 0;
-
-      switch (sortBy) {
-        case 'due-date':
-          comparison = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-          break;
-        case 'value':
-          comparison = b.value - a.value; // Highest first by default
-          break;
-        case 'probability':
-          comparison = b.actualWinRate - a.actualWinRate; // Highest first
-          break;
-        case 'name':
-          comparison = a.title.localeCompare(b.title);
-          break;
-        case 'priority':
-          const priorityOrder = { high: 0, medium: 1, low: 2 };
-          comparison = priorityOrder[a.priority] - priorityOrder[b.priority];
-          break;
-        case 'created-date':
-          comparison = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-          break;
-        case 'days-in-stage':
-          comparison = b.daysInStage - a.daysInStage; // Longest first
-          break;
-      }
-
-      return sortOrder === 'desc' ? -comparison : comparison;
-    });
-
-    return deals;
-  });
-
-  // Computed: Total pages
-  totalPages = computed(() => {
-    const total = this.sortedDeals().length;
-    const perPage = this.viewConfig().cardsPerPage;
-    return Math.ceil(total / perPage) || 1;
+    switch (sortBy) {
+      case 'dueDate' as StageSortBy:
+        return deals.sort((a, b) => a.daysUntilDue - b.daysUntilDue);
+      case 'valueDesc' as StageSortBy:
+        return deals.sort((a, b) => b.value - a.value);
+      case 'valueAsc' as StageSortBy:
+        return deals.sort((a, b) => a.value - b.value);
+      case 'winRateDesc' as StageSortBy:
+        return deals.sort((a, b) => b.actualWinRate - a.actualWinRate);
+      case 'winRateAsc' as StageSortBy:
+        return deals.sort((a, b) => a.actualWinRate - b.actualWinRate);
+      case 'recent' as StageSortBy:
+        return deals.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      case 'oldest' as StageSortBy:
+        return deals.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      default:
+        return deals;
+    }
   });
 
   // Computed: Paginated deals
   paginatedDeals = computed(() => {
-    const sorted = this.sortedDeals();
-    const page = this.viewConfig().currentPage;
-    const perPage = this.viewConfig().cardsPerPage;
+    const deals = this.sortedDeals();
+    const config = this.viewConfig();
+    const startIndex = (config.currentPage - 1) * config.cardsPerPage;
+    const endIndex = startIndex + config.cardsPerPage;
+    return deals.slice(startIndex, endIndex);
+  });
 
-    const startIndex = (page - 1) * perPage;
-    const endIndex = startIndex + perPage;
-
-    return sorted.slice(startIndex, endIndex);
+  // Computed: Total pages
+  totalPages = computed(() => {
+    const totalDeals = this.deals().length;
+    const cardsPerPage = this.viewConfig().cardsPerPage;
+    return Math.ceil(totalDeals / cardsPerPage);
   });
 
   // Format currency
-  formatCurrency(amount: number): string {
-    if (amount >= 1000000) {
-      return `฿${(amount / 1000000).toFixed(1)}M`;
+  formatCurrency(value: number): string {
+    if (value >= 1000000) {
+      return `฿${(value / 1000000).toFixed(2)}M`;
     }
-    if (amount >= 1000) {
-      return `฿${(amount / 1000).toFixed(0)}K`;
+    if (value >= 1000) {
+      return `฿${(value / 1000).toFixed(0)}K`;
     }
-    return `฿${amount.toLocaleString()}`;
+    return `฿${value.toLocaleString()}`;
   }
 
   // Handle sort change
-  onSortChange(value: StageSortBy): void {
-    this.sortChange.emit(value);
+  onSortChange(sortBy: StageSortBy): void {
+    this.sortChange.emit(sortBy);
   }
 
   // Handle page change
@@ -139,35 +176,52 @@ export class StageColumnComponent {
   }
 
   // Handle cards per page change
-  onCardsPerPageChange(value: number): void {
-    this.cardsPerPageChange.emit(value);
+  onCardsPerPageChange(cardsPerPage: number): void {
+    this.cardsPerPageChange.emit(cardsPerPage);
   }
 
-  // Handle stage settings
-  onStageSettings(): void {
-    this.stageSettings.emit();
-  }
-
-  // Handle deal clicks
-  onDealClicked(dealId: string): void {
-    this.dealClicked.emit(dealId);
-  }
-
-  onDealMenuClicked(dealId: string): void {
-    this.dealMenuClicked.emit(dealId);
-  }
-
-  // Drop zone handlers
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.dataTransfer!.dropEffect = 'move';
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    const dealId = event.dataTransfer!.getData('dealId');
-    if (dealId) {
-      this.dealDropped.emit(dealId);
+  // Handle previous page
+  onPreviousPage(): void {
+    const currentPage = this.viewConfig().currentPage;
+    if (currentPage > 1) {
+      this.pageChange.emit(currentPage - 1);
     }
+  }
+
+  // Handle next page
+  onNextPage(): void {
+    const currentPage = this.viewConfig().currentPage;
+    const totalPages = this.totalPages();
+    if (currentPage < totalPages) {
+      this.pageChange.emit(currentPage + 1);
+    }
+  }
+
+  // Handle settings click
+  onSettingsClick(): void {
+    this.settingsClick.emit();
+  }
+
+  // Handle deal click
+  onDealClick(dealId: string): void {
+    this.dealClick.emit(dealId);
+  }
+
+  // Handle deal menu
+  onDealMenu(dealId: string): void {
+    this.dealMenuClick.emit(dealId);
+  }
+
+  // Handle deal drag start - just notify kanban-board
+  onDealDragStart(event: { dealId: string; event: MouseEvent }): void {
+    this.dealDragStart.emit(event.dealId);
+    ////console.log('📍 Column', this.stage().name, 'registered drag:', event.dealId);
+  }
+
+  // Handle deal drag end - effect will handle drop if over this column
+  onDealDragEnd(event: MouseEvent): void {
+    ////console.log('🎯 Stage-column: Drag ended, notifying kanban-board');
+    this.dealDragEnd.emit();
+    // Effect watches isDraggingGlobal and will emit drop if this column is the target
   }
 }

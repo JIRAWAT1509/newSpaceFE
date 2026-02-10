@@ -1,105 +1,209 @@
-<!-- meter-list.component.html - FINAL CORRECTED -->
+<!-- meter-list.component.html - TABLE VERSION -->
 
 <div class="meter-list-container">
   <!-- Header Stats -->
   <div class="header-stats">
-    <div class="stat-item success">
-      <i class="pi pi-check-circle"></i>
-      <div>
-        <div class="stat-value">{{ totalCompleted() }}</div>
-        <div class="stat-label">Total Completed</div>
+    <div class="stat-card stat-card--blue">
+      <div class="stat-icon"><i class="pi pi-th-large"></i></div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalMeters() }}</div>
+        <div class="stat-label">Total Meters</div>
       </div>
     </div>
-
-    <div class="stat-item primary">
-      <i class="pi pi-calendar"></i>
-      <div>
-        <div class="stat-value">{{ thisMonthCompleted() }}</div>
-        <div class="stat-label">This Month</div>
+    <div class="stat-card stat-card--amber">
+      <div class="stat-icon"><i class="pi pi-clock"></i></div>
+      <div class="stat-info">
+        <div class="stat-value">{{ pendingCount() }}</div>
+        <div class="stat-label">Pending</div>
       </div>
     </div>
-
-    <div class="stat-item">
-      <i class="pi pi-chart-line"></i>
-      <div>
-        <div class="stat-value">100%</div>
-        <div class="stat-label">Completion Rate</div>
+    <div class="stat-card stat-card--emerald">
+      <div class="stat-icon"><i class="pi pi-check-circle"></i></div>
+      <div class="stat-info">
+        <div class="stat-value">{{ completeCount() }}</div>
+        <div class="stat-label">Complete</div>
       </div>
     </div>
   </div>
 
-  <!-- Group Dropdown Filter -->
-  <div class="filter-section">
-    <h3 class="filter-title">Filter by Group</h3>
-    <p-select
-      [options]="groupDropdownOptions()"
-      (onChange)="onGroupChange($event)"
-      placeholder="All Groups"
-      [showClear]="true"
-      styleClass="w-full md:w-80"
-    ></p-select>
-  </div>
-
-  <!-- Meter Type Filter Buttons -->
-  <div class="filter-section">
-    <h3 class="filter-title">Filter by Meter Type</h3>
-    <div class="filter-buttons">
-      @for (option of filterOptions(); track option.type) {
-        <button
-          class="filter-btn"
-          [class.active]="isFilterSelected(option.type)"
-          [style.border-color]="isFilterSelected(option.type) ? option.color : '#e5e7eb'"
-          (click)="selectFilter(option.type)"
-        >
-          <div
-            class="filter-icon"
-            [style.background-color]="option.color"
-          >
-            <i class="pi" [ngClass]="option.icon"></i>
-          </div>
-          <span>{{ option.label }}</span>
-          @if (option.type !== 'all') {
-            <span class="filter-count">
-              {{ getMeterCountByType(option.type) }}
-            </span>
-          }
-        </button>
-      }
+  <!-- Filters Row: group + meter type + search on ONE LINE -->
+  <div class="filters-row">
+    <div class="filter-item">
+      <label class="filter-label">กลุ่ม Meter</label>
+      <p-select
+        [options]="groupDropdownOptions()"
+        [ngModel]="selectedGroup()"
+        (onChange)="onGroupChange($event)"
+        placeholder="ทุกกลุ่ม"
+        [showClear]="true"
+        styleClass="filter-select"
+      ></p-select>
     </div>
-  </div>
 
-  <!-- Meters Grid -->
-  <div class="meters-section">
-    <div class="section-header">
-      <h3 class="section-title">
-        {{ sectionTitle() }}
-        <span class="meter-count">({{ filteredMeters().length }})</span>
-      </h3>
+    <div class="filter-item">
+      <label class="filter-label">ประเภท Meter</label>
+      <p-select
+        [options]="meterTypeOptions()"
+        [ngModel]="selectedType()"
+        (onChange)="onTypeChange($event)"
+        placeholder="ทั้งหมด"
+        styleClass="filter-select"
+      ></p-select>
+    </div>
+
+    <div class="filter-item filter-search">
+      <label class="filter-label">ค้นหา</label>
+      <div class="search-input-wrapper">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="ค้นหา meter, ห้อง, อาคาร..."
+          [ngModel]="searchText()"
+          (ngModelChange)="searchText.set($event)"
+        />
+      </div>
+    </div>
+
+    <div class="filter-item filter-actions">
+      <label class="filter-label">&nbsp;</label>
       <button class="export-btn" (click)="onExportData()">
         <i class="pi pi-download"></i>
-        <span>Export Data</span>
+        <span>Export</span>
       </button>
     </div>
-
-    @if (filteredMeters().length > 0) {
-      <div class="meters-grid">
-        @for (meter of filteredMeters(); track meter.id) {
-          <app-meter-input-card
-            [meter]="meter"
-            [isExpanded]="isCardExpanded(meter.id)"
-            [isCompleted]="true"
-            (readingSaved)="onReadingSaved($event)"
-            (cardClicked)="onCardClicked($event)"
-            (backgroundClicked)="onCardBackgroundClicked($event)"
-          />
-        }
-      </div>
-    } @else {
-      <div class="empty-state">
-        <i class="pi pi-inbox"></i>
-        <h3>No completed meters</h3>
-        <p>Meters will appear here after readings are saved</p>
-      </div>
-    }
   </div>
-</div>s
+
+  <!-- Table -->
+  <div class="table-card">
+    <div class="table-header-bar">
+      <h3 class="table-title">
+        Meter List
+        <span class="table-count">({{ filteredMeters().length }})</span>
+      </h3>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="meter-table">
+        <thead>
+          <tr>
+            <th>ชื่อ Meter</th>
+            <th>กลุ่ม Meter</th>
+            <th>ประเภท</th>
+            <th>อาคาร</th>
+            <th>ห้อง</th>
+            <th>สถานะ</th>
+            <th>วันที่บันทึกล่าสุด</th>
+            <th>ค่ามิเตอร์ปัจจุบัน</th>
+            <th>Avg. Consumption</th>
+            <th>ค่าใช้จ่าย (฿)</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of filteredMeters(); track row.id) {
+            <tr [class.editing-row]="row.isEditing">
+              <!-- 1. ชื่อ Meter -->
+              <td>
+                <div class="meter-name-cell">
+                  <span class="meter-number">{{ row.meterNumber }}</span>
+                </div>
+              </td>
+
+              <!-- 2. กลุ่ม Meter -->
+              <td>
+                <span class="group-tag">{{ row.groupName }}</span>
+              </td>
+
+              <!-- 3. ประเภท Meter -->
+              <td>
+                <div class="type-badge" [style.background-color]="row.meterTypeColor + '20'" [style.color]="row.meterTypeColor">
+                  <i class="pi" [ngClass]="row.meterTypeIcon"></i>
+                  <span>{{ row.meterTypeLabel }}</span>
+                </div>
+              </td>
+
+              <!-- 4. อาคาร -->
+              <td>{{ row.building }}</td>
+
+              <!-- 5. ห้อง -->
+              <td>
+                <span class="room-badge">{{ row.room }}</span>
+              </td>
+
+              <!-- 6. สถานะ -->
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(row.status)">
+                  {{ getStatusLabel(row.status) }}
+                </span>
+              </td>
+
+              <!-- 7. วันที่บันทึกล่าสุด -->
+              <td>{{ formatDate(row.lastRecordedDate) }}</td>
+
+              <!-- 8. ค่ามิเตอร์ปัจจุบัน (editable) -->
+              <td>
+                @if (row.isEditing) {
+                  <div class="inline-edit">
+                    <input
+                      type="number"
+                      class="edit-input"
+                      [(ngModel)]="row.editReading"
+                      (keyup.enter)="saveReading(row)"
+                      (keyup.escape)="cancelEdit(row)"
+                      autofocus
+                    />
+                    <button class="btn-save-sm" (click)="saveReading(row)" title="บันทึก">
+                      <i class="pi pi-check"></i>
+                    </button>
+                    <button class="btn-cancel-sm" (click)="cancelEdit(row)" title="ยกเลิก">
+                      <i class="pi pi-times"></i>
+                    </button>
+                  </div>
+                } @else {
+                  <div class="reading-cell" (click)="startEdit(row)">
+                    <span class="reading-value">{{ formatNumber(row.currentReading) }}</span>
+                    <span class="reading-unit">{{ row.unit }}</span>
+                    <i class="pi pi-pencil edit-hint"></i>
+                  </div>
+                }
+              </td>
+
+              <!-- 9. Avg. Consumption -->
+              <td>
+                <span class="consumption-value">{{ formatNumber(row.averageConsumption) }}</span>
+                <span class="consumption-unit">{{ row.unit }}</span>
+              </td>
+
+              <!-- 10. ค่าใช้จ่าย -->
+              <td>
+                <span class="cost-value">฿{{ formatCost(row.currentCost) }}</span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="10" class="empty-state-cell">
+                <div class="empty-state">
+                  <i class="pi pi-inbox"></i>
+                  <p>ไม่พบข้อมูล Meter</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal: out-of-range reading -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  type="warning"
+  [title]="confirmTitle()"
+  [message]="confirmMessage()"
+  confirmText="ยืนยันบันทึก"
+  cancelText="ยกเลิก"
+  confirmIcon="pi-check"
+  (confirm)="onConfirmSave()"
+  (cancel)="onCancelSave()"
+/>

@@ -4,13 +4,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { Meter, getMeterTypeLabel } from '@core/models/meter.model';
+import {
+  computeExpectedRange,
+  formatMinForDisplay,
+  formatRangeForDisplay,
+  ExpectedRangeResult
+} from '@core/utils/meter-range.util';
 import { getFacilitiesUtilitiesConfig } from '@core/services/ui-settings';
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-meter-input-card',
   standalone: true,
-  imports: [CommonModule, FormsModule, InputText],
+  imports: [CommonModule, FormsModule, InputText, ConfirmationModalComponent],
   templateUrl: './meter-input-card.component.html',
   styleUrl: './meter-input-card.component.css'
 })
@@ -19,6 +26,8 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   meter = input.required<Meter>();
   isExpanded = input<boolean>(false); // Controlled by parent
   isCompleted = input<boolean>(false); // For meter list view
+  /** เมื่อ true แสดงเป็นแถวเดียว มีช่องกรอกและปุ่มบันทึกให้กรอกได้เลยโดยไม่ต้องขยาย */
+  inlineMode = input<boolean>(false);
 
   // Outputs
   readingSaved = output<{ meterId: string; reading: number; photos: string[] }>();
@@ -32,7 +41,18 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   showSuccess = signal<boolean>(false);
   hasError = signal<boolean>(false);
   errorMessage = signal<string>('');
+  isWarning = signal<boolean>(false);
+  warningMessage = signal<string>('');
   isEditing = signal<boolean>(false);
+  /** สำหรับโหมด inline ของ completed meters - คลิกแก้ไขเพื่อเปิดฟอร์ม */
+  isInlineEditing = signal<boolean>(false);
+
+  // Confirmation modal state (for out-of-range readings)
+  showConfirmModal = signal<boolean>(false);
+  confirmTitle = signal<string>('');
+  confirmMessage = signal<string>('');
+  private pendingSaveMode = signal<'normal' | 'edit' | 'inline'>('normal');
+  private pendingSaveEvent = signal<Event | null>(null);
 
   // Config tracking
   private configCheckInterval?: Subscription;
@@ -92,9 +112,29 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     return this.meterTypeInfo()?.EN || 'Electricity';
   }
 
-  getExpectedRange(): string {
-    const meter = this.meter();
-    return `${meter.expectedMin.toLocaleString()} - ${meter.expectedMax.toLocaleString()}`;
+  /** Cached result for current meter; used by display and validation. */
+  getExpectedRangeInfo(): ExpectedRangeResult {
+    return computeExpectedRange(this.meter());
+  }
+
+  /** For display: "X - Y" only when we have a real range (X < Y). */
+  getExpectedRangeDisplay(): string | null {
+    const info = this.getExpectedRangeInfo();
+    if (!info.hasRange || info.max == null) return null;
+    return formatRangeForDisplay(info.min, info.max);
+  }
+
+  /** For display when only minimum rule: "Minimum allowed: X unit" or min value. */
+  getMinimumAllowedDisplay(): string {
+    const info = this.getExpectedRangeInfo();
+    const minStr = formatMinForDisplay(info.min);
+    const unit = this.meter().unit ?? 'kWh';
+    return `Minimum allowed: ${minStr} ${unit}`;
+  }
+
+  /** True when we show "Expected range: X - Y" (real range). */
+  hasExpectedRange(): boolean {
+    return this.getExpectedRangeInfo().hasRange;
   }
 
   getConsumption(): number {
@@ -104,10 +144,12 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
 
   isOutOfRange(): boolean {
     const reading = this.currentReading();
-    if (!reading) return false;
+    if (reading === null || reading === undefined) return false;
 
-    const meter = this.meter();
-    return reading < meter.expectedMin || reading > meter.expectedMax;
+    const info = this.getExpectedRangeInfo();
+    if (reading < info.min) return true;
+    if (info.hasRange && info.max != null && reading > info.max) return true;
+    return false;
   }
 
   // Card Click Handlers
@@ -178,24 +220,33 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     if (!reading || reading === 0) {
       this.hasError.set(true);
       this.errorMessage.set('Please enter a reading value');
+      this.isWarning.set(false);
+      this.warningMessage.set('');
       return false;
     }
 
-    const meter = this.meter();
-    if (reading < meter.currentReading) {
+    const info = this.getExpectedRangeInfo();
+    if (reading < info.min) {
       this.hasError.set(true);
-      this.errorMessage.set('Reading cannot be less than previous reading');
+      this.errorMessage.set('Reading must be greater than last reading');
+      this.isWarning.set(false);
+      this.warningMessage.set('');
       return false;
     }
 
     if (this.isOutOfRange()) {
-      this.hasError.set(true);
-      this.errorMessage.set('Reading is outside expected range');
-      return false;
+      // อนุญาตให้บันทึกได้ แต่แสดงคำเตือน
+      this.hasError.set(false);
+      this.errorMessage.set('');
+      this.isWarning.set(true);
+      this.warningMessage.set('Warning: reading is outside expected range');
+      return true;
     }
 
     this.hasError.set(false);
     this.errorMessage.set('');
+    this.isWarning.set(false);
+    this.warningMessage.set('');
     return true;
   }
 
@@ -206,6 +257,20 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const reading = this.currentReading();
+    if (!reading) return;
+
+    // ถ้าเกิน expected range → แสดง confirm popup
+    if (this.isOutOfRange()) {
+      this.showRangeConfirmation('normal', event);
+      return;
+    }
+
+    this.doSave();
+  }
+
+  /** บันทึกจริง (หลังผ่าน validation/confirmation แล้ว) */
+  private doSave(): void {
     const reading = this.currentReading();
     if (!reading) return;
 
@@ -232,6 +297,9 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   onInputChange(): void {
     this.hasError.set(false);
     this.errorMessage.set('');
+    // รีเซ็ตคำเตือนเมื่อแก้ไขค่า
+    this.isWarning.set(false);
+    this.warningMessage.set('');
   }
 
   // Edit mode for meter list
@@ -256,6 +324,20 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     const reading = this.currentReading();
     if (!reading) return;
 
+    // ถ้าเกิน expected range → แสดง confirm popup
+    if (this.isOutOfRange()) {
+      this.showRangeConfirmation('edit', event);
+      return;
+    }
+
+    this.doSaveEdit();
+  }
+
+  /** บันทึกแก้ไขจริง */
+  private doSaveEdit(): void {
+    const reading = this.currentReading();
+    if (!reading) return;
+
     this.readingSaved.emit({
       meterId: this.meter().id,
       reading: reading,
@@ -263,6 +345,109 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     });
 
     this.isEditing.set(false);
-    alert('Reading updated successfully!');
+  }
+
+  // ==================== INLINE EDIT MODE (for completed meters) ====================
+
+  /** เปิดโหมดแก้ไขในการ์ด inline */
+  onInlineEdit(event: Event): void {
+    event.stopPropagation();
+    this.isInlineEditing.set(true);
+    // ตั้งค่าเริ่มต้นเป็นค่าปัจจุบัน
+    this.currentReading.set(this.meter().currentReading);
+  }
+
+  /** ยกเลิกแก้ไขในโหมด inline */
+  onCancelInlineEdit(event: Event): void {
+    event.stopPropagation();
+    this.isInlineEditing.set(false);
+    this.currentReading.set(null);
+    this.hasError.set(false);
+    this.errorMessage.set('');
+    this.isWarning.set(false);
+    this.warningMessage.set('');
+  }
+
+  /** บันทึกการแก้ไขในโหมด inline */
+  onSaveInlineEdit(event: Event): void {
+    event.stopPropagation();
+
+    if (!this.validateReading()) {
+      return;
+    }
+
+    const reading = this.currentReading();
+    if (!reading) return;
+
+    // ถ้าเกิน expected range → แสดง confirm popup
+    if (this.isOutOfRange()) {
+      this.showRangeConfirmation('inline', event);
+      return;
+    }
+
+    this.doSaveInlineEdit();
+  }
+
+  /** บันทึก inline จริง */
+  private doSaveInlineEdit(): void {
+    const reading = this.currentReading();
+    if (!reading) return;
+
+    this.isSaving.set(true);
+
+    setTimeout(() => {
+      this.readingSaved.emit({
+        meterId: this.meter().id,
+        reading: reading,
+        photos: this.attachedPhotos()
+      });
+
+      this.showSuccess.set(true);
+      this.isSaving.set(false);
+
+      setTimeout(() => {
+        this.showSuccess.set(false);
+        this.isInlineEditing.set(false);
+        this.currentReading.set(null);
+      }, 1000);
+    }, 500);
+  }
+
+  // ==================== CONFIRMATION MODAL ====================
+
+  /** แสดง popup ยืนยันเมื่อค่าเกิน expected range */
+  private showRangeConfirmation(mode: 'normal' | 'edit' | 'inline', event: Event): void {
+    const reading = this.currentReading()!;
+    const info = this.getExpectedRangeInfo();
+    const unit = this.meter().unit || '';
+
+    this.pendingSaveMode.set(mode);
+    this.pendingSaveEvent.set(event);
+    this.confirmTitle.set('ค่ามิเตอร์เกิน Expected Range');
+    this.confirmMessage.set(
+      `ค่าที่กรอก: ${reading.toLocaleString()} ${unit}\n` +
+      `Expected range: ${info.min.toLocaleString()} - ${(info.max ?? 0).toLocaleString()} ${unit}\n\n` +
+      `คุณต้องการบันทึกค่านี้หรือไม่?`
+    );
+    this.showConfirmModal.set(true);
+  }
+
+  /** ยืนยันบันทึก (กดตกลงใน popup) */
+  onConfirmSave(): void {
+    this.showConfirmModal.set(false);
+    const mode = this.pendingSaveMode();
+
+    if (mode === 'normal') {
+      this.doSave();
+    } else if (mode === 'edit') {
+      this.doSaveEdit();
+    } else if (mode === 'inline') {
+      this.doSaveInlineEdit();
+    }
+  }
+
+  /** ยกเลิก (กดยกเลิกใน popup) */
+  onCancelConfirm(): void {
+    this.showConfirmModal.set(false);
   }
 }

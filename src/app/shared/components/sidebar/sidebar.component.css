@@ -8,35 +8,41 @@ img.text-white-primary {
     filter: brightness(0) invert(1); /* white */
 }
 
-/* Ensure sidebar container clips overflow */
+/* Sidebar: allow vertical scroll, contain horizontal so text wraps instead of clipping */
 aside {
     position: relative;
     overflow-x: hidden;
     overflow-y: auto;
 }
 
-/* Ensure nav container clips overflow */
 nav {
-    overflow-x: hidden;
     width: 100%;
+    min-width: 0;
 }
 
-/* Ensure list items don't overflow */
 ul {
-    overflow-x: hidden;
     width: 100%;
+    min-width: 0;
 }
 
 li {
     position: relative;
-    overflow-x: hidden;
     width: 100%;
+    min-width: 0;
 }
 
-/* Ensure sidebar items are contained within bounds */
+/* Sidebar labels: wrap to new line so text is never cut off */
+a .break-words span,
+div[class*="group"] .break-words span {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+}
+
 a, div[class*="group"] {
     position: relative;
     max-width: 100%;
+    min-width: 0;
     box-sizing: border-box;
 }
 

@@ -1,14 +1,17 @@
-/* deal-card.component.css */
+/* deal-card.component.css (ENHANCED VISUAL FEEDBACK) */
 
-/* ==================== CARD CONTAINER ==================== */
 .deal-card {
   background: white;
   border: 2px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   position: relative;
+  user-select: none;
 }
 
 .deal-card:hover {
@@ -17,83 +20,104 @@
   transform: translateY(-2px);
 }
 
-.deal-card[draggable="true"] {
-  cursor: grab;
+/* Holding state - visual feedback */
+.deal-card.holding {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  transform: scale(1.02);
 }
 
-.deal-card:active {
-  cursor: grabbing;
+/* Dragging state - strong visual feedback */
+.deal-card.dragging {
+  opacity: 0.7;
+  transform: scale(1.05) rotate(2deg);
+  cursor: grabbing !important;
+  border-color: #10b981;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+  z-index: 1000;
+  transition: none; /* Disable transition for immediate feedback */
 }
 
-/* ==================== HEADER ==================== */
-.deal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  gap: 8px;
+.deal-card.overdue {
+  border-left: 4px solid #ef4444;
 }
 
-.deal-customer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
+.deal-card.near-due {
+  border-left: 4px solid #f59e0b;
 }
 
-.customer-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: 13px;
-  flex-shrink: 0;
-}
-
-.customer-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
+/* ==================== HOLD INDICATOR ==================== */
+.hold-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(16, 185, 129, 0.2);
+  border-radius: 12px 12px 0 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  z-index: 10;
 }
 
-.deal-menu {
+.hold-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  animation: holdProgress 0.5s linear forwards;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+@keyframes holdProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* ==================== CARD HEADER ==================== */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.priority-badge {
+  font-size: 16px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-menu-btn {
   width: 24px;
   height: 24px;
-  border-radius: 6px;
   border: none;
   background: transparent;
+  font-size: 18px;
+  font-weight: 700;
   color: #9ca3af;
   cursor: pointer;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  flex-shrink: 0;
   transition: all 0.2s;
-  padding: 0;
 }
 
-.deal-menu:hover {
+.card-menu-btn:hover {
   background: #f3f4f6;
   color: #374151;
 }
 
-/* ==================== TITLE & VALUE ==================== */
-.deal-title {
-  font-size: 14px;
-  font-weight: 600;
+/* ==================== CARD CONTENT ==================== */
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
   color: #1f2937;
-  margin-bottom: 8px;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -101,272 +125,69 @@
   overflow: hidden;
 }
 
-.deal-value {
+.card-value {
   font-size: 18px;
-  font-weight: 800;
-  color: #10b981;
-  margin-bottom: 10px;
-}
-
-/* ==================== PROBABILITY ==================== */
-.deal-probability {
-  margin-bottom: 10px;
-}
-
-.probability-label {
-  font-size: 11px;
-  color: #6b7280;
-  margin-bottom: 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.probability-value {
   font-weight: 700;
-  color: #374151;
+  color: #3b82f6;
 }
 
-.probability-bar {
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.probability-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-/* ==================== LOCATION ==================== */
-.deal-location {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-  color: #6b7280;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
-
-.location-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.location-icon {
-  font-size: 12px;
-}
-
-/* ==================== DUE DATE ==================== */
-.deal-due {
+.card-due-date {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
   padding: 6px 10px;
   border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 10px;
 }
 
-.deal-due.overdue {
-  background: #fee2e2;
+.card-due-date.overdue {
+  background: #fef2f2;
   color: #dc2626;
 }
 
-.deal-due.warning {
+.card-due-date.warning {
   background: #fef3c7;
   color: #d97706;
 }
 
-.deal-due.ok {
-  background: #d1fae5;
-  color: #059669;
+.card-due-date.normal {
+  background: #f0fdf4;
+  color: #16a34a;
 }
 
 .due-icon {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .due-text {
-  flex: 1;
+  font-size: 13px;
 }
 
-/* ==================== TAGS ==================== */
-.deal-tags {
+.card-owner {
   display: flex;
+  align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-
-.deal-tag {
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: #e0f2fe;
-  color: #0369a1;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-/* ==================== ACTIVITY ==================== */
-.deal-activity {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
+  font-size: 13px;
   color: #6b7280;
-  margin-bottom: 10px;
-  padding: 6px 8px;
-  background: #f9fafb;
-  border-radius: 6px;
-}
-
-.activity-type {
-  font-weight: 600;
-}
-
-.activity-time {
-  font-weight: 400;
-}
-
-/* ==================== FOOTER ==================== */
-.deal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 10px;
+  padding-top: 8px;
   border-top: 1px solid #f3f4f6;
-  gap: 8px;
 }
 
-.footer-left {
-  flex: 1;
-  min-width: 0;
-}
-
-.footer-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-/* Owner */
-.deal-owner {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.owner-avatar {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 10px;
-  font-weight: 700;
-  flex-shrink: 0;
+.owner-icon {
+  font-size: 14px;
 }
 
 .owner-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Counts */
-.deal-counts {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.count-item {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 11px;
-  color: #6b7280;
-}
-
-.count-icon {
-  font-size: 12px;
-}
-
-.count-value {
   font-weight: 600;
 }
 
-/* Priority */
-.deal-priority {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 6px;
-}
-
-.deal-priority.high {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.deal-priority.medium {
-  background: #fef3c7;
-  color: #d97706;
-}
-
-.deal-priority.low {
-  background: #f3f4f6;
-  color: #6b7280;
-}
-
-.priority-icon {
-  font-size: 10px;
-}
-
-.priority-label {
-  white-space: nowrap;
-}
-
-/* ==================== RESPONSIVE ==================== */
-@media (max-width: 768px) {
-  .deal-card {
-    padding: 12px;
-  }
-
-  .deal-location {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  .deal-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .footer-left,
-  .footer-right {
-    width: 100%;
-  }
-
-  .footer-right {
-    justify-content: space-between;
-  }
+/* ==================== DRAG GHOST ==================== */
+::ng-deep .drag-ghost {
+  opacity: 0.9 !important;
+  transform: scale(1.05) rotate(3deg) !important;
+  box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4) !important;
+  border-color: #10b981 !important;
+  cursor: grabbing !important;
+  transition: none !important;
 }

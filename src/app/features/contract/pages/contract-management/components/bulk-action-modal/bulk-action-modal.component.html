@@ -1,0 +1,344 @@
+<!-- bulk-action-modal.component.html -->
+@if (isOpen()) {
+  <div class="modal-backdrop" (click)="onCancel()">
+    <div class="modal-content" (click)="onBackdropClick($event)">
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="header-icon" [ngClass]="action()">
+          <i class="pi" [ngClass]="actionIcon()"></i>
+        </div>
+        <h2 class="modal-title">{{ modalTitle() }}</h2>
+        <button class="close-btn" (click)="onCancel()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Selected Contracts Summary -->
+      <div class="selected-summary">
+        <i class="pi pi-info-circle"></i>
+        <span>ดำเนินการกับ <strong>{{ selectedContracts().length }}</strong> สัญญาที่เลือก</span>
+      </div>
+
+      <!-- Contract List Preview -->
+      <div class="contracts-preview">
+        <div class="preview-label">สัญญาที่เลือก:</div>
+        <div class="preview-list">
+          @for (contract of selectedContracts().slice(0, 5); track contract.CONTRACT_ID) {
+            <span class="contract-chip">
+              {{ contract.CONTRACT_NUMBER }}
+            </span>
+          }
+          @if (selectedContracts().length > 5) {
+            <span class="more-count">+{{ selectedContracts().length - 5 }} อื่นๆ</span>
+          }
+        </div>
+      </div>
+
+      <!-- Form Content -->
+      <div class="modal-body">
+        
+        <!-- Terminate Form -->
+        @if (action() === 'terminate') {
+          <div class="form-section">
+            <div class="form-group required">
+              <label>วันที่ยกเลิกสัญญา</label>
+              <p-datepicker
+                [ngModel]="terminateData().terminationDate"
+                (ngModelChange)="updateTerminateField('terminationDate', $event)"
+                [showIcon]="true"
+                dateFormat="dd/mm/yy"
+                placeholder="เลือกวันที่"
+                styleClass="w-full"
+              ></p-datepicker>
+            </div>
+
+            <div class="form-group required">
+              <label>เหตุผลการยกเลิก</label>
+              <p-select
+                [ngModel]="terminateData().reason"
+                (ngModelChange)="updateTerminateField('reason', $event)"
+                [options]="terminationReasons"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="เลือกเหตุผล"
+                styleClass="w-full"
+              ></p-select>
+            </div>
+
+            <div class="form-group">
+              <label>การคืนเงินมัดจำ</label>
+              <p-select
+                [ngModel]="terminateData().refundDeposit"
+                (ngModelChange)="updateTerminateField('refundDeposit', $event)"
+                [options]="refundOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full"
+              ></p-select>
+            </div>
+
+            <div class="form-group">
+              <label>หมายเหตุเพิ่มเติม</label>
+              <textarea
+                pInputTextarea
+                [ngModel]="terminateData().notes"
+                (ngModelChange)="updateTerminateField('notes', $event)"
+                rows="3"
+                placeholder="กรอกหมายเหตุ (ถ้ามี)"
+                class="w-full"
+              ></textarea>
+            </div>
+          </div>
+        }
+
+        <!-- Discount Form -->
+        @if (action() === 'discount') {
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group required">
+                <label>ประเภทส่วนลด</label>
+                <p-select
+                  [ngModel]="discountData().discountType"
+                  (ngModelChange)="updateDiscountField('discountType', $event)"
+                  [options]="discountTypeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  styleClass="w-full"
+                ></p-select>
+              </div>
+
+              <div class="form-group required">
+                <label>{{ discountData().discountType === 'percentage' ? 'ส่วนลด (%)' : 'ส่วนลด (บาท)' }}</label>
+                <input
+                  pInputText
+                  type="number"
+                  [ngModel]="discountData().discountValue"
+                  (ngModelChange)="updateDiscountField('discountValue', $event)"
+                  [placeholder]="discountData().discountType === 'percentage' ? '0 - 100' : 'จำนวนเงิน'"
+                  class="w-full"
+                  [min]="0"
+                  [max]="discountData().discountType === 'percentage' ? 100 : 999999999"
+                />
+              </div>
+            </div>
+
+            <div class="form-group required">
+              <label>ใช้กับ</label>
+              <p-select
+                [ngModel]="discountData().applyTo"
+                (ngModelChange)="updateDiscountField('applyTo', $event)"
+                [options]="applyToOptions"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="w-full"
+              ></p-select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group required">
+                <label>วันที่เริ่มต้น</label>
+                <p-datepicker
+                  [ngModel]="discountData().startDate"
+                  (ngModelChange)="updateDiscountField('startDate', $event)"
+                  [showIcon]="true"
+                  dateFormat="dd/mm/yy"
+                  placeholder="เลือกวันที่"
+                  styleClass="w-full"
+                ></p-datepicker>
+              </div>
+
+              <div class="form-group required">
+                <label>วันที่สิ้นสุด</label>
+                <p-datepicker
+                  [ngModel]="discountData().endDate"
+                  (ngModelChange)="updateDiscountField('endDate', $event)"
+                  [showIcon]="true"
+                  dateFormat="dd/mm/yy"
+                  placeholder="เลือกวันที่"
+                  styleClass="w-full"
+                ></p-datepicker>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>หมายเหตุ</label>
+              <textarea
+                pInputTextarea
+                [ngModel]="discountData().notes"
+                (ngModelChange)="updateDiscountField('notes', $event)"
+                rows="3"
+                placeholder="กรอกหมายเหตุ (ถ้ามี)"
+                class="w-full"
+              ></textarea>
+            </div>
+          </div>
+        }
+
+        <!-- Renew Form -->
+        @if (action() === 'renew') {
+          <div class="form-section">
+            <div class="form-group required">
+              <label>วันที่เริ่มต้นสัญญาใหม่</label>
+              <p-datepicker
+                [ngModel]="renewData().renewalStartDate"
+                (ngModelChange)="updateRenewField('renewalStartDate', $event)"
+                [showIcon]="true"
+                dateFormat="dd/mm/yy"
+                placeholder="เลือกวันที่"
+                styleClass="w-full"
+              ></p-datepicker>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group required">
+                <label>ระยะเวลา (ปี)</label>
+                <input
+                  pInputText
+                  type="number"
+                  [ngModel]="renewData().durationYears"
+                  (ngModelChange)="updateRenewField('durationYears', $event)"
+                  placeholder="0"
+                  class="w-full"
+                  [min]="0"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>ระยะเวลา (เดือน)</label>
+                <input
+                  pInputText
+                  type="number"
+                  [ngModel]="renewData().durationMonths"
+                  (ngModelChange)="updateRenewField('durationMonths', $event)"
+                  placeholder="0"
+                  class="w-full"
+                  [min]="0"
+                  [max]="11"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>อัตราค่าเช่าใหม่ (บาท/เดือน)</label>
+                <input
+                  pInputText
+                  type="number"
+                  [ngModel]="renewData().newRentRate"
+                  (ngModelChange)="updateRenewField('newRentRate', $event)"
+                  placeholder="ไม่เปลี่ยนแปลง"
+                  class="w-full"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>อัตราค่าบริการใหม่ (บาท/เดือน)</label>
+                <input
+                  pInputText
+                  type="number"
+                  [ngModel]="renewData().newServiceRate"
+                  (ngModelChange)="updateRenewField('newServiceRate', $event)"
+                  placeholder="ไม่เปลี่ยนแปลง"
+                  class="w-full"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>หมายเหตุ</label>
+              <textarea
+                pInputTextarea
+                [ngModel]="renewData().notes"
+                (ngModelChange)="updateRenewField('notes', $event)"
+                rows="3"
+                placeholder="กรอกหมายเหตุ (ถ้ามี)"
+                class="w-full"
+              ></textarea>
+            </div>
+          </div>
+        }
+
+        <!-- Extend Form -->
+        @if (action() === 'extend') {
+          <div class="form-section">
+            <div class="form-row">
+              <div class="form-group required">
+                <label>ขยายเวลา (เดือน)</label>
+                <input
+                  pInputText
+                  type="number"
+                  [ngModel]="extendData().extensionMonths"
+                  (ngModelChange)="updateExtendField('extensionMonths', $event)"
+                  placeholder="0"
+                  class="w-full"
+                  [min]="0"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>ขยายเวลา (วัน)</label>
+                <input
+                  pInputText
+                  type="number"
+                  [ngModel]="extendData().extensionDays"
+                  (ngModelChange)="updateExtendField('extensionDays', $event)"
+                  placeholder="0"
+                  class="w-full"
+                  [min]="0"
+                  [max]="30"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>หมายเหตุ</label>
+              <textarea
+                pInputTextarea
+                [ngModel]="extendData().notes"
+                (ngModelChange)="updateExtendField('notes', $event)"
+                rows="3"
+                placeholder="กรอกหมายเหตุ (ถ้ามี)"
+                class="w-full"
+              ></textarea>
+            </div>
+          </div>
+        }
+
+        <!-- Edit Notice -->
+        @if (action() === 'edit') {
+          <div class="form-section">
+            <div class="edit-notice">
+              <i class="pi pi-info-circle"></i>
+              <div class="notice-content">
+                <p><strong>การแก้ไขสัญญาเดี่ยว</strong></p>
+                <p>คุณเลือกสัญญา {{ selectedContracts().length }} รายการ</p>
+                @if (selectedContracts().length === 1) {
+                  <p class="success-text">กดยืนยันเพื่อเปิดหน้าแก้ไขสัญญา</p>
+                } @else {
+                  <p class="warning-text">กรุณาเลือกเพียง 1 สัญญาเพื่อแก้ไขทีละรายการ หรือใช้ฟีเจอร์อื่นสำหรับการดำเนินการกลุ่ม</p>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="onCancel()">
+          ยกเลิก
+        </button>
+        <button 
+          class="btn-primary" 
+          [ngClass]="action()"
+          [disabled]="!isFormValid() || (action() === 'edit' && selectedContracts().length !== 1)"
+          (click)="onConfirm()"
+        >
+          <i class="pi" [ngClass]="actionIcon()"></i>
+          <span>{{ action() === 'edit' ? 'แก้ไขสัญญา' : 'ยืนยัน' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}

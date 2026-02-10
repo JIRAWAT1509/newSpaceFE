@@ -1,22 +1,14 @@
-// pipeline-filters.component.ts
+// pipeline-filters.component.ts (SIMPLIFIED)
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-
-interface SelectOption {
-  label: string;
-  value: string;
-}
 
 export interface FilterState {
   search: string;
   owner: string | null;
   priority: string | null;
-  tags: string[];
 }
 
 @Component({
@@ -26,9 +18,7 @@ export interface FilterState {
     CommonModule,
     FormsModule,
     InputText,
-    Select,
-    IconField,
-    InputIcon
+    Select
   ],
   templateUrl: './pipeline-filters.component.html',
   styleUrl: './pipeline-filters.component.css'
@@ -42,68 +32,58 @@ export class PipelineFiltersComponent {
   filterChange = output<FilterState>();
 
   // Filter state
-  searchValue = signal('');
+  searchQuery = signal('');
   selectedOwner = signal<string | null>(null);
   selectedPriority = signal<string | null>(null);
 
-  // Priority options
-  priorityOptions: SelectOption[] = [
-    { label: 'All Priorities', value: '' },
-    { label: '🔴 High Priority', value: 'high' },
-    { label: '🟡 Medium Priority', value: 'medium' },
-    { label: '⚪ Low Priority', value: 'low' }
-  ];
-
-  // Get owner options
-  getOwnerOptions(): SelectOption[] {
+  // Owner options
+  get ownerOptions() {
     return [
-      { label: 'All Owners', value: '' },
+      { label: 'All Owners', value: null },
       ...this.owners().map(owner => ({ label: owner, value: owner }))
     ];
   }
 
-  // Handle search input
+  // Priority options
+  priorityOptions = [
+    { label: 'All Priorities', value: null },
+    { label: '🔴 High', value: 'high' },
+    { label: '🟡 Medium', value: 'medium' },
+    { label: '⚪ Low', value: 'low' }
+  ];
+
+  // Handle search change
   onSearchChange(value: string): void {
-    this.searchValue.set(value);
-    this.emitFilterChange();
+    this.searchQuery.set(value);
+    this.emitFilters();
   }
 
   // Handle owner change
-  onOwnerChange(value: string): void {
-    this.selectedOwner.set(value || null);
-    this.emitFilterChange();
+  onOwnerChange(value: string | null): void {
+    this.selectedOwner.set(value);
+    this.emitFilters();
   }
 
   // Handle priority change
-  onPriorityChange(value: string): void {
-    this.selectedPriority.set(value || null);
-    this.emitFilterChange();
+  onPriorityChange(value: string | null): void {
+    this.selectedPriority.set(value);
+    this.emitFilters();
+  }
+
+  // Emit filter state
+  private emitFilters(): void {
+    this.filterChange.emit({
+      search: this.searchQuery(),
+      owner: this.selectedOwner(),
+      priority: this.selectedPriority()
+    });
   }
 
   // Clear all filters
   clearFilters(): void {
-    this.searchValue.set('');
+    this.searchQuery.set('');
     this.selectedOwner.set(null);
     this.selectedPriority.set(null);
-    this.emitFilterChange();
-  }
-
-  // Check if any filters are active
-  hasActiveFilters(): boolean {
-    return !!(
-      this.searchValue() ||
-      this.selectedOwner() ||
-      this.selectedPriority()
-    );
-  }
-
-  // Emit filter change
-  private emitFilterChange(): void {
-    this.filterChange.emit({
-      search: this.searchValue(),
-      owner: this.selectedOwner(),
-      priority: this.selectedPriority(),
-      tags: []
-    });
+    this.emitFilters();
   }
 }

@@ -1,1 +1,181 @@
-<p>add-deal-modal works!</p>
+<!-- add-deal-modal.component.html (FIXED FOR ANGULAR 20.3 SIGNALS) -->
+
+@if (visible()) {
+  <div class="modal-overlay" (click)="onClose()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="header-content">
+          <h2 class="modal-title">
+            <span class="title-icon">➕</span>
+            <span>Add New Deal</span>
+          </h2>
+          <p class="modal-subtitle">Create a new deal in your pipeline</p>
+        </div>
+        <button class="btn-close" (click)="onClose()">
+          <span>✕</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+
+        <!-- Customer Selection -->
+        <div class="form-group">
+          <label class="form-label">
+            Customer <span class="required">*</span>
+          </label>
+          <p-select
+            [ngModel]="selectedCustomerId()"
+            (ngModelChange)="selectedCustomerId.set($event)"
+            [options]="customerOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select customer..."
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <!-- Pipeline Stage -->
+        <div class="form-group">
+          <label class="form-label">
+            Pipeline Stage <span class="required">*</span>
+          </label>
+          <p-select
+            [ngModel]="selectedStageId()"
+            (ngModelChange)="onStageChange($event)"
+            [options]="stageOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select stage..."
+            styleClass="w-full"
+          ></p-select>
+          @if (selectedStage()) {
+            <div class="info-message">
+              <span class="info-icon">ℹ️</span>
+              <span class="info-text">Deal will start with {{ selectedStage()!.forecastWinRate }}% win rate and be due in {{ selectedStage()!.defaultDueDays }} days</span>
+            </div>
+          }
+        </div>
+
+        <!-- Deal Title -->
+        <div class="form-group">
+          <label class="form-label">
+            Deal Title <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            pInputText
+            class="w-full"
+            placeholder="e.g., Cafe Space - Sukhumvit Area"
+            [ngModel]="dealTitle()"
+            (ngModelChange)="dealTitle.set($event)"
+          />
+        </div>
+
+        <!-- Deal Value -->
+        <div class="form-group">
+          <label class="form-label">
+            Deal Value (฿) <span class="required">*</span>
+          </label>
+          <p-inputNumber
+            [ngModel]="dealValue()"
+            (ngModelChange)="dealValue.set($event || 0)"
+            [min]="0"
+            [showButtons]="true"
+            mode="currency"
+            currency="THB"
+            locale="th-TH"
+            styleClass="w-full"
+            placeholder="฿0"
+          ></p-inputNumber>
+          @if (dealValue() > 0 && selectedStage()) {
+            <small class="form-hint">
+              <span class="hint-icon">💰</span>
+              Weighted value: {{ formatCurrency(dealValue() * selectedStage()!.forecastWinRate / 100) }}
+            </small>
+          }
+        </div>
+
+        <!-- Area/Location -->
+        <div class="form-group">
+          <label class="form-label">Area/Location</label>
+          <p-select
+            [ngModel]="selectedAreaId()"
+            (ngModelChange)="selectedAreaId.set($event)"
+            [options]="areaOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select area..."
+            styleClass="w-full"
+          ></p-select>
+          @if (!selectedCustomerId()) {
+            <div class="warning-message">
+              <span class="warning-icon">⚠️</span>
+              <span class="warning-text">Select a customer first</span>
+            </div>
+          }
+        </div>
+
+        <!-- Tags -->
+        <div class="form-group">
+          <label class="form-label">Tags</label>
+          <p-multiSelect
+            [ngModel]="selectedTags()"
+            (ngModelChange)="selectedTags.set($event)"
+            [options]="tagOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select tags..."
+            styleClass="w-full"
+          ></p-multiSelect>
+        </div>
+
+        <!-- Priority -->
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <p-select
+            [ngModel]="selectedPriority()"
+            (ngModelChange)="selectedPriority.set($event)"
+            [options]="priorityOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select priority..."
+            styleClass="w-full"
+          ></p-select>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea
+            pTextarea
+            class="w-full"
+            rows="3"
+            placeholder="Add any additional notes about this deal..."
+            [ngModel]="notes()"
+            (ngModelChange)="notes.set($event)"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="onClose()">
+          <span>Cancel</span>
+        </button>
+        <button
+          class="btn-save"
+          (click)="onSave()"
+          [disabled]="!isFormValid()"
+        >
+          <span class="btn-icon">+</span>
+          <span class="btn-label">Add Deal</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

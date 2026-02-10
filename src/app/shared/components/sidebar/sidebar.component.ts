@@ -1,10 +1,11 @@
-import { Component, OnInit, effect } from '@angular/core';
+import { Component, OnInit, effect, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { animate, style, transition, trigger } from '@angular/animations';
 
 import { NavigationService } from '@core/services/navigation.service';
 import { LanguageService } from '@core/services/language.service';
+import { BookmarkService } from '@core/services/bookmark.service';
 import { NAVIGATION_CONTENT } from '@core/data/content';
 import { NavigationItem, NavigationSecondary, NavigationTertiary } from '@core/models/navigation.model';
 import { SIDEBAR_TEXTS } from '@assets/language/sidebar.text';
@@ -25,44 +26,50 @@ import { SIDEBAR_TEXTS } from '@assets/language/sidebar.text';
         animate('300ms ease-in', style({ height: '0', opacity: 0, overflow: 'hidden' }))
       ])
     ]),
-      trigger('fadeInOut', [
-    transition(':enter', [
-      style({ opacity: 0 }),
-      animate('400ms ease-in', style({ opacity: 1 }))
-    ]),
-    transition(':leave', [
-      animate('200ms ease-out', style({ opacity: 0 }))
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('400ms ease-in', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-out', style({ opacity: 0 }))
+      ])
     ])
-  ])
   ]
 })
 export class SidebarComponent implements OnInit {
-  // --- Component State ---
-  // REMOVED: Local isExpanded property is gone.
+  isMobileOverlay = input<boolean>(false);
+
   isHovering: boolean = false;
   openAccordion: string | null = null;
 
-  // --- Data ---
   navigationContent: NavigationItem[] = NAVIGATION_CONTENT;
   currentSecondaryNav: NavigationSecondary[] = [];
+  displayNav: NavigationSecondary[] = [];
 
-  // --- Signals from Services ---
+  // ✅ เพิ่ม bookmark section
+  bookmarkSection: NavigationSecondary | null = null;
+
+  // Signals
   isExpanded: any;
   activePrimaryItem: any;
   activeSubRoute: any;
   currentLanguage: any;
+  bookmarks: any;
 
-  // --- i18n ---
   texts: { [key: string]: string } = {};
 
   constructor(
     private navigationService: NavigationService,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private bookmarkService: BookmarkService
   ) {
     this.isExpanded = this.navigationService.isSidebarExpanded;
     this.activePrimaryItem = this.navigationService.activePrimaryItem;
     this.activeSubRoute = this.navigationService.activeSubRouteItem;
     this.currentLanguage = this.languageService.currentLanguage;
+    this.bookmarks = this.bookmarkService.bookmarks;
+
     effect(() => {
       const langCode = this.currentLanguage().code;
       this.texts = SIDEBAR_TEXTS[langCode];
@@ -72,56 +79,102 @@ export class SidebarComponent implements OnInit {
       const activeItemName = this.activePrimaryItem();
       const newNavContent = this.navigationContent.find(item => item.primary_content === activeItemName);
       this.currentSecondaryNav = newNavContent ? newNavContent.secondary_content : [];
+      this.updateDisplayNav();
       this.autoOpenActiveAccordion();
     });
-  effect(() => {
-      // This line is a "guard" to prevent the effect from running on initial setup.
-      const isExpandedNow = this.isExpanded();
 
-      // If the sidebar's permanent state changes (e.g., from the header),
-      // the temporary hover state is no longer valid and must be reset.
+    // ✅ Effect สำหรับ bookmarks
+    effect(() => {
+      const bookmarkList = this.bookmarks();
+      this.updateBookmarkSection(bookmarkList);
+      this.updateDisplayNav();
+    });
+
+    effect(() => {
+      const isExpandedNow = this.isExpanded();
       if (this.isHovering) {
         this.isHovering = false;
       }
     });
+
     effect(() => {
       this.autoOpenActiveAccordion();
     });
 
     effect(() => {
-      // When the sidebar is collapsed (and not being hovered),
-      // ensure any open accordion is closed.
       if (!this.isExpanded() && !this.isHovering) {
         this.openAccordion = null;
       }
     });
-
-
   }
 
   ngOnInit(): void {
     this.autoOpenActiveAccordion();
   }
 
-  // --- State Change and Event Handlers (Updated to use the service) ---
+  // ✅ สร้าง bookmark accordion section
+  private updateBookmarkSection(bookmarks: NavigationSecondary[]): void {
+    if (bookmarks.length > 0) {
+      this.bookmarkSection = {
+        name: 'bookmarks',
+        icon: 'pi-bookmark-fill',
+        sub: bookmarks.map(b => ({
+          name: b.name,
+          route: b.route || ''
+        }))
+      };
+    } else {
+      this.bookmarkSection = null;
+    }
+  }
+
+  // ✅ Merge bookmark section + divider + normal nav
+  private updateDisplayNav(): void {
+    if (this.bookmarkSection) {
+      this.displayNav = [
+        this.bookmarkSection,
+        { name: '__divider__', icon: '', isDivider: true } as any,
+        ...this.currentSecondaryNav
+      ];
+    } else {
+      this.displayNav = this.currentSecondaryNav;
+    }
+  }
+
+  toggleBookmark(event: MouseEvent, item: NavigationSecondary): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (item.route) {
+      this.bookmarkService.toggleBookmark(item);
+    }
+  }
+
+  isBookmarked(item: NavigationSecondary): boolean {
+    return this.bookmarkService.isBookmarked(item.route);
+  }
+
+  isPrimeIcon(icon: string): boolean {
+    return icon?.startsWith('pi-');
+  }
 
   toggleAccordion(itemName: string): void {
     this.openAccordion = this.openAccordion === itemName ? null : itemName;
   }
 
-onSubItemClick(subItem: NavigationTertiary): void {
-    this.navigationService.setSidebarExpanded(false); // Always hide on click
+  onSubItemClick(subItem: NavigationTertiary): void {
+    this.navigationService.setSidebarExpanded(false);
   }
 
   onMouseEnter(): void {
-    if (!this.isExpanded()) { // Read signal with ()
+    if (!this.isExpanded()) {
       this.isHovering = true;
       this.autoOpenActiveAccordion();
     }
   }
 
   onMouseLeave(): void {
-    if (!this.isExpanded()) { // Read signal with ()
+    if (!this.isExpanded()) {
       this.isHovering = false;
       this.openAccordion = null;
     }
@@ -129,15 +182,19 @@ onSubItemClick(subItem: NavigationTertiary): void {
 
   onIconClick(event: MouseEvent, itemName: string): void {
     event.stopPropagation();
-    this.navigationService.setSidebarExpanded(true); // Tell service to show
+    this.navigationService.setSidebarExpanded(true);
     this.openAccordion = itemName;
   }
-
-  // --- Helper Functions ---
 
   private autoOpenActiveAccordion(): void {
     const activeRoute = this.activeSubRoute();
     if (activeRoute) {
+      // ✅ เช็ค bookmarks ด้วย
+      if (this.bookmarkSection?.sub?.some(subItem => subItem.route === activeRoute)) {
+        this.openAccordion = 'bookmarks';
+        return;
+      }
+
       for (const secondaryItem of this.currentSecondaryNav) {
         if (secondaryItem.sub && secondaryItem.sub.some(subItem => subItem.route === activeRoute)) {
           this.openAccordion = secondaryItem.name;
@@ -148,16 +205,16 @@ onSubItemClick(subItem: NavigationTertiary): void {
     this.openAccordion = null;
   }
 
-handleItemClick(itemName: string): void {
+  handleItemClick(itemName: string): void {
     if (!this.isExpanded()) {
-      this.isHovering = false; // <-- ADD THIS LINE
+      this.isHovering = false;
       this.navigationService.setSidebarExpanded(true);
     }
     this.toggleAccordion(itemName);
   }
 
-handleDirectLinkClick(): void {
-    this.navigationService.setSidebarExpanded(false); // Always hide on click
+  handleDirectLinkClick(): void {
+    this.navigationService.setSidebarExpanded(false);
   }
 
   isItemActive(item: NavigationSecondary): boolean {
@@ -168,15 +225,11 @@ handleDirectLinkClick(): void {
     return false;
   }
 
-
-
   isItemHighlighted(item: NavigationSecondary): boolean {
-    // An item is highlighted if its route is active OR if its accordion is open.
     const isActive = this.isItemActive(item);
     const isAccordionOpen = this.openAccordion === item.name;
     return isActive || isAccordionOpen;
   }
-
 
   translate(key: string): string {
     return this.texts[key] || key;

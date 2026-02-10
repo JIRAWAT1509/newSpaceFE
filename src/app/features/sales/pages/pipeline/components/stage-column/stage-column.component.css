@@ -1,23 +1,25 @@
-/* stage-column.component.css */
+/* stage-column.component.css (FIXED - NO HOVER HIGHLIGHT) */
 
 /* ==================== COLUMN CONTAINER ==================== */
 .stage-column {
-  flex: 0 0 320px;
+  flex: 0 0 270px; /* Width: Reduced from 320px to fit 5 columns */
   background: #f9fafb;
   border-radius: 12px;
   border: 2px solid #e5e7eb;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  max-height: 800px;
+  height: 680px; /* Fixed height = header + 3 cards + pagination */
+  min-height: 680px; /* Ensure minimum height */
+  max-height: 680px; /* Ensure maximum height */
 }
 
 /* ==================== STAGE HEADER ==================== */
 .stage-header {
-  padding: 16px;
+  padding: 14px;
   border-bottom: 2px solid #e5e7eb;
   background: white;
   border-radius: 12px 12px 0 0;
+  flex-shrink: 0; /* Don't shrink header */
 }
 
 .stage-header-top {
@@ -118,15 +120,18 @@
   padding: 6px 10px;
 }
 
-/* ==================== DEALS LIST ==================== */
+/* ==================== DEALS LIST (SCROLLABLE AREA) ==================== */
 .deals-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
+  position: relative;
+  flex: 1; /* Take remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-height: 200px;
+  gap: 10px;
+  min-height: 0; /* Critical: Allow flex item to shrink below content size */
+  max-height: 470px; /* Fixed height for exactly 3 cards + gaps + padding */
 }
 
 /* Custom scrollbar */
@@ -147,10 +152,11 @@
   background: #9ca3af;
 }
 
-/* Drop zone highlight */
+/* Drop zone highlight - ONLY when drag-over class is present */
 .deals-list.drag-over {
-  background: #eff6ff;
-  border: 2px dashed #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 3px dashed #3b82f6;
+  border-radius: 8px;
 }
 
 /* Empty state */
@@ -175,6 +181,10 @@
   font-weight: 500;
 }
 
+/* ==================== PAGINATION ==================== */
+/* Pagination component stays at bottom */
+/* Height is controlled by pagination component itself (~100px) */
+
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 1024px) {
   .stage-column {
@@ -185,9 +195,41 @@
 @media (max-width: 768px) {
   .stage-column {
     flex: 0 0 260px;
+    height: 600px; /* Shorter on mobile */
+    min-height: 600px;
+    max-height: 600px;
+  }
+
+  .deals-list {
+    max-height: 390px; /* Adjusted for mobile */
   }
 
   .stage-metrics {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==================== DROP ZONE ANIMATION ==================== */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* "Drop here" indicator - ONLY shown when drag-over */
+.deals-list.drag-over::before {
+  content: 'Drop here';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #3b82f6;
+  font-size: 18px;
+  font-weight: 700;
+  pointer-events: none;
+  animation: pulse 1s infinite;
+  z-index: 10;
 }
