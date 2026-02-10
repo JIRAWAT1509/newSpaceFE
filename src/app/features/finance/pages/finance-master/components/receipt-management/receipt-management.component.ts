@@ -18,6 +18,10 @@ export class ReceiptManagementComponent implements OnInit {
   showBulkActions = signal<boolean>(false);
   showRowMenu = signal<string | null>(null);
 
+  // ✅ เพิ่ม signals สำหรับ menu positioning
+  currentReceipt = signal<Receipt | null>(null);
+  menuPosition = signal<{ top: number; left: number }>({ top: 0, left: 0 });
+
   subTabs = [
     { id: 'issue', label: 'การออกใบแจ้งหนี้' },
     { id: 'receipt', label: 'การออกใบเสร็จหรือ เอกสารอื่นๆ' }
@@ -78,21 +82,48 @@ export class ReceiptManagementComponent implements OnInit {
     return this.selectedReceipts().size;
   }
 
-  // Row Menu
-  toggleRowMenu(receiptId: string): void {
-    if (this.showRowMenu() === receiptId) {
-      this.showRowMenu.set(null);
-    } else {
+toggleRowMenu(receiptId: string, event: MouseEvent): void {
+  if (this.showRowMenu() === receiptId) {
+    this.closeRowMenu();
+  } else {
+    const receipt = this.receipts().find(r => r.id === receiptId);
+    if (receipt) {
+      this.currentReceipt.set(receipt);
       this.showRowMenu.set(receiptId);
+
+      const button = event.currentTarget as HTMLElement;
+      const rect = button.getBoundingClientRect();
+      const menuWidth = 224;
+      const menuHeight = 300; // ประมาณ
+
+      // ตรวจสอบว่ามีพื้นที่ทางขวาหรือไม่
+      const spaceOnRight = window.innerWidth - rect.right;
+      const spaceOnLeft = rect.left;
+
+      // ตรวจสอบว่ามีพื้นที่ด้านล่างหรือไม่
+      const spaceBelow = window.innerHeight - rect.bottom;
+
+      let top = rect.bottom -20;
+      let left = rect.left - menuWidth + 20;
+
+      // ถ้าพื้นที่ล่างไม่พอ ให้แสดงด้านบน
+      if (spaceBelow < menuHeight) {
+        top = rect.top - menuHeight - 4;
+      }
+
+      this.menuPosition.set({ top, left });
     }
   }
+}
 
   isRowMenuOpen(receiptId: string): boolean {
     return this.showRowMenu() === receiptId;
   }
 
+  // ✅ แก้ไข closeRowMenu
   closeRowMenu(): void {
     this.showRowMenu.set(null);
+    this.currentReceipt.set(null);
   }
 
   // Row Actions

@@ -3,7 +3,7 @@
 import { FinanceStats, Debt, Invoice, Receipt } from './../models/finance.model';
 
 export const MOCK_FINANCE_STATS: FinanceStats = {
-  totalItems: 62,
+  totalItems: 73,
   invoicesIssued: 19,
   taxInvoicesIssued: 40,
   totalOutstanding: 14

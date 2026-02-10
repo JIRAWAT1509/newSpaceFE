@@ -145,20 +145,20 @@
   @apply border-none cursor-pointer;
 }
 
-/* Menu Wrapper & Dropdown */
-.menu-wrapper {
-  @apply relative;
+.action-menu {
+  @apply w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2;
+  animation: slideDown 0.2s ease;
+}
+
+.action-menu-portal {
+  position: fixed;
+  z-index: 200;
+  
 }
 
 .menu-overlay {
-  @apply fixed inset-0 z-30;
-}
-
-.action-menu {
-  @apply absolute right-0 top-full mt-2 w-56;
-  @apply bg-white rounded-lg shadow-xl border border-gray-200;
-  @apply py-2 z-40;
-  animation: slideDown 0.2s ease;
+  @apply fixed inset-0;
+  z-index: 150;
 }
 
 @keyframes slideDown {
