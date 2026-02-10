@@ -63,3 +63,13 @@ export interface DeepNavigationNote {
   totalLevels: number;  // Total levels in full structure (4 or 5)
   note: string;        // Description of what's nested deeper
 }
+export interface NavigationSecondary {
+  name: string;
+  icon: string;
+  route?: string;
+  sub?: NavigationTertiary[];
+  hasDeeper?: boolean;
+  deeperNote?: string;
+  isBookmark?: boolean; // ✅ เพิ่ม
+  isDivider?: boolean;  // ✅ เพิ่ม
+}

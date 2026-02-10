@@ -15,66 +15,133 @@
 }
 
 .header-content {
-  @apply flex items-center gap-4;
+  @apply flex items-center gap-3;
 }
 
 .header-icon {
-  @apply w-16 h-16 rounded-xl flex items-center justify-center text-white text-3xl;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  @apply w-12 h-12 rounded-lg flex items-center justify-center text-white text-2xl;
+  background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
+  box-shadow: 0 2px 8px rgb(var(--shadow) / 0.2);
 }
 
 .header-title {
-  @apply text-2xl font-bold text-gray-800;
+  @apply text-2xl font-bold text-fg;
 }
 
 .header-subtitle {
-  @apply text-sm text-gray-500 mt-1;
+  @apply text-muted mt-0.5 text-sm;
 }
 
+/* Tab Navigation - compact */
 .tab-navigation {
-  @apply flex gap-3 p-3 bg-gray-100 rounded-xl;
+  @apply flex gap-2 p-2 bg-card rounded-lg border border-border;
 }
 
 .tab-btn {
-  @apply flex items-center gap-2 px-6 py-3 rounded-lg;
-  @apply text-gray-600 font-medium transition-all duration-300;
+  @apply flex items-center gap-2 px-4 py-2 rounded-md text-sm;
+  @apply text-muted font-medium transition-all duration-300;
   @apply border-none bg-transparent cursor-pointer;
 }
 
 .tab-btn:hover {
-  @apply bg-white bg-opacity-50;
+  @apply bg-bg;
 }
 
 .tab-btn.active {
-  @apply bg-white text-blue-600 shadow-md;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  @apply bg-primary text-primary-foreground shadow-sm;
 }
 
 .tab-btn i {
-  @apply text-lg;
+  @apply text-base;
 }
 
+/* Tab Content */
 .tab-content {
-  @apply min-h-screen;
+  @apply min-h-0;
 }
 
+.tab-panel {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Placeholder Content */
+.placeholder-content,
+.coming-soon-section {
+  @apply flex flex-col items-center justify-center;
+  @apply py-20 text-center bg-card rounded-xl;
+  @apply border-2 border-dashed border-border;
+}
+
+.coming-soon-section {
+  @apply mt-8;
+}
+
+.placeholder-content h3,
+.coming-soon-section h3 {
+  @apply text-2xl font-bold text-fg mt-4 mb-2;
+}
+
+.placeholder-content p,
+.coming-soon-section p {
+  @apply text-muted;
+}
+
+/* Responsive - Mobile (เท่า Area Layout) */
 @media (max-width: 768px) {
   .finance-container {
     @apply p-4 gap-4;
+  }
+
+  .header-content {
+    @apply gap-2;
+  }
+
+  .header-icon {
+    @apply w-10 h-10 text-xl;
   }
 
   .header-title {
     @apply text-xl;
   }
 
+  .header-subtitle {
+    @apply text-xs;
+  }
+
   .tab-navigation {
-    @apply flex-col gap-2;
+    @apply p-2 gap-1;
   }
 
   .tab-btn {
-    @apply justify-center;
+    @apply px-3 py-2 text-sm flex-1 justify-center min-w-0;
+  }
+
+  .tab-btn span {
+    @apply truncate;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-title {
+    @apply text-lg;
+  }
+
+  .tab-navigation {
+    @apply flex-wrap;
+  }
+
+  .tab-btn {
+    @apply basis-[calc(50%-0.25rem)];
   }
 }

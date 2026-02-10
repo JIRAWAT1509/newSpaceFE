@@ -1,6 +1,7 @@
 export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
   en: {
     // --- Main Categories ---
+    bookmarks: 'Bookmarks',
     area_management: 'Area Management',
     area_allocation: 'Area Allocation',
     area_maintenance: 'Area Maintenance',
@@ -184,6 +185,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
   },
   th: {
     // --- Main Categories ---
+    bookmarks: 'บุ๊กมาร์ก',
     area_management: 'การจัดการพื้นที่',
     area_allocation: 'การจัดสรรพื้นที่',
     area_maintenance: 'การบำรุงรักษาพื้นที่',
