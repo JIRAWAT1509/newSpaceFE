@@ -1,30 +1,34 @@
+/* header.component.css - FIXED with increased specificity */
+
+/* Wrap all styles in app-header selector for higher specificity */
+
 /* Drop shadow for text */
-.drop-shadow-lg {
+app-header .drop-shadow-lg {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-.drop-shadow-md {
+app-header .drop-shadow-md {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 /* Smooth transitions */
-header {
+app-header header {
   transition: all 0.3s ease-in-out;
 }
 
 /* Hide scrollbar for navigation */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+app-header .scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
+app-header .scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* Responsive text truncation */
 @media (max-width: 640px) {
-  .truncate {
+  app-header .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -32,9 +36,9 @@ header {
 }
 
 /* Header nav - short, straight, centered in bar */
-.header-nav-item {
+app-header .header-nav-item {
   align-items: center;
-  color: rgb(var(--primary-foreground));
+  color: rgb(var(--primary-foreground)) !important;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -54,14 +58,14 @@ header {
   overflow: visible;
 }
 
-.header-nav-item:hover {
+app-header .header-nav-item:hover {
   transform: translateY(-1px);
   opacity: 1;
   background: rgba(255, 255, 255, 0.08);
 }
 
-.header-nav-item-active {
-  background: rgba(255, 255, 255, 0.18);
+app-header .header-nav-item-active {
+  background: rgba(255, 255, 255, 0.18) !important;
   border-radius: 12px;
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.4),
@@ -69,11 +73,11 @@ header {
   filter: brightness(1.06);
 }
 
-.header-nav-item:not(.header-nav-item-active) {
+app-header .header-nav-item:not(.header-nav-item-active) {
   opacity: 0.88;
 }
 
-.header-nav-icon {
+app-header .header-nav-icon {
   align-items: center;
   display: inline-flex;
   font-size: 21px;
@@ -86,7 +90,7 @@ header {
   flex-shrink: 0;
 }
 
-.header-nav-label {
+app-header .header-nav-label {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -95,11 +99,10 @@ header {
   padding-bottom: 2px;
   max-width: 100%;
   overflow: visible;
-  /* ไม่ตัดคำยาว เช่น Collection & Finance */
   min-height: 1.4em;
 }
 
-.header-nav-underline {
+app-header .header-nav-underline {
   bottom: 2px;
   height: 2px;
   left: 50%;
@@ -112,7 +115,7 @@ header {
 /* ============================================
    Mobile: Bottom navigation bar
    ============================================ */
-.bottom-nav {
+app-header .bottom-nav {
   min-height: calc(72px + env(safe-area-inset-bottom, 0px));
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
@@ -120,7 +123,7 @@ header {
   -webkit-backdrop-filter: blur(12px);
 }
 
-.bottom-nav-item {
+app-header .bottom-nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -129,8 +132,7 @@ header {
   padding: 8px 6px 10px;
   min-width: 0;
   border-radius: 14px;
-  /* สีน้ำเงินตามภาพ - ไม่ใช้สีดำ */
-  color: rgb(var(--primary));
+  color: rgb(var(--primary)) !important;
   opacity: 0.7;
   cursor: pointer;
   transition: opacity 0.2s ease, color 0.2s ease, background 0.2s ease, transform 0.15s ease;
@@ -139,23 +141,23 @@ header {
   position: relative;
 }
 
-.bottom-nav-item:hover {
+app-header .bottom-nav-item:hover {
   opacity: 1;
   background: rgba(var(--primary), 0.08);
 }
 
-.bottom-nav-item:active {
+app-header .bottom-nav-item:active {
   transform: scale(0.96);
 }
 
-.bottom-nav-item-active {
-  opacity: 1;
-  color: rgb(var(--primary));
-  background: rgba(var(--primary), 0.12);
+app-header .bottom-nav-item-active {
+  opacity: 1 !important;
+  color: rgb(var(--primary)) !important;
+  background: rgba(var(--primary), 0.12) !important;
   font-weight: 600;
 }
 
-.bottom-nav-item-active::before {
+app-header .bottom-nav-item-active::before {
   content: '';
   position: absolute;
   top: 0;
@@ -164,20 +166,19 @@ header {
   width: 24px;
   height: 3px;
   border-radius: 0 0 4px 4px;
-  /* เส้นใต้ active - สีน้ำเงินเข้มตามภาพ */
   background: rgb(var(--primary));
 }
 
-.bottom-nav-item-active .bottom-nav-label {
+app-header .bottom-nav-item-active .bottom-nav-label {
   font-weight: 600;
-  color: rgb(var(--primary));
+  color: rgb(var(--primary)) !important;
 }
 
-.bottom-nav-item-active:active {
+app-header .bottom-nav-item-active:active {
   transform: scale(0.96);
 }
 
-.bottom-nav-icon-wrap {
+app-header .bottom-nav-icon-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -186,14 +187,13 @@ header {
   flex-shrink: 0;
 }
 
-/* ไอคอนสีน้ำเงินตามภาพ - บังคับใช้ currentColor จาก parent */
-.bottom-nav-icon,
-.bottom-nav-item i {
+app-header .bottom-nav-icon,
+app-header .bottom-nav-item i {
   color: inherit !important;
   -webkit-text-fill-color: inherit;
 }
 
-.bottom-nav-icon {
+app-header .bottom-nav-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -203,7 +203,7 @@ header {
   flex-shrink: 0;
 }
 
-.bottom-nav-label {
+app-header .bottom-nav-label {
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -211,7 +211,7 @@ header {
   text-align: center;
   width: 100%;
   max-width: 68px;
-  color: inherit;
+  color: inherit !important;
   white-space: normal;
   word-break: break-word;
   overflow: visible;
@@ -220,27 +220,28 @@ header {
 }
 
 /* ============================================
-   Universal Search – Simple Bar (no dropdown)
+   Universal Search — Simple Bar (no dropdown)
    ============================================ */
 
-.usearch-root {
+app-header .usearch-root {
   width: 240px;
+  position: relative;
 }
 
 @media (min-width: 1024px) {
-  .usearch-root {
+  app-header .usearch-root {
     width: 300px;
   }
 }
 
 @media (min-width: 1280px) {
-  .usearch-root {
+  app-header .usearch-root {
     width: 340px;
   }
 }
 
 /* -- Search Bar -- */
-.usearch-bar {
+app-header .usearch-bar {
   position: relative;
   display: flex;
   align-items: center;
@@ -253,19 +254,19 @@ header {
   overflow: visible;
 }
 
-.usearch-bar:hover {
+app-header .usearch-bar:hover {
   background: rgba(255, 255, 255, 0.25) !important;
   border-color: rgba(255, 255, 255, 0.38) !important;
 }
 
-.usearch-bar:focus-within {
+app-header .usearch-bar:focus-within {
   background: rgba(255, 255, 255, 0.28) !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
-/* Search icon – ensure it's visible */
-.usearch-bar__icon {
+/* Search icon — ensure it's visible */
+app-header .usearch-bar__icon {
   position: absolute;
   left: 12px;
   top: 50%;
@@ -280,15 +281,15 @@ header {
   justify-content: center;
 }
 
-.usearch-bar:focus-within .usearch-bar__icon {
+app-header .usearch-bar:focus-within .usearch-bar__icon {
   color: #ffffff !important;
 }
 
 /* Override global primeng-overrides that force white bg on all inputs */
-.usearch-bar__input,
-.usearch-bar input,
-.usearch-bar input[type="text"],
-.usearch-bar input.usearch-bar__input {
+app-header .usearch-bar__input,
+app-header .usearch-bar input,
+app-header .usearch-bar input[type="text"],
+app-header .usearch-bar input.usearch-bar__input {
   width: 100% !important;
   height: 100% !important;
   padding: 0 36px 0 38px !important;
@@ -304,9 +305,9 @@ header {
   border-radius: 10px !important;
 }
 
-.usearch-bar__input:focus,
-.usearch-bar input:focus,
-.usearch-bar input[type="text"]:focus {
+app-header .usearch-bar__input:focus,
+app-header .usearch-bar input:focus,
+app-header .usearch-bar input[type="text"]:focus {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
@@ -314,19 +315,19 @@ header {
   outline: none !important;
 }
 
-.usearch-bar__input::placeholder,
-.usearch-bar input::placeholder {
+app-header .usearch-bar__input::placeholder,
+app-header .usearch-bar input::placeholder {
   color: rgba(255, 255, 255, 0.55) !important;
   font-weight: 400 !important;
 }
 
-.usearch-bar:focus-within .usearch-bar__input::placeholder,
-.usearch-bar:focus-within input::placeholder {
+app-header .usearch-bar:focus-within .usearch-bar__input::placeholder,
+app-header .usearch-bar:focus-within input::placeholder {
   color: rgba(255, 255, 255, 0.4) !important;
 }
 
 /* Clear button */
-.usearch-bar__clear {
+app-header .usearch-bar__clear {
   position: absolute;
   right: 6px;
   top: 50%;
@@ -348,13 +349,13 @@ header {
   z-index: 2;
 }
 
-.usearch-bar__clear:hover {
+app-header .usearch-bar__clear:hover {
   color: #fff !important;
   background: rgba(255, 255, 255, 0.28) !important;
 }
 
 /* ==================== SEARCH DROPDOWN ==================== */
-.search-dropdown {
+app-header .search-dropdown {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
@@ -379,7 +380,7 @@ header {
   }
 }
 
-.search-item {
+app-header .search-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -389,15 +390,15 @@ header {
   border-bottom: 1px solid #f3f4f6;
 }
 
-.search-item:last-child {
+app-header .search-item:last-child {
   border-bottom: none;
 }
 
-.search-item:hover {
+app-header .search-item:hover {
   background: #f9fafb;
 }
 
-.search-item-icon {
+app-header .search-item-icon {
   width: 32px;
   height: 32px;
   display: flex;
@@ -409,19 +410,25 @@ header {
   flex-shrink: 0;
 }
 
-.search-item-content {
+app-header .search-item-content {
   flex: 1;
   min-width: 0;
 }
 
-.search-item-title {
+app-header .search-item-title {
   font-size: 0.875rem;
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 2px;
 }
 
-.search-item-category {
+app-header .search-item-category {
   font-size: 0.75rem;
   color: #6b7280;
+}
+
+/* Language and Profile dropdowns */
+app-header .language-dropdown,
+app-header .profile-dropdown {
+  position: relative;
 }
