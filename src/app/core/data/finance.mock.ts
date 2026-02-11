@@ -49,6 +49,16 @@ export const MOCK_DEBTS: Debt[] = [
     dueDate: '2024-11-30',
     overdueDays: 35,
     status: 'warning'
+  },
+  {
+    id: 'D005',
+    description: 'ค่าเช่าพื้นที่ - เดือน กุมภา.',
+    customerName: 'เต๋า',
+    contractFile: 'CONTRACT-2025-023.pdf',
+    amount: 1000,
+    dueDate: '2025-11-30',
+    overdueDays: 1,
+    status: 'warning'
   }
 ];
 

@@ -66,7 +66,7 @@ export interface CreditNote {
 
 export const DEBT_STATUS_CONFIG = {
   new: {
-    label: 'เพิ่งเกิดขึ้น',
+    label: 'New',
     icon: 'pi-info-circle',
     color: 'text-green-600',
     description: 'หนี้ที่เกิดขึ้นใหม่ ยังไม่เกินกำหนดชำระมากนัก'
