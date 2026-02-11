@@ -53,6 +53,17 @@ export interface Receipt {
   status: 'open' | 'cancel';
 }
 
+export interface CreditNote {
+  id: string;
+  cnNumber: string;
+  refInvoiceNumber: string;
+  customerName: string;
+  amount: number;
+  date: string;
+  reason: string;
+  status: 'open' | 'cancel';
+}
+
 export const DEBT_STATUS_CONFIG = {
   new: {
     label: 'เพิ่งเกิดขึ้น',

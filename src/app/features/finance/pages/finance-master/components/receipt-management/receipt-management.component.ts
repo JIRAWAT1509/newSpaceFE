@@ -1,15 +1,16 @@
 // receipt-management.component.ts
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Receipt, Invoice } from '@core/models/finance.model';
-import { MOCK_RECEIPTS, MOCK_RECEIPTS_WAITING } from '@core/data/finance.mock';
+import { Receipt, Invoice, CreditNote } from '@core/models/finance.model';
+import { MOCK_RECEIPTS, MOCK_RECEIPTS_WAITING, MOCK_RECEIPT_CREDIT_NOTES } from '@core/data/finance.mock';
 import { FinanceDocumentModalComponent } from '@shared/components/finance-document-modal/finance-document-modal.component';
 import { DocumentType } from '@core/models/finance-document.model';
-import { DebtDetailModalComponent } from '@shared/components/debt-detail-modal/debt-detail-modal.component';
+import { ReceiptDetailModalComponent } from '@shared/components/receipt-detail-modal/receipt-detail-modal.component';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
 
 type ReceiptSortField = 'contractNumber' | 'customerName' | 'collectionItem' | 'amount' | 'startDate' | 'status';
 type SortDirection = 'asc' | 'desc' | null;
+type HistoryTab = 'receipt' | 'credit';
 
 @Component({
   selector: 'app-receipt-management',
@@ -17,7 +18,7 @@ type SortDirection = 'asc' | 'desc' | null;
   imports: [
     CommonModule,
     FinanceDocumentModalComponent,
-    DebtDetailModalComponent,
+    ReceiptDetailModalComponent,
     ConfirmationModalComponent
   ],
   templateUrl: './receipt-management.component.html',
@@ -26,12 +27,12 @@ type SortDirection = 'asc' | 'desc' | null;
 export class ReceiptManagementComponent implements OnInit {
   // View States
   showHistory = signal<boolean>(false);
-  activeHistoryTab = signal<'receipt' | 'credit'>('receipt'); // receipt history or credit note history
+  activeHistoryTab = signal<HistoryTab>('receipt');
 
   // Data
   receipts = signal<Receipt[]>([]); // Invoices waiting to become receipts
   issuedReceipts = signal<Receipt[]>([]); // Actual receipts
-  issuedCreditNotes = signal<Receipt[]>([]); // Credit notes for receipts
+  issuedCreditNotes = signal<CreditNote[]>([]); // Credit notes for receipts
   selectedReceipts = signal<Set<string>>(new Set());
   showBulkActions = signal<boolean>(false);
 
@@ -46,6 +47,10 @@ export class ReceiptManagementComponent implements OnInit {
   showDetailModal = signal<boolean>(false);
   showConfirmModal = signal<boolean>(false);
   pendingCancelReceipt = signal<Receipt | null>(null);
+
+  // Edit Modal
+  showEditModal = signal<boolean>(false);
+  editingReceipt = signal<Receipt | CreditNote | null>(null);
 
   // Kebab Menu
   showRowMenu = signal<string | null>(null);
@@ -65,8 +70,8 @@ export class ReceiptManagementComponent implements OnInit {
     // Issued receipts
     this.issuedReceipts.set(MOCK_RECEIPTS.filter(rec => rec.status === 'open'));
 
-    // Credit notes (mock data)
-    this.issuedCreditNotes.set([]);
+    // Credit notes for receipts
+    this.issuedCreditNotes.set(MOCK_RECEIPT_CREDIT_NOTES);
   }
 
   // ===================== VIEW TOGGLE =====================
@@ -77,32 +82,42 @@ export class ReceiptManagementComponent implements OnInit {
     this.searchQuery.set('');
   }
 
-  setHistoryTab(tab: 'receipt' | 'credit'): void {
+  setHistoryTab(tab: HistoryTab): void {
     this.activeHistoryTab.set(tab);
     this.selectedReceipts.set(new Set());
     this.showBulkActions.set(false);
   }
 
-  getCurrentViewReceipts(): Receipt[] {
+  getCurrentViewReceipts(): any[] {
+    let data: any[];
+
     if (!this.showHistory()) {
-      return this.getFilteredReceipts(this.receipts());
+      data = this.receipts();
     } else {
       if (this.activeHistoryTab() === 'receipt') {
-        return this.getFilteredReceipts(this.issuedReceipts());
+        data = this.issuedReceipts();
       } else {
-        return this.getFilteredReceipts(this.issuedCreditNotes());
+        // Map Credit Note to match table properties
+        data = this.issuedCreditNotes().map(cn => ({
+          id: cn.id,
+          contractNumber: cn.cnNumber,
+          customerName: cn.customerName,
+          collectionItem: `อ้างอิง: ${cn.refInvoiceNumber}`,
+          amount: cn.amount,
+          startDate: cn.date,
+          status: cn.status,
+          originalData: cn
+        }));
       }
     }
-  }
 
-  getFilteredReceipts(receipts: Receipt[]): Receipt[] {
     const query = this.searchQuery().toLowerCase();
-    if (!query) return receipts;
+    if (!query) return data;
 
-    return receipts.filter(rec =>
-      rec.contractNumber.toLowerCase().includes(query) ||
-      rec.customerName.toLowerCase().includes(query) ||
-      rec.collectionItem.toLowerCase().includes(query)
+    return data.filter(item =>
+      (item.contractNumber || '').toLowerCase().includes(query) ||
+      (item.customerName || '').toLowerCase().includes(query) ||
+      (item.collectionItem || '').toLowerCase().includes(query)
     );
   }
 
@@ -135,18 +150,57 @@ export class ReceiptManagementComponent implements OnInit {
     const direction = this.sortDirection();
     if (!field || !direction) return;
 
-    const sortData = (data: Receipt[]) => {
+    const sortData = <T extends Receipt | CreditNote>(data: T[]): T[] => {
       return [...data].sort((a, b) => {
-        let aVal: any = a[field];
-        let bVal: any = b[field];
+        let aVal: any;
+        let bVal: any;
+
+        // Map CreditNote properties to match sorting fields
+        if ('cnNumber' in a) {
+          const aCN = a as CreditNote;
+          const bCN = b as CreditNote;
+
+          switch (field) {
+            case 'contractNumber':
+              aVal = aCN.cnNumber;
+              bVal = bCN.cnNumber;
+              break;
+            case 'collectionItem':
+              aVal = aCN.refInvoiceNumber;
+              bVal = bCN.refInvoiceNumber;
+              break;
+            case 'startDate':
+              aVal = new Date(aCN.date).getTime();
+              bVal = new Date(bCN.date).getTime();
+              break;
+            case 'amount':
+              aVal = Number(aCN.amount);
+              bVal = Number(bCN.amount);
+              break;
+            case 'customerName':
+              aVal = aCN.customerName;
+              bVal = bCN.customerName;
+              break;
+            case 'status':
+              aVal = aCN.status;
+              bVal = bCN.status;
+              break;
+            default:
+              aVal = '';
+              bVal = '';
+          }
+        } else {
+          aVal = (a as any)[field];
+          bVal = (b as any)[field];
+        }
 
         if (field === 'amount') {
           aVal = Number(aVal);
           bVal = Number(bVal);
-        } else if (field === 'startDate') {
+        } else if (field === 'startDate' && typeof aVal === 'string') {
           aVal = new Date(aVal).getTime();
           bVal = new Date(bVal).getTime();
-        } else {
+        } else if (typeof aVal === 'string') {
           aVal = String(aVal).toLowerCase();
           bVal = String(bVal).toLowerCase();
         }
@@ -265,7 +319,7 @@ export class ReceiptManagementComponent implements OnInit {
 
   // ===================== ACTIONS =====================
   onPreview(receipt: Receipt): void {
-    this.currentReceipt.set(this.convertReceiptToDebt(receipt));
+    this.currentReceipt.set(receipt);
     this.showDetailModal.set(true);
   }
 
@@ -276,6 +330,142 @@ export class ReceiptManagementComponent implements OnInit {
         this.currentReceipt.set(null);
       }
     }, 300);
+  }
+
+  onEdit(receipt: Receipt): void {
+    // Check if this is actually a mapped credit note (has originalData)
+    if ('originalData' in receipt && receipt.originalData) {
+      this.editingReceipt.set({ ...(receipt.originalData as CreditNote) });
+    } else {
+      this.editingReceipt.set({ ...receipt });
+    }
+    this.showEditModal.set(true);
+  }
+
+  closeEditModal(): void {
+    this.showEditModal.set(false);
+    this.editingReceipt.set(null);
+  }
+
+  onSaveEdit(): void {
+    const edited = this.editingReceipt();
+    if (!edited) return;
+
+    if (!this.showHistory()) {
+      // Editing waiting receipts
+      this.receipts.update((recs) => recs.map((rec) => (rec.id === edited.id ? edited as Receipt : rec)));
+    } else if (this.activeHistoryTab() === 'receipt') {
+      // Editing issued receipts
+      this.issuedReceipts.update((recs) => recs.map((rec) => (rec.id === edited.id ? edited as Receipt : rec)));
+    } else {
+      // Editing credit notes - type guard to check if it's a CreditNote
+      if ('cnNumber' in edited) {
+        this.issuedCreditNotes.update((notes) =>
+          notes.map((note) => (note.id === edited.id ? edited as CreditNote : note))
+        );
+      }
+    }
+    alert('บันทึกการแก้ไขสำเร็จ');
+    this.closeEditModal();
+  }
+
+  updateEditField(field: string, value: any): void {
+    this.editingReceipt.update((rec) => {
+      if (!rec) return null;
+      let finalValue = value;
+      if (field === 'amount') {
+        finalValue = parseFloat(value) || 0;
+      }
+      return { ...rec, [field]: finalValue };
+    });
+  }
+
+  // ✅ FIX #5: Helper methods for edit modal
+  getEditContractNumber(): string {
+    const editing = this.editingReceipt();
+    if (!editing) return '';
+    if ('cnNumber' in editing) {
+      return editing.cnNumber;
+    }
+    return editing.contractNumber;
+  }
+
+  getEditCustomerName(): string {
+    const editing = this.editingReceipt();
+    return editing?.customerName || '';
+  }
+
+  getEditCollectionItem(): string {
+    const editing = this.editingReceipt();
+    if (!editing) return '';
+    if ('refInvoiceNumber' in editing) {
+      return `อ้างอิง: ${editing.refInvoiceNumber}`;
+    }
+    return editing.collectionItem;
+  }
+
+  getEditAmount(): number {
+    const editing = this.editingReceipt();
+    return editing?.amount || 0;
+  }
+
+  getEditStartDate(): string {
+    const editing = this.editingReceipt();
+    if (!editing) return '';
+    if ('date' in editing) {
+      return editing.date;
+    }
+    return editing.startDate;
+  }
+
+  setEditContractNumber(value: string): void {
+    this.editingReceipt.update((rec) => {
+      if (!rec) return null;
+      if ('cnNumber' in rec) {
+        return { ...rec, cnNumber: value };
+      }
+      return { ...rec, contractNumber: value };
+    });
+  }
+
+  setEditCustomerName(value: string): void {
+    this.editingReceipt.update((rec) => {
+      if (!rec) return null;
+      return { ...rec, customerName: value };
+    });
+  }
+
+  setEditCollectionItem(value: string): void {
+    this.editingReceipt.update((rec) => {
+      if (!rec) return null;
+      if ('refInvoiceNumber' in rec) {
+        return { ...rec, refInvoiceNumber: value.replace('อ้างอิง: ', '') };
+      }
+      return { ...rec, collectionItem: value };
+    });
+  }
+
+  setEditAmount(value: number): void {
+    this.editingReceipt.update((rec) => {
+      if (!rec) return null;
+      return { ...rec, amount: value };
+    });
+  }
+
+  setEditStartDate(value: string): void {
+    this.editingReceipt.update((rec) => {
+      if (!rec) return null;
+      if ('date' in rec) {
+        return { ...rec, date: value };
+      }
+      return { ...rec, startDate: value };
+    });
+  }
+
+  // ✅ FIX #2: Make cancel button work and move to history
+  onCancel(receipt: Receipt): void {
+    this.pendingCancelReceipt.set(receipt);
+    this.showConfirmModal.set(true);
   }
 
   onPrint(receipt: Receipt): void {
@@ -291,12 +481,22 @@ export class ReceiptManagementComponent implements OnInit {
     this.showConfirmModal.set(true);
   }
 
+  // ✅ FIX #5: When canceling receipt, move to history
   onConfirmCancel(): void {
     const receipt = this.pendingCancelReceipt();
     if (receipt) {
-      this.issuedReceipts.update(recs =>
-        recs.map(r => r.id === receipt.id ? { ...r, status: 'cancel' as const } : r)
-      );
+      const canceledReceipt = { ...receipt, status: 'cancel' as const };
+
+      if (!this.showHistory()) {
+        // Remove from waiting list and add to issued receipts
+        this.receipts.update((recs) => recs.filter(rec => rec.id !== receipt.id));
+        this.issuedReceipts.update((recs) => [...recs, canceledReceipt]);
+      } else if (this.activeHistoryTab() === 'receipt') {
+        // Update in issued receipts
+        this.issuedReceipts.update((recs) =>
+          recs.map((rec) => (rec.id === receipt.id ? canceledReceipt : rec))
+        );
+      }
       alert(`ยกเลิกใบเสร็จ ${receipt.contractNumber} สำเร็จ`);
     }
     this.showConfirmModal.set(false);
@@ -316,6 +516,7 @@ export class ReceiptManagementComponent implements OnInit {
     (window as any).__pendingReceiptData = { originalReceipt: receipt };
   }
 
+  // ✅ FIX #4: Use ออกใบเสร็จ modal and move to history
   onDocumentSubmit(formData: any): void {
     console.log('Document submitted:', formData);
     const pendingData = (window as any).__pendingReceiptData || {};
@@ -323,16 +524,23 @@ export class ReceiptManagementComponent implements OnInit {
 
     if (receipt && formData.documentType === 'receipt') {
       // Move from waiting list to issued receipts
+      const issuedReceipt = { ...receipt, status: 'open' as const };
       this.receipts.update(recs => recs.filter(r => r.id !== receipt.id));
-      this.issuedReceipts.update(recs => [...recs, receipt]);
+      this.issuedReceipts.update(recs => [...recs, issuedReceipt]);
       alert('ออกใบเสร็จสำเร็จ');
     } else if (receipt && formData.documentType === 'receipt_credit') {
       // Add to credit notes
-      this.issuedCreditNotes.update(notes => [...notes, {
-        ...receipt,
-        id: `credit-${Date.now()}`,
-        amount: -receipt.amount
-      }]);
+      const creditNote: CreditNote = {
+        id: `RCN-${Date.now()}`,
+        cnNumber: `RCN-2025-${String(this.issuedCreditNotes().length + 1).padStart(3, '0')}`,
+        refInvoiceNumber: receipt.contractNumber,
+        customerName: receipt.customerName,
+        amount: Math.abs(formData.amount || receipt.amount),
+        date: new Date().toISOString().split('T')[0],
+        reason: formData.reason || 'ออกใบลดหนี้',
+        status: 'open'
+      };
+      this.issuedCreditNotes.update(notes => [...notes, creditNote]);
       alert('ออกใบลดหนี้ใบเสร็จสำเร็จ');
     }
 
@@ -368,8 +576,9 @@ export class ReceiptManagementComponent implements OnInit {
     const selectedRecs = this.receipts().filter(rec => selectedIds.includes(rec.id));
 
     // Move to issued receipts
+    const issuedRecs = selectedRecs.map(rec => ({ ...rec, status: 'open' as const }));
     this.receipts.update(recs => recs.filter(rec => !selectedIds.includes(rec.id)));
-    this.issuedReceipts.update(recs => [...recs, ...selectedRecs]);
+    this.issuedReceipts.update(recs => [...recs, ...issuedRecs]);
 
     alert(`ออกใบเสร็จ ${count} รายการสำเร็จ`);
     this.selectedReceipts.set(new Set());

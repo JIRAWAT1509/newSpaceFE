@@ -1,4 +1,4 @@
-/* invoice-detail-modal.component.css */
+/* receipt-detail-modal.component.css */
 
 .modal-overlay {
   position: fixed;
@@ -139,7 +139,7 @@
 }
 
 .contract-number,
-.invoice-number {
+.receipt-number {
   color: #667eea !important;
   font-family: 'Courier New', monospace;
 }

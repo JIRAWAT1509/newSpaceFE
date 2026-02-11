@@ -1,14 +1,13 @@
 // invoice-management.component.ts
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Invoice } from '@core/models/finance.model';
-import { MOCK_INVOICES } from '@core/data/finance.mock';
+import { Invoice, CreditNote } from '@core/models/finance.model';
+import { MOCK_INVOICES, MOCK_CREDIT_NOTES } from '@core/data/finance.mock';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
 import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 import { FinanceDocumentModalComponent } from '@shared/components/finance-document-modal/finance-document-modal.component';
 import { DocumentType } from '@core/models/finance-document.model';
 import { InvoiceDetailModalComponent } from '@shared/components/invoice-detail-modal/invoice-detail-modal.component';
-
 
 type SortField = 'contractNumber' | 'customerName' | 'collectionItem' | 'amount' | 'startDate' | 'status';
 type SortDirection = 'asc' | 'desc' | null;
@@ -33,7 +32,7 @@ export class InvoiceManagementComponent implements OnInit {
   activeHistoryTab = signal<HistoryTab>('invoice');
   invoices = signal<Invoice[]>([]);
   issuedInvoices = signal<Invoice[]>([]);
-  issuedCreditNotes = signal<Invoice[]>([]);
+  issuedCreditNotes = signal<CreditNote[]>([]);
   selectedInvoices = signal<Set<string>>(new Set());
   showBulkActions = signal<boolean>(false);
 
@@ -62,7 +61,7 @@ export class InvoiceManagementComponent implements OnInit {
 
   // Edit Modal
   showEditModal = signal<boolean>(false);
-  editingInvoice = signal<Invoice | null>(null);
+  editingInvoice = signal<Invoice | CreditNote | null>(null);
 
   // Kebab Menu
   showRowMenu = signal<string | null>(null);
@@ -85,7 +84,7 @@ export class InvoiceManagementComponent implements OnInit {
   loadInvoices(): void {
     this.invoices.set(MOCK_INVOICES.filter((inv) => inv.status === 'ready'));
     this.issuedInvoices.set(MOCK_INVOICES.filter((inv) => inv.status === 'open'));
-    this.issuedCreditNotes.set([]); // Mock credit notes
+    this.issuedCreditNotes.set(MOCK_CREDIT_NOTES);
   }
 
   // ===================== VIEW TOGGLE =====================
@@ -102,25 +101,35 @@ export class InvoiceManagementComponent implements OnInit {
     this.showBulkActions.set(false);
   }
 
-  getCurrentViewInvoices(): Invoice[] {
-    let data: Invoice[];
+  getCurrentViewInvoices(): any[] {
+    let data: any[];
 
     if (!this.showHistory()) {
       data = this.invoices();
     } else {
-      data = this.activeHistoryTab() === 'invoice'
-        ? this.issuedInvoices()
-        : this.issuedCreditNotes();
+      if (this.activeHistoryTab() === 'invoice') {
+        data = this.issuedInvoices();
+      } else {
+        data = this.issuedCreditNotes().map(cn => ({
+          id: cn.id,
+          contractNumber: cn.cnNumber,
+          customerName: cn.customerName,
+          collectionItem: `อ้างอิง: ${cn.refInvoiceNumber}`,
+          amount: cn.amount,
+          startDate: cn.date,
+          status: cn.status,
+          originalData: cn
+        }));
+      }
     }
 
-    // Apply search filter
     const query = this.searchQuery().toLowerCase();
     if (!query) return data;
 
-    return data.filter(inv =>
-      inv.contractNumber.toLowerCase().includes(query) ||
-      inv.customerName.toLowerCase().includes(query) ||
-      inv.collectionItem.toLowerCase().includes(query)
+    return data.filter(item =>
+      (item.contractNumber || '').toLowerCase().includes(query) ||
+      (item.customerName || '').toLowerCase().includes(query) ||
+      (item.collectionItem || '').toLowerCase().includes(query)
     );
   }
 
@@ -153,18 +162,56 @@ export class InvoiceManagementComponent implements OnInit {
     const direction = this.sortDirection();
     if (!field || !direction) return;
 
-    const sortData = (data: Invoice[]) => {
+    const sortData = <T extends Invoice | CreditNote>(data: T[]): T[] => {
       return [...data].sort((a, b) => {
-        let aVal: any = a[field];
-        let bVal: any = b[field];
+        let aVal: any;
+        let bVal: any;
+
+        if ('cnNumber' in a) {
+          const aCN = a as CreditNote;
+          const bCN = b as CreditNote;
+
+          switch (field) {
+            case 'contractNumber':
+              aVal = aCN.cnNumber;
+              bVal = bCN.cnNumber;
+              break;
+            case 'collectionItem':
+              aVal = aCN.refInvoiceNumber;
+              bVal = bCN.refInvoiceNumber;
+              break;
+            case 'startDate':
+              aVal = new Date(aCN.date).getTime();
+              bVal = new Date(bCN.date).getTime();
+              break;
+            case 'amount':
+              aVal = Number(aCN.amount);
+              bVal = Number(bCN.amount);
+              break;
+            case 'customerName':
+              aVal = aCN.customerName;
+              bVal = bCN.customerName;
+              break;
+            case 'status':
+              aVal = aCN.status;
+              bVal = bCN.status;
+              break;
+            default:
+              aVal = '';
+              bVal = '';
+          }
+        } else {
+          aVal = (a as any)[field];
+          bVal = (b as any)[field];
+        }
 
         if (field === 'amount') {
           aVal = Number(aVal);
           bVal = Number(bVal);
-        } else if (field === 'startDate') {
+        } else if (field === 'startDate' && typeof aVal === 'string') {
           aVal = new Date(aVal).getTime();
           bVal = new Date(bVal).getTime();
-        } else {
+        } else if (typeof aVal === 'string') {
           aVal = String(aVal).toLowerCase();
           bVal = String(bVal).toLowerCase();
         }
@@ -300,6 +347,7 @@ export class InvoiceManagementComponent implements OnInit {
     (window as any).__pendingInvoiceActions = { originalInvoice: invoice };
   }
 
+  // ✅ FIX #3 & #4: Move to history when issuing invoice
   onDocumentSubmit(formData: any): void {
     console.log('Document submitted:', formData);
     const actions = (window as any).__pendingInvoiceActions || {};
@@ -318,7 +366,16 @@ export class InvoiceManagementComponent implements OnInit {
         this.showMessage('สำเร็จ', message);
       } else if (formData.documentType === 'credit_note') {
         // Add to credit notes
-        const creditNote = { ...invoice, id: `credit-${Date.now()}`, amount: -invoice.amount };
+        const creditNote: CreditNote = {
+          id: `CN-${Date.now()}`,
+          cnNumber: `CN-2025-${String(this.issuedCreditNotes().length + 1).padStart(3, '0')}`,
+          refInvoiceNumber: invoice.contractNumber,
+          customerName: invoice.customerName,
+          amount: Math.abs(formData.amount || invoice.amount),
+          date: new Date().toISOString().split('T')[0],
+          reason: formData.reason || 'ออกใบลดหนี้',
+          status: 'open'
+        };
         this.issuedCreditNotes.update((notes) => [...notes, creditNote]);
         this.showMessage('สำเร็จ', 'ออกใบลดหนี้สำเร็จ');
       }
@@ -336,6 +393,7 @@ export class InvoiceManagementComponent implements OnInit {
   }
 
   // ===================== CREATE MANUAL INVOICE =====================
+  // ✅ FIX #4: Use ออกใบแจ้งหนี้ modal for create button
   openCreateDrawer(): void {
     this.newInvoiceData.set({
       contractNumber: '',
@@ -345,7 +403,22 @@ export class InvoiceManagementComponent implements OnInit {
       startDate: new Date().toISOString().split('T')[0],
       status: 'ready',
     });
-    this.showCreateDrawer.set(true);
+
+    // Instead of opening drawer, open the document modal
+    const mockInvoice: Invoice = {
+      id: `temp-${Date.now()}`,
+      contractNumber: '',
+      customerName: '',
+      collectionItem: '',
+      amount: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      status: 'ready',
+    };
+
+    this.currentInvoice.set(this.convertInvoiceToDebt(mockInvoice));
+    this.selectedDocumentType.set('invoice');
+    this.showDocumentModal.set(true);
+    (window as any).__pendingInvoiceActions = { isNewInvoice: true };
   }
 
   closeCreateDrawer(): void {
@@ -361,10 +434,10 @@ export class InvoiceManagementComponent implements OnInit {
       collectionItem: data.collectionItem || 'N/A',
       amount: data.amount || 0,
       startDate: data.startDate || '',
-      status: 'ready',
+      status: 'open', // ✅ Go directly to history
     };
 
-    this.invoices.update((invs) => [...invs, newInvoice]);
+    this.issuedInvoices.update((invs) => [...invs, newInvoice]);
     this.showMessage('สำเร็จ', 'สร้างใบแจ้งหนี้สำเร็จ');
     this.closeCreateDrawer();
   }
@@ -375,7 +448,7 @@ export class InvoiceManagementComponent implements OnInit {
 
   // ===================== ROW ACTIONS =====================
   onPreview(invoice: Invoice): void {
-    this.currentInvoice.set(this.convertInvoiceToDebt(invoice));
+    this.currentInvoice.set(invoice);
     this.showDetailModal.set(true);
   }
 
@@ -388,8 +461,21 @@ export class InvoiceManagementComponent implements OnInit {
     }, 300);
   }
 
+  // ✅ FIX #3: Handle issue invoice from detail modal
+  onIssueInvoiceFromDetail(invoice: any): void {
+    // Find the original invoice from ready list
+    const originalInvoice = this.invoices().find(inv => inv.id === invoice.id);
+    if (originalInvoice) {
+      this.issueInvoiceForSingle(originalInvoice);
+    }
+  }
+
   onEdit(invoice: Invoice): void {
-    this.editingInvoice.set({ ...invoice });
+    if ('originalData' in invoice && invoice.originalData) {
+      this.editingInvoice.set({ ...(invoice.originalData as CreditNote) });
+    } else {
+      this.editingInvoice.set({ ...invoice });
+    }
     this.showEditModal.set(true);
   }
 
@@ -400,16 +486,20 @@ export class InvoiceManagementComponent implements OnInit {
 
   onSaveEdit(): void {
     const edited = this.editingInvoice();
-    if (edited) {
-      if (!this.showHistory()) {
-        this.invoices.update((invs) => invs.map((inv) => (inv.id === edited.id ? edited : inv)));
-      } else if (this.activeHistoryTab() === 'invoice') {
-        this.issuedInvoices.update((invs) => invs.map((inv) => (inv.id === edited.id ? edited : inv)));
-      } else {
-        this.issuedCreditNotes.update((notes) => notes.map((note) => (note.id === edited.id ? edited : note)));
+    if (!edited) return;
+
+    if (!this.showHistory()) {
+      this.invoices.update((invs) => invs.map((inv) => (inv.id === edited.id ? edited as Invoice : inv)));
+    } else if (this.activeHistoryTab() === 'invoice') {
+      this.issuedInvoices.update((invs) => invs.map((inv) => (inv.id === edited.id ? edited as Invoice : inv)));
+    } else {
+      if ('cnNumber' in edited) {
+        this.issuedCreditNotes.update((notes) =>
+          notes.map((note) => (note.id === edited.id ? edited as CreditNote : note))
+        );
       }
-      this.showMessage('สำเร็จ', 'บันทึกการแก้ไขสำเร็จ');
     }
+    this.showMessage('สำเร็จ', 'บันทึกการแก้ไขสำเร็จ');
     this.closeEditModal();
   }
 
@@ -424,6 +514,88 @@ export class InvoiceManagementComponent implements OnInit {
     });
   }
 
+  getEditContractNumber(): string {
+    const editing = this.editingInvoice();
+    if (!editing) return '';
+    if ('cnNumber' in editing) {
+      return editing.cnNumber;
+    }
+    return editing.contractNumber;
+  }
+
+  getEditCustomerName(): string {
+    const editing = this.editingInvoice();
+    return editing?.customerName || '';
+  }
+
+  getEditCollectionItem(): string {
+    const editing = this.editingInvoice();
+    if (!editing) return '';
+    if ('refInvoiceNumber' in editing) {
+      return `อ้างอิง: ${editing.refInvoiceNumber}`;
+    }
+    return editing.collectionItem;
+  }
+
+  getEditAmount(): number {
+    const editing = this.editingInvoice();
+    return editing?.amount || 0;
+  }
+
+  getEditStartDate(): string {
+    const editing = this.editingInvoice();
+    if (!editing) return '';
+    if ('date' in editing) {
+      return editing.date;
+    }
+    return editing.startDate;
+  }
+
+  setEditContractNumber(value: string): void {
+    this.editingInvoice.update((inv) => {
+      if (!inv) return null;
+      if ('cnNumber' in inv) {
+        return { ...inv, cnNumber: value };
+      }
+      return { ...inv, contractNumber: value };
+    });
+  }
+
+  setEditCustomerName(value: string): void {
+    this.editingInvoice.update((inv) => {
+      if (!inv) return null;
+      return { ...inv, customerName: value };
+    });
+  }
+
+  setEditCollectionItem(value: string): void {
+    this.editingInvoice.update((inv) => {
+      if (!inv) return null;
+      if ('refInvoiceNumber' in inv) {
+        return { ...inv, refInvoiceNumber: value.replace('อ้างอิง: ', '') };
+      }
+      return { ...inv, collectionItem: value };
+    });
+  }
+
+  setEditAmount(value: number): void {
+    this.editingInvoice.update((inv) => {
+      if (!inv) return null;
+      return { ...inv, amount: value };
+    });
+  }
+
+  setEditStartDate(value: string): void {
+    this.editingInvoice.update((inv) => {
+      if (!inv) return null;
+      if ('date' in inv) {
+        return { ...inv, date: value };
+      }
+      return { ...inv, startDate: value };
+    });
+  }
+
+  // ✅ FIX #3: Move to history when canceling
   onCancel(invoice: Invoice): void {
     this.pendingCancelInvoice.set(invoice);
     this.showConfirmModal.set(true);
@@ -432,13 +604,16 @@ export class InvoiceManagementComponent implements OnInit {
   onConfirmCancel(): void {
     const invoice = this.pendingCancelInvoice();
     if (invoice) {
+      const canceledInvoice = { ...invoice, status: 'cancel' as const };
+
       if (!this.showHistory()) {
-        this.invoices.update((invs) =>
-          invs.map((inv) => (inv.id === invoice.id ? { ...inv, status: 'cancel' as const } : inv))
-        );
+        // Remove from ready list and add to issued invoices
+        this.invoices.update((invs) => invs.filter(inv => inv.id !== invoice.id));
+        this.issuedInvoices.update((invs) => [...invs, canceledInvoice]);
       } else if (this.activeHistoryTab() === 'invoice') {
+        // Update in issued invoices
         this.issuedInvoices.update((invs) =>
-          invs.map((inv) => (inv.id === invoice.id ? { ...inv, status: 'cancel' as const } : inv))
+          invs.map((inv) => (inv.id === invoice.id ? canceledInvoice : inv))
         );
       }
       this.showMessage('ยกเลิกสำเร็จ', `ใบแจ้งหนี้ ${invoice.contractNumber} ถูกยกเลิกแล้ว`);

@@ -1,6 +1,6 @@
 // finance.mock.ts - Complete mock data
 
-import { FinanceStats, Debt, Invoice, Receipt } from './../models/finance.model';
+import { FinanceStats, Debt, Invoice, Receipt, CreditNote } from './../models/finance.model';
 
 export const MOCK_FINANCE_STATS: FinanceStats = {
   totalItems: 73,
@@ -202,6 +202,103 @@ export const MOCK_RECEIPTS: Receipt[] = [
     collectionItem: 'ค่าเช่าพื้นที่',
     amount: 42000,
     startDate: '2025-01-20',
+    status: 'cancel'
+  }
+];
+
+export const MOCK_CREDIT_NOTES: CreditNote[] = [
+  {
+    id: 'CN001',
+    cnNumber: 'CN-2025-001',
+    refInvoiceNumber: 'INV-2025-001',
+    customerName: 'คุณสมชาย ธุรกิจ',
+    amount: 5000,
+    date: '2025-01-15',
+    reason: 'ปรับปรุงราคาเนื่องจากพื้นที่ชำรุด',
+    status: 'open'
+  },
+  {
+    id: 'CN002',
+    cnNumber: 'CN-2025-002',
+    refInvoiceNumber: 'INV-2025-003',
+    customerName: 'บริษัท ABC จำกัด',
+    amount: 12500,
+    date: '2025-01-18',
+    reason: 'ยกเลิกบริการเสริมส่วนเกิน',
+    status: 'open'
+  },
+  {
+    id: 'CN003',
+    cnNumber: 'CN-2025-003',
+    refInvoiceNumber: 'INV-2025-007',
+    customerName: 'ห้างหุ้นส่วน GHI',
+    amount: 2000,
+    date: '2025-01-20',
+    reason: 'ส่วนลดพิเศษเนื่องจากชำระเงินล่วงหน้า',
+    status: 'open'
+  },
+  {
+    id: 'CN004',
+    cnNumber: 'CN-2025-004',
+    refInvoiceNumber: 'INV-2025-004',
+    customerName: 'ร้าน XYZ',
+    amount: 28000,
+    date: '2025-01-22',
+    reason: 'ออกใบลดหนี้ผิดฉบับ',
+    status: 'cancel'
+  }
+];
+
+// ✅ Mock data สำหรับใบลดหนี้ใบเสร็จ (Receipt Credit Notes)
+export const MOCK_RECEIPT_CREDIT_NOTES: CreditNote[] = [
+  {
+    id: 'RCN001',
+    cnNumber: 'RCN-2025-001',
+    refInvoiceNumber: 'RCP-2025-001',
+    customerName: 'คุณสมชาย ธุรกิจ',
+    amount: 3000,
+    date: '2025-01-16',
+    reason: 'ส่วนลดพิเศษจากการชำระเงินทันที',
+    status: 'open'
+  },
+  {
+    id: 'RCN002',
+    cnNumber: 'RCN-2025-002',
+    refInvoiceNumber: 'RCP-2025-002',
+    customerName: 'คุณสมหญิง ค้าขาย',
+    amount: 7500,
+    date: '2025-01-17',
+    reason: 'ปรับปรุงราคาตามข้อตกลง',
+    status: 'open'
+  },
+  {
+    id: 'RCN003',
+    cnNumber: 'RCN-2025-003',
+    refInvoiceNumber: 'RCP-2025-003',
+    customerName: 'บริษัท ABC จำกัด',
+    amount: 5000,
+    date: '2025-01-19',
+    reason: 'ยกเลิกค่าบริการบางรายการ',
+    status: 'open'
+  },
+  {
+    id: 'RCN004',
+    cnNumber: 'RCN-2025-004',
+    refInvoiceNumber: 'RCP-2025-004',
+    customerName: 'ร้าน XYZ',
+    amount: 2800,
+    date: '2025-01-21',
+    reason: 'คืนเงินค่าบริการที่ยกเลิก',
+    status: 'open'
+  },
+  {
+    id: 'RCN005',
+    cnNumber: 'RCN-2025-005',
+    refInvoiceNumber: 'RCP-2025-005',
+    customerName: 'คุณสมศักดิ์ ธุรกิจ',
+    amount: 10000,
+    date: '2025-01-23',
+    reason: 'ออกใบลดหนี้ผิดฉบับ',
     status: 'cancel'
   }
 ];

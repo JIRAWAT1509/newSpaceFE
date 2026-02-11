@@ -4,10 +4,18 @@
   <div class="content-header">
     <div>
       <h2 class="page-title">
-        {{ showHistory() ? 'ประวัติการออกใบแจ้งหนี้' : 'ตารางรายการสัญญาที่พร้อมเรียกเก็บในเดือนนี้' }}
+        {{
+          showHistory()
+            ? "ประวัติการออกใบแจ้งหนี้"
+            : "ตารางรายการสัญญาที่พร้อมเรียกเก็บในเดือนนี้"
+        }}
       </h2>
       <p class="page-subtitle">
-        {{ showHistory() ? 'จัดการและติดตามใบแจ้งหนี้ที่ออกไปแล้ว' : 'เลือกรายการเพื่อออกใบแจ้งหนี้' }}
+        {{
+          showHistory()
+            ? "จัดการและติดตามใบแจ้งหนี้ที่ออกไปแล้ว"
+            : "เลือกรายการเพื่อออกใบแจ้งหนี้"
+        }}
       </p>
     </div>
 
@@ -68,11 +76,25 @@
       <thead>
         <tr>
           <th class="checkbox-col">
-            <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)" />
+            <input
+              type="checkbox"
+              [checked]="isAllSelected()"
+              (change)="toggleSelectAll($event)"
+            />
           </th>
           <th (click)="sortBy('contractNumber')">
-            {{ showHistory() ? 'เลขที่ใบแจ้งหนี้' : 'เลขที่สัญญาเช่า' }}
-            <i class="pi sort-icon" [ngClass]="getSortIcon('contractNumber')"></i>
+            <!-- ✅ FIX #1: Change header based on tab -->
+            @if (showHistory() && activeHistoryTab() === 'credit') {
+              เลขที่ใบลดหนี้ใบแจ้งหนี้
+            } @else if (showHistory()) {
+              เลขที่ใบแจ้งหนี้
+            } @else {
+              เลขที่สัญญาเช่า
+            }
+            <i
+              class="pi sort-icon"
+              [ngClass]="getSortIcon('contractNumber')"
+            ></i>
           </th>
           <th (click)="sortBy('customerName')">
             ชื่อลูกค้า
@@ -80,7 +102,10 @@
           </th>
           <th (click)="sortBy('collectionItem')">
             รายการเรียกเก็บหลัก
-            <i class="pi sort-icon" [ngClass]="getSortIcon('collectionItem')"></i>
+            <i
+              class="pi sort-icon"
+              [ngClass]="getSortIcon('collectionItem')"
+            ></i>
           </th>
           <th (click)="sortBy('amount')">
             ยอดเงิน (รวมภาษี)
@@ -101,7 +126,11 @@
         @for (invoice of getCurrentViewInvoices(); track invoice.id) {
           <tr [class.selected]="isSelected(invoice.id)">
             <td class="checkbox-col">
-              <input type="checkbox" [checked]="isSelected(invoice.id)" (change)="toggleSelection(invoice.id)" />
+              <input
+                type="checkbox"
+                [checked]="isSelected(invoice.id)"
+                (change)="toggleSelection(invoice.id)"
+              />
             </td>
             <td>
               <div class="contract-number">{{ invoice.contractNumber }}</div>
@@ -120,37 +149,75 @@
             </td>
             <td>
               <span class="status-badge" [ngClass]="'status-' + invoice.status">
-                {{ invoice.status === 'ready' ? 'Ready' : invoice.status === 'open' ? 'Open' : 'Cancelled' }}
+                {{
+                  invoice.status === "ready"
+                    ? "Ready"
+                    : invoice.status === "open"
+                      ? "Open"
+                      : "Cancelled"
+                }}
               </span>
             </td>
             <td>
               <div class="row-actions">
                 @if (showHistory()) {
                   <!-- History View Actions -->
-                  <button class="action-btn" title="Preview" (click)="onPreview(invoice)">
+                  <button
+                    class="action-btn"
+                    title="Preview"
+                    (click)="onPreview(invoice)"
+                  >
                     <i class="pi pi-eye"></i>
                   </button>
-                  <button class="action-btn" title="พิมพ์" (click)="onPrint(invoice)">
+                  <button
+                    class="action-btn"
+                    title="พิมพ์"
+                    (click)="onPrint(invoice)"
+                  >
                     <i class="pi pi-print"></i>
                   </button>
-                  <button class="action-btn" title="ส่งอีเมล" (click)="onEmail(invoice)">
+                  <button
+                    class="action-btn"
+                    title="ส่งอีเมล"
+                    (click)="onEmail(invoice)"
+                  >
                     <i class="pi pi-send"></i>
                   </button>
-                  <button class="action-btn" title="เพิ่มเติม" (click)="toggleRowMenu(invoice.id, $event)">
+                  <button
+                    class="action-btn"
+                    title="เพิ่มเติม"
+                    (click)="toggleRowMenu(invoice.id, $event)"
+                  >
                     <i class="pi pi-ellipsis-v"></i>
                   </button>
                 } @else {
                   <!-- Main View Actions -->
-                  <button class="action-btn" title="Preview" (click)="onPreview(invoice)">
+                  <button
+                    class="action-btn"
+                    title="Preview"
+                    (click)="onPreview(invoice)"
+                  >
                     <i class="pi pi-eye"></i>
                   </button>
-                  <button class="action-btn" title="Edit" (click)="onEdit(invoice)">
+                  <button
+                    class="action-btn"
+                    title="Edit"
+                    (click)="onEdit(invoice)"
+                  >
                     <i class="pi pi-pencil"></i>
                   </button>
-                  <button class="action-btn danger" title="Cancel" (click)="onCancel(invoice)">
+                  <button
+                    class="action-btn danger"
+                    title="Cancel"
+                    (click)="onCancel(invoice)"
+                  >
                     <i class="pi pi-times"></i>
                   </button>
-                  <button class="action-btn" title="เพิ่มเติม" (click)="toggleRowMenu(invoice.id, $event)">
+                  <button
+                    class="action-btn"
+                    title="เพิ่มเติม"
+                    (click)="toggleRowMenu(invoice.id, $event)"
+                  >
                     <i class="pi pi-ellipsis-v"></i>
                   </button>
                 }
@@ -165,7 +232,13 @@
       <div class="empty-state">
         <i class="pi pi-inbox"></i>
         <h3>ไม่มีข้อมูล</h3>
-        <p>{{ showHistory() ? 'ยังไม่มีประวัติ' : 'ไม่พบรายการที่พร้อมออกใบแจ้งหนี้' }}</p>
+        <p>
+          {{
+            showHistory()
+              ? "ยังไม่มีประวัติ"
+              : "ไม่พบรายการที่พร้อมออกใบแจ้งหนี้"
+          }}
+        </p>
       </div>
     }
   </div>
@@ -174,10 +247,14 @@
   @if (showBulkActions()) {
     <div class="bottom-action-bar">
       <div class="selection-info">
-        <span class="selected-text">เลือกแล้ว <strong>{{ getSelectedCount() }}</strong> รายการ</span>
+        <span class="selected-text"
+          >เลือกแล้ว <strong>{{ getSelectedCount() }}</strong> รายการ</span
+        >
       </div>
       <div class="bulk-actions">
-        <button class="btn btn-secondary" (click)="toggleSelectAll($event)">ยกเลิกการเลือก</button>
+        <button class="btn btn-secondary" (click)="toggleSelectAll($event)">
+          ยกเลิกการเลือก
+        </button>
         @if (showHistory()) {
           <button class="btn btn-primary" (click)="onBulkEmail()">
             <i class="pi pi-send"></i>
@@ -200,37 +277,64 @@
 
 <!-- Kebab Menu -->
 @if (showRowMenu() && currentInvoice()) {
-  <div class="action-menu-portal" [style.top.px]="menuPosition().top" [style.left.px]="menuPosition().left">
+  <div
+    class="action-menu-portal"
+    [style.top.px]="menuPosition().top"
+    [style.left.px]="menuPosition().left"
+  >
     <div class="action-menu">
       @if (!showHistory()) {
         <!-- Ready Invoices Menu -->
-        <button class="menu-item" (click)="onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้')">
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้')"
+        >
           <i class="pi pi-file-check"></i>
           <span>ออกใบแจ้งหนี้</span>
         </button>
-        <button class="menu-item" (click)="onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้ + พิมพ์เอกสาร')">
+        <button
+          class="menu-item"
+          (click)="
+            onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้ + พิมพ์เอกสาร')
+          "
+        >
           <i class="pi pi-print"></i>
           <span>ออกใบแจ้งหนี้ + พิมพ์เอกสาร</span>
         </button>
-        <button class="menu-item" (click)="onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้ + ส่งอีเมล')">
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้ + ส่งอีเมล')"
+        >
           <i class="pi pi-send"></i>
           <span>ออกใบแจ้งหนี้ + ส่งอีเมล</span>
         </button>
-        <button class="menu-item danger" (click)="onMenuAction(currentInvoice()!, 'ลบสัญญา')">
+        <button
+          class="menu-item danger"
+          (click)="onMenuAction(currentInvoice()!, 'ลบสัญญา')"
+        >
           <i class="pi pi-trash"></i>
           <span>ลบสัญญา</span>
         </button>
       } @else {
         <!-- Issued Invoices Menu -->
-        <button class="menu-item" (click)="onMenuAction(currentInvoice()!, 'ออกใบลดหนี้')">
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'ออกใบลดหนี้')"
+        >
           <i class="pi pi-minus-circle"></i>
           <span>ออกใบลดหนี้</span>
         </button>
-        <button class="menu-item" (click)="onMenuAction(currentInvoice()!, 'พิมพ์เอกสาร (PDF)')">
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'พิมพ์เอกสาร (PDF)')"
+        >
           <i class="pi pi-file-pdf"></i>
           <span>พิมพ์เอกสาร (PDF)</span>
         </button>
-        <button class="menu-item" (click)="onMenuAction(currentInvoice()!, 'ส่งทางอีเมล')">
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'ส่งทางอีเมล')"
+        >
           <i class="pi pi-envelope"></i>
           <span>ส่งทางอีเมล</span>
         </button>
@@ -248,7 +352,11 @@
   [isOpen]="showConfirmModal()"
   type="warning"
   title="ยกเลิกใบแจ้งหนี้"
-  [message]="'คุณต้องการยกเลิกใบแจ้งหนี้ ' + (pendingCancelInvoice()?.contractNumber || '') + ' หรือไม่?'"
+  [message]="
+    'คุณต้องการยกเลิกใบแจ้งหนี้ ' +
+    (pendingCancelInvoice()?.contractNumber || '') +
+    ' หรือไม่?'
+  "
   confirmText="ยกเลิกใบแจ้งหนี้"
   confirmIcon="pi-times"
   (confirm)="onConfirmCancel()"
@@ -272,47 +380,76 @@
   />
 }
 
+<!-- ✅ FIX #3: Pass source info to detail modal -->
 @if (showDetailModal() && currentInvoice()) {
-  <app-invoice-detail-modal [invoice]="currentInvoice()!" (close)="closeDetailModal()" />
+  <app-invoice-detail-modal
+    [invoice]="currentInvoice()!"
+    [isFromReadyList]="!showHistory()"
+    (close)="closeDetailModal()"
+    (issueInvoice)="onIssueInvoiceFromDetail($event)"
+  />
 }
 
-<!-- Edit Modal -->
+<!-- ✅ FIX #4: Edit Modal as Popup (not drawer) -->
 @if (showEditModal() && editingInvoice()) {
-  <div class="drawer-overlay" (click)="closeEditModal()"></div>
-  <div class="drawer-panel">
-    <div class="drawer-header">
-      <h3>แก้ไขใบแจ้งหนี้</h3>
-      <button class="close-btn" (click)="closeEditModal()">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
-    <div class="drawer-content">
-      <div class="form-group">
-        <label>เลขที่สัญญาเช่า</label>
-        <input type="text" [value]="editingInvoice()!.contractNumber" (input)="updateEditField('contractNumber', $any($event.target).value)" />
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="edit-modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>แก้ไขใบแจ้งหนี้</h3>
+        <button class="close-btn" (click)="closeEditModal()">
+          <i class="pi pi-times"></i>
+        </button>
       </div>
-      <div class="form-group">
-        <label>ชื่อลูกค้า</label>
-        <input type="text" [value]="editingInvoice()!.customerName" (input)="updateEditField('customerName', $any($event.target).value)" />
-      </div>
-      <div class="form-group">
-        <label>รายการเรียกเก็บหลัก</label>
-        <input type="text" [value]="editingInvoice()!.collectionItem" (input)="updateEditField('collectionItem', $any($event.target).value)" />
-      </div>
-      <div class="form-row">
+      <div class="modal-body">
         <div class="form-group">
-          <label>ยอดเงิน</label>
-          <input type="number" [value]="editingInvoice()!.amount" (input)="updateEditField('amount', $any($event.target).value)" />
+          <label>เลขที่สัญญาเช่า</label>
+          <input
+            type="text"
+            [value]="getEditContractNumber()"
+            (input)="setEditContractNumber($any($event.target).value)"
+          />
         </div>
         <div class="form-group">
-          <label>วันที่เริ่มต้นเรียกเก็บ</label>
-          <input type="date" [value]="editingInvoice()!.startDate" (input)="updateEditField('startDate', $any($event.target).value)" />
+          <label>ชื่อลูกค้า</label>
+          <input
+            type="text"
+            [value]="getEditCustomerName()"
+            (input)="setEditCustomerName($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label>รายการเรียกเก็บหลัก</label>
+          <input
+            type="text"
+            [value]="getEditCollectionItem()"
+            (input)="setEditCollectionItem($any($event.target).value)"
+          />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ยอดเงิน</label>
+            <input
+              type="number"
+              [value]="getEditAmount()"
+              (input)="setEditAmount($any($event.target).value)"
+            />
+          </div>
+          <div class="form-group">
+            <label>วันที่เริ่มต้นเรียกเก็บ</label>
+            <input
+              type="date"
+              [value]="getEditStartDate()"
+              (input)="setEditStartDate($any($event.target).value)"
+            />
+          </div>
         </div>
       </div>
-    </div>
-    <div class="drawer-footer">
-      <button class="btn btn-secondary" (click)="closeEditModal()">ยกเลิก</button>
-      <button class="btn btn-primary" (click)="onSaveEdit()">บันทึก</button>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeEditModal()">
+          ยกเลิก
+        </button>
+        <button class="btn btn-primary" (click)="onSaveEdit()">บันทึก</button>
+      </div>
     </div>
   </div>
 }
@@ -330,29 +467,62 @@
     <div class="drawer-content">
       <div class="form-group">
         <label>เลขที่สัญญาเช่า</label>
-        <input type="text" [value]="newInvoiceData().contractNumber" (input)="updateNewInvoiceField('contractNumber', $any($event.target).value)" placeholder="กรอกเลขที่สัญญา" />
+        <input
+          type="text"
+          [value]="newInvoiceData().contractNumber"
+          (input)="
+            updateNewInvoiceField('contractNumber', $any($event.target).value)
+          "
+          placeholder="กรอกเลขที่สัญญา"
+        />
       </div>
       <div class="form-group">
         <label>ชื่อลูกค้า</label>
-        <input type="text" [value]="newInvoiceData().customerName" (input)="updateNewInvoiceField('customerName', $any($event.target).value)" placeholder="กรอกชื่อลูกค้า" />
+        <input
+          type="text"
+          [value]="newInvoiceData().customerName"
+          (input)="
+            updateNewInvoiceField('customerName', $any($event.target).value)
+          "
+          placeholder="กรอกชื่อลูกค้า"
+        />
       </div>
       <div class="form-group">
         <label>รายการเรียกเก็บหลัก</label>
-        <input type="text" [value]="newInvoiceData().collectionItem" (input)="updateNewInvoiceField('collectionItem', $any($event.target).value)" placeholder="กรอกรายการเรียกเก็บ" />
+        <input
+          type="text"
+          [value]="newInvoiceData().collectionItem"
+          (input)="
+            updateNewInvoiceField('collectionItem', $any($event.target).value)
+          "
+          placeholder="กรอกรายการเรียกเก็บ"
+        />
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>ยอดเงิน (รวมภาษี)</label>
-          <input type="number" [value]="newInvoiceData().amount" (input)="updateNewInvoiceField('amount', $any($event.target).value)" />
+          <input
+            type="number"
+            [value]="newInvoiceData().amount"
+            (input)="updateNewInvoiceField('amount', $any($event.target).value)"
+          />
         </div>
         <div class="form-group">
           <label>วันที่เริ่มต้นเรียกเก็บ</label>
-          <input type="date" [value]="newInvoiceData().startDate" (input)="updateNewInvoiceField('startDate', $any($event.target).value)" />
+          <input
+            type="date"
+            [value]="newInvoiceData().startDate"
+            (input)="
+              updateNewInvoiceField('startDate', $any($event.target).value)
+            "
+          />
         </div>
       </div>
     </div>
     <div class="drawer-footer">
-      <button class="btn btn-secondary" (click)="closeCreateDrawer()">ยกเลิก</button>
+      <button class="btn btn-secondary" (click)="closeCreateDrawer()">
+        ยกเลิก
+      </button>
       <button class="btn btn-create" (click)="onCreateInvoice()">
         <i class="pi pi-plus"></i>
         <span>สร้างใบแจ้งหนี้</span>

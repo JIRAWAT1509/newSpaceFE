@@ -11,7 +11,9 @@ import { CommonModule } from '@angular/common';
 })
 export class InvoiceDetailModalComponent {
   invoice = input.required<any>();
+  isFromReadyList = input<boolean>(false); // ✅ FIX #3: Know if from ready list
   close = output<void>();
+  issueInvoice = output<any>(); // ✅ FIX #3: Emit to parent to issue invoice
 
   onClose(): void {
     this.close.emit();
@@ -49,5 +51,11 @@ export class InvoiceDetailModalComponent {
 
   onSendEmail(): void {
     alert('Mock: กำลังส่งอีเมล');
+  }
+
+  // ✅ FIX #3: Issue invoice from detail modal
+  onIssueInvoice(): void {
+    this.issueInvoice.emit(this.invoice());
+    this.close.emit();
   }
 }
