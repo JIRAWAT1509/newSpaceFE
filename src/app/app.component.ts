@@ -16,7 +16,7 @@ const MOBILE_BREAKPOINT = 768;
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
-  title = 'newSpaceFE';
+  title = 'SpaceCRM';
 
   isScrolled;
   isSidebarExpanded;
@@ -86,7 +86,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     // Calculate header height after view init
     this.updateHeaderHeight();
-    
+
     // Set up ResizeObserver to track header height changes
     if (this.headerRef?.nativeElement) {
       const resizeObserver = new ResizeObserver(() => {
