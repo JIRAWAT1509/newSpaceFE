@@ -31,7 +31,7 @@ export class FloorOverviewTabComponent implements AfterViewInit, OnDestroy {
   lineChart = viewChild<ElementRef>('lineChart');
 
   // Signals
-  pieChartInstance = signal<Chart | null>(null);
+pieChartInstance = signal<Chart | null>(null);
   lineChartInstance = signal<Chart | null>(null);
   typeVisibility = signal<Record<string, boolean>>({
     'log': true,
@@ -190,7 +190,7 @@ export class FloorOverviewTabComponent implements AfterViewInit, OnDestroy {
     };
 
     const chart = new Chart(ctx, config);
-    this.pieChartInstance.set(chart);
+    this.pieChartInstance.set(chart as any);
   }
 
   updatePieChart(): void {

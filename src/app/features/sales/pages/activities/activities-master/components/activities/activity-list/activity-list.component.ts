@@ -60,10 +60,20 @@ export class ActivityListComponent {
     this.activityEdit.emit(activity);
   }
 
-  onDelete(activityId: string, event: Event): void {
-    event.stopPropagation();
-    this.activityDelete.emit(activityId);
+// Line 98 - Update delete handler
+onDelete(activityId: string, event: Event): void {
+  event.stopPropagation();
+
+  // Get activity title for better confirmation message
+  const activity = this.activities.find(a => a.id === activityId);
+  const title = activity?.title || 'กิจกรรมนี้';
+
+  if (!confirm(`คุณแน่ใจหรือไม่ที่จะลบ "${title}"?`)) {
+    return;
   }
+
+  this.activityDelete.emit(activityId);
+}
 
   onStatusChange(activityId: string, status: ActivityStatus, event: Event): void {
     event.stopPropagation();

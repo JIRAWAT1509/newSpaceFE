@@ -49,3 +49,16 @@
 .main-with-bottom-nav {
   padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
 }
+
+/* ✅ NEW: Layout without sidebar */
+.app-layout-no-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: rgb(var(--bg));
+}
+
+.app-layout-no-sidebar main {
+  flex: 1;
+}

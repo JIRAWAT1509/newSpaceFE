@@ -12,6 +12,12 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     dashboard: "Dashboard",
     report_dashboard: "Report",
 
+    sales_dashboard: "Sales Dashboard",
+    customer_management: "Customer Management",
+    budget_management: "Budget Management",
+    pipeline_management: "Pipeline Management",
+    activities_management: "Activities Management",
+
     // Area - Secondary
     area_management: "Area Management",
     area_allocation: "Area Allocation",
@@ -260,6 +266,12 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     dashboard: "แดชบอร์ด",
     report_dashboard: "รายงาน",
 
+    sales_dashboard: "แดชบอร์ดการขาย",
+    customer_management: "การจัดการลูกค้า",
+    budget_management: "การจัดการงบประมาณ",
+    pipeline_management: "การจัดการพายไลน์",
+    activities_management: "การจัดการกิจกรรม",
+
     // Area - Secondary
     area_management: "การจัดการพื้นที่",
     area_allocation: "การจัดสรรพื้นที่",
@@ -507,6 +519,12 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     finance: "财务",
     dashboard: "仪表板",
     report_dashboard: "报告",
+
+    sales_dashboard: "销售仪表板",
+    customer_management: "客户管理",
+    budget_management: "预算管理",
+    pipeline_management: "管道管理",
+    activities_management: "活动管理",
 
     // Area - Secondary
     area_management: "区域管理",

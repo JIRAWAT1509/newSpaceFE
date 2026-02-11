@@ -1,6 +1,6 @@
-// header.component.ts - UPDATED with logo navigation
+// header.component.ts - UPDATED: Sales-only navigation
 
-import { Component, HostListener, OnInit, OnDestroy, effect, input } from '@angular/core';
+import { Component, HostListener, OnInit, effect, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -13,7 +13,7 @@ import {
 } from '@angular/animations';
 
 import { NAVIGATION_CONTENT } from '@core/data/content';
-import { NavigationItem } from '@core/models/navigation.model';
+import { NavigationSecondary } from '@core/models/navigation.model';
 import { UserService } from '@core/services/user.service';
 import { LanguageService } from '@core/services/language.service';
 import { SearchService } from '@core/services/search.service';
@@ -25,58 +25,27 @@ import { NavigationService } from '@core/services/navigation.service';
 import { HeaderService } from '@core/services/header.service';
 import { getLabelOverride } from '@core/services/ui-settings';
 
-export interface SearchResultItem {
+// ✅ Searchable items - ONLY Sales + Settings
+interface SearchableItem {
+  id: string;
   title: string;
-  category: string;
   route: string;
-  icon: string;
-  keywords: string[];
+  category: string;
+  module: 'sales' | 'setting';
 }
 
-/** All searchable pages in the system */
-const SEARCHABLE_ITEMS: SearchResultItem[] = [
-  // Dashboard
-  { title: 'Dashboard Overview', category: 'Home > Dashboard', route: '/dashboard/overview', icon: 'pi-chart-bar', keywords: ['dashboard', 'overview', 'home', 'หน้าแรก', 'แดชบอร์ด', 'ภาพรวม'] },
+const SEARCHABLE_ITEMS: SearchableItem[] = [
+  // Sales items
+  { id: 's1', title: 'Sales Dashboard', route: '/sales/dashboard', category: 'Sales', module: 'sales' },
+  { id: 's2', title: 'Customer Management', route: '/sales/customer', category: 'Sales', module: 'sales' },
+  { id: 's3', title: 'Budget Management', route: '/sales/budget', category: 'Sales', module: 'sales' },
+  { id: 's4', title: 'Pipeline Management', route: '/sales/pipeline', category: 'Sales', module: 'sales' },
+  { id: 's5', title: 'Activities Management', route: '/sales/activities', category: 'Sales', module: 'sales' },
 
-  // Sales
-  { title: 'Sales Dashboard', category: 'Sales > Dashboard', route: '/sales/dashboard', icon: 'pi-chart-line', keywords: ['sales', 'dashboard', 'การขาย', 'แดชบอร์ด'] },
-  { title: 'Customer Management', category: 'Sales > Customer', route: '/sales/customer', icon: 'pi-users', keywords: ['customer', 'management', 'ลูกค้า', 'จัดการลูกค้า', 'ผู้เช่า'] },
-  { title: 'Budget Management', category: 'Sales > Budget', route: '/sales/budget', icon: 'pi-wallet', keywords: ['budget', 'งบประมาณ', 'งบ'] },
-  { title: 'Pipeline Management', category: 'Sales > Pipeline', route: '/sales/pipeline', icon: 'pi-sitemap', keywords: ['pipeline', 'ไปป์ไลน์', 'lead', 'โอกาส'] },
-  { title: 'Activities Management', category: 'Sales > Activities', route: '/sales/activities', icon: 'pi-calendar', keywords: ['activities', 'กิจกรรม', 'นัดหมาย', 'activity'] },
-
-  // Area
-  { title: 'Area Layout Master', category: 'Area > Layout', route: '/area/layout/master', icon: 'pi-map', keywords: ['area', 'layout', 'master', 'พื้นที่', 'แผนผัง', 'ตึก', 'building', 'floor', 'ชั้น', 'ห้อง', 'room'] },
-
-  // Contract
-  { title: 'Contract Management', category: 'Contract > Management', route: '/contract/management', icon: 'pi-file-edit', keywords: ['contract', 'สัญญา', 'management', 'ใบเสนอราคา', 'quotation', 'สัญญาจอง', 'booking', 'lease'] },
-
-  // Finance
-  { title: 'Finance Master', category: 'Finance > Master', route: '/finance/master', icon: 'pi-wallet', keywords: ['finance', 'การเงิน', 'invoice', 'ใบแจ้งหนี้', 'ใบเสร็จ', 'receipt'] },
-
-  // Facilities
-  { title: 'Utilities Management', category: 'Facilities > Utilities', route: '/facilities/utilities/master', icon: 'pi-cog', keywords: ['facilities', 'utilities', 'meter', 'มิเตอร์', 'สาธารณูปโภค', 'ไฟฟ้า', 'น้ำ', 'electric', 'water'] },
-
-  // Reports
-  { title: 'All Reports', category: 'Report > All', route: '/reports', icon: 'pi-chart-bar', keywords: ['report', 'รายงาน', 'reports'] },
-  { title: 'Area Reports', category: 'Report > Area', route: '/reports/category/area', icon: 'pi-chart-bar', keywords: ['report', 'area', 'รายงานพื้นที่'] },
-  { title: 'Service Reports', category: 'Report > Service', route: '/reports/category/service', icon: 'pi-chart-bar', keywords: ['report', 'service', 'รายงานบริการ'] },
-  { title: 'Contract Reports', category: 'Report > Contract', route: '/reports/category/contract', icon: 'pi-chart-bar', keywords: ['report', 'contract', 'รายงานสัญญา'] },
-  { title: 'Budget Reports', category: 'Report > Budget', route: '/reports/category/budget', icon: 'pi-chart-bar', keywords: ['report', 'budget', 'รายงานงบประมาณ'] },
-  { title: 'Finance Reports', category: 'Report > Finance', route: '/reports/category/finance', icon: 'pi-chart-bar', keywords: ['report', 'finance', 'รายงานการเงิน'] },
-  { title: 'Collection Reports', category: 'Report > Collection', route: '/reports/category/collection', icon: 'pi-chart-bar', keywords: ['report', 'collection', 'รายงานเก็บเงิน'] },
-
-  // Settings
-  { title: 'User Account Management', category: 'Setting > User', route: '/setting/user-accounts/data', icon: 'pi-user-edit', keywords: ['user', 'account', 'ผู้ใช้', 'บัญชี', 'setting', 'ตั้งค่า'] },
-  { title: 'Roles & Permissions', category: 'Setting > User', route: '/setting/user-accounts/roles', icon: 'pi-lock', keywords: ['role', 'permission', 'สิทธิ์', 'บทบาท'] },
-  { title: 'Company Information', category: 'Setting > Company', route: '/setting/company/data', icon: 'pi-building', keywords: ['company', 'บริษัท', 'สาขา', 'branch'] },
-  { title: 'Bank Information', category: 'Setting > Company', route: '/setting/company/bank', icon: 'pi-credit-card', keywords: ['bank', 'ธนาคาร'] },
-  { title: 'Contract Preparation Data', category: 'Setting > System', route: '/setting/system/contract', icon: 'pi-sliders-h', keywords: ['contract', 'preparation', 'profit center', 'business type', 'ตั้งค่าสัญญา'] },
-  { title: 'Finance Document Type', category: 'Setting > Finance', route: '/setting/system/finance/document-type', icon: 'pi-file', keywords: ['document', 'type', 'ประเภทเอกสาร', 'finance'] },
-  { title: 'Finance Basic Data', category: 'Setting > Finance', route: '/setting/system/finance/basic', icon: 'pi-database', keywords: ['finance', 'basic', 'พื้นฐาน'] },
-  { title: 'Finance Revenue Data', category: 'Setting > Finance', route: '/setting/system/finance/revenue', icon: 'pi-money-bill', keywords: ['revenue', 'รายได้'] },
-  { title: 'Finance Tax Data', category: 'Setting > Finance', route: '/setting/system/finance/tax', icon: 'pi-percentage', keywords: ['tax', 'ภาษี', 'vat', 'wht'] },
-  { title: 'Interface Configuration', category: 'Setting > System', route: '/setting/system/interface', icon: 'pi-link', keywords: ['interface', 'configuration', 'api', 'ftp', 'rpa'] },
+  // Settings items
+  { id: 'set1', title: 'User Accounts', route: '/setting/user-accounts/data', category: 'Settings', module: 'setting' },
+  { id: 'set2', title: 'Roles Management', route: '/setting/user-accounts/roles', category: 'Settings', module: 'setting' },
+  { id: 'set3', title: 'Company Data', route: '/setting/company/data', category: 'Settings', module: 'setting' },
 ];
 
 @Component({
@@ -86,7 +55,6 @@ const SEARCHABLE_ITEMS: SearchResultItem[] = [
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
   animations: [
-    // Big search bar - slide UP from bottom when appearing, slide DOWN when hiding
     trigger('slideDown', [
       transition(':enter', [
         style({ height: '0', opacity: 100, overflow: 'hidden' }),
@@ -99,7 +67,6 @@ const SEARCHABLE_ITEMS: SearchResultItem[] = [
         ),
       ]),
     ]),
-    // Small search bar and greeting - slide down when appearing, slide up when hiding
     trigger('slideDownSmall', [
       transition(':enter', [
         style({ transform: 'translateY(-50px)', opacity: 100 }),
@@ -115,7 +82,7 @@ const SEARCHABLE_ITEMS: SearchResultItem[] = [
         ),
       ]),
     ]),
-     trigger('slideDownSmallFaded', [
+    trigger('slideDownSmallFaded', [
       transition(':enter', [
         style({ transform: 'translateY(-20px)', opacity: 0 }),
         animate(
@@ -132,22 +99,24 @@ const SEARCHABLE_ITEMS: SearchResultItem[] = [
     ]),
   ],
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent implements OnInit {
   isMobile = input<boolean>(false);
 
-  // Navigation data
-  navigationItems: NavigationItem[] = NAVIGATION_CONTENT.filter(
-    (item) => item.primary_content !== 'setting'
-  );
-  activeMenuItem: string = '';
+  // ✅ NEW: Navigation data - ONLY Sales secondary items
+  navigationItems: NavigationSecondary[] =
+    NAVIGATION_CONTENT
+      .find(item => item.primary_content === 'sales')
+      ?.secondary_content || [];
+
+  activeRoute: string = '';
+
   navIconMap: Record<string, string> = {
-    sales: 'pi pi-chart-line',
-    area: 'pi pi-map',
-    contract: 'pi pi-file-edit',
-    collection_finance: 'pi pi-wallet',
-    facilities: 'pi pi-cog',
-    report_dashboard: 'pi pi-chart-bar',
-    setting: 'pi pi-sliders-h',
+    // Sales icons
+    dashboard: 'pi pi-chart-line',
+    customer: 'pi pi-users',
+    budget: 'pi pi-wallet',
+    pipeline: 'pi pi-sitemap',
+    activities: 'pi pi-calendar',
   };
 
   // UI state
@@ -167,6 +136,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   // Search
   searchQuery: string = '';
+  searchResults: SearchableItem[] = [];
+  showSearchResults: boolean = false;
 
   // Texts for multi-language support
   texts: HeaderTexts;
@@ -177,14 +148,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     private navigationService: NavigationService,
     private headerService: HeaderService,
-    private router: Router // NEW: Inject Router for navigation
+    private router: Router
   ) {
     this.currentLanguage = this.languageService.getCurrentLanguage();
     this.texts = HEADER_TEXTS[this.currentLanguage.code];
 
-    // This makes the local activeMenuItem property reactive to service changes
+    // ✅ Watch for route changes to update active state
     effect(() => {
-      this.activeMenuItem = this.navigationService.activePrimaryItem();
+      this.activeRoute = this.router.url;
     });
 
     effect(() => {
@@ -201,6 +172,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     // Load language data
     this.availableLanguages = this.languageService.getAvailableLanguages();
+
+    // Set initial active route
+    this.activeRoute = this.router.url;
   }
 
   getUserInitials(name: string): string {
@@ -208,90 +182,79 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Navigate to home page when logo is clicked
+   * ✅ NEW: Direct navigation - no sidebar logic
    */
-  onLogoClick(): void {
-    this.router.navigate(['/dashboard/overview']);
-    this.navigationService.setSidebarExpanded(false);
+  setActiveMenuItem(route: string): void {
+    this.router.navigate([route]);
   }
 
   /**
-   * Home button in nav bar – navigate to dashboard overview
+   * ✅ REMOVED: No more home button
    */
-  onHomeClick(): void {
-    this.activeMenuItem = '__home__';
-    this.router.navigate(['/dashboard/overview']);
-    this.navigationService.setSidebarExpanded(false);
+  // onHomeClick(): void { ... }
+
+  /**
+   * ✅ REMOVED: No more sidebar toggle
+   */
+  // toggleSidebar(): void { ... }
+
+  /**
+   * ✅ NEW: Check if route is active
+   */
+  isRouteActive(route: string): boolean {
+    return this.activeRoute === route || this.activeRoute.startsWith(route + '/');
   }
 
-  toggleSidebar(): void {
-    this.navigationService.toggleSidebar();
+  /**
+   * ✅ NEW: Get icon for navigation item
+   */
+  getNavIcon(itemName: string): string {
+    return this.navIconMap[itemName] || 'pi pi-circle';
   }
 
-  setActiveMenuItem(item: string): void {
-    // Get the currently active item from the service
-    const currentActive = this.navigationService.activePrimaryItem();
-
-    if (item === currentActive) {
-      // If the same item is clicked, toggle the sidebar
-      this.navigationService.toggleSidebar();
-    } else {
-      // If a new item is clicked, change the category AND ensure the sidebar is expanded
-      this.navigationService.setActivePrimaryNavItem(item);
-      this.navigationService.setSidebarExpanded(true);
-      const targetRoute = this.getPrimaryRoute(item);
-      if (targetRoute) {
-        this.router.navigate([targetRoute]);
-      }
-    }
-  }
-
-  // ========== Universal Search Methods ==========
-
-  /** Press Enter → navigate to the best matching page */
+  /**
+   * ✅ UPDATED: Search with filtered items (Sales + Settings only)
+   */
   onSearchGlobal(): void {
-    const query = this.searchQuery.trim().toLowerCase();
-    if (!query) return;
-
-    const match = this.findBestMatch(query);
-    if (match) {
-      this.router.navigate([match.route]);
-      this.searchQuery = '';
+    if (!this.searchQuery.trim()) {
+      this.searchResults = [];
+      this.showSearchResults = false;
+      return;
     }
-    this.searchService.setSearchQuery(this.searchQuery);
+
+    const query = this.searchQuery.toLowerCase();
+    this.searchResults = SEARCHABLE_ITEMS.filter(item =>
+      item.title.toLowerCase().includes(query) ||
+      item.category.toLowerCase().includes(query)
+    );
+    this.showSearchResults = true;
   }
 
   clearSearchSimple(): void {
     this.searchQuery = '';
+    this.searchResults = [];
+    this.showSearchResults = false;
   }
 
-  private findBestMatch(query: string): SearchResultItem | null {
-    const terms = query.split(/\s+/).filter(t => t.length > 0);
+// header.component.ts - Fix search result selection
 
-    const scored = SEARCHABLE_ITEMS
-      .map(item => {
-        let score = 0;
-        const titleLower = item.title.toLowerCase();
-        const categoryLower = item.category.toLowerCase();
-        const keywordsJoined = item.keywords.join(' ').toLowerCase();
-
-        for (const term of terms) {
-          if (titleLower.includes(term)) score += 10;
-          if (titleLower.startsWith(term)) score += 5;
-          if (categoryLower.includes(term)) score += 3;
-          if (keywordsJoined.includes(term)) score += 5;
-        }
-        return { item, score };
-      })
-      .filter(r => r.score > 0)
-      .sort((a, b) => b.score - a.score);
-
-    return scored.length > 0 ? scored[0].item : null;
+selectSearchResult(item: SearchableItem, event?: Event): void {
+  // ✅ Stop event propagation
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
   }
 
-  ngOnDestroy(): void {
-    // Cleanup if needed
-  }
+  console.log('🔍 Navigating to:', item.route); // Debug log
+
+  // Clear search first
+  this.clearSearchSimple();
+
+  // Navigate after a short delay to ensure dropdown closes
+  setTimeout(() => {
+    this.router.navigate([item.route]);
+  }, 50);
+}
 
   toggleLanguageDropdown(): void {
     this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
@@ -315,8 +278,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   translateNav(key: string): string {
-    const lookupKey = key === 'report_dashboard' ? 'report' : key;
-    const override = getLabelOverride(lookupKey);
+    const override = getLabelOverride(key);
     if (override) {
       return override;
     }
@@ -324,37 +286,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   goToSettings(): void {
-    this.navigationService.setActivePrimaryNavItem('setting');
-    this.navigationService.setSidebarExpanded(true);
     this.router.navigate(['/setting/user-accounts/data']);
     this.isProfileDropdownOpen = false;
-  }
-
-  private getPrimaryRoute(key: string): string | null {
-    const navItem = this.navigationItems.find(
-      (item) => item.primary_content === key
-    );
-    if (!navItem) {
-      return null;
-    }
-
-    for (const secondary of navItem.secondary_content || []) {
-      if (secondary.route) {
-        return secondary.route;
-      }
-      if (secondary.sub && secondary.sub.length > 0) {
-        const firstSubRoute = secondary.sub.find((sub) => !!sub.route)?.route;
-        if (firstSubRoute) {
-          return firstSubRoute;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  getNavIcon(key: string): string {
-    return this.navIconMap[key] || 'pi pi-circle';
   }
 
   logout(): void {
@@ -368,10 +301,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     const target = event.target as HTMLElement;
     if (
       !target.closest('.language-dropdown') &&
-      !target.closest('.profile-dropdown')
+      !target.closest('.profile-dropdown') &&
+      !target.closest('.usearch-root')
     ) {
       this.isLanguageDropdownOpen = false;
       this.isProfileDropdownOpen = false;
+      this.showSearchResults = false;
     }
   }
 }

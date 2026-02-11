@@ -7,12 +7,12 @@ export const routes: Routes = [
   // ============================================
   {
     path: '',
-    redirectTo: '/dashboard/overview',
+    redirectTo: '/sales/dashboard',
     pathMatch: 'full'
   },
   {
     path: 'dashboard',
-    redirectTo: 'dashboard/overview',
+    redirectTo: 'sales/dashboard',
     pathMatch: 'full'
   },
 
@@ -115,6 +115,6 @@ export const routes: Routes = [
   // ============================================
   {
     path: '**',
-    redirectTo: '/dashboard/overview'
+    redirectTo: '/sales/dashboard'
   }
 ];

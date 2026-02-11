@@ -51,16 +51,16 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   // ============================================
   // 2. AREA
   // ============================================
-  {
-    primary_content: 'area',
-    secondary_content: [
-      {
-        name: 'master_data',
-        icon: 'assets/icons/briefcase-outline.svg',
-        route: '/area/layout/master',
-        hasDeeper: true,
-        deeperNote: 'Contains: Building, Floor, Zone, Layout, Price List, etc.',
-      },
+  // {
+  //   primary_content: 'area',
+  //   secondary_content: [
+  //     {
+  //       name: 'master_data',
+  //       icon: 'assets/icons/briefcase-outline.svg',
+  //       route: '/area/layout/master',
+  //       hasDeeper: true,
+  //       deeperNote: 'Contains: Building, Floor, Zone, Layout, Price List, etc.',
+  //     },
       /* {
         name: 'area_layout_management',
         icon: 'assets/icons/briefcase-outline.svg',
@@ -113,19 +113,19 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           { name: 'reports', route: '/area/measurement/reports' },
         ],
       }, */
-    ],
-  },
+  //   ],
+  // },
 
   // ============================================
   // 3. CONTRACT
   // ============================================
-  {
-    primary_content: 'contract',
-    secondary_content: [
-      {
-        name: 'contract_management',
-        icon: 'assets/icons/business-outline.svg',
-        route: '/contract/management',
+  // {
+  //   primary_content: 'contract',
+  //   secondary_content: [
+  //     {
+  //       name: 'contract_management',
+  //       icon: 'assets/icons/business-outline.svg',
+  //       route: '/contract/management',
         // sub: [
         //   {
         //     name: 'contract_preparation_data',
@@ -134,7 +134,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
         //     deeperNote: 'Contains: Profit center, Business types, Categories, Sales type, Contract types, Product groups, Signatories, Cost center'
         //   }
         // ]
-      },
+      // },
       /* {
         name: 'quotation_management',
         icon: 'assets/icons/briefcase-outline.svg',
@@ -256,31 +256,31 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
         icon: 'assets/icons/clipboard-outline.svg',
         sub: [{ name: 'daily_transactions', route: '/contract/fitout/daily' }],
       }, */
-    ],
-  },
+  //   ],
+  // },
 
   // ============================================
   // 4. COLLECTION AND FINANCE
   // ============================================
-  {
-    primary_content: 'collection_finance',
-    secondary_content: [
-      // --- FINANCE SECTION ---
-      {
-        name: 'dashboard',
-        icon: 'pi-chart-bar',
-        route: '/finance/master',
-      },
-      {
-        name: 'invoices',
-        icon: 'pi-money-bill',
-        route: '/collection/invoice/daily',
-      },
-      {
-        name: 'finance_receipts',
-        icon: 'pi-receipt',
-        route: '/finance/receipt/daily',
-      },
+  // {
+  //   primary_content: 'collection_finance',
+  //   secondary_content: [
+  //     // --- FINANCE SECTION ---
+  //     {
+  //       name: 'dashboard',
+  //       icon: 'pi-chart-bar',
+  //       route: '/finance/master',
+  //     },
+  //     {
+  //       name: 'invoices',
+  //       icon: 'pi-money-bill',
+  //       route: '/collection/invoice/daily',
+  //     },
+  //     {
+  //       name: 'finance_receipts',
+  //       icon: 'pi-receipt',
+  //       route: '/finance/receipt/daily',
+  //     },
       /* {
         name: 'finance_receipts',
         icon: 'assets/icons/business-outline.svg',
@@ -399,21 +399,21 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           },
         ],
       }, */
-    ],
-  },
+  //   ],
+  // },
 
   // ============================================
   // 5. FACILITIES MANAGEMENT
   // ============================================
-  {
-    primary_content: 'facilities',
+  // {
+  //   primary_content: 'facilities',
 
-    secondary_content: [
-      {
-        name: 'utilities',
-        icon: 'assets/icons/briefcase-outline.svg',
-        route: '/facilities/utilities/master',
-      },
+  //   secondary_content: [
+  //     {
+  //       name: 'utilities',
+  //       icon: 'assets/icons/briefcase-outline.svg',
+  //       route: '/facilities/utilities/master',
+  //     },
       // --- UTILITIES SECTION ---
       /* {
         name: 'utilities_meter_management',
@@ -474,8 +474,8 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           { name: 'reports', route: '/facilities/workorder/reports' },
         ],
       }, */
-    ],
-  },
+  //   ],
+  // },
 
   // ============================================
   // 6. REPORT AND DASHBOARD
@@ -520,50 +520,50 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       },
     ],
   }, */
-  {
-    primary_content: 'report_dashboard',
-    secondary_content: [
-      {
-        name: 'report_all',
-        icon: 'assets/icons/clipboard-outline.svg',
-        sub: [
-          {
-            name: 'view all',
-            route: '/reports',
-          },
-          {
-            name: 'report_area',
-            route: '/reports/category/area',
-          },
-          {
-            name: 'report_service',
-            route: '/reports/category/service',
-          },
-          {
-            name: 'report_contract',
-            route: '/reports/category/contract',
-          },
-          {
-            name: 'report_budget',
-            route: '/reports/category/budget',
-          },
-          {
-            name: 'report_finance',
-            route: '/reports/category/finance',
-          },
-          {
-            name: 'report_collection',
-            route: '/reports/category/collection',
-          },
-        ],
-      },
-      {
-        name: 'dashboard',
-        icon: 'assets/icons/dashboard.svg',
-        route: '/dashboard/overview',
-      },
-    ],
-  },
+  // {
+  //   primary_content: 'report_dashboard',
+  //   secondary_content: [
+  //     {
+  //       name: 'report_all',
+  //       icon: 'assets/icons/clipboard-outline.svg',
+  //       sub: [
+  //         {
+  //           name: 'view all',
+  //           route: '/reports',
+  //         },
+  //         {
+  //           name: 'report_area',
+  //           route: '/reports/category/area',
+  //         },
+  //         {
+  //           name: 'report_service',
+  //           route: '/reports/category/service',
+  //         },
+  //         {
+  //           name: 'report_contract',
+  //           route: '/reports/category/contract',
+  //         },
+  //         {
+  //           name: 'report_budget',
+  //           route: '/reports/category/budget',
+  //         },
+  //         {
+  //           name: 'report_finance',
+  //           route: '/reports/category/finance',
+  //         },
+  //         {
+  //           name: 'report_collection',
+  //           route: '/reports/category/collection',
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       name: 'dashboard',
+  //       icon: 'assets/icons/dashboard.svg',
+  //       route: '/sales/dashboard',
+  //     },
+  //   ],
+  // },
 
   // ============================================
   // 7. SETTING

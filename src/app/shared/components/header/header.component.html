@@ -1,172 +1,148 @@
-<!-- header.component.html - RESPONSIVE FIXED -->
+<!-- header.component.html - UPDATED: Sales-only navigation -->
 
 <header class="fixed top-0 left-0 right-0 z-50">
   <!-- Main Header -->
-  <div
-    class="bg-gradient-to-r from-primary via-primary to-secondary py-2.5 md:py-3 shadow-lg relative">
-    <!-- Row 1: Logo + Right actions -->
+  <div class="bg-gradient-to-r from-primary via-primary to-secondary py-2.5 md:py-3 shadow-lg relative">
+    <!-- Row 1: Logo + Navigation + Right actions -->
     <div class="flex items-center justify-between px-4 sm:px-6 md:px-8 gap-3 min-h-[52px] md:min-h-14">
-      <!-- Left: Hamburger (mobile) + Logo -->
+
+      <!-- Left: Logo (✅ NO hamburger - sidebar removed) -->
       <div class="flex items-center flex-shrink-0 gap-2 min-w-0">
-        <button
-          type="button"
-          class="md:hidden flex items-center justify-center w-11 h-11 -ml-1 rounded-xl text-primary-foreground hover:bg-white/10 active:bg-white/15 transition-colors touch-manipulation"
-          (click)="toggleSidebar()"
-          aria-label="Open menu"
-        >
-          <i class="pi pi-bars text-[1.25rem]"></i>
-        </button>
         <h1
-          (click)="onLogoClick()"
-          class="text-primary-foreground text-xl md:text-2xl font-bold tracking-tight md:tracking-wide drop-shadow-md cursor-pointer hover:opacity-90 active:opacity-95 transition-opacity duration-200 whitespace-nowrap truncate"
-          title="Go to Home"
+          class="text-primary-foreground text-xl md:text-2xl font-bold tracking-tight md:tracking-wide drop-shadow-md whitespace-nowrap truncate"
         >
           {{ texts.logoText }}
         </h1>
       </div>
 
-      <!-- Center: Navigation (desktop only) – fixed position, no sidebar shift -->
+      <!-- Center: Sales Navigation (desktop only) -->
       <div class="flex-1 min-w-0 hidden md:block">
         <div class="content-container">
           <nav class="flex items-center gap-4 lg:gap-5 overflow-x-auto scrollbar-hide ml-12 lg:ml-16">
-            <!-- Reserved slot 1: Home -->
-            <a
-              id="nav-item-home"
-              (click)="onHomeClick()"
-              class="header-nav-item"
-              [class.header-nav-item-active]="activeMenuItem === '__home__'"
-            >
-              <i class="header-nav-icon pi pi-home"></i>
-              <span class="header-nav-label">Home</span>
-            </a>
 
-            <!-- Reserved slot 2: Sales -->
-            <a
-              id="nav-item-sales"
-              (click)="setActiveMenuItem('sales')"
-              class="header-nav-item"
-              [class.header-nav-item-active]="activeMenuItem === 'sales'"
-            >
-              <i class="header-nav-icon pi pi-chart-line"></i>
-              <span class="header-nav-label">{{ translateNav('sales') }}</span>
-              <span
-                *ngIf="activeMenuItem === 'sales'"
-                class="header-nav-underline bg-secondary"
-              ></span>
-            </a>
-
-            <!-- Remaining nav items (excluding sales, which is already above) -->
+            <!-- ✅ Loop through SALES secondary items only -->
             <ng-container *ngFor="let item of navigationItems; let i = index">
               <a
-                *ngIf="item.primary_content !== 'sales'"
                 [id]="'nav-item-' + i"
-                (click)="setActiveMenuItem(item.primary_content)"
-                [class.header-nav-item-active]="activeMenuItem === item.primary_content"
+                (click)="setActiveMenuItem(item.route || '')"
+                [class.header-nav-item-active]="isRouteActive(item.route || '')"
                 class="header-nav-item"
               >
-                <i class="header-nav-icon" [ngClass]="getNavIcon(item.primary_content)"></i>
-                <span class="header-nav-label">{{ translateNav(item.primary_content) }}</span>
+                <i class="header-nav-icon" [ngClass]="getNavIcon(item.name)"></i>
+                <span class="header-nav-label">{{ translateNav(item.name) }}</span>
                 <span
-                  *ngIf="activeMenuItem === item.primary_content"
+                  *ngIf="isRouteActive(item.route || '')"
                   class="header-nav-underline bg-secondary"
                 ></span>
               </a>
             </ng-container>
+
           </nav>
         </div>
       </div>
 
       <!-- Right: User Menu -->
       <div class="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
-          <!-- Universal Search - always visible in top menu (desktop) -->
-          <div class="hidden md:block flex-shrink-0 min-w-0 usearch-root">
-            <div class="usearch-bar">
-              <i class="pi pi-search usearch-bar__icon"></i>
-              <input
-                type="text"
-                [(ngModel)]="searchQuery"
-                (keyup.enter)="onSearchGlobal()"
-                placeholder="Search..."
-                class="usearch-bar__input"
-                autocomplete="off"
-              />
-              @if (searchQuery) {
-                <button (click)="clearSearchSimple()" class="usearch-bar__clear" type="button">
-                  <i class="pi pi-times"></i>
-                </button>
-              }
-            </div>
+
+        <!-- Universal Search -->
+        <div class="hidden md:block flex-shrink-0 min-w-0 usearch-root">
+          <div class="usearch-bar">
+            <i class="pi pi-search usearch-bar__icon"></i>
+            <input
+              type="text"
+              [(ngModel)]="searchQuery"
+              (input)="onSearchGlobal()"
+              (keyup.enter)="onSearchGlobal()"
+              placeholder="Search..."
+              class="usearch-bar__input"
+              autocomplete="off"
+            />
+            @if (searchQuery) {
+              <button (click)="clearSearchSimple()" class="usearch-bar__clear" type="button">
+                <i class="pi pi-times"></i>
+              </button>
+            }
           </div>
 
-          <!-- Language Selector -->
-          <div class="relative language-dropdown">
-            <button (click)="toggleLanguageDropdown()"
-              class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-card text-fg font-semibold text-xs md:text-sm flex items-center justify-center hover:bg-bg active:scale-95 transition-all duration-200 shadow-md flex-shrink-0 touch-manipulation">
-              {{ currentLanguage.abbreviation }}
+          <!-- ✅ Search Results Dropdown -->
+          @if (showSearchResults && searchResults.length > 0) {
+    <div class="search-dropdown" (click)="$event.stopPropagation()">
+      @for (result of searchResults; track result.id) {
+        <div class="search-item" (click)="selectSearchResult(result)">
+          <div class="search-item-icon">
+            <i class="pi pi-angle-right"></i>
+          </div>
+          <div class="search-item-content">
+            <div class="search-item-title">{{ result.title }}</div>
+            <div class="search-item-category">{{ result.category }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+        </div>
+
+        <!-- Language Selector -->
+        <div class="relative language-dropdown">
+          <button (click)="toggleLanguageDropdown()"
+            class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-card text-fg font-semibold text-xs md:text-sm flex items-center justify-center hover:bg-bg active:scale-95 transition-all duration-200 shadow-md flex-shrink-0 touch-manipulation">
+            {{ currentLanguage.abbreviation }}
+          </button>
+
+          <!-- Language Dropdown -->
+          <div *ngIf="isLanguageDropdownOpen"
+            class="absolute right-0 mt-2 w-40 md:w-48 bg-card rounded-xl shadow-xl py-2 border border-border z-50">
+            <button *ngFor="let lang of availableLanguages" (click)="selectLanguage(lang)"
+              class="w-full px-3 md:px-4 py-2 text-left text-sm hover:bg-bg hover:text-fg transition-colors duration-150 flex items-center justify-between"
+              [ngClass]="{ 'bg-bg text-fg': currentLanguage.code === lang.code }">
+              <span class="font-medium">{{ lang.name }}</span>
+              <span class="text-xs md:text-sm font-semibold">{{ lang.abbreviation }}</span>
             </button>
-
-            <!-- Language Dropdown -->
-            <div *ngIf="isLanguageDropdownOpen"
-              class="absolute right-0 mt-2 w-40 md:w-48 bg-card rounded-xl shadow-xl py-2 border border-border z-50">
-              <button *ngFor="let lang of availableLanguages" (click)="selectLanguage(lang)"
-                class="w-full px-3 md:px-4 py-2 text-left text-sm hover:bg-bg hover:text-fg transition-colors duration-150 flex items-center justify-between"
-                [ngClass]="{
-                'bg-bg text-fg': currentLanguage.code === lang.code
-              }">
-                <span class="font-medium">{{ lang.name }}</span>
-                <span class="text-xs md:text-sm font-semibold">{{ lang.abbreviation }}</span>
-              </button>
-            </div>
           </div>
+        </div>
 
-          <!-- User Profile -->
-          <div class="relative profile-dropdown">
-            <button (click)="toggleProfileDropdown()"
-              class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-card flex items-center justify-center hover:bg-bg active:scale-95 transition-all duration-200 shadow-md overflow-hidden flex-shrink-0 touch-manipulation ring-2 ring-transparent focus:ring-primary/30">
-              <img *ngIf="hasProfilePicture && profilePictureUrl" [src]="profilePictureUrl" [alt]="username"
-                class="w-full h-full object-cover" />
-              <svg *ngIf="!hasProfilePicture" class="w-4 h-4 md:w-5 md:h-5 text-muted" fill="none"
-                stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+        <!-- User Profile -->
+        <div class="relative profile-dropdown">
+          <button (click)="toggleProfileDropdown()"
+            class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-card flex items-center justify-center hover:bg-bg active:scale-95 transition-all duration-200 shadow-md overflow-hidden flex-shrink-0 touch-manipulation ring-2 ring-transparent focus:ring-primary/30">
+            <img *ngIf="hasProfilePicture && profilePictureUrl" [src]="profilePictureUrl" [alt]="username"
+              class="w-full h-full object-cover" />
+            <svg *ngIf="!hasProfilePicture" class="w-4 h-4 md:w-5 md:h-5 text-muted" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </button>
+
+          <!-- Profile Dropdown -->
+          <div *ngIf="isProfileDropdownOpen"
+            class="absolute right-0 mt-2 w-48 md:w-56 bg-card rounded-xl shadow-xl py-2 border border-border z-50">
+            <div class="px-3 md:px-4 py-3 border-b border-border">
+              <p class="text-sm font-semibold text-fg truncate">{{ username }}</p>
+              <p class="text-xs text-muted">{{ texts.profileLabel }}</p>
+            </div>
+            <button
+              class="w-full px-3 md:px-4 py-2 text-left text-sm hover:bg-bg transition-colors duration-150">
+              {{ texts.viewProfile }}
             </button>
-
-            <!-- Profile Dropdown -->
-            <div *ngIf="isProfileDropdownOpen"
-              class="absolute right-0 mt-2 w-48 md:w-56 bg-card rounded-xl shadow-xl py-2 border border-border z-50">
-              <div class="px-3 md:px-4 py-3 border-b border-border">
-                <p class="text-sm font-semibold text-fg truncate">
-                  {{ username }}
-                </p>
-                <p class="text-xs text-muted">
-                  {{ texts.profileLabel }}
-                </p>
-              </div>
-              <button
-                class="w-full px-3 md:px-4 py-2 text-left text-sm hover:bg-bg transition-colors duration-150">
-                {{ texts.viewProfile }}
-              </button>
-              <button
-                (click)="goToSettings()"
-                class="w-full px-3 md:px-4 py-2 text-left text-sm hover:bg-bg transition-colors duration-150">
-                {{ texts.settings }}
-              </button>
-              <hr class="my-2" />
-              <button (click)="logout()"
-                class="w-full px-3 md:px-4 py-2 text-left text-sm text-danger hover:bg-danger/10 transition-colors duration-150">
-                {{ texts.logout }}
-              </button>
-            </div>
+            <button
+              (click)="goToSettings()"
+              class="w-full px-3 md:px-4 py-2 text-left text-sm hover:bg-bg transition-colors duration-150">
+              {{ texts.settings }}
+            </button>
+            <hr class="my-2" />
+            <button (click)="logout()"
+              class="w-full px-3 md:px-4 py-2 text-left text-sm text-danger hover:bg-danger/10 transition-colors duration-150">
+              {{ texts.logout }}
+            </button>
           </div>
+        </div>
       </div>
     </div>
-
-    <!-- All floating/mobile search bars removed – only the permanent top-menu search remains -->
   </div>
 </header>
 
-<!-- Mobile only: Bottom navigation bar (เมนูด้านล่างบนมือถือ) -->
+<!-- ✅ Mobile: Bottom navigation bar - ONLY Sales items -->
 <nav
   class="bottom-nav md:hidden fixed left-0 right-0 bottom-0 z-40 flex items-center justify-around bg-card border-t border-border rounded-t-2xl shadow-[0_-8px_30px_-8px_rgba(0,0,0,0.12)] pb-[env(safe-area-inset-bottom)] pt-3 px-2 sm:px-4"
   aria-label="Main menu"
@@ -175,14 +151,14 @@
   <a
     *ngFor="let item of navigationItems; let i = index"
     [id]="'bottom-nav-' + i"
-    (click)="setActiveMenuItem(item.primary_content)"
-    [class.bottom-nav-item-active]="activeMenuItem === item.primary_content"
+    (click)="setActiveMenuItem(item.route || '')"
+    [class.bottom-nav-item-active]="isRouteActive(item.route || '')"
     class="bottom-nav-item flex-1 min-w-0 max-w-[76px]"
     role="button"
   >
     <span class="bottom-nav-icon-wrap">
-      <i class="bottom-nav-icon" [ngClass]="getNavIcon(item.primary_content)"></i>
+      <i class="bottom-nav-icon" [ngClass]="getNavIcon(item.name)"></i>
     </span>
-    <span class="bottom-nav-label">{{ translateNav(item.primary_content) }}</span>
+    <span class="bottom-nav-label">{{ translateNav(item.name) }}</span>
   </a>
 </nav>

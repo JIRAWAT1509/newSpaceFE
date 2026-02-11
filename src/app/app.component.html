@@ -1,80 +1,29 @@
-<!-- <app-header></app-header>
-
-<div class="flex h-screen overflow-hidden bg-gray-100 min-w-0">
-  <app-sidebar
-    class="h-full col transition-all duration-300"
-    [style.padding-top]="!isScrolled() ? '144px' : '80px'"
-  >
-  </app-sidebar>
-
-  <div class="flex-1 flex flex-col overflow-hidden">
-    <main
-      (scroll)="onContentScroll($event)"
-      class="flex-1 overflow-x-hidden overflow-y-auto transition-all duration-300"
-      [style.padding-top]="!isScrolled() ? '144px' : '80px'"
-    >
-      <div class="container mx-auto px-4 py-8">
-        <router-outlet /> -->
-
-        <!-- <div class="h-[200vh] mt-8">
-          <h1 class="text-3xl font-bold mb-4">
-            Welcome to Space : Digital Property Management
-          </h1>
-          <p class="mb-4">Scroll down to see the header transform!</p>
-          <p class="text-gray-600">
-            More content here to ensure there's a lot to scroll through...
-          </p>
-        </div> -->
-<!--
-      </div>
-    </main>
-  </div>
-</div> -->
-
-
-
 <app-header
   #headerRef
-  [style.--sidebar-width]="isMobile() ? '0' : (isSidebarExpanded() ? '16rem' : '5rem')"
   [isMobile]="isMobile()"
 ></app-header>
 
-<!-- Backdrop when sidebar open on mobile -->
-@if (isMobile() && isSidebarExpanded()) {
-  <div
-    class="sidebar-backdrop"
-    (click)="closeSidebar()"
-    role="button"
-    tabindex="0"
-    aria-label="Close menu"
-  ></div>
-}
+<!-- ✅ Backdrop removed - no sidebar -->
 
+<!-- ✅ SIDEBAR COMMENTED OUT
 <div class="app-layout">
-  <div
-    class="sidebar-wrapper"
-    [class.sidebar-mobile-overlay]="isMobile()"
-    [class.sidebar-mobile-open]="isMobile() && isSidebarExpanded()"
-    [style.padding-top.px]="isMobile() ? headerHeight() : headerHeight()"
-  >
-    <app-sidebar
-      class="h-full flex-shrink-0 transition-all duration-300"
-      [style.padding-top.px]="isMobile() ? 0 : 0"
-      [isMobileOverlay]="isMobile()"
-    >
-    </app-sidebar>
+  <div class="sidebar-wrapper" ...>
+    <app-sidebar ...></app-sidebar>
   </div>
+  ...
+</div>
+-->
 
-  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
-    <main
-      (scroll)="onContentScroll($event)"
-      class="flex-1 overflow-x-hidden overflow-y-auto transition-all duration-300"
-      [style.padding-top.px]="headerHeight()"
-      [class.main-with-bottom-nav]="isMobile()"
-    >
-      <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4 md:pt-4 md:pb-8 max-w-[1600px]">
-        <router-outlet />
-      </div>
-    </main>
-  </div>
+<!-- ✅ NEW: Layout without sidebar -->
+<div class="app-layout-no-sidebar">
+  <main
+    (scroll)="onContentScroll($event)"
+    class="flex-1 overflow-x-hidden overflow-y-auto"
+    [style.padding-top.px]="headerHeight()"
+    [class.main-with-bottom-nav]="isMobile()"
+  >
+    <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4 md:pt-4 md:pb-8 max-w-[1600px]">
+      <router-outlet />
+    </div>
+  </main>
 </div>
