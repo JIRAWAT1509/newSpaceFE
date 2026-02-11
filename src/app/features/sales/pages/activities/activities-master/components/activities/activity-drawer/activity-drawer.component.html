@@ -88,6 +88,17 @@
         ></textarea>
       </div>
 
+      <!-- Location -->
+<div class="form-section">
+  <label class="form-label">สถานที่</label>
+  <app-location-picker
+    [selectedLocation]="formData().location"
+    [showMap]="true"
+    (locationSelect)="onLocationSelect($event)"
+    (locationClear)="onLocationClear()"
+  ></app-location-picker>
+</div>
+
       <!-- Date Range -->
       <div class="form-section">
         <label class="form-label">วันและเวลา <span class="required">*</span></label>

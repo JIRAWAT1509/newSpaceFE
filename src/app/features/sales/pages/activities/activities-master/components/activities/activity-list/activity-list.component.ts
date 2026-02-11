@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { DateTime } from 'luxon';
 import { Activity, ActivityStatus } from '@core/data/activities.mock';
 import { User } from '@core/data/users.mock';
+import { ActivityLocationMapComponent } from '@shared/components/activity-location-map/activity-location-map.component';
+
 interface StatusUpdateEvent {
   id: string;
   status: ActivityStatus;
@@ -14,7 +16,7 @@ interface StatusUpdateEvent {
 @Component({
   selector: 'app-activity-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ActivityLocationMapComponent],
   templateUrl: './activity-list.component.html',
   styleUrl: './activity-list.component.css'
 })
@@ -60,20 +62,19 @@ export class ActivityListComponent {
     this.activityEdit.emit(activity);
   }
 
-// Line 98 - Update delete handler
-onDelete(activityId: string, event: Event): void {
-  event.stopPropagation();
+  onDelete(activityId: string, event: Event): void {
+    event.stopPropagation();
 
-  // Get activity title for better confirmation message
-  const activity = this.activities.find(a => a.id === activityId);
-  const title = activity?.title || 'กิจกรรมนี้';
+    // Get activity title for better confirmation message
+    const activity = this.activities.find(a => a.id === activityId);
+    const title = activity?.title || 'กิจกรรมนี้';
 
-  if (!confirm(`คุณแน่ใจหรือไม่ที่จะลบ "${title}"?`)) {
-    return;
+    if (!confirm(`คุณแน่ใจหรือไม่ที่จะลบ "${title}"?`)) {
+      return;
+    }
+
+    this.activityDelete.emit(activityId);
   }
-
-  this.activityDelete.emit(activityId);
-}
 
   onStatusChange(activityId: string, status: ActivityStatus, event: Event): void {
     event.stopPropagation();

@@ -135,7 +135,16 @@
               </div>
             </div>
           }
-
+<!-- Location -->
+          @if (activity.location) {
+            <div class="detail-section">
+              <h4 class="detail-title">สถานที่</h4>
+              <app-activity-location-map
+                [location]="activity.location"
+                [compact]="true"
+              ></app-activity-location-map>
+            </div>
+          }
           <!-- Files -->
           @if (activity.files.length > 0) {
             <div class="detail-section">
