@@ -598,7 +598,7 @@ export const DEFAULT_UI_CONFIG: UiConfig = {
     sales: 'Sales',
     area: 'Area',
     contract: 'Contract',
-    collection_finance: 'collection_finance',
+    Collection: 'Collection',
     facilities: 'facilities',
     report: 'Report',
     report_dashboard: 'Report',

@@ -72,8 +72,8 @@
 /* Page Selector */
 .pagination-page-selector {
   flex: 1;
-  max-width: 130px; /* Reduced from 200px */
-  min-width: 130px;
+  max-width: 125px; /* Reduced from 200px */
+  min-width: 125px;
 }
 
 /* ==================== PER PAGE SELECTOR ==================== */

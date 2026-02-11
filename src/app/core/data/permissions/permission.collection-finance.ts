@@ -1,4 +1,4 @@
-export const COLLECTION_FINANCE_TAB = {
+export const Collection_TAB = {
   label: "Collection and Finance",
   icon: "pi pi-wallet",
   items: [
