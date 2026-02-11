@@ -57,71 +57,111 @@ export const MOCK_INVOICES: Invoice[] = [
     id: 'INV001',
     contractNumber: 'COWBP125070001',
     customerName: 'คุณสมชาย ธุรกิจ',
-    collectionItem: 'ค่าเช่าพ ื้นที่',
+    collectionItem: 'ค่าเช่าพื้นที่',
     amount: 25000,
     startDate: '2025-01-12',
     status: 'ready'
   },
   {
     id: 'INV002',
-    contractNumber: 'COWBP125070001',
-    customerName: 'คุณสมชาย ธุรกิจ',
+    contractNumber: 'COWBP125070002',
+    customerName: 'คุณสมหญิง ค้าขาย',
     collectionItem: 'ค่าเช่าพื้นที่',
-    amount: 25000,
-    startDate: '2025-01-12',
+    amount: 35000,
+    startDate: '2025-01-15',
     status: 'ready'
   },
   {
     id: 'INV003',
-    contractNumber: 'COWBP125070001',
-    customerName: 'คุณสมหญิง',
-    collectionItem: 'ค่าเช่าพื้นที่',
-    amount: 25000,
-    startDate: '2025-01-12',
+    contractNumber: 'COWBP125070003',
+    customerName: 'บริษัท ABC จำกัด',
+    collectionItem: 'ค่าเช่าพื้นที่ + ค่าบริการ',
+    amount: 50000,
+    startDate: '2025-01-10',
     status: 'ready'
   },
   {
     id: 'INV004',
-    contractNumber: 'COWBP125070001',
-    customerName: 'คุณสมหญิง',
+    contractNumber: 'COWBP125070004',
+    customerName: 'ร้าน XYZ',
     collectionItem: 'ค่าเช่าพื้นที่',
-    amount: 25000,
-    startDate: '2025-01-12',
+    amount: 28000,
+    startDate: '2025-01-08',
     status: 'ready'
   },
   {
     id: 'INV005',
-    contractNumber: 'COWBP125070001',
-    customerName: 'คุณสมหญิง',
+    contractNumber: 'COWBP125070005',
+    customerName: 'คุณสมศักดิ์ ธุรกิจ',
     collectionItem: 'ค่าเช่าพื้นที่',
-    amount: 25000,
-    startDate: '2025-01-12',
-    status: 'ready'
+    amount: 42000,
+    startDate: '2025-01-20',
+    status: 'open'
   },
   {
     id: 'INV006',
-    contractNumber: 'COWBP125070001',
-    customerName: 'คุณสมหญิง',
+    contractNumber: 'COWBP125070006',
+    customerName: 'บริษัท DEF จำกัด',
     collectionItem: 'ค่าเช่าพื้นที่',
-    amount: 25000,
-    startDate: '2025-01-12',
-    status: 'ready'
+    amount: 55000,
+    startDate: '2025-01-18',
+    status: 'open'
   },
   {
     id: 'INV007',
-    contractNumber: 'COWBP125070001',
-    customerName: 'คุณสมหญิง',
+    contractNumber: 'COWBP125070007',
+    customerName: 'ห้างหุ้นส่วน GHI',
+    collectionItem: 'ค่าเช่าพื้นที่ + ค่าบริการ',
+    amount: 65000,
+    startDate: '2025-01-22',
+    status: 'open'
+  }
+];
+
+// ✅ Mock data สำหรับรายการรอออกใบเสร็จ (invoices ที่ออกแล้วและรอออกใบเสร็จ)
+export const MOCK_RECEIPTS_WAITING: Receipt[] = [
+  {
+    id: 'RW001',
+    contractNumber: 'INV-2025-001',
+    customerName: 'คุณสมชาย ธุรกิจ',
     collectionItem: 'ค่าเช่าพื้นที่',
     amount: 25000,
     startDate: '2025-01-12',
-    status: 'ready'
+    status: 'open'
+  },
+  {
+    id: 'RW002',
+    contractNumber: 'INV-2025-002',
+    customerName: 'คุณสมหญิง ค้าขาย',
+    collectionItem: 'ค่าเช่าพื้นที่',
+    amount: 35000,
+    startDate: '2025-01-15',
+    status: 'open'
+  },
+  {
+    id: 'RW003',
+    contractNumber: 'INV-2025-003',
+    customerName: 'บริษัท ABC จำกัด',
+    collectionItem: 'ค่าเช่าพื้นที่ + ค่าบริการ',
+    amount: 50000,
+    startDate: '2025-01-10',
+    status: 'open'
+  },
+  {
+    id: 'RW004',
+    contractNumber: 'INV-2025-004',
+    customerName: 'ร้าน XYZ',
+    collectionItem: 'ค่าเช่าพื้นที่',
+    amount: 28000,
+    startDate: '2025-01-08',
+    status: 'open'
   }
 ];
 
 export const MOCK_RECEIPTS: Receipt[] = [
   {
     id: 'REC001',
-    contractNumber: 'COWBP125070001',
+    contractNumber: 'RCP-2025-001',
     customerName: 'คุณสมชาย ธุรกิจ',
     collectionItem: 'ค่าเช่าพื้นที่',
     amount: 25000,
@@ -130,48 +170,46 @@ export const MOCK_RECEIPTS: Receipt[] = [
   },
   {
     id: 'REC002',
-    contractNumber: 'COWBP125070001',
-    customerName: 'คุณสมชาย ธุรกิจ',
+    contractNumber: 'RCP-2025-002',
+    customerName: 'คุณสมหญิง ค้าขาย',
     collectionItem: 'ค่าเช่าพื้นที่',
-    amount: 25000,
-    startDate: '2025-01-12',
+    amount: 35000,
+    startDate: '2025-01-15',
     status: 'open'
   },
   {
     id: 'REC003',
-    contractNumber: 'COWBP125070001',
-    customerName: 'คุณสมหญิง',
-    collectionItem: 'ค่าเช่าพื้นที่',
-    amount: 25000,
-    startDate: '2025-01-12',
+    contractNumber: 'RCP-2025-003',
+    customerName: 'บริษัท ABC จำกัด',
+    collectionItem: 'ค่าเช่าพื้นที่ + ค่าบริการ',
+    amount: 50000,
+    startDate: '2025-01-10',
     status: 'open'
   },
   {
     id: 'REC004',
-    contractNumber: 'COWBP125070001',
-    customerName: 'คุณสมหญิง',
+    contractNumber: 'RCP-2025-004',
+    customerName: 'ร้าน XYZ',
     collectionItem: 'ค่าเช่าพื้นที่',
-    amount: 25000,
-    startDate: '2025-01-12',
+    amount: 28000,
+    startDate: '2025-01-08',
     status: 'cancel'
   },
   {
     id: 'REC005',
-    contractNumber: 'COWBP125070001',
-    customerName: 'กรุณาเลือก',
-    collectionItem: 'กรุณาเลือก',
-    amount: 0,
-    startDate: '2025-01-12',
+    contractNumber: 'RCP-2025-005',
+    customerName: 'คุณสมศักดิ์ ธุรกิจ',
+    collectionItem: 'ค่าเช่าพื้นที่',
+    amount: 42000,
+    startDate: '2025-01-20',
     status: 'cancel'
   }
 ];
 
-// finance.mock.ts - แก้ไข ISSUED_DOCUMENTS
-
 export const ISSUED_DOCUMENTS: Record<string, {
   hasCreditNote: boolean;
   hasInvoice: boolean;
-  hasCancelInvoice: boolean;  // ✅ เพิ่ม
+  hasCancelInvoice: boolean;
 }> = {
   'D001': { hasCreditNote: false, hasInvoice: false, hasCancelInvoice: false },
   'D002': { hasCreditNote: true, hasInvoice: false, hasCancelInvoice: false },

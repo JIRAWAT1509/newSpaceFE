@@ -27,12 +27,20 @@ export interface DebtStatusConfig {
 
 export interface Invoice {
   id: string;
+  contractFile?: string;
   contractNumber: string;
   customerName: string;
   collectionItem: string;
   amount: number;
   startDate: string;
   status: 'ready' | 'open' | 'cancel';
+}
+
+export interface InvoiceStatusConfig {
+  label: string;
+  icon: string;
+  color: string;
+  description: string; // ✅ เพิ่ม
 }
 
 export interface Receipt {

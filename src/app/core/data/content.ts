@@ -557,11 +557,11 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           },
         ],
       },
-      {
+      /* {
         name: 'dashboard',
         icon: 'assets/icons/dashboard.svg',
         route: '/dashboard/overview',
-      },
+      }, */
     ],
   },
 

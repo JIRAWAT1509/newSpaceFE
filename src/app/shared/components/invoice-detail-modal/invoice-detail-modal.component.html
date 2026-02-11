@@ -1,0 +1,123 @@
+<!-- invoice-detail-modal.component.html -->
+
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div>
+        <h2 class="modal-title">รายละเอียดใบแจ้งหนี้</h2>
+        <p class="modal-subtitle">เลขที่: {{ invoice().id }}</p>
+      </div>
+      <button class="close-btn" (click)="onClose()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Customer Info Section -->
+      <div class="section">
+        <h3 class="section-title">
+          <i class="pi pi-user"></i>
+          <span>ข้อมูลลูกค้า</span>
+        </h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>ชื่อลูกค้า</label>
+            <p>{{ invoice().customerName || invoice().description }}</p>
+          </div>
+          <div class="info-item">
+            <label>เลขที่สัญญา</label>
+            <p class="contract-number">{{ invoice().contractFile || invoice().contractNumber }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoice Details Section -->
+      <div class="section">
+        <h3 class="section-title">
+          <i class="pi pi-file-check"></i>
+          <span>รายละเอียดใบแจ้งหนี้</span>
+        </h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>รายการ</label>
+            <p>{{ invoice().collectionItem || invoice().description }}</p>
+          </div>
+          <div class="info-item">
+            <label>จำนวนเงินทั้งหมด</label>
+            <p class="amount-large">{{ formatCurrency(invoice().amount) }}</p>
+          </div>
+          <div class="info-item">
+            <label>วันที่เริ่มเรียกเก็บ</label>
+            <p>{{ formatDate(invoice().startDate || invoice().dueDate) }}</p>
+          </div>
+          <div class="info-item">
+            <label>เลขที่ใบแจ้งหนี้</label>
+            <p class="invoice-number">{{ invoice().contractNumber || invoice().id }}</p>
+          </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="financial-summary">
+          <div class="summary-row">
+            <span class="summary-label">ยอดชำระแล้ว</span>
+            <span class="summary-value paid">{{ formatCurrency(0) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">ยอดคงค้าง</span>
+            <span class="summary-value remaining">{{ formatCurrency(invoice().amount) }}</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row total">
+            <span class="summary-label">ยอดรวมทั้งหมด</span>
+            <span class="summary-value">{{ formatCurrency(invoice().amount) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Section -->
+      <div class="section">
+        <h3 class="section-title">
+          <i class="pi pi-info-circle"></i>
+          <span>สถานะ</span>
+        </h3>
+        <div class="status-container">
+          <div class="status-badge" [ngClass]="getStatusClass(invoice().status)">
+            <i class="pi" [ngClass]="getStatusConfig(invoice().status).icon"></i>
+            <span>{{ getStatusConfig(invoice().status).label }}</span>
+          </div>
+          <p class="status-description">
+            {{ getStatusConfig(invoice().status)?.description || "ไม่มีข้อมูล" }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Payment History Section -->
+      <div class="section">
+        <h3 class="section-title">
+          <i class="pi pi-history"></i>
+          <span>ประวัติการชำระเงิน</span>
+        </h3>
+        <div class="payment-history">
+          <div class="empty-history">
+            <i class="pi pi-inbox"></i>
+            <p>ยังไม่มีประวัติการชำระเงิน</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="onDownloadPDF()">
+        <i class="pi pi-download"></i>
+        <span>ดาวน์โหลด PDF</span>
+      </button>
+      <button class="btn-primary" (click)="onSendEmail()">
+        <i class="pi pi-send"></i>
+        <span>ส่งอีเมล</span>
+      </button>
+    </div>
+  </div>
+</div>
