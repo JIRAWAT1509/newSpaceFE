@@ -70,10 +70,10 @@
 }
 
 /* Page Selector */
-.pagination-page-selector {
+.budget-pagination-page-selector {
   flex: 1;
-  max-width: 140px; /* Reduced from 200px */
-  min-width: 100px;
+  max-width: 200px; /* Reduced from 200px */
+  min-width: 200px;
 }
 
 /* ==================== PER PAGE SELECTOR ==================== */
@@ -111,7 +111,7 @@
     flex-wrap: wrap;
   }
 
-  .pagination-page-selector {
+  .budget-pagination-page-selector {
     order: 3;
     flex-basis: 100%;
     max-width: none;
