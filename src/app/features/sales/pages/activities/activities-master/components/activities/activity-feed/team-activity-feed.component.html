@@ -1,11 +1,18 @@
-<!-- team-activity-feed.component.html -->
+<!-- team-activity-feed.component.html - UPDATED with Show More button -->
 
 <div class="feed-container">
 
   <!-- ==================== FEED HEADER ==================== -->
   <div class="feed-header">
     <div class="feed-header-content">
-      <span class="feed-count">{{ feedItems.length }} รายการ</span>
+      <!-- ✅ UPDATED: Show current/total count -->
+      <span class="feed-count">
+        @if (isExpanded()) {
+          {{ feedItems.length }} รายการทั้งหมด
+        } @else {
+          {{ displayedItems().length }} / {{ feedItems.length }} รายการ
+        }
+      </span>
       <span class="feed-separator">•</span>
       <span class="last-update">
         อัพเดทล่าสุด: {{ getRelativeTimeTh(lastRefreshTime().toISO()) }}
@@ -38,7 +45,8 @@
     } @else {
       <!-- Feed Items List -->
       <div class="feed-list">
-        @for (item of feedItems.slice(0, maxItems); track item.id) {
+        <!-- ✅ UPDATED: Use displayedItems() instead of slice -->
+        @for (item of displayedItems(); track item.id) {
           <div
             class="feed-item"
             [class.recent]="isRecentItem(item.timestamp)"
@@ -109,11 +117,20 @@
         }
       </div>
 
-      <!-- Show More Indicator (if items exceed maxItems) -->
-      @if (feedItems.length > maxItems) {
-        <div class="more-indicator">
-          +{{ feedItems.length - maxItems }} รายการเพิ่มเติม
-        </div>
+      <!-- ✅ NEW: Show More/Less Button -->
+      @if (hasMoreItems()) {
+        <button
+          class="btn-show-more"
+          (click)="toggleExpand()"
+        >
+          @if (isExpanded()) {
+            <i class="pi pi-chevron-up"></i>
+            <span>แสดงน้อยลง</span>
+          } @else {
+            <i class="pi pi-chevron-down"></i>
+            <span>แสดงเพิ่มเติม ({{ hiddenItemsCount() }})</span>
+          }
+        </button>
       }
     }
   </div>

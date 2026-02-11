@@ -10,7 +10,7 @@ export interface ActivityRequirement {
   description?: string;
 }
 
-export interface ActivityFile {     
+export interface ActivityFile {
   id: string;
   name: string;
   size: number;
@@ -507,5 +507,171 @@ export const MOCK_TEAM_ACTIVITY_FEED: TeamActivityFeedItem[] = [
     action: 'created',
     description: 'Created demo preparation task',
     timestamp: DateTime.now().minus({ days: 3 }).toISO()
+  },
+    {
+    id: 'feed-011',
+    activityId: 'act-002',
+    activityTitle: 'Review Contract #12345',
+    userId: 'user-001',
+    userName: 'John Smith',
+    userAvatar: '👨‍💼',
+    action: 'updated',
+    description: 'Reviewed contract clauses and added comments',
+    timestamp: DateTime.now().minus({ minutes: 35 }).toISO()
+  },
+  {
+    id: 'feed-012',
+    activityId: 'act-003',
+    activityTitle: 'Client Meeting Preparation',
+    userId: 'user-004',
+    userName: 'Esther Howard',
+    userAvatar: '👩‍💻',
+    action: 'finished',
+    description: 'Presentation slides completed',
+    timestamp: DateTime.now().minus({ hours: 1 }).toISO()
+  },
+  {
+    id: 'feed-013',
+    activityId: 'act-004',
+    activityTitle: 'Update CRM Data',
+    userId: 'user-005',
+    userName: 'Cody Fisher',
+    userAvatar: '👨‍💻',
+    action: 'updated',
+    description: 'Updated customer contact information',
+    timestamp: DateTime.now().minus({ hours: 2 }).toISO()
+  },
+  {
+    id: 'feed-014',
+    activityId: 'act-007',
+    activityTitle: 'Financial Forecast Review',
+    userId: 'user-003',
+    userName: 'Robert Fox',
+    userAvatar: '👨‍💼',
+    action: 'returned',
+    description: 'Returned due to missing assumptions',
+    timestamp: DateTime.now().minus({ hours: 3 }).toISO()
+  },
+  {
+    id: 'feed-015',
+    activityId: 'act-008',
+    activityTitle: 'Website Content Update',
+    userId: 'user-006',
+    userName: 'Emily Davis',
+    userAvatar: '👩‍🎨',
+    action: 'updated',
+    description: 'Added new landing page content',
+    timestamp: DateTime.now().minus({ hours: 4 }).toISO()
+  },
+  {
+    id: 'feed-016',
+    activityId: 'act-009',
+    activityTitle: 'Internal Training Session',
+    userId: 'user-002',
+    userName: 'Jane Cooper',
+    userAvatar: '👩‍💼',
+    action: 'finished',
+    description: 'Training session successfully completed',
+    timestamp: DateTime.now().minus({ hours: 6 }).toISO()
+  },
+  {
+    id: 'feed-017',
+    activityId: 'act-010',
+    activityTitle: 'Product Demo Preparation',
+    userId: 'user-004',
+    userName: 'Esther Howard',
+    userAvatar: '👩‍💻',
+    action: 'updated',
+    description: 'Demo script updated based on feedback',
+    timestamp: DateTime.now().minus({ hours: 8 }).toISO()
+  },
+  {
+    id: 'feed-018',
+    activityId: 'act-011',
+    activityTitle: 'Customer Follow-up Call',
+    userId: 'user-001',
+    userName: 'John Smith',
+    userAvatar: '👨‍💼',
+    action: 'finished',
+    description: 'Customer confirmed next steps',
+    timestamp: DateTime.now().minus({ hours: 10 }).toISO()
+  },
+  {
+    id: 'feed-019',
+    activityId: 'act-012',
+    activityTitle: 'Bug Fix Verification',
+    userId: 'user-005',
+    userName: 'Cody Fisher',
+    userAvatar: '👨‍💻',
+    action: 'updated',
+    description: 'Verified fix on staging environment',
+    timestamp: DateTime.now().minus({ hours: 12 }).toISO()
+  },
+  {
+    id: 'feed-020',
+    activityId: 'act-013',
+    activityTitle: 'Design Review',
+    userId: 'user-006',
+    userName: 'Emily Davis',
+    userAvatar: '👩‍🎨',
+    action: 'returned',
+    description: 'Requested minor UI adjustments',
+    timestamp: DateTime.now().minus({ hours: 14 }).toISO()
+  },
+  {
+    id: 'feed-021',
+    activityId: 'act-014',
+    activityTitle: 'Monthly Performance Report',
+    userId: 'user-003',
+    userName: 'Robert Fox',
+    userAvatar: '👨‍💼',
+    action: 'updated',
+    description: 'Updated KPIs and charts',
+    timestamp: DateTime.now().minus({ hours: 18 }).toISO()
+  },
+  {
+    id: 'feed-022',
+    activityId: 'act-015',
+    activityTitle: 'Security Access Review',
+    userId: 'user-002',
+    userName: 'Jane Cooper',
+    userAvatar: '👩‍💼',
+    action: 'finished',
+    description: 'Access rights reviewed and approved',
+    timestamp: DateTime.now().minus({ hours: 22 }).toISO()
+  },
+  {
+    id: 'feed-023',
+    activityId: 'act-016',
+    activityTitle: 'Marketing Campaign Planning',
+    userId: 'user-004',
+    userName: 'Esther Howard',
+    userAvatar: '👩‍💻',
+    action: 'updated',
+    description: 'Drafted campaign timeline',
+    timestamp: DateTime.now().minus({ days: 1 }).toISO()
+  },
+  {
+    id: 'feed-024',
+    activityId: 'act-017',
+    activityTitle: 'Data Migration Task',
+    userId: 'user-005',
+    userName: 'Cody Fisher',
+    userAvatar: '👨‍💻',
+    action: 'canceled',
+    description: 'Canceled due to change in requirements',
+    timestamp: DateTime.now().minus({ days: 1, hours: 4 }).toISO()
+  },
+  {
+    id: 'feed-025',
+    activityId: 'act-018',
+    activityTitle: 'User Feedback Analysis',
+    userId: 'user-006',
+    userName: 'Emily Davis',
+    userAvatar: '👩‍🎨',
+    action: 'updated',
+    description: 'Summarized user feedback insights',
+    timestamp: DateTime.now().minus({ days: 2 }).toISO()
   }
+
 ];

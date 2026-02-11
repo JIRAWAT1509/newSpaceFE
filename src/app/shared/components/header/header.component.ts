@@ -110,14 +110,14 @@ export class HeaderComponent implements OnInit {
 
   activeRoute: string = '';
 
-  navIconMap: Record<string, string> = {
-    // Sales icons
-    dashboard: 'pi pi-chart-line',
-    customer: 'pi pi-users',
-    budget: 'pi pi-wallet',
-    pipeline: 'pi pi-sitemap',
-    activities: 'pi pi-calendar',
-  };
+navIconMap: Record<string, string> = {
+  sales_dashboard: 'pi pi-chart-line',
+  customer_management: 'pi pi-users',
+  budget_management: 'pi pi-wallet',
+  pipeline_management: 'pi pi-sitemap',
+  activities_management: 'pi pi-calendar',
+};
+
 
   // UI state
   isScrolled: boolean = false;

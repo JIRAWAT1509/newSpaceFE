@@ -26,6 +26,9 @@
               "src/assets"
             ],
             "styles": [
+                "node_modules/primeicons/primeicons.css",
+  "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
+  "node_modules/primeng/resources/primeng.min.css",
               "src/styles/styles.css",
               "primeicons/primeicons.css",
               "src/styles/primeng-overrides.css",

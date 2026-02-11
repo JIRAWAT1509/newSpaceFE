@@ -28,8 +28,10 @@
                 [class.header-nav-item-active]="isRouteActive(item.route || '')"
                 class="header-nav-item"
               >
-                <i class="header-nav-icon" [ngClass]="getNavIcon(item.name)"></i>
-                <span class="header-nav-label">{{ translateNav(item.name) }}</span>
+<i
+  class="header-nav-icon"
+  [ngClass]="navIconMap[item.name]"
+></i>                <span class="header-nav-label">{{ translateNav(item.name) }}</span>
                 <span
                   *ngIf="isRouteActive(item.route || '')"
                   class="header-nav-underline bg-secondary"

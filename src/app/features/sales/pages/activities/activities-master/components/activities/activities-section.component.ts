@@ -178,20 +178,26 @@ export class ActivitiesSectionComponent implements OnInit {
 
   // ==================== DATA LOADING ====================
 
-  loadActivitiesData(): void {
-    this.isLoading.set(true);
+loadActivitiesData(): void {
+  this.isLoading.set(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      this.activities.set([...MOCK_ACTIVITIES]);
-      this.teamActivityFeed.set([...MOCK_TEAM_ACTIVITY_FEED].slice(0, 10));
-      this.users.set([...MOCK_USERS]);
-      this.roles.set([...MOCK_ROLES]);
+  // Simulate API call
+  setTimeout(() => {
+    this.activities.set([...MOCK_ACTIVITIES]);
 
-      this.isLoading.set(false);
-      ////console.log('Activities data loaded:', this.activities().length);
-    }, 500);
-  }
+    // ✅ LOAD ALL TEAM FEED (not just 10)
+    this.teamActivityFeed.set([...MOCK_TEAM_ACTIVITY_FEED]);
+
+    // ✅ DEBUG: Check if data exists
+    // console.log('🔍 Team Activity Feed loaded:', MOCK_TEAM_ACTIVITY_FEED.length);
+    // console.log('🔍 Feed items:', this.teamActivityFeed());
+
+    this.users.set([...MOCK_USERS]);
+    this.roles.set([...MOCK_ROLES]);
+
+    this.isLoading.set(false);
+  }, 500);
+}
 
   // Auto-refresh team activity feed every 30 seconds
   startAutoRefresh(): void {

@@ -90,6 +90,7 @@
       <div class="team-feed-content">
         <app-team-activity-feed
           [feedItems]="teamActivityFeed()"
+          [initialDisplayCount]="10"
           (activityClick)="selectActivity($event)"
         ></app-team-activity-feed>
       </div>
