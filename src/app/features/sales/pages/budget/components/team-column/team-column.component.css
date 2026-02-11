@@ -8,9 +8,9 @@
   border: 2px solid #e5e7eb;
   display: flex;
   flex-direction: column;
-  height: 720px;
-  min-height: 720px;
-  max-height: 720px;
+  height: 875px;
+  min-height: 875px;
+  max-height: 875px;
 }
 
 /* ==================== TEAM HEADER ==================== */
@@ -141,7 +141,7 @@
   flex-direction: column;
   gap: 10px;
   min-height: 0;
-  max-height: 400px;
+  max-height: 1000px;
 }
 
 /* Custom scrollbar */

@@ -1,4 +1,4 @@
-// activities-section.component.ts - CORRECTED VERSION
+// activities-section.component.ts - FULL WITH CHECK-IN HANDLER
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DateTime } from 'luxon';
@@ -14,6 +14,9 @@ import {
 } from '@core/data/activities.mock';
 import { User, CURRENT_USER, MOCK_USERS } from '@core/data/users.mock';
 import { Role, MOCK_ROLES } from '@core/data/roles.mock';
+
+// Import services
+import { CheckInService } from '@core/services/checkin.service';
 
 // Import child components
 import { ActivityCalendarComponent } from './calendar/activity-calendar.component';
@@ -55,10 +58,16 @@ export class ActivitiesSectionComponent implements OnInit {
   // Calendar State
   calendarView = signal<'month' | 'week'>('month');
   currentDate = signal<DateTime>(DateTime.now());
-  selectedDate = signal<DateTime | null>(null); // NEW: Track selected date
+  selectedDate = signal<DateTime | null>(null);
 
   // Filter State
   activeFilters = signal<ActivityFilters>({ types: [], statuses: [] });
+
+  // ==================== CONSTRUCTOR ====================
+
+  constructor(
+    private checkInService: CheckInService
+  ) {}
 
   // ==================== COMPUTED ====================
 
@@ -184,12 +193,11 @@ export class ActivitiesSectionComponent implements OnInit {
     // Simulate API call
     setTimeout(() => {
       this.activities.set([...MOCK_ACTIVITIES]);
-      this.teamActivityFeed.set([...MOCK_TEAM_ACTIVITY_FEED].slice(0, 10));
+      this.teamActivityFeed.set([...MOCK_TEAM_ACTIVITY_FEED]);
       this.users.set([...MOCK_USERS]);
       this.roles.set([...MOCK_ROLES]);
 
       this.isLoading.set(false);
-      ////console.log('Activities data loaded:', this.activities().length);
     }, 500);
   }
 
@@ -201,7 +209,7 @@ export class ActivitiesSectionComponent implements OnInit {
   }
 
   refreshTeamActivityFeed(): void {
-    ////console.log('Team activity feed refreshed');
+    // console.log('Team activity feed refreshed');
   }
 
   // ==================== FILTER MANAGEMENT ====================
@@ -246,7 +254,7 @@ export class ActivitiesSectionComponent implements OnInit {
 
   goToToday(): void {
     this.currentDate.set(DateTime.now());
-    this.selectedDate.set(null); // Clear date filter when going to today
+    this.selectedDate.set(null);
   }
 
   // ==================== ACTIVITY SELECTION ====================
@@ -302,6 +310,8 @@ export class ActivitiesSectionComponent implements OnInit {
         assignedTo: activityData.assignedTo || [],
         assignedToRoles: activityData.assignedToRoles || [],
         finishRequirement: activityData.finishRequirement,
+        location: activityData.location,
+        checkIns: [],
         files: [],
         comments: [],
         createdAt: DateTime.now().toISO(),
@@ -323,7 +333,7 @@ export class ActivitiesSectionComponent implements OnInit {
       this.isLoading.set(false);
       this.closeDrawer();
 
-      ////console.log('Activity created:', newActivity);
+      console.log('✅ Activity created:', newActivity);
     }, 500);
   }
 
@@ -342,7 +352,7 @@ export class ActivitiesSectionComponent implements OnInit {
       this.isLoading.set(false);
       this.closeDrawer();
 
-      ////console.log('Activity updated:', activityId);
+      console.log('✅ Activity updated:', activityId);
     }, 500);
   }
 
@@ -361,7 +371,7 @@ export class ActivitiesSectionComponent implements OnInit {
       this.isLoading.set(false);
       this.deselectActivity();
 
-      ////console.log('Activity deleted:', activityId);
+      console.log('✅ Activity deleted:', activityId);
     }, 300);
   }
 
@@ -407,8 +417,60 @@ export class ActivitiesSectionComponent implements OnInit {
       }
 
       this.isLoading.set(false);
-      ////console.log('Activity status updated:', activityId, status);
+      console.log('✅ Activity status updated:', activityId, status);
     }, 500);
+  }
+
+  // ==================== CHECK-IN MANAGEMENT ====================
+
+  async handleCheckIn(activityId: string): Promise<void> {
+    const activity = this.activities().find(a => a.id === activityId);
+    if (!activity) {
+      console.error('❌ Activity not found:', activityId);
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    try {
+      // Perform check-in via service
+      const result = await this.checkInService.performCheckIn(
+        activity,
+        this.currentUser().id,
+        this.currentUser().name
+      );
+
+      if (result.success && result.checkIn) {
+        // Update activity with new check-in
+        this.activities.update(activities =>
+          activities.map(a =>
+            a.id === activityId
+              ? { ...a, checkIns: [...(a.checkIns || []), result.checkIn!] }
+              : a
+          )
+        );
+
+        // Add to team activity feed
+        this.addTeamActivityFeedItem({
+          activityId,
+          activityTitle: activity.title,
+          action: 'checked-in' as any,
+          description: `Checked in at ${result.checkIn.address || 'location'}${
+            result.checkIn.distanceFromLocation
+              ? ` (${result.checkIn.distanceFromLocation}m away)`
+              : ''
+          }`
+        });
+
+        console.log('✅ Check-in successful:', result.checkIn);
+      } else {
+        console.error('❌ Check-in failed:', result.error);
+      }
+    } catch (error: any) {
+      console.error('❌ Check-in error:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   // ==================== TEAM ACTIVITY FEED ====================
@@ -416,7 +478,7 @@ export class ActivitiesSectionComponent implements OnInit {
   addTeamActivityFeedItem(data: {
     activityId: string;
     activityTitle: string;
-    action: 'created' | 'updated' | 'finished' | 'canceled' | 'returned';
+    action: 'created' | 'updated' | 'finished' | 'canceled' | 'returned' | 'checked-in';
     description: string;
   }): void {
     const newItem: TeamActivityFeedItem = {
@@ -431,7 +493,7 @@ export class ActivitiesSectionComponent implements OnInit {
       timestamp: DateTime.now().toISO()
     };
 
-    this.teamActivityFeed.update(feed => [newItem, ...feed].slice(0, 10));
+    this.teamActivityFeed.update(feed => [newItem, ...feed].slice(0, 50));
   }
 
   // ==================== UTILITY ====================
@@ -443,4 +505,56 @@ export class ActivitiesSectionComponent implements OnInit {
   getRoleById(roleId: string): Role | undefined {
     return this.roles().find(r => r.id === roleId);
   }
+// ==================== ADD METHOD ====================
+
+duplicateActivity(data: { originalId: string; duplicatedData: Partial<Activity> }): void {
+  this.isLoading.set(true);
+
+  setTimeout(() => {
+    const original = this.activities().find(a => a.id === data.originalId);
+    if (!original) {
+      console.error('Original activity not found');
+      this.isLoading.set(false);
+      return;
+    }
+
+    const newActivity: Activity = {
+      id: `act-${Date.now()}`,
+      type: data.duplicatedData.type || original.type,
+      title: data.duplicatedData.title || original.title,
+      description: data.duplicatedData.description || original.description,
+      startDate: data.duplicatedData.startDate!,
+      endDate: data.duplicatedData.endDate!,
+      status: 'pending',
+      createdBy: this.currentUser().id,
+      createdByName: this.currentUser().name,
+      assignedTo: data.duplicatedData.assignedTo || [],
+      assignedToRoles: data.duplicatedData.assignedToRoles || [],
+      finishRequirement: data.duplicatedData.finishRequirement,
+      location: data.duplicatedData.location,
+      checkIns: [],
+      files: [],
+      comments: [],
+      createdAt: DateTime.now().toISO()!,
+      updatedAt: DateTime.now().toISO()!,
+      color: data.duplicatedData.color || original.color
+    };
+
+    this.activities.update(activities => [...activities, newActivity]);
+
+    // Add to team feed
+    if (newActivity.type === 'assignment') {
+      this.addTeamActivityFeedItem({
+        activityId: newActivity.id,
+        activityTitle: newActivity.title,
+        action: 'created',
+        description: `Duplicated from "${original.title}"`
+      });
+    }
+
+    this.isLoading.set(false);
+
+    console.log('✅ Activity duplicated:', newActivity);
+  }, 500);
+}
 }

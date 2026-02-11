@@ -1,0 +1,177 @@
+<!-- location-picker.component.html -->
+
+<div class="location-picker">
+
+  <!-- ==================== SELECTED LOCATION ==================== -->
+  @if (selectedLocation) {
+    <div class="selected-location">
+      <div class="selected-location-info">
+        <i class="pi pi-map-marker location-icon"></i>
+        <div class="location-details">
+          <span class="location-name">{{ selectedLocation.name }}</span>
+          <span class="location-address">{{ selectedLocation.address }}</span>
+        </div>
+      </div>
+
+      <div class="selected-location-actions">
+        <button
+          type="button"
+          class="btn-location-action btn-map"
+          (click)="openInGoogleMaps(selectedLocation, $event)"
+          title="เปิดใน Google Maps"
+        >
+          <i class="pi pi-external-link"></i>
+        </button>
+        <button
+          type="button"
+          class="btn-location-action btn-clear"
+          (click)="clearLocation()"
+          title="ลบสถานที่"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mini Map Preview -->
+    @if (showMap && selectedLocation) {
+      <div class="map-preview" (click)="openInGoogleMaps(selectedLocation)">
+        <iframe
+          [src]="getStaticMapUrl(selectedLocation) | sanitizeUrl"
+          class="map-iframe"
+          scrolling="no"
+        ></iframe>
+        <div class="map-overlay">
+          <i class="pi pi-external-link"></i>
+          <span>คลิกเพื่อเปิดใน Google Maps</span>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- ==================== SEARCH BAR ==================== -->
+  @if (!selectedLocation) {
+    <div class="search-container">
+      <div class="search-bar">
+        <i class="pi pi-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          [placeholder]="placeholder"
+          [(ngModel)]="searchQuery"
+          (focus)="onSearchFocus()"
+          (blur)="onSearchBlur()"
+          autocomplete="off"
+        />
+        @if (searchQuery()) {
+          <button
+            type="button"
+            class="btn-clear-search"
+            (click)="clearSearch()"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        }
+        @if (isLoading()) {
+          <div class="search-loading">
+            <i class="pi pi-spin pi-spinner"></i>
+          </div>
+        }
+      </div>
+
+      <!-- Remaining slots indicator -->
+      <div class="slots-indicator">
+        <i class="pi pi-bookmark"></i>
+        <span>บันทึกได้อีก {{ getRemainingSlots() }}/4 สถานที่</span>
+      </div>
+
+      <!-- ==================== SEARCH RESULTS ==================== -->
+      @if (showResults()) {
+        <div class="results-dropdown">
+
+          <!-- No query: Show saved locations -->
+          @if (!searchQuery() && savedLocations().length > 0) {
+            <div class="results-section">
+              <div class="section-header">
+                <i class="pi pi-bookmark-fill"></i>
+                <span>สถานที่ที่บันทึกไว้</span>
+              </div>
+
+              @for (location of savedLocations(); track location.id) {
+                <div
+                  class="result-item"
+                  (click)="selectLocation(location)"
+                >
+                  <i class="pi pi-map-marker item-icon"></i>
+                  <div class="item-info">
+                    <span class="item-name">{{ location.name }}</span>
+                    <span class="item-address">{{ location.address }}</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-bookmark active"
+                    (click)="toggleBookmark(location, $event)"
+                    title="ลบออกจากรายการบันทึก"
+                  >
+                    <i class="pi pi-bookmark-fill"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Has query: Show search results -->
+          @if (searchQuery() && searchResults().length > 0) {
+            <div class="results-section">
+              <div class="section-header">
+                <i class="pi pi-search"></i>
+                <span>ผลการค้นหา</span>
+              </div>
+
+              @for (location of searchResults(); track location.id) {
+                <div
+                  class="result-item"
+                  (click)="selectLocation(location)"
+                >
+                  <i class="pi pi-map-marker item-icon"></i>
+                  <div class="item-info">
+                    <span class="item-name">{{ location.name }}</span>
+                    <span class="item-address">{{ location.address }}</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-bookmark"
+                    [class.active]="isLocationSaved(location.id)"
+                    (click)="toggleBookmark(location, $event)"
+                    [title]="isLocationSaved(location.id) ? 'ลบออกจากรายการบันทึก' : 'บันทึกสถานที่'"
+                  >
+                    <i [class]="isLocationSaved(location.id) ? 'pi pi-bookmark-fill' : 'pi pi-bookmark'"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Empty state -->
+          @if (searchQuery() && searchResults().length === 0 && !isLoading()) {
+            <div class="results-empty">
+              <i class="pi pi-map-marker"></i>
+              <p>ไม่พบสถานที่</p>
+              <span>ลองค้นหาด้วยคำอื่น</span>
+            </div>
+          }
+
+          <!-- No saved locations -->
+          @if (!searchQuery() && savedLocations().length === 0) {
+            <div class="results-empty">
+              <i class="pi pi-bookmark"></i>
+              <p>ยังไม่มีสถานที่ที่บันทึกไว้</p>
+              <span>ค้นหาและบันทึกสถานที่เพื่อเข้าถึงได้ง่าย</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+</div>

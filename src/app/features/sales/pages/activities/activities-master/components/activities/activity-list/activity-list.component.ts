@@ -1,9 +1,13 @@
-// activity-list.component.ts
-import { Component, Input, Output, EventEmitter, signal, computed } from '@angular/core';
+// activity-list.component.ts - UPDATED with Check-In support
+import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DateTime } from 'luxon';
 import { Activity, ActivityStatus } from '@core/data/activities.mock';
 import { User } from '@core/data/users.mock';
+import { ActivityLocationMapComponent } from '@shared/components/activity-location-map/activity-location-map.component';
+import { ActivityCheckInButtonComponent } from './../activity-checkin-button/activity-checkin-button.component';
+import { ActivityDuplicateDialogComponent } from './../activity-duplicate-dialog/activity-duplicate-dialog.component';
+
 interface StatusUpdateEvent {
   id: string;
   status: ActivityStatus;
@@ -14,7 +18,7 @@ interface StatusUpdateEvent {
 @Component({
   selector: 'app-activity-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ActivityLocationMapComponent, ActivityCheckInButtonComponent, ActivityDuplicateDialogComponent],
   templateUrl: './activity-list.component.html',
   styleUrl: './activity-list.component.css'
 })
@@ -33,14 +37,19 @@ export class ActivityListComponent {
   @Output() activityEdit = new EventEmitter<Activity>();
   @Output() activityDelete = new EventEmitter<string>();
   @Output() statusUpdate = new EventEmitter<StatusUpdateEvent>();
-
+  @Output() checkInSuccess = new EventEmitter<string>(); // ✅ NEW: Check-in event
+  @Output() activityDuplicate = new EventEmitter<{
+    originalId: string;
+    duplicatedData: Partial<Activity>;
+  }>();
   // ==================== SIGNALS ====================
   expandedId = signal<string | null>(null);
   showStatusDialog = signal<boolean>(false);
   statusDialogType = signal<'cancel' | 'return' | 'finish'>('cancel');
   statusDialogActivityId = signal<string | null>(null);
   statusDialogReason = signal<string>('');
-
+  showDuplicateDialog = signal<boolean>(false);
+  activityToDuplicate = signal<Activity | null>(null);
   // ==================== EVENT HANDLERS ====================
 
   onActivityClick(activityId: string): void {
@@ -62,7 +71,24 @@ export class ActivityListComponent {
 
   onDelete(activityId: string, event: Event): void {
     event.stopPropagation();
+
+    // Get activity title for better confirmation message
+    const activity = this.activities.find(a => a.id === activityId);
+    const title = activity?.title || 'กิจกรรมนี้';
+
+    if (!confirm(`คุณแน่ใจหรือไม่ที่จะลบ "${title}"?`)) {
+      return;
+    }
+
     this.activityDelete.emit(activityId);
+  }
+
+  // ✅ NEW: Check-in success handler
+  onCheckInSuccess(activityId: string, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.checkInSuccess.emit(activityId);
   }
 
   onStatusChange(activityId: string, status: ActivityStatus, event: Event): void {
@@ -289,5 +315,30 @@ export class ActivityListComponent {
   truncateText(text: string, maxLength: number): string {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
+  }
+
+  onDuplicate(activity: Activity, event: Event): void {
+    event.stopPropagation();
+    this.activityToDuplicate.set(activity);
+    this.showDuplicateDialog.set(true);
+  }
+
+  onDuplicateConfirm(duplicatedData: Partial<Activity>): void {
+    const originalId = this.activityToDuplicate()?.id;
+    if (!originalId) return;
+
+    this.activityDuplicate.emit({
+      originalId,
+      duplicatedData
+    });
+
+    this.closeDuplicateDialog();
+  }
+
+  closeDuplicateDialog(): void {
+    this.showDuplicateDialog.set(false);
+    setTimeout(() => {
+      this.activityToDuplicate.set(null);
+    }, 300);
   }
 }

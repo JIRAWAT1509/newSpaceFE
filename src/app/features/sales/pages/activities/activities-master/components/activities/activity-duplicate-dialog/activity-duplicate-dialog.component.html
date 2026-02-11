@@ -1,0 +1,215 @@
+<!-- activity-duplicate-dialog.component.html -->
+
+<div class="dialog-overlay" (click)="onCancel()"></div>
+
+<div class="dialog-container" (click)="$event.stopPropagation()">
+
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="header-icon">
+      <i class="pi pi-copy"></i>
+    </div>
+    <div class="header-content">
+      <h2 class="dialog-title">คัดลอกกิจกรรม</h2>
+      <p class="dialog-subtitle">Duplicate Activity</p>
+    </div>
+    <button class="btn-close" (click)="onCancel()">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="dialog-body">
+
+    <!-- Original Activity Info -->
+    <div class="original-activity-card">
+      <div class="card-header">
+        <span class="type-badge" [class.assignment]="activity.type === 'assignment'">
+          {{ activityType() }}
+        </span>
+        <span class="duration-badge">
+          <i class="pi pi-clock"></i>
+          {{ activityDuration() }}
+        </span>
+      </div>
+
+      <h3 class="activity-title">{{ activity.title }}</h3>
+
+      <div class="activity-features">
+        @if (hasLocation()) {
+          <div class="feature-badge">
+            <i class="pi pi-map-marker"></i>
+            <span>มีสถานที่</span>
+          </div>
+        }
+        @if (hasFinishRequirement()) {
+          <div class="feature-badge">
+            <i class="pi pi-check-circle"></i>
+            <span>มีข้อกำหนด</span>
+          </div>
+        }
+        @if (activity.assignedTo && activity.assignedTo.length > 0) {
+          <div class="feature-badge">
+            <i class="pi pi-users"></i>
+            <span>{{ activity.assignedTo.length }} คน</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="section-divider">
+      <i class="pi pi-arrow-down"></i>
+      <span>กำหนดข้อมูลใหม่</span>
+    </div>
+
+    <!-- New Activity Form -->
+    <div class="form-section">
+
+      <!-- Title -->
+      <div class="form-group">
+        <label class="form-label">
+          ชื่อกิจกรรมใหม่ <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          class="form-input"
+          [class.error]="formErrors()['title']"
+          [value]="newTitle()"
+          (input)="newTitle.set($any($event.target).value)"
+          placeholder="กรอกชื่อกิจกรรม..."
+        />
+        @if (formErrors()['title']) {
+          <span class="error-message">{{ formErrors()['title'] }}</span>
+        }
+      </div>
+
+      <!-- Quick Date Selection -->
+      <div class="form-group">
+        <label class="form-label">เลือกวันที่แบบเร็ว</label>
+        <div class="quick-options">
+          <button
+            type="button"
+            class="quick-option"
+            [class.active]="selectedQuickOption() === 'today'"
+            (click)="onQuickDateSelect('today')"
+          >
+            <i class="pi pi-calendar-plus"></i>
+            <span>วันนี้</span>
+          </button>
+
+          <button
+            type="button"
+            class="quick-option"
+            [class.active]="selectedQuickOption() === 'tomorrow'"
+            (click)="onQuickDateSelect('tomorrow')"
+          >
+            <i class="pi pi-calendar"></i>
+            <span>พรุ่งนี้</span>
+          </button>
+
+          <button
+            type="button"
+            class="quick-option"
+            [class.active]="selectedQuickOption() === 'next-week'"
+            (click)="onQuickDateSelect('next-week')"
+          >
+            <i class="pi pi-forward"></i>
+            <span>สัปดาห์หน้า</span>
+          </button>
+
+          <button
+            type="button"
+            class="quick-option"
+            [class.active]="selectedQuickOption() === 'next-month'"
+            (click)="onQuickDateSelect('next-month')"
+          >
+            <i class="pi pi-calendar-times"></i>
+            <span>เดือนหน้า</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Date & Time -->
+      <div class="form-group">
+        <label class="form-label">วันและเวลา <span class="required">*</span></label>
+
+        <div class="date-time-grid">
+          <!-- Start -->
+          <div class="date-time-group">
+            <label class="sub-label">เริ่มต้น</label>
+            <div class="date-time-inputs">
+              <input
+                type="date"
+                class="form-input"
+                [class.error]="formErrors()['startDate']"
+                [value]="startDate()"
+                (change)="startDate.set($any($event.target).value); selectedQuickOption.set(null)"
+              />
+              <input
+                type="time"
+                class="form-input"
+                [value]="startTime()"
+                (change)="startTime.set($any($event.target).value); selectedQuickOption.set(null)"
+              />
+            </div>
+          </div>
+
+          <!-- End -->
+          <div class="date-time-group">
+            <label class="sub-label">สิ้นสุด</label>
+            <div class="date-time-inputs">
+              <input
+                type="date"
+                class="form-input"
+                [class.error]="formErrors()['endDate']"
+                [value]="endDate()"
+                (change)="endDate.set($any($event.target).value); selectedQuickOption.set(null)"
+              />
+              <input
+                type="time"
+                class="form-input"
+                [value]="endTime()"
+                (change)="endTime.set($any($event.target).value); selectedQuickOption.set(null)"
+              />
+            </div>
+          </div>
+        </div>
+
+        @if (formErrors()['startDate'] || formErrors()['endDate']) {
+          <span class="error-message">
+            {{ formErrors()['startDate'] || formErrors()['endDate'] }}
+          </span>
+        }
+      </div>
+
+      <!-- Info Note -->
+      <div class="info-note">
+        <i class="pi pi-info-circle"></i>
+        <div class="info-content">
+          <strong>หมายเหตุ:</strong>
+          <ul>
+            <li>สถานะจะถูกรีเซ็ตเป็น "รอดำเนินการ"</li>
+            <li>ข้อมูล Check-In จะถูกล้างออก</li>
+            <li>ไฟล์และความคิดเห็นจะถูกล้างออก</li>
+            <li>การมอบหมายและข้อกำหนดจะถูกคัดลอก</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="dialog-footer">
+    <button class="btn-footer btn-cancel" (click)="onCancel()">
+      <i class="pi pi-times"></i>
+      <span>ยกเลิก</span>
+    </button>
+
+    <button class="btn-footer btn-confirm" (click)="onSubmit()">
+      <i class="pi pi-copy"></i>
+      <span>คัดลอกกิจกรรม</span>
+    </button>
+  </div>
+
+</div>
