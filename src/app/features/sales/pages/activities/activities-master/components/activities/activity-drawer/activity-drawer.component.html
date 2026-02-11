@@ -1,4 +1,4 @@
-<!-- activity-drawer.component.html -->
+<!-- activity-drawer.component.html - UPDATED: Location moved to attachments -->
 
 <div class="drawer-container">
 
@@ -87,17 +87,6 @@
           rows="4"
         ></textarea>
       </div>
-
-      <!-- Location -->
-<div class="form-section">
-  <label class="form-label">สถานที่</label>
-  <app-location-picker
-    [selectedLocation]="formData().location"
-    [showMap]="true"
-    (locationSelect)="onLocationSelect($event)"
-    (locationClear)="onLocationClear()"
-  ></app-location-picker>
-</div>
 
       <!-- Date Range -->
       <div class="form-section">
@@ -382,6 +371,41 @@
           }
         </div>
       }
+
+      <!-- ✅ NEW: Attachments Section -->
+      <div class="form-section attachments-section">
+        <h3 class="section-title">
+          <i class="pi pi-paperclip"></i>
+          <span>สิ่งที่แนบ</span>
+        </h3>
+        <p class="section-subtitle">เพิ่มสถานที่หรือไฟล์เอกสาร (ถ้ามี)</p>
+
+        <!-- Location (Optional Attachment) -->
+        <div class="attachment-item">
+          <div class="attachment-header">
+            <i class="pi pi-map-marker"></i>
+            <span class="attachment-label">สถานที่</span>
+            <span class="attachment-badge optional">ไม่บังคับ</span>
+          </div>
+
+          <app-location-picker
+            [selectedLocation]="formData().location"
+            [showMap]="true"
+            (locationSelect)="onLocationSelect($event)"
+            (locationClear)="onLocationClear()"
+          ></app-location-picker>
+
+          @if (formData().location) {
+            <div class="location-note">
+              <i class="pi pi-info-circle"></i>
+              <span>ผู้รับผิดชอบต้อง Check-In ด้วย GPS ในแต่ละวันของกิจกรรม</span>
+            </div>
+          }
+        </div>
+
+        <!-- Files (Future) -->
+        <!-- You can add file upload here later -->
+      </div>
 
     </form>
   </div>

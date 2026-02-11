@@ -3,7 +3,7 @@ import { Component, OnInit, signal, ViewChild, ElementRef, AfterViewInit, inject
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { PerformanceSectionComponent } from './components/performance/performance-section.component';
-import { ActivitiesSectionComponent } from './components/activities/activities-section.component';
+// import { ActivitiesSectionComponent } from './components/activities/activities-section.component';
 import { AnalysisSectionComponent } from './components/analysis/analysis-section.component';
 
 interface NavigationCard {
@@ -25,7 +25,7 @@ interface NavigationCard {
     CommonModule,
     RouterModule,
     PerformanceSectionComponent,
-    ActivitiesSectionComponent,
+    // ActivitiesSectionComponent,
     AnalysisSectionComponent
   ],
   templateUrl: './sales-dashboard.component.html',

@@ -1,4 +1,4 @@
-<!-- activities-section.component.html - CORRECTED VERSION -->
+<!-- activities-section.component.html - FULL WITH CHECK-IN HANDLER -->
 
 <div class="activities-section-container">
 
@@ -128,7 +128,7 @@
       </button>
     </div>
 
-    <!-- FILTERS SECTION (REPLACES OLD TABS) -->
+    <!-- FILTERS SECTION -->
     <div class="filters-section">
       <app-activity-filters
         [activities]="activities()"
@@ -168,14 +168,16 @@
         </div>
       } @else {
         <app-activity-list
-          [activities]="filteredActivities()"
-          [selectedId]="selectedActivityId()"
-          [currentUser]="currentUser()"
-          (activitySelect)="selectActivity($event)"
-          (activityEdit)="openEditDrawer($event)"
-          (activityDelete)="deleteActivity($event)"
-          (statusUpdate)="updateActivityStatus($event.id, $event.status, $event.reason, $event.finishNote)"
-        ></app-activity-list>
+  [activities]="filteredActivities()"
+  [selectedId]="selectedActivityId()"
+  [currentUser]="currentUser()"
+  (activitySelect)="selectActivity($event)"
+  (activityEdit)="openEditDrawer($event)"
+  (activityDelete)="deleteActivity($event)"
+  (statusUpdate)="updateActivityStatus($event.id, $event.status, $event.reason, $event.finishNote)"
+  (checkInSuccess)="handleCheckIn($event)"
+  (activityDuplicate)="duplicateActivity($event)"
+></app-activity-list>
       }
     </div>
   </div>

@@ -1,0 +1,106 @@
+<!-- activity-checkin-button.component.html -->
+
+<div class="checkin-container">
+
+  <!-- Check-In Button -->
+  @if (canCheckIn()) {
+    <button
+      class="btn-checkin"
+      [class.checking]="isCheckingIn()"
+      [disabled]="isCheckingIn()"
+      (click)="onCheckIn($event)"
+    >
+      @if (isCheckingIn()) {
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>กำลังเช็คอิน...</span>
+      } @else {
+        <i class="pi pi-map-marker"></i>
+        <span>{{ buttonText() }}</span>
+      }
+    </button>
+  }
+
+  <!-- Already Checked In (Today) -->
+  @if (checkInStatus()?.todayCheckIn) {
+    <div class="checkin-badge checked-in">
+      <i class="pi pi-check-circle"></i>
+      <div class="badge-content">
+        <span class="badge-text">เช็คอินแล้ว</span>
+        <span class="badge-time">
+          {{ checkInStatus()!.todayCheckIn!.timestamp | date:'HH:mm' }}
+        </span>
+      </div>
+    </div>
+  }
+
+  <!-- Cannot Check In (with reason) -->
+  @if (!canCheckIn() && !checkInStatus()?.todayCheckIn && checkInStatus()?.reason) {
+    <div class="checkin-badge disabled">
+      <i class="pi pi-info-circle"></i>
+      <span class="badge-text">{{ checkInStatus()!.reason }}</span>
+    </div>
+  }
+
+  <!-- Progress Indicator (for multi-day activities) -->
+  @if (checkInStatus() && checkInStatus()!.requiredCheckIns > 1) {
+    <div class="checkin-progress">
+      <div class="progress-bar">
+        <div
+          class="progress-fill"
+          [style.width.%]="(checkInStatus()!.completedCheckIns / checkInStatus()!.requiredCheckIns) * 100"
+        ></div>
+      </div>
+      <span class="progress-text">{{ progressText() }}</span>
+    </div>
+  }
+
+</div>
+
+<!-- Error Alert -->
+@if (error()) {
+  <div class="error-alert" (click)="$event.stopPropagation()">
+    <div class="alert-content">
+      <i class="pi pi-exclamation-triangle"></i>
+      <div class="alert-text">
+        <strong>ไม่สามารถเช็คอินได้</strong>
+        <p>{{ error() }}</p>
+      </div>
+      <button class="btn-alert-close" (click)="closeError()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Permission Modal -->
+@if (showPermissionModal()) {
+  <div class="modal-overlay" (click)="closePermissionModal()"></div>
+
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <i class="pi pi-map-marker modal-icon"></i>
+      <h3 class="modal-title">ต้องการเข้าถึงตำแหน่ง</h3>
+    </div>
+
+    <div class="modal-body">
+      <p class="modal-text">
+        กรุณาอนุญาตให้เข้าถึงตำแหน่ง GPS เพื่อเช็คอินเข้างาน
+      </p>
+      <ul class="modal-list">
+        <li>ใช้สำหรับยืนยันการเข้าปฏิบัติงาน</li>
+        <li>ข้อมูลตำแหน่งจะถูกบันทึกในระบบ</li>
+        <li>จำเป็นต้องอนุญาตทุกครั้งที่เช็คอิน</li>
+      </ul>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-modal btn-cancel" (click)="closePermissionModal()">
+        ยกเลิก
+      </button>
+      <button class="btn-modal btn-confirm" (click)="openLocationSettings()">
+        <i class="pi pi-cog"></i>
+        <span>เปิดการตั้งค่า</span>
+      </button>
+    </div>
+  </div>
+}
