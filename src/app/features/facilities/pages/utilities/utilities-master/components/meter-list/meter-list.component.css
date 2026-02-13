@@ -288,6 +288,98 @@
   @apply font-semibold text-gray-900;
 }
 
+/* ==================== ACTION COLUMN ==================== */
+.actions-col {
+  width: 48px;
+  text-align: center !important;
+}
+
+.btn-edit-row {
+  @apply w-8 h-8 rounded-lg flex items-center justify-center;
+  @apply bg-transparent hover:bg-blue-50 text-gray-400 hover:text-blue-600;
+  @apply border-none cursor-pointer transition-all duration-150;
+}
+
+.btn-edit-row i {
+  @apply text-sm;
+}
+
+/* ==================== EDIT MODAL ==================== */
+.edit-modal-backdrop {
+  @apply fixed inset-0 z-50 flex items-center justify-center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.edit-modal-content {
+  @apply bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4;
+  @apply flex flex-col;
+}
+
+.edit-modal-header {
+  @apply flex items-center justify-between px-6 py-4 border-b border-gray-200;
+}
+
+.edit-modal-header h3 {
+  @apply text-lg font-bold text-gray-900;
+}
+
+.modal-close-btn {
+  @apply w-8 h-8 rounded-full flex items-center justify-center;
+  @apply text-gray-400 hover:text-gray-600 hover:bg-gray-100;
+  @apply border-none cursor-pointer transition-colors;
+}
+
+.edit-modal-body {
+  @apply px-6 py-5;
+}
+
+.edit-form-grid {
+  @apply grid grid-cols-2 gap-4;
+}
+
+.edit-form-group {
+  @apply flex flex-col gap-1.5;
+}
+
+.edit-form-group label {
+  @apply text-sm font-semibold text-gray-600;
+}
+
+.edit-form-input {
+  @apply w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg;
+  @apply focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100;
+  @apply transition-all duration-200;
+}
+
+select.edit-form-input {
+  @apply appearance-none bg-white cursor-pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.edit-modal-footer {
+  @apply flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200;
+}
+
+.btn-cancel {
+  @apply px-4 py-2.5 rounded-lg text-sm font-medium;
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
+  @apply border-none cursor-pointer transition-colors;
+}
+
+.btn-save {
+  @apply flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium;
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+  @apply border-none cursor-pointer transition-colors;
+}
+
+.btn-save i {
+  @apply text-sm;
+}
+
 /* ==================== EMPTY STATE ==================== */
 .empty-state-cell {
   text-align: center !important;

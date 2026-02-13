@@ -164,19 +164,14 @@
         </div>
 
         <div class="form-group">
-          <label>เบอร์โทรศัพท์</label>
+          <label>ผู้ติดต่อ / ผู้ประสานงาน</label>
           <input
-            type="tel"
+            type="text"
             pInputText
-            formControlName="phone"
-            placeholder="กรอกเบอร์โทรศัพท์ (ตัวเลข 9-10 หลัก)"
+            formControlName="contactPerson"
+            placeholder="กรอกชื่อผู้ติดต่อ/ผู้ประสานงาน"
             class="w-full"
-            [class.ng-invalid]="isFieldInvalid('phone')"
-            maxlength="10"
           />
-          @if (isFieldInvalid('phone')) {
-            <small class="error-text">{{ getPhoneError() }}</small>
-          }
         </div>
 
         <div class="form-group">
@@ -192,17 +187,6 @@
           @if (isFieldInvalid('email')) {
             <small class="error-text">{{ getEmailError() }}</small>
           }
-        </div>
-
-        <div class="form-group full-width">
-          <label>ผู้ติดต่อ / ผู้ประสานงาน</label>
-          <input
-            type="text"
-            pInputText
-            formControlName="contactPerson"
-            placeholder="กรอกชื่อผู้ติดต่อ/ผู้ประสานงาน"
-            class="w-full"
-          />
         </div>
       </div>
     </div>

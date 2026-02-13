@@ -52,6 +52,10 @@
   @apply text-green-600;
 }
 
+.tab-btn.incomplete {
+  @apply text-amber-600;
+}
+
 .tab-number {
   @apply w-8 h-8 rounded-full;
   @apply flex items-center justify-center;
@@ -66,12 +70,20 @@
   @apply bg-green-600 text-white;
 }
 
+.tab-btn.incomplete .tab-number {
+  @apply bg-amber-500 text-white;
+}
+
 .tab-label {
   @apply font-medium text-sm;
 }
 
 .tab-check {
   @apply text-green-600 text-xs;
+}
+
+.tab-warning {
+  @apply text-amber-500 text-xs;
 }
 
 /* ==================== Modal Body ==================== */

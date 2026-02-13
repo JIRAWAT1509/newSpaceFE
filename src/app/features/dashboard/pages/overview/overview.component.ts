@@ -483,6 +483,52 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     const success = this.getCssColor('--success', '#22C55E');
     const warning = this.getCssColor('--warning', '#F59E0B');
 
+    // ---------- Compute cumulative (running total) lines ----------
+    // Actual cumulative: sum up actual values; null after last actual month
+    const cumulativeActual: (number | null)[] = [];
+    let runningActual = 0;
+    let lastActualIndex = -1;
+    for (let i = 0; i < this.revenueActual.length; i++) {
+      if (this.revenueActual[i] != null) {
+        runningActual += this.revenueActual[i]!;
+        cumulativeActual.push(parseFloat(runningActual.toFixed(2)));
+        lastActualIndex = i;
+      } else {
+        cumulativeActual.push(null);
+      }
+    }
+
+    // Budget cumulative: full year running total
+    const cumulativeBudget: number[] = [];
+    let runningBudget = 0;
+    for (let i = 0; i < this.revenueBudget.length; i++) {
+      runningBudget += this.revenueBudget[i];
+      cumulativeBudget.push(parseFloat(runningBudget.toFixed(2)));
+    }
+
+    // Forecast cumulative: starts from last actual cumulative value, then adds forecast increments
+    // Only has values from lastActualIndex onward (connects to actual line)
+    const cumulativeForecast: (number | null)[] = new Array(this.revenueLabels.length).fill(null);
+    if (lastActualIndex >= 0) {
+      let runningForecast = cumulativeActual[lastActualIndex]!;
+      cumulativeForecast[lastActualIndex] = runningForecast; // start point = same as last actual
+      for (let i = lastActualIndex + 1; i < this.revenueForecast.length; i++) {
+        if (this.revenueForecast[i] != null) {
+          runningForecast += this.revenueForecast[i]!;
+          cumulativeForecast[i] = parseFloat(runningForecast.toFixed(2));
+        }
+      }
+    }
+
+    // Compute max Y from all cumulative data for proper scaling
+    const allValues = [
+      ...cumulativeActual.filter(v => v != null) as number[],
+      ...cumulativeBudget,
+      ...cumulativeForecast.filter(v => v != null) as number[],
+    ];
+    const maxVal = Math.max(...allValues, 1);
+    const yMax = Math.ceil(maxVal * 1.15); // 15% headroom
+
     const config: ChartConfiguration = {
       type: 'bar',
       data: {
@@ -498,6 +544,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             barPercentage: 0.45,
             categoryPercentage: 0.7,
             order: 3,
+            yAxisID: 'y',
           } as any,
           // Bars: Budget
           {
@@ -509,12 +556,13 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             barPercentage: 0.45,
             categoryPercentage: 0.7,
             order: 3,
+            yAxisID: 'y',
           } as any,
-          // Line: Actual trend (breaks at null months)
+          // Line: Actual cumulative (breaks at null months)
           {
             type: 'line',
-            label: 'Actual (trend)',
-            data: this.revenueActual,
+            label: 'Actual (cumulative)',
+            data: cumulativeActual,
             borderColor: primary,
             backgroundColor: 'transparent',
             borderWidth: 2.5,
@@ -526,12 +574,13 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             pointBorderWidth: 2,
             spanGaps: false,
             order: 1,
+            yAxisID: 'y2',
           } as any,
-          // Line: Budget trend (full year)
+          // Line: Budget cumulative (full year, dashed)
           {
             type: 'line',
-            label: 'Budget (trend)',
-            data: this.revenueBudget,
+            label: 'Budget (cumulative)',
+            data: cumulativeBudget,
             borderColor: success,
             backgroundColor: 'transparent',
             borderWidth: 2,
@@ -543,12 +592,13 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             pointBorderWidth: 2,
             borderDash: [6, 4],
             order: 1,
+            yAxisID: 'y2',
           } as any,
-          // Line: Forecast (starts from last actual → future only)
+          // Line: Forecast cumulative (starts from last actual, connects seamlessly)
           {
             type: 'line',
             label: 'Forecast',
-            data: this.revenueForecast,
+            data: cumulativeForecast,
             borderColor: warning,
             backgroundColor: 'transparent',
             borderWidth: 2.5,
@@ -561,6 +611,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             borderDash: [6, 4],
             spanGaps: false,
             order: 1,
+            yAxisID: 'y2',
           } as any,
         ],
       },
@@ -580,7 +631,11 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
               padding: 14,
               font: { size: 12, weight: 500 },
               usePointStyle: true,
-              filter: (item) => !item.text.includes('trend'),
+              filter: (item) => {
+                const label = item.text || '';
+                // Show: Actual, Budget, Forecast — hide "cumulative" labels
+                return !label.includes('cumulative');
+              },
             },
           },
           tooltip: {
@@ -593,9 +648,15 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             padding: 10,
             titleFont: { size: 11, weight: 600 },
             bodyFont: { size: 11 },
-            filter: (item) => !item.dataset.label?.includes('trend'),
             callbacks: {
-              label: (item) => ` ${item.dataset.label}: $${Number(item.raw).toFixed(1)}M`,
+              label: (item) => {
+                const label = item.dataset.label || '';
+                const val = Number(item.raw);
+                if (label.includes('cumulative')) {
+                  return ` ${label}: $${val.toFixed(1)}M`;
+                }
+                return ` ${label}: $${val.toFixed(1)}M`;
+              },
             },
           },
         },
@@ -609,7 +670,9 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
               padding: 4,
             },
           },
+          // Left Y-axis: monthly bars
           y: {
+            position: 'left',
             min: 0,
             max: 3.0,
             grid: { color: gridColor, drawTicks: false },
@@ -619,6 +682,20 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
               font: { size: 11, weight: 500 },
               padding: 6,
               stepSize: 0.5,
+              callback: (v) => `$${Number(v).toFixed(1)}M`,
+            },
+          },
+          // Right Y-axis: cumulative lines
+          y2: {
+            position: 'right',
+            min: 0,
+            max: yMax,
+            grid: { display: false },
+            border: { display: false },
+            ticks: {
+              color: muted,
+              font: { size: 11, weight: 500 },
+              padding: 6,
               callback: (v) => `$${Number(v).toFixed(1)}M`,
             },
           },

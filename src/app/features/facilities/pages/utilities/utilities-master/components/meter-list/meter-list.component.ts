@@ -48,6 +48,18 @@ export class MeterListComponent implements OnInit {
   selectedGroup = signal<string | null>(null);
   searchText = signal<string>('');
 
+  // Edit modal
+  showEditModal = signal<boolean>(false);
+  editingMeterId = signal<string | null>(null);
+  editForm = {
+    meterNumber: '',
+    meterType: '' as string,
+    building: '',
+    room: '',
+    tenantName: '',
+    unit: ''
+  };
+
   // Confirmation popup for out-of-range values
   showConfirmModal = signal<boolean>(false);
   confirmTitle = signal<string>('');
@@ -268,6 +280,54 @@ export class MeterListComponent implements OnInit {
         };
       })
     );
+  }
+
+  // ==================== EDIT MODAL ====================
+
+  openEditModal(row: MeterTableRow): void {
+    this.editingMeterId.set(row.id);
+    this.editForm = {
+      meterNumber: row.meterNumber,
+      meterType: row.meterType,
+      building: row.building,
+      room: row.room,
+      tenantName: row.meterName,
+      unit: row.unit
+    };
+    this.showEditModal.set(true);
+  }
+
+  cancelEditModal(): void {
+    this.showEditModal.set(false);
+    this.editingMeterId.set(null);
+  }
+
+  saveEditModal(): void {
+    const meterId = this.editingMeterId();
+    if (!meterId) return;
+
+    const typeInfo = getMeterTypeLabel(this.editForm.meterType as MeterType);
+
+    this.meters.update(meters =>
+      meters.map(m => {
+        if (m.id !== meterId) return m;
+        return {
+          ...m,
+          meterNumber: this.editForm.meterNumber,
+          meterName: this.editForm.meterNumber,
+          meterType: this.editForm.meterType as MeterType,
+          meterTypeLabel: typeInfo.EN,
+          meterTypeColor: typeInfo.color,
+          meterTypeIcon: typeInfo.icon,
+          building: this.editForm.building,
+          room: this.editForm.room,
+          unit: this.editForm.unit
+        };
+      })
+    );
+
+    this.showEditModal.set(false);
+    this.editingMeterId.set(null);
   }
 
   // ==================== HELPERS ====================

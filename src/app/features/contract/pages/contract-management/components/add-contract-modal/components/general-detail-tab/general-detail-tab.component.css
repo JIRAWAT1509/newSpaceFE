@@ -76,14 +76,28 @@
   @apply w-1 h-6 bg-blue-600 rounded;
 }
 
-/* ==================== Auto-generated fields (กดไม่ได้, สีเทา) ==================== */
+/* ==================== Auto-generated fields (กดไม่ได้, สีเทาจาง — ผู้ใช้ไม่ต้องสนใจ) ==================== */
+.auto-field-group {
+  opacity: 0.5;
+}
+
+.auto-field-group label {
+  @apply text-gray-400 font-normal !important;
+}
+
 .field-auto {
-  @apply bg-gray-100 text-gray-600 cursor-not-allowed;
-  @apply border-gray-300;
+  @apply bg-gray-100 cursor-not-allowed !important;
+  color: #9ca3af !important; /* gray-400 */
+  border-color: #e5e7eb !important; /* gray-200 */
+}
+
+.field-auto::placeholder {
+  color: #d1d5db !important; /* gray-300 */
 }
 
 .field-auto:focus {
-  @apply outline-none ring-0 border-gray-300;
+  @apply outline-none ring-0 !important;
+  border-color: #e5e7eb !important;
 }
 
 /* ==================== Form Grid ==================== */

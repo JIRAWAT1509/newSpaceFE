@@ -140,10 +140,37 @@
   @apply w-full flex items-center gap-3 px-4 py-2;
   @apply text-left text-sm text-gray-700;
   @apply hover:bg-gray-50 transition-colors;
+  border: none;
+  background: transparent;
+  cursor: pointer;
 }
 
 .menu-item i {
   @apply text-gray-500;
+}
+
+.menu-item--danger {
+  @apply text-red-600;
+}
+
+.menu-item--danger i {
+  @apply text-red-500;
+}
+
+.menu-item--danger:hover {
+  @apply bg-red-50;
+}
+
+.menu-item--disabled {
+  @apply text-blue-500 opacity-60 cursor-not-allowed;
+}
+
+.menu-item--disabled:hover {
+  @apply bg-transparent;
+}
+
+.menu-item--disabled i {
+  @apply text-blue-500;
 }
 
 /* ==================== Table ==================== */
@@ -188,10 +215,41 @@
 
 .status-dot {
   @apply w-3 h-3 rounded-full flex-shrink-0;
+  transition: background-color 0.3s ease;
+}
+
+.status-dot--transferred {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  animation: pulse-blue 2s ease-in-out infinite;
+}
+
+@keyframes pulse-blue {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15); }
+  50% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25); }
 }
 
 .contract-info {
-  @apply flex flex-col gap-1;
+  @apply flex flex-col gap-0.5;
+}
+
+.transferred-badge {
+  @apply inline-flex items-center gap-1 text-blue-600 font-medium;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.transferred-badge i {
+  font-size: 10px;
+}
+
+.terminated-badge {
+  @apply inline-flex items-center gap-1 text-red-500 font-medium;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.terminated-badge i {
+  font-size: 10px;
 }
 
 .contract-number {

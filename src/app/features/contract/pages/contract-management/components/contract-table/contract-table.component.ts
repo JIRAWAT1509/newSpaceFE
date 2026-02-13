@@ -12,12 +12,12 @@ import { WarningModalComponent } from '@shared/components/warning-modal/warning-
 import { BulkActionModalComponent, BulkActionType, BulkActionResult } from '../bulk-action-modal/bulk-action-modal.component';
 import { DraftContractService, DraftContract } from '@core/services/draft-contract.service';
 import { ConfirmationModalComponent, ConfirmationType } from '@shared/components/confirmation-modal/confirmation-modal.component';
-import { DeclineInfoModalComponent, DeclineInfo } from '@shared/components/decline-info-modal/decline-info-modal.component';
+
 
 @Component({
   selector: 'app-contract-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, AdvanceSearchModalComponent, AddContractModalComponent, WarningModalComponent, BulkActionModalComponent, ConfirmationModalComponent, DeclineInfoModalComponent],
+  imports: [CommonModule, FormsModule, AdvanceSearchModalComponent, AddContractModalComponent, WarningModalComponent, BulkActionModalComponent, ConfirmationModalComponent],
   templateUrl: './contract-table.component.html',
   styleUrl: './contract-table.component.css'
 })
@@ -72,14 +72,6 @@ export class ContractTableComponent {
   confirmModalCancelText = signal<string>('ยกเลิก');
   confirmModalIcon = signal<string>('pi-check');
   private confirmModalOnConfirm?: () => void;
-
-  // Decline info modal (เด้งตอนกดยกเลิกสัญญา)
-  showDeclineModal = signal<boolean>(false);
-  declineContractNumber = signal<string>('');
-  declineQuotationNumber = signal<string>('');
-  declineCustomerName = signal<string>('');
-  private pendingCancelContract: Contract | null = null;
-  private pendingCancelType: CancelType | null = null;
 
   // Bulk action modal
   showBulkActionModal = signal<boolean>(false);
@@ -537,6 +529,9 @@ export class ContractTableComponent {
       case 'cancel-booking':
         this.cancelBooking(contract);
         break;
+      case 'cancel-lease':
+        this.cancelLease(contract);
+        break;
       case 'addendum':
         this.openAddendum(contract);
         break;
@@ -573,9 +568,22 @@ export class ContractTableComponent {
     this.openMessageModal('คัดลอกสัญญาเรียบร้อย', `สร้างสัญญาใหม่เลขที่: ${newNumber}`);
   }
 
-  /** ใบเสนอราคา → โอนเป็นสัญญาจอง (ใช้เลขเดียวกับใบเสนอราคา) */
+  /** ใบเสนอราคา → โอนเป็นสัญญาจอง (ขอยืนยันก่อน) */
   transferToBooking(contract: Contract): void {
-    // ใช้เลขเดียวกับใบเสนอราคาเดิม
+    this.openConfirmModal({
+      type: 'warning',
+      title: 'ยืนยันโอนเป็นสัญญาจอง',
+      message: `คุณต้องการโอนใบเสนอราคา ${contract.CONTRACT_NUMBER} เป็นสัญญาจองใช่หรือไม่?\n\nใบเสนอราคาต้นทางจะถูกเปลี่ยนสถานะเป็น "โอนแล้ว" และไม่สามารถแก้ไขได้อีก`,
+      confirmText: 'ยืนยันโอน',
+      confirmIcon: 'pi-arrow-right-arrow-left',
+      onConfirm: () => {
+        this.executeTransferToBooking(contract);
+      }
+    });
+  }
+
+  /** ดำเนินการโอนใบเสนอราคา → สัญญาจองจริง */
+  private executeTransferToBooking(contract: Contract): void {
     const sameNumber = contract.CONTRACT_NUMBER;
     const copy: Contract = {
       ...contract,
@@ -589,23 +597,48 @@ export class ContractTableComponent {
       QUOTATION_NUMBER: sameNumber
     } as Contract;
     this.contractCopied.emit(copy);
+
+    // อัปเดตสถานะใบเสนอราคาต้นทาง → COMPLETED (โอนแล้ว)
+    contract.STATUS = 'COMPLETED';
+    contract.TRANSFER_TO_BOOKING = sameNumber;
+
     this.openMessageModal('โอนเป็นสัญญาจองเรียบร้อย', `เลขที่สัญญาจอง: ${sameNumber}\nอ้างอิงใบเสนอราคา: ${sameNumber}`);
   }
 
-  /** สัญญาจอง → โอนเป็นสัญญาเช่า (สร้างสัญญาเช่าจากสัญญาจอง) */
+  /** สัญญาจอง → โอนเป็นสัญญาเช่า (ขอยืนยันก่อน) */
   transferToLease(contract: Contract): void {
+    this.openConfirmModal({
+      type: 'warning',
+      title: 'ยืนยันโอนเป็นสัญญาเช่า',
+      message: `คุณต้องการโอนสัญญาจอง ${contract.CONTRACT_NUMBER} เป็นสัญญาเช่าใช่หรือไม่?\n\nสัญญาจองต้นทางจะถูกเปลี่ยนสถานะเป็น "โอนแล้ว" และไม่สามารถแก้ไขได้อีก`,
+      confirmText: 'ยืนยันโอน',
+      confirmIcon: 'pi-arrow-right-arrow-left',
+      onConfirm: () => {
+        this.executeTransferToLease(contract);
+      }
+    });
+  }
+
+  /** ดำเนินการโอนสัญญาจอง → สัญญาเช่าจริง */
+  private executeTransferToLease(contract: Contract): void {
     const newNumber = this.newContractNumber();
     const copy: Contract = {
       ...contract,
       CONTRACT_ID: `CNT-${Date.now()}`,
       CONTRACT_NUMBER: newNumber,
       CONTRACT_TYPE: 'LEASE_AGREEMENT',
+      STATUS: 'ACTIVE',
       BOOKING_NUMBER: contract.CONTRACT_NUMBER ?? contract.BOOKING_NUMBER,
       CONTRACT_NUMBER_MAIN: contract.CONTRACT_NUMBER_MAIN,
       CONTRACT_NUMBER_SUB: contract.CONTRACT_NUMBER_SUB
     } as Contract;
     this.contractCopied.emit(copy);
-    this.openMessageModal('โอนเป็นสัญญาเช่าเรียบร้อย', `เลขที่สัญญาเช่า: ${newNumber}`);
+
+    // อัปเดตสถานะสัญญาจองต้นทาง → COMPLETED (โอนแล้ว)
+    contract.STATUS = 'COMPLETED';
+    (contract as any).TRANSFER_TO_LEASE = newNumber;
+
+    this.openMessageModal('โอนเป็นสัญญาเช่าเรียบร้อย', `เลขที่สัญญาเช่า: ${newNumber}\nอ้างอิงสัญญาจอง: ${contract.CONTRACT_NUMBER}`);
   }
 
   /** สัญญาเช่า → คัดลอกไปเป็นสัญญาจอง */
@@ -656,58 +689,73 @@ export class ContractTableComponent {
     this.openMessageModal('คัดลอกสัญญาจองไปเป็นใบเสนอราคาเรียบร้อย', `เลขที่ใบเสนอราคา: ${newNumber}`);
   }
 
-  /** ยกเลิกใบเสนอราคา: เปิด Decline Info Modal ให้กรอกเหตุผล */
+  /** ยกเลิกใบเสนอราคา: ยกเลิกทันที */
   cancelQuotation(contract: Contract): void {
-    this.openDeclineModal(contract, 'quotation');
+    this.cancelContractDirectly(contract, 'quotation');
   }
 
-  /** ยกเลิกสัญญาจอง: เปิด Decline Info Modal ให้กรอกเหตุผล */
+  /** ยกเลิกสัญญาจอง: ยกเลิกทันที */
   cancelBooking(contract: Contract): void {
-    this.openDeclineModal(contract, 'booking');
+    this.cancelContractDirectly(contract, 'booking');
   }
 
-  /** ยกเลิกสัญญาเช่า: เปิด Decline Info Modal ให้กรอกเหตุผล */
+  /** ยกเลิกสัญญาเช่า */
+  cancelLease(contract: Contract): void {
+    this.cancelContractDirectly(contract, 'lease');
+  }
+
+  /** ภาคผนวก (Addendum) - สำหรับใช้งานในอนาคต */
   openAddendum(contract: Contract): void {
-    this.openDeclineModal(contract, 'lease');
+    this.openMessageModal('ภาคผนวก', `ฟีเจอร์ภาคผนวกสำหรับสัญญา ${contract.CONTRACT_NUMBER} อยู่ระหว่างพัฒนา`);
   }
 
-  /** เปิด Decline Info Modal พร้อมข้อมูลสัญญา */
-  private openDeclineModal(contract: Contract, cancelType: CancelType): void {
-    this.pendingCancelContract = contract;
-    this.pendingCancelType = cancelType;
-    this.declineContractNumber.set(contract.CONTRACT_NUMBER || '');
-    this.declineQuotationNumber.set(contract.CONTRACT_NUMBER_MAIN || contract.CONTRACT_NUMBER || '');
-    this.declineCustomerName.set(contract.TENANT_NAME_TH || '');
-    this.showDeclineModal.set(true);
+  // ==================== CANCEL CONFIRMATION MODAL ====================
+  showCancelConfirm = signal<boolean>(false);
+  cancelConfirmTitle = signal<string>('');
+  cancelConfirmMessage = signal<string>('');
+  private pendingCancelContract = signal<Contract | null>(null);
+  private pendingCancelType = signal<CancelType | null>(null);
+
+  private readonly cancelLabelMap: Record<string, string> = {
+    quotation: 'ใบเสนอราคา',
+    booking: 'สัญญาจอง',
+    lease: 'สัญญาเช่า',
+  };
+
+  /** แสดง confirmation modal ก่อนยกเลิก */
+  private cancelContractDirectly(contract: Contract, cancelType: CancelType): void {
+    const label = this.cancelLabelMap[cancelType] || cancelType;
+    this.pendingCancelContract.set(contract);
+    this.pendingCancelType.set(cancelType);
+    this.cancelConfirmTitle.set(`ยืนยันการยกเลิก${label}`);
+    this.cancelConfirmMessage.set(`คุณต้องการยกเลิก${label} ${contract.CONTRACT_NUMBER} ใช่หรือไม่?\nการดำเนินการนี้ไม่สามารถย้อนกลับได้`);
+    this.showCancelConfirm.set(true);
   }
 
-  /** เมื่อกรอกเหตุผลแล้วกดยืนยัน Decline */
-  onDeclineConfirm(info: DeclineInfo): void {
-    this.showDeclineModal.set(false);
-    if (this.pendingCancelContract && this.pendingCancelType) {
-      const contract = this.pendingCancelContract;
-      const cancelType = this.pendingCancelType;
+  /** เมื่อกดยืนยันใน confirmation modal */
+  onCancelConfirm(): void {
+    const contract = this.pendingCancelContract();
+    const cancelType = this.pendingCancelType();
+    this.showCancelConfirm.set(false);
+
+    if (contract && cancelType) {
+      const label = this.cancelLabelMap[cancelType] || cancelType;
       this.contractCancelRequest.emit({ contract, cancelType });
-
-      const labelMap: Record<string, string> = {
-        quotation: 'ใบเสนอราคา',
-        booking: 'สัญญาจอง',
-        lease: 'สัญญาเช่า',
-      };
       this.openMessageModal(
         'ยกเลิกสำเร็จ',
-        `${labelMap[cancelType]} ${contract.CONTRACT_NUMBER} ถูกยกเลิกแล้ว\n\nเหตุผล: ${info.reason}`
+        `${label} ${contract.CONTRACT_NUMBER} ถูกยกเลิกแล้ว`
       );
     }
-    this.pendingCancelContract = null;
-    this.pendingCancelType = null;
+
+    this.pendingCancelContract.set(null);
+    this.pendingCancelType.set(null);
   }
 
-  /** เมื่อกดยกเลิกใน Decline Modal */
-  onDeclineCancel(): void {
-    this.showDeclineModal.set(false);
-    this.pendingCancelContract = null;
-    this.pendingCancelType = null;
+  /** เมื่อกดยกเลิกใน confirmation modal */
+  onCancelDismiss(): void {
+    this.showCancelConfirm.set(false);
+    this.pendingCancelContract.set(null);
+    this.pendingCancelType.set(null);
   }
 
   openAddModal(): void {
@@ -854,12 +902,46 @@ export class ContractTableComponent {
     );
   }
 
-  /** สีจุดสถานะ: สัญญาจอง (DEPOSIT_AGREEMENT) = น้ำเงิน */
+  /**
+   * สีจุดสถานะ — UX logic:
+   * - ใบเสนอราคาที่โอนเป็นสัญญาจองแล้ว (COMPLETED + มี TRANSFER_TO_BOOKING) → น้ำเงิน
+   * - สัญญาจอง (DEPOSIT_AGREEMENT) → น้ำเงิน
+   * - ACTIVE → เขียว (ใช้งานอยู่)
+   * - PENDING → เหลือง (รอดำเนินการ)
+   * - TERMINATED → แดง (ยกเลิก)
+   * - EXPIRED → แดง (หมดอายุ)
+   * - DRAFT → เทา (ร่าง)
+   * - COMPLETED → เทา (เสร็จสิ้น)
+   */
   getStatusDotColor(item: Contract): string {
+    // สัญญาที่โอนแล้ว → สีน้ำเงิน
+    if (item.TRANSFER_TO_BOOKING || item.TRANSFER_TO_LEASE) {
+      return '#3B82F6'; // blue — transferred
+    }
+    // สัญญาจอง → สีน้ำเงิน
     if (item.CONTRACT_TYPE === 'DEPOSIT_AGREEMENT') {
-      return '#3B82F6'; // blue for booking (สัญญาจอง)
+      return '#3B82F6'; // blue for booking
     }
     return this.getStatusColor(item.STATUS);
+  }
+
+  /** สถานะแสดงผลเป็นภาษาไทย (ใช้ในตาราง) */
+  getStatusDisplayLabel(item: Contract): string {
+    if (item.TRANSFER_TO_BOOKING) {
+      return 'โอนเป็นสัญญาจองแล้ว';
+    }
+    if (item.TRANSFER_TO_LEASE) {
+      return 'โอนเป็นสัญญาเช่าแล้ว';
+    }
+    return CONTRACT_STATUS_LABELS[item.STATUS as keyof typeof CONTRACT_STATUS_LABELS]?.TH || item.STATUS;
+  }
+
+  /** ตรวจว่าสัญญาถูกล็อกแล้วหรือไม่ (โอนแล้ว / ยกเลิกแล้ว) */
+  isContractLocked(item: Contract): boolean {
+    return !!item.TRANSFER_TO_BOOKING ||
+           !!item.TRANSFER_TO_LEASE ||
+           item.STATUS === 'TERMINATED' ||
+           item.STATUS === 'EXPIRED';
   }
 
   getContractNumberColumnLabel(): string {
@@ -868,6 +950,26 @@ export class ContractTableComponent {
       case 'booking': return 'เลขที่สัญญาจอง';
       case 'lease': return 'เลขที่สัญญาเช่า';
       default: return 'เลขที่สัญญา';
+    }
+  }
+
+  /** ป้ายคอลัมน์เลขที่อ้างอิง ตามประเภทแท็บ */
+  getReferenceNumberColumnLabel(): string {
+    switch (this.contractType()) {
+      case 'quotation': return 'เลขที่อ้างอิง';
+      case 'booking': return 'เลขที่ใบเสนอราคา';
+      case 'lease': return 'เลขที่สัญญาจอง';
+      default: return 'เลขที่อ้างอิง';
+    }
+  }
+
+  /** ป้ายปุ่ม "สร้าง..." ตามประเภทแท็บ */
+  getAddButtonLabel(): string {
+    switch (this.contractType()) {
+      case 'quotation': return 'สร้างใบเสนอราคา';
+      case 'booking': return 'สร้างสัญญาจอง';
+      case 'lease': return 'สร้างสัญญาเช่า';
+      default: return 'สร้างสัญญา';
     }
   }
 
