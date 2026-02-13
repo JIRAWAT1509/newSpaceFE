@@ -22,7 +22,7 @@ export interface DebtStatusConfig {
   label: string;
   icon: string;
   color: string;
-  description: string; // ✅ เพิ่ม
+  description: string;
 }
 
 export interface Invoice {
@@ -40,7 +40,7 @@ export interface InvoiceStatusConfig {
   label: string;
   icon: string;
   color: string;
-  description: string; // ✅ เพิ่ม
+  description: string; 
 }
 
 export interface Receipt {

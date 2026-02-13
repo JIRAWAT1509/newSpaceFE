@@ -62,6 +62,7 @@ export const MOCK_DEBTS: Debt[] = [
   }
 ];
 
+// Mock data (ใบแจ้งหนี้ที่ยังไม่ออกใบเสร็จ)
 export const MOCK_INVOICES: Invoice[] = [
   {
     id: 'INV001',
@@ -128,7 +129,7 @@ export const MOCK_INVOICES: Invoice[] = [
   }
 ];
 
-// ✅ Mock data สำหรับรายการรอออกใบเสร็จ (invoices ที่ออกแล้วและรอออกใบเสร็จ)
+// Mock data สำหรับรายการรอออกใบเสร็จ (invoices ที่ออกแล้วและรอออกใบเสร็จ)
 export const MOCK_RECEIPTS_WAITING: Receipt[] = [
   {
     id: 'RW001',

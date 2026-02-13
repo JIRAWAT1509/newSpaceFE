@@ -399,7 +399,6 @@ export class FinanceDashboardComponent implements OnInit {
 
   closeDetailModal(): void {
     this.showDetailModal.set(false);
-    // ไม่ต้อง clear currentDebt ทันที เพราะอาจมี animation
     setTimeout(() => {
       if (!this.showDetailModal()) {
         this.currentDebt.set(null);

@@ -4,7 +4,7 @@ import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Debt, DEBT_STATUS_CONFIG } from '@core/models/finance.model';
 
-// ✅ เพิ่ม interface ชัดเจน
+
 interface DebtStatusConfig {
   label: string;
   icon: string;
@@ -23,7 +23,6 @@ export class DebtDetailModalComponent {
   debt = input.required<Debt>();
   close = output<void>();
 
-  // ✅ แก้ return type ให้ชัดเจน
   getStatusConfig(status: string): DebtStatusConfig {
     const config = DEBT_STATUS_CONFIG[status as keyof typeof DEBT_STATUS_CONFIG];
     return config || {
