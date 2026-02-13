@@ -1,3 +1,5 @@
+/* marker-list-panel.component.css */
+
 .marker-list-panel {
   @apply h-full flex flex-col bg-white;
 }

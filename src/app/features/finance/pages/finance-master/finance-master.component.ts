@@ -5,6 +5,12 @@ import { FinanceDashboardComponent } from './components/finance-dashboard/financ
 import { InvoiceManagementComponent } from './components/invoice-management/invoice-management.component';
 import { ReceiptManagementComponent } from './components/receipt-management/receipt-management.component';
 
+interface Tab {
+  id: string;
+  label: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-finance-master',
   standalone: true,
@@ -20,7 +26,7 @@ import { ReceiptManagementComponent } from './components/receipt-management/rece
 export class FinanceMasterComponent {
   activeTab = signal<string>('dashboard');
 
-  tabs = [
+  tabs: Tab[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'pi-chart-bar' },
     { id: 'invoices', label: 'ใบแจ้งหนี้', icon: 'pi-money-bill' },
     { id: 'receipts', label: 'ใบเสร็จรับเงิน', icon: 'pi-receipt' }

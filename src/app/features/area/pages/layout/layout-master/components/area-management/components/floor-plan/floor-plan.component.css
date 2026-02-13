@@ -1,3 +1,5 @@
+/* floor-plan.component.css */
+
 .floor-plan-wrapper {
   @apply relative w-full h-full flex flex-col bg-gray-50 rounded-lg overflow-hidden;
 }
@@ -121,11 +123,16 @@
   @apply text-xl;
 }
 
-/* Bottom Center: Status Bar */
+/* Bottom Center: Status Bar - Compact Version */
 .bottom-center-controls {
-  @apply absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20;
-  @apply max-w-[600px] w-full px-4;
+  @apply absolute bottom-12 left-1/2 transform -translate-x-1/2 z-20;
+  @apply min-w-[400px] w-auto h-4 px-3;
 }
+
+:host ::ng-deep .status-segment {
+  @apply text-sm; /* ลดขนาดตัวอักษร */
+}
+
 
 /* Bottom Right: Edit Button */
 .bottom-right-controls {
@@ -133,9 +140,9 @@
 }
 
 .edit-button {
-  @apply flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-lg shadow-md;
+  @apply flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg shadow-md; /* ลด padding */
   @apply hover:bg-blue-700 transition-colors duration-200;
-  @apply font-medium;
+  @apply font-medium text-sm; /* ลดขนาดตัวอักษร */
 }
 
 .edit-button i {
@@ -173,7 +180,15 @@
   }
 
   .bottom-center-controls {
-    @apply max-w-[400px];
+    @apply max-w-[350px] bottom-3; /* ลดขนาดและเว้นระยะ */
+  }
+
+  .bottom-right-controls {
+    @apply bottom-3 right-3;
+  }
+
+  .edit-button {
+    @apply px-3 py-2 text-xs; /* ลดขนาดเพิ่มเติม */
   }
 }
 
@@ -182,11 +197,25 @@
     @apply hidden;
   }
 
+  .bottom-center-controls {
+    @apply max-w-[200px] left-20 transform-none; /* ย้ายไปซ้าย ไม่ center */
+    @apply bottom-3;
+  }
+
+  :host ::ng-deep .status-segment {
+    @apply text-xs; /* ลดตัวอักษรมากขึ้นในมือถือ */
+    min-height: 32px;
+  }
+
   .edit-button span {
     @apply hidden;
   }
 
   .edit-button {
-    @apply w-12 h-12 p-0 justify-center;
+    @apply w-11 h-11 p-0 justify-center;
+  }
+
+  .bottom-right-controls {
+    @apply bottom-3 right-3;
   }
 }
