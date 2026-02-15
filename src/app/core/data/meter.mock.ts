@@ -1,6 +1,6 @@
 // meter.mock.ts - UPDATED Mock data with Group support
 
-import { Meter, MeterStats, MeterGroup } from '@core/models/meter.model';
+import { Meter, MeterStats, MeterGroup, UtilityRate } from '@core/models/meter.model';
 
 export const MOCK_METER_STATS: MeterStats = {
   totalActiveMeters: 127,
@@ -155,13 +155,16 @@ export const MOCK_METERS: Meter[] = [
   }
 ];
 
-// Mock Meter Groups
+// Mock Meter Groups (with rates)
 export const MOCK_METER_GROUPS: MeterGroup[] = [
   {
     id: 'GRP-001',
     name: 'Building A - Floor 1 Electric',
     description: 'All electricity meters on Building A, Floor 1',
+    meterType: 'electricity',
     meterIds: ['MTR-001', 'MTR-002', 'MTR-008'],
+    rate: 4.5,
+    currency: 'THB',
     createdDate: '2025-01-01',
     updatedDate: '2025-01-10'
   },
@@ -169,7 +172,10 @@ export const MOCK_METER_GROUPS: MeterGroup[] = [
     id: 'GRP-002',
     name: 'Building B - Water System',
     description: 'Water meters across all floors in Building B',
+    meterType: 'water',
     meterIds: ['MTR-004', 'MTR-005'],
+    rate: 18.0,
+    currency: 'THB',
     createdDate: '2025-01-05',
     updatedDate: '2025-01-12'
   },
@@ -177,7 +183,10 @@ export const MOCK_METER_GROUPS: MeterGroup[] = [
     id: 'GRP-003',
     name: 'Zone C - AC Units',
     description: 'Air conditioning units in Zone C',
+    meterType: 'ac',
     meterIds: ['MTR-007'],
+    rate: 4.5,
+    currency: 'THB',
     createdDate: '2025-01-08',
     updatedDate: '2025-01-13'
   },
@@ -185,9 +194,56 @@ export const MOCK_METER_GROUPS: MeterGroup[] = [
     id: 'GRP-004',
     name: 'Critical Systems',
     description: 'Meters for critical infrastructure that require priority monitoring',
+    meterType: 'electricity',
     meterIds: ['MTR-008'],
+    rate: 5.0,
+    currency: 'THB',
     createdDate: '2025-01-10',
     updatedDate: '2025-01-13'
+  }
+];
+
+// Mock Default Utility Rates (อัตราค่าบริการเริ่มต้น)
+export const MOCK_UTILITY_RATES: UtilityRate[] = [
+  {
+    id: 'RATE-001',
+    meterType: 'electricity',
+    rate: 4.5,
+    unit: 'kWh',
+    currency: 'THB',
+    effectiveDate: '2025-01-01',
+    description: 'อัตราค่าไฟฟ้าเริ่มต้น',
+    isActive: true
+  },
+  {
+    id: 'RATE-002',
+    meterType: 'water',
+    rate: 18.0,
+    unit: 'm³',
+    currency: 'THB',
+    effectiveDate: '2025-01-01',
+    description: 'อัตราค่าน้ำประปาเริ่มต้น',
+    isActive: true
+  },
+  {
+    id: 'RATE-003',
+    meterType: 'gas',
+    rate: 25.0,
+    unit: 'm³',
+    currency: 'THB',
+    effectiveDate: '2025-01-01',
+    description: 'อัตราค่าแก๊สเริ่มต้น',
+    isActive: true
+  },
+  {
+    id: 'RATE-004',
+    meterType: 'ac',
+    rate: 4.5,
+    unit: 'kWh',
+    currency: 'THB',
+    effectiveDate: '2025-01-01',
+    description: 'อัตราค่าแอร์เริ่มต้น',
+    isActive: true
   }
 ];
 

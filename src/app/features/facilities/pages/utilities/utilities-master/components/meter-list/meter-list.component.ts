@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { Meter, MeterType, MeterGroup, getMeterTypeLabel } from '@core/models/meter.model';
+import { MeterService } from '@core/services/meter.service';
 import { MOCK_METERS, MOCK_METER_GROUPS } from '@core/data/meter.mock';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
 
@@ -41,6 +42,7 @@ interface MeterTableRow {
   styleUrl: './meter-list.component.css'
 })
 export class MeterListComponent implements OnInit {
+  constructor(private meterService: MeterService) {}
   // State
   meters = signal<MeterTableRow[]>([]);
   groups = signal<MeterGroup[]>([]);
@@ -67,13 +69,10 @@ export class MeterListComponent implements OnInit {
   pendingConfirmMeterId = signal<string | null>(null);
   pendingConfirmReading = signal<number>(0);
 
-  // Rate per unit (mock: baht per unit)
-  private readonly COST_RATES: Record<MeterType, number> = {
-    electricity: 4.5,
-    water: 18.0,
-    gas: 25.0,
-    ac: 4.5
-  };
+  // Dynamic cost rates from MeterService
+  private get COST_RATES(): Record<MeterType, number> {
+    return this.meterService.getCostRates();
+  }
 
   // Building mapping (mock - in reality from API)
   private readonly ROOM_BUILDING_MAP: Record<string, string> = {
@@ -159,7 +158,8 @@ export class MeterListComponent implements OnInit {
     const rows: MeterTableRow[] = MOCK_METERS.map(m => {
       const typeInfo = getMeterTypeLabel(m.meterType);
       const consumption = m.currentReading - m.previousReading;
-      const cost = consumption * (this.COST_RATES[m.meterType] || 0);
+      const rate = this.meterService.getRateForMeter(m.id, m.meterType);
+      const cost = consumption * rate;
       const groupNames = m.groupIds
         .map(gId => groups.find(g => g.id === gId)?.name || '')
         .filter(Boolean)
