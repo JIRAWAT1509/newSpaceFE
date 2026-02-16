@@ -43,6 +43,7 @@
     (drop)="onDrop($event)"
   >
     <div
+      #floorPlanContent
       class="floor-plan-content"
       [style.transform]="'translate(' + panOffset().x + 'px, ' + panOffset().y + 'px) scale(' + zoomLevel() + ')'"
     >
@@ -69,6 +70,7 @@
           [isSelected]="selectedAreaId() === area.id"
           [isDraggable]="true"
           [shouldPulse]="selectedAreaId() === area.id"
+          [contentDiv]="floorPlanContent"
           (markerDragged)="onMarkerDragged($event)"
           (markerClicked)="onMarkerClicked($event)"
           (markerDragStart)="onMarkerDragStart($event)"
