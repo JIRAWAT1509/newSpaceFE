@@ -416,3 +416,26 @@ select.edit-form-input {
     min-width: unset;
   }
 }
+
+@media (max-width: 480px) {
+  .header-stats {
+    @apply gap-2;
+  }
+
+  .filters-row {
+    @apply gap-2;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    @apply px-3 py-2 text-xs;
+  }
+
+  .empty-state i {
+    @apply text-3xl;
+  }
+
+  .empty-state p {
+    @apply text-xs;
+  }
+}

@@ -248,4 +248,109 @@
   .drawer-panel {
     @apply w-full;
   }
+
+  .conditions-wrapper {
+    @apply space-y-3;
+  }
+
+  .progress-indicator {
+    @apply mb-3 p-2;
+  }
+
+  .progress-steps {
+    @apply justify-start overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .step-circle {
+    @apply w-10 h-10 text-sm;
+  }
+
+  .step-name {
+    @apply hidden;
+  }
+
+  .step-number {
+    @apply text-base;
+  }
+
+  .form-section {
+    @apply p-3;
+  }
+
+  .section-header h4 {
+    @apply text-base;
+  }
+
+  .duration-inputs {
+    @apply flex-col items-stretch;
+  }
+
+  .duration-field {
+    @apply w-full;
+  }
+
+  .drawer-header {
+    @apply px-4 py-3;
+  }
+
+  .drawer-header h3 {
+    @apply text-lg;
+  }
+
+  .drawer-body {
+    @apply px-4 py-4;
+  }
+
+  .drawer-footer {
+    @apply px-4 py-3;
+  }
+
+  .data-table {
+    min-width: 500px;
+  }
+
+  .data-table th,
+  .data-table td {
+    @apply px-2 py-2 text-xs;
+  }
+
+  .btn-add {
+    @apply px-3 py-1.5 text-xs;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-circle {
+    @apply w-8 h-8 text-xs;
+  }
+
+  .step-arrow {
+    @apply mx-0.5 text-lg;
+  }
+
+  .form-section {
+    @apply p-2;
+  }
+
+  .form-group label {
+    @apply text-xs;
+  }
+
+  .drawer-header {
+    @apply px-3 py-2;
+  }
+
+  .drawer-body {
+    @apply px-3 py-3;
+  }
+
+  .drawer-footer {
+    @apply px-3 py-2 gap-2;
+  }
+
+  .btn-secondary,
+  .btn-primary {
+    @apply px-3 py-1.5 text-xs;
+  }
 }

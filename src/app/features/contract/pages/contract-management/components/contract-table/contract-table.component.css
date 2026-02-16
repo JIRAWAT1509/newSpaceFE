@@ -493,19 +493,85 @@
 }
 
 @media (max-width: 480px) {
+  .contract-table-container {
+    min-height: 300px;
+  }
+
   .search-section {
-    @apply px-3 py-2;
+    @apply px-2 py-2;
+  }
+
+  .search-input {
+    @apply py-1.5;
+    font-size: 14px;
   }
 
   .actions-section {
-    @apply pl-2 pr-3 py-2;
+    @apply pl-1 pr-2 py-2;
+  }
+
+  .actions-left {
+    @apply gap-1;
+  }
+
+  .action-btn {
+    @apply px-2 py-1.5 text-xs;
+  }
+
+  .advance-search-btn {
+    @apply px-3 py-1.5;
   }
 
   .advance-search-btn span {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
   }
 
   .filter-tag {
     @apply px-2 py-1 text-xs;
+  }
+
+  .data-table {
+    min-width: 600px;
+  }
+
+  .data-table th,
+  .data-table td {
+    @apply px-1.5 py-2 text-xs;
+  }
+
+  .contract-number-cell {
+    @apply max-w-[100px];
+  }
+
+  .drafts-panel {
+    @apply mx-2 my-2;
+  }
+
+  .draft-item {
+    @apply p-2;
+  }
+
+  .draft-name {
+    @apply text-sm;
+  }
+
+  .draft-btn.continue {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .selected-count {
+    @apply text-xs;
+  }
+
+  .empty-state {
+    @apply py-10;
+  }
+
+  .empty-state i {
+    @apply text-4xl mb-2;
+  }
+
+  .empty-state p {
+    @apply text-sm;
   }
 }

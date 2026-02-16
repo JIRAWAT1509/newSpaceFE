@@ -111,3 +111,76 @@
   color: rgb(var(--muted));
   font-size: 13px;
 }
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .report-page {
+    padding: 12px 14px;
+    border-radius: 8px;
+  }
+
+  .report-filters {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .filter-buttons {
+    width: 100%;
+  }
+
+  .report-title {
+    font-size: 18px;
+    margin: 8px 0 12px;
+  }
+
+  .report-item {
+    padding: 10px 12px;
+  }
+
+  .report-name {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .report-page {
+    padding: 8px 10px;
+    border-radius: 6px;
+  }
+
+  .filter-buttons button {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .report-title {
+    font-size: 16px;
+  }
+
+  .report-item {
+    padding: 8px 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .report-name {
+    font-size: 13px;
+  }
+
+  .report-desc {
+    font-size: 11px;
+  }
+
+  .bookmark-btn {
+    align-self: flex-end;
+  }
+}

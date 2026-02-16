@@ -136,7 +136,7 @@ export class AddContractModalComponent implements OnInit {
       subCategory: ['', Validators.required],
       category: [''],
       profitCenter: [''],
-      businessName: [''],
+      businessName: ['', Validators.required],
       productType1: [''],
       productType2: [''],
       productType3: [''],
@@ -173,9 +173,9 @@ export class AddContractModalComponent implements OnInit {
       serviceRate: [0],
       creditTermRent: [0, Validators.required],
       creditTermUtility: [0, Validators.required],
-      paymentFrequency: [''],
+      paymentFrequency: ['', Validators.required],
       rentAdjustmentPercent: [0],
-      depositAmount: [0],
+      depositAmount: [0, Validators.required],
 
       // Section 3: เงื่อนไขพิเศษ
       advanceNoticeDays: [0],
@@ -476,8 +476,15 @@ export class AddContractModalComponent implements OnInit {
   isContractDetailFormValid(): boolean {
     const form = this.contractDetailTab?.contractInfoTab?.form;
     if (!form) {
-      // ถ้ายังไม่ได้เข้า tab นี้ ให้ผ่านไปก่อน
-      return true;
+      // ถ้ายังไม่ได้เข้า tab นี้ → ตรวจจากค่าที่เก็บไว้
+      const saved = this.lastContractDetailValue();
+      if (!saved || Object.keys(saved).length === 0) return false;
+      // ตรวจว่าฟิลบังคับกรอกมีค่าหรือยัง
+      const requiredFields = ['contractMaker', 'legalEntityName', 'registeredAddress', 'contactPerson', 'email'];
+      return requiredFields.every(f => {
+        const v = saved[f];
+        return v !== null && v !== undefined && String(v).trim() !== '';
+      });
     }
     return form.valid;
   }

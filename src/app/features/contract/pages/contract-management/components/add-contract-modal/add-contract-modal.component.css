@@ -318,16 +318,38 @@
 
 /* ==================== Responsive ==================== */
 @media (max-width: 768px) {
+  .modal-backdrop {
+    @apply p-0;
+  }
+
   .modal-content {
     @apply max-w-full h-full max-h-full rounded-none;
   }
 
+  .modal-header {
+    @apply px-4 py-3;
+  }
+
+  .modal-title {
+    @apply text-lg;
+  }
+
   .tab-navigation {
-    @apply overflow-x-auto;
+    @apply overflow-x-auto px-2;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .tab-navigation::-webkit-scrollbar {
+    display: none;
   }
 
   .tab-btn {
-    @apply px-4 py-3 flex-shrink-0;
+    @apply px-3 py-3 flex-shrink-0;
+  }
+
+  .tab-number {
+    @apply w-7 h-7 text-xs;
   }
 
   .tab-label {
@@ -338,13 +360,124 @@
     @apply grid-cols-1;
   }
 
+  .modal-body {
+    @apply px-4 py-4;
+  }
+
+  .section-title {
+    @apply text-lg mb-3;
+  }
+
+  .subsection {
+    @apply mt-4 p-3;
+  }
+
+  .subsection-title {
+    @apply text-base mb-3;
+  }
+
   .modal-footer {
-    @apply flex-col items-stretch gap-3;
+    @apply flex-col items-stretch gap-2 px-4 py-3;
   }
 
   .footer-left,
   .footer-right {
     @apply w-full justify-between;
+  }
+
+  .btn-secondary,
+  .btn-primary,
+  .btn-draft,
+  .btn-save-quotation,
+  .btn-success {
+    @apply px-3 py-2 text-xs justify-center;
+  }
+
+  .summary-grid {
+    @apply gap-3;
+  }
+
+  .summary-group {
+    @apply p-3;
+  }
+
+  .step-title {
+    @apply text-lg mb-3;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-header {
+    @apply px-3 py-2;
+  }
+
+  .modal-title {
+    @apply text-base;
+  }
+
+  .modal-close-btn {
+    @apply w-8 h-8;
+  }
+
+  .tab-btn {
+    @apply px-2 py-2;
+  }
+
+  .tab-number {
+    @apply w-6 h-6 text-xs;
+  }
+
+  .modal-body {
+    @apply px-3 py-3;
+  }
+
+  .section-title {
+    @apply text-base;
+  }
+
+  .form-group label {
+    @apply text-xs;
+  }
+
+  .modal-footer {
+    @apply px-3 py-2 gap-2;
+  }
+
+  .btn-secondary,
+  .btn-primary,
+  .btn-draft,
+  .btn-save-quotation,
+  .btn-success {
+    @apply px-2 py-1.5 text-xs;
+  }
+
+  .confirm-close-modal {
+    @apply p-5 mx-2;
+  }
+
+  .confirm-close-icon {
+    @apply w-12 h-12 mb-3;
+  }
+
+  .confirm-close-icon i {
+    @apply text-2xl;
+  }
+
+  .confirm-close-title {
+    @apply text-lg mb-1;
+  }
+
+  .confirm-close-message {
+    @apply text-sm mb-4;
+  }
+
+  .confirm-close-actions {
+    @apply flex-col gap-2;
+  }
+
+  .confirm-close-actions .btn-cancel,
+  .confirm-close-actions .btn-confirm {
+    @apply w-full justify-center px-4 py-2;
   }
 }
 

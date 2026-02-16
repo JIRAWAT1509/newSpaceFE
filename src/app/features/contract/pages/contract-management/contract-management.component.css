@@ -122,11 +122,27 @@
 }
 
 @media (max-width: 480px) {
+  .contract-management-container {
+    @apply p-2 gap-2;
+  }
+
   .page-header {
-    @apply px-3 py-2;
+    @apply px-3 py-2 rounded-lg;
   }
 
   .page-title {
-    @apply text-lg;
+    @apply text-base;
+  }
+
+  .content-card {
+    @apply rounded-lg;
+  }
+
+  ::ng-deep .contract-tabs .p-tablist {
+    @apply px-1 gap-0;
+  }
+
+  ::ng-deep .contract-tabs .p-tab {
+    @apply px-2 py-2;
   }
 }
