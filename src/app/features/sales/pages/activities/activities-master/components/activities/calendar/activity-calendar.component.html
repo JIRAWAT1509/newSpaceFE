@@ -1,11 +1,9 @@
 <!-- activity-calendar.component.html - FIXED VERSION -->
 
 <div class="calendar-container">
-
   <!-- ==================== MONTH VIEW ==================== -->
-  @if (view === 'month') {
+  @if (view === "month") {
     <div class="month-view">
-
       <!-- Month Header with Weekday Labels -->
       <div class="month-header">
         @for (day of weekdays; track day; let i = $index) {
@@ -32,10 +30,7 @@
               >
                 <!-- Day Number -->
                 <div class="day-header">
-                  <span
-                    class="day-number"
-                    [class.today-number]="day.isToday"
-                  >
+                  <span class="day-number" [class.today-number]="day.isToday">
                     {{ day.day }}
                   </span>
                 </div>
@@ -46,6 +41,7 @@
                     <div
                       class="activity-bar"
                       [class]="getTypeClass(activity.type)"
+                      [ngClass]="getMultiDayClasses(activity, day.date)"
                       [style]="getActivityBarStyle(activity, day.date)"
                       [class.overdue-activity]="isOverdue(activity)"
                       (click)="onActivityClick(activity.id, $event)"
@@ -73,7 +69,10 @@
 
                   <!-- Show "+N more" if more than 3 activities -->
                   @if (day.activities.length >= 3) {
-                    <div class="more-activities" (click)="onDayClick(day.date, $event)">
+                    <div
+                      class="more-activities"
+                      (click)="onDayClick(day.date, $event)"
+                    >
                       +{{ day.activities.length - 3 }} เพิ่มเติม
                     </div>
                   }
@@ -87,9 +86,8 @@
   }
 
   <!-- ==================== WEEK VIEW ==================== -->
-  @if (view === 'week') {
+  @if (view === "week") {
     <div class="week-view">
-
       <!-- Week Header with Days -->
       <div class="week-header">
         <!-- Time column header -->
@@ -105,10 +103,7 @@
           >
             <div class="day-info">
               <span class="day-name">{{ day.dayName.toUpperCase() }}</span>
-              <span
-                class="day-date"
-                [class.today-date]="day.isToday"
-              >
+              <span class="day-date" [class.today-date]="day.isToday">
                 {{ day.dayNumber }}
               </span>
             </div>
@@ -118,7 +113,6 @@
 
       <!-- Week Grid Container -->
       <div class="week-grid-container">
-
         <!-- Time Column -->
         <div class="time-column">
           @for (slot of timeSlots(); track slot.hour) {
@@ -152,29 +146,43 @@
               (click)="onDayClick(day.date, $event)"
             >
               <!-- Activities for this day -->
-              @for (activityWithTime of day.activities; track activityWithTime.activity.id) {
+              @for (
+                activityWithTime of day.activities;
+                track activityWithTime.activity.id
+              ) {
                 <div
                   class="week-activity"
                   [class]="getTypeClass(activityWithTime.activity.type)"
-                  [class.overdue-activity]="isOverdue(activityWithTime.activity)"
+                  [class.overdue-activity]="
+                    isOverdue(activityWithTime.activity)
+                  "
                   [style]="getWeekViewActivityStyle(activityWithTime)"
-                  (click)="onActivityClick(activityWithTime.activity.id, $event)"
+                  (click)="
+                    onActivityClick(activityWithTime.activity.id, $event)
+                  "
                 >
                   <!-- Activity Content -->
                   <div class="week-activity-content">
                     <div class="activity-header">
                       <span class="activity-title-week">
-                        {{ formatActivityTitle(activityWithTime.activity.title, 25) }}
+                        {{
+                          formatActivityTitle(
+                            activityWithTime.activity.title,
+                            25
+                          )
+                        }}
                       </span>
                       <span
                         class="activity-status-badge"
-                        [class]="getStatusClass(activityWithTime.activity.status)"
+                        [class]="
+                          getStatusClass(activityWithTime.activity.status)
+                        "
                       ></span>
                     </div>
 
                     <div class="activity-time-week">
-                      {{ activityWithTime.startTime.toFormat('HH:mm') }} -
-                      {{ activityWithTime.endTime.toFormat('HH:mm') }}
+                      {{ activityWithTime.startTime.toFormat("HH:mm") }} -
+                      {{ activityWithTime.endTime.toFormat("HH:mm") }}
                     </div>
 
                     @if (activityWithTime.spansDays > 1) {
@@ -191,7 +199,10 @@
               @if (day.isToday) {
                 <div
                   class="current-time-indicator"
-                  [style.top.px]="(DateTime.now().hour * 60 + DateTime.now().minute) / 60 * 60"
+                  [style.top.px]="
+                    ((DateTime.now().hour * 60 + DateTime.now().minute) / 60) *
+                    60
+                  "
                 >
                   <div class="time-dot"></div>
                   <div class="time-line"></div>
@@ -203,5 +214,4 @@
       </div>
     </div>
   }
-
 </div>

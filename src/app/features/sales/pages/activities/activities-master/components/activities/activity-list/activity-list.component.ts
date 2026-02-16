@@ -1,5 +1,5 @@
 // activity-list.component.ts - UPDATED with Check-In support
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DateTime } from 'luxon';
 import { Activity, ActivityStatus } from '@core/data/activities.mock';
@@ -23,6 +23,15 @@ interface StatusUpdateEvent {
   styleUrl: './activity-list.component.css'
 })
 export class ActivityListComponent {
+  constructor() {
+  // ✅ Watch expandedId from parent และ sync กับ internal signal
+  effect(() => {
+    const expanded = this.expandedId;
+    if (expanded) {
+      this.expandedId_internal.set(expanded);
+    }
+  });
+}
 
   // ==================== EXPOSE DateTime TO TEMPLATE ====================
   protected readonly DateTime = DateTime;
@@ -31,6 +40,7 @@ export class ActivityListComponent {
   @Input() activities: Activity[] = [];
   @Input() selectedId: string | null = null;
   @Input() currentUser!: User;
+  @Input() expandedId: string | null = null;
 
   // ==================== OUTPUTS ====================
   @Output() activitySelect = new EventEmitter<string>();
@@ -43,7 +53,8 @@ export class ActivityListComponent {
     duplicatedData: Partial<Activity>;
   }>();
   // ==================== SIGNALS ====================
-  expandedId = signal<string | null>(null);
+  private expandedId_internal = signal<string | null>(null);
+  // expandedId = signal<string | null>(null);
   showStatusDialog = signal<boolean>(false);
   statusDialogType = signal<'cancel' | 'return' | 'finish'>('cancel');
   statusDialogActivityId = signal<string | null>(null);
@@ -52,17 +63,17 @@ export class ActivityListComponent {
   activityToDuplicate = signal<Activity | null>(null);
   // ==================== EVENT HANDLERS ====================
 
-  onActivityClick(activityId: string): void {
-    // Toggle selection
-    this.activitySelect.emit(activityId);
+onActivityClick(activityId: string): void {
+  // Toggle selection (emit to parent)
+  this.activitySelect.emit(activityId);
 
-    // Toggle expand
-    if (this.expandedId() === activityId) {
-      this.expandedId.set(null);
-    } else {
-      this.expandedId.set(activityId);
-    }
+  // ✅ Toggle expand (ใช้ internal signal)
+  if (this.expandedId_internal() === activityId) {
+    this.expandedId_internal.set(null);
+  } else {
+    this.expandedId_internal.set(activityId);
   }
+}
 
   onEdit(activity: Activity, event: Event): void {
     event.stopPropagation();
@@ -155,9 +166,10 @@ export class ActivityListComponent {
   // ==================== UTILITY METHODS ====================
 
   // Check if activity is expanded
-  isExpanded(activityId: string): boolean {
-    return this.expandedId() === activityId;
-  }
+isExpanded(activityId: string): boolean {
+  // ✅ ใช้ internal signal
+  return this.expandedId_internal() === activityId;
+}
 
   // Check if activity is selected
   isSelected(activityId: string): boolean {

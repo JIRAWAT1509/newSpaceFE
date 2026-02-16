@@ -5,12 +5,13 @@
   <!-- ==================== ACTIVITY ITEMS ==================== -->
   @for (activity of activities; track activity.id) {
     <div
-      class="activity-item"
-      [class.expanded]="isExpanded(activity.id)"
-      [class.selected]="isSelected(activity.id)"
-      [class.overdue]="isOverdue(activity)"
-      (click)="onActivityClick(activity.id)"
-    >
+  class="activity-item"
+  [attr.data-activity-id]="activity.id"
+  [class.expanded]="isExpanded(activity.id)"
+  [class.selected]="isSelected(activity.id)"
+  [class.overdue]="isOverdue(activity)"
+  (click)="onActivityClick(activity.id)"
+>
 
       <!-- ========== COLLAPSED VIEW ========== -->
       <div class="activity-header">

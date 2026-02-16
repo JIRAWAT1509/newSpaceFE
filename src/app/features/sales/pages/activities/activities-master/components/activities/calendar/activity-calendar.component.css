@@ -2,11 +2,16 @@
 
 /* ==================== CONTAINER ==================== */
 .calendar-container {
-  width: 100%;
   height: 100%;
   background: white;
   border-radius: 8px;
   overflow: hidden;
+
+    width: 100%;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ==================== MONTH VIEW ==================== */
@@ -66,10 +71,10 @@
 /* Calendar Cell */
 .calendar-cell {
   border-right: 1px solid #e5e7eb;
-  padding: 0.5rem;
+    padding: 0.5rem 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.5rem 0;
   background: white;
   transition: background-color 0.2s;
   min-height: 100px;
@@ -252,7 +257,8 @@
   border-bottom: 2px solid #e5e7eb;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 30;  /* ✅ เปลี่ยนจาก 100 → 30 */
+  flex-shrink: 0;
 }
 
 .time-column-header {
@@ -315,14 +321,14 @@
 }
 
 /* Time Column */
+/* ✅ ตรวจสอบว่ามี */
 .time-column {
   border-right: 1px solid #e5e7eb;
   background: #fafafa;
   position: sticky;
   left: 0;
-  z-index: 5;
+  z-index: 25;  /* ✅ ต่ำกว่า week-header */
 }
-
 .time-slot {
   height: 60px;
   display: flex;
@@ -399,8 +405,11 @@
 
 .week-activity:hover {
   transform: translateX(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  z-index: 20 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 45 !important;  /* ✅ เปลี่ยนจาก 99 → 45 */
+}
+.week-activity {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .week-activity.type-assignment {
@@ -493,7 +502,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  z-index: 15;
+  z-index: 98;  /* ✅ เปลี่ยนจาก 15 เป็น 98 */
   pointer-events: none;
 }
 
@@ -541,6 +550,38 @@
 .month-grid::-webkit-scrollbar-thumb:hover,
 .week-grid-container::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+/* Single-day: มุมโค้ง + gap */
+.activity-bar.single-day {
+  border-radius: 6px;
+  margin: 0 4px;
+}
+
+/* Multi-day start: โค้งซ้าย */
+.activity-bar.multi-day-start {
+  border-radius: 6px 0 0 6px;
+  margin-left: 4px;
+  margin-right: -1px;
+}
+
+/* ✅ ซ่อน status dot ในวันกลาง/สุดท้ายด้วย */
+.activity-status-dot,
+.activity-status-dot {
+  display: none !important;
+}
+
+/* ✅ ลบ gap ระหว่างแท่ง */
+.activity-bar.multi-day-start {
+  border-radius: 4px 0 0 4px;
+  margin-left: 2px;
+  margin-right: 0; /* ชิดขวา */
+}
+
+.activity-bar.single-day,
+.activity-bar.multi-day-start {
+  border-radius: 4px;
+  margin: 0 2px;
 }
 
 /* ==================== RESPONSIVE ==================== */
@@ -858,4 +899,51 @@
 /* More activities Thai text */
 .more-activities {
   font-weight: 500;
+}
+
+/* ✅ ให้ทั้ง month และ week สูงเท่ากัน */
+.calendar-container {
+  width: 100%;
+  height: 700px;  /* ← กำหนดความสูงคงที่ (ปรับตามต้องการ) */
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.month-view,
+.week-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;  /* ← ใช้ความสูงเต็ม container */
+  overflow: hidden;
+}
+
+/* ✅ Month grid มี scroll */
+.month-grid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;  /* ← Scroll ข้างใน */
+  overflow-x: hidden;
+}
+
+/* ✅ Week grid มี scroll */
+.week-grid-container {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  flex: 1;  /* ← ใช้พื้นที่ที่เหลือ */
+  overflow-y: auto;  /* ← Scroll ข้างใน */
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ✅ ปรับ header ไม่ให้ scroll ไปด้วย */
+.week-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;  /* ← อยู่เหนือ activities */
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
 }
