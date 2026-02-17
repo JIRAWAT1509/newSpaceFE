@@ -598,8 +598,8 @@ export const DEFAULT_UI_CONFIG: UiConfig = {
     sales: 'Sales',
     area: 'Area',
     contract: 'Contract',
-    collection_finance: 'Collection & Finance',
-    facilities: 'Facilities',
+    collection_finance: 'collection_finance',
+    facilities: 'facilities',
     report: 'Report',
     report_dashboard: 'Report',
   },
@@ -705,23 +705,14 @@ export const loadUiConfig = (): UiConfig => {
       },
     };
 
-    // Normalize labels: replace raw keys that were never properly set
-    const mergedLabels = {
-      ...DEFAULT_UI_CONFIG.labels,
-      ...(parsed.labels || {}),
-    };
-    // Fix legacy raw-key labels (e.g. 'collection_finance' → 'Collection & Finance')
-    for (const [key, value] of Object.entries(mergedLabels)) {
-      if (value === key) {
-        mergedLabels[key] = DEFAULT_UI_CONFIG.labels[key] || value;
-      }
-    }
-
     return {
       ...DEFAULT_UI_CONFIG,
       ...parsed,
       tokens: mergedTokens,
-      labels: mergedLabels,
+      labels: {
+        ...DEFAULT_UI_CONFIG.labels,
+        ...(parsed.labels || {}),
+      },
       moduleOverrides: mergedModuleOverrides,
       paletteMode,
       activePresetId: paletteMode === 'preset' ? resolvedPresetId : null,

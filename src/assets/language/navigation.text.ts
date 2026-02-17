@@ -7,8 +7,6 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     // Primary navigation
     area: "Area",
     contract: "Contract",
-    collection_finance: "Collection & Finance",
-    facilities: "Facilities",
     service: "Service",
     finance: "Finance",
     dashboard: "Dashboard",
@@ -257,8 +255,6 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     // Primary navigation
     area: "พื้นที่",
     contract: "สัญญา",
-    collection_finance: "Collection & Finance",
-    facilities: "Facilities",
     service: "บริการ",
     finance: "การเงิน",
     dashboard: "แดชบอร์ด",
@@ -507,8 +503,6 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     // Primary navigation
     area: "区域",
     contract: "合同",
-    collection_finance: "Collection & Finance",
-    facilities: "Facilities",
     service: "服务",
     finance: "财务",
     dashboard: "仪表板",
