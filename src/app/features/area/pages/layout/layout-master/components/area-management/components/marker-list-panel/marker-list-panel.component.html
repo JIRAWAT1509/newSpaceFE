@@ -10,17 +10,19 @@
   </div>
 
   <!-- Active Areas Section -->
-  <div class="list-section">
-    <div class="section-header">
+  <div class="list-section" [class.collapsed]="isActiveSectionCollapsed()">
+    <div class="section-header" (click)="toggleActiveSection()">
       <span class="section-title">
         <i class="pi pi-check-circle"></i>
         Active Areas
+        <i class="pi pi-chevron-up toggle-icon" [class.collapsed]="isActiveSectionCollapsed()"></i>
       </span>
       <span class="count-badge">{{ activeAreas().length }}</span>
     </div>
 
     <div
       class="area-list"
+      [class.collapsed]="isActiveSectionCollapsed()"
       #activeListZone
       [class.drop-zone-active]="isActiveZoneHovered()"
       (dragover)="onActiveZoneDragOver($event)"
@@ -113,17 +115,19 @@
   </div>
 
   <!-- Inactive Areas Section -->
-  <div class="list-section">
-    <div class="section-header">
+  <div class="list-section" [class.collapsed]="isInactiveSectionCollapsed()">
+    <div class="section-header" (click)="toggleInactiveSection()">
       <span class="section-title">
         <i class="pi pi-eye-slash"></i>
         Inactive Areas
+        <i class="pi pi-chevron-up toggle-icon" [class.collapsed]="isInactiveSectionCollapsed()"></i>
       </span>
       <span class="count-badge">{{ inactiveAreas().length }}</span>
     </div>
 
     <div
       class="area-list"
+      [class.collapsed]="isInactiveSectionCollapsed()"
       #inactiveListZone
       [class.drop-zone-active]="isInactiveZoneHovered()"
       (dragover)="onInactiveZoneDragOver($event)"
