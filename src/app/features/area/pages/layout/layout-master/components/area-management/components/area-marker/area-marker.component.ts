@@ -1,4 +1,4 @@
-import { Component, input, output, ElementRef, viewChild, effect } from '@angular/core';
+import { Component, input, output, ElementRef, viewChild, effect, AfterViewInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Area } from '@core/models/area.model';
 
@@ -25,6 +25,7 @@ export class AreaMarkerComponent {
   isSelected = input<boolean>(false);
   isDraggable = input<boolean>(true);
   shouldPulse = input<boolean>(false);
+  @Input() contentDiv?: HTMLDivElement;
 
   markerDragged = output<MarkerDragEvent>();
   markerClicked = output<string>();
@@ -39,6 +40,7 @@ export class AreaMarkerComponent {
   private dragStartY = 0;
   private containerRect: DOMRect | null = null;
   private clickStartPos = { x: 0, y: 0 }; // Track click position to detect drag vs click
+  private mousePosInContentDiv = { x: 0, y: 0 } // current mouse position of content div
 
   constructor() {
     effect(() => {
@@ -136,10 +138,12 @@ export class AreaMarkerComponent {
     if (!floorImage) return;
 
     const imageRect = floorImage.getBoundingClientRect();
+    this.onMouseMoveInContentDiv(event);
 
     // Calculate raw mouse position relative to image
-    const rawMouseX = event.clientX - imageRect.left;
-    const rawMouseY = event.clientY - imageRect.top;
+    const zoomLevel = Number(this.zoomLevel().toFixed(1))
+    const rawMouseX = this.mousePosInContentDiv.x / zoomLevel; // event.clientX - imageRect.left;
+    const rawMouseY = this.mousePosInContentDiv.y / zoomLevel; //event.clientY - imageRect.top;
 
     // Check if cursor is outside image bounds
     const isOutsideImage =
@@ -163,8 +167,8 @@ export class AreaMarkerComponent {
     // The CSS transform will handle placing the marker correctly
 
     // Convert to percentage
-    let newX = (rawMouseX / imageRect.width) * 100;
-    let newY = (rawMouseY / imageRect.height) * 100;
+    let newX = (rawMouseX / imageRect.width) * 100
+    let newY = (rawMouseY / imageRect.height) * 100
 
     // Clamp to valid range
     newX = Math.max(5, Math.min(95, newX));
@@ -189,8 +193,9 @@ export class AreaMarkerComponent {
 
       if (floorImage) {
         const imageRect = floorImage.getBoundingClientRect();
-        const mouseX = event.clientX - imageRect.left;
-        const mouseY = event.clientY - imageRect.top;
+        const zoomLevel = Number(this.zoomLevel().toFixed(1))
+        const mouseX = this.mousePosInContentDiv.x / zoomLevel; // event.clientX - imageRect.left;
+        const mouseY = this.mousePosInContentDiv.y / zoomLevel; //event.clientY - imageRect.top;
 
         const isOutsideImage =
           mouseX < 0 ||
@@ -220,6 +225,13 @@ export class AreaMarkerComponent {
       document.removeEventListener('mouseup', this.onMouseUp);
     }
   };
+
+  private onMouseMoveInContentDiv = (event: MouseEvent): void => {
+    const rect = this.contentDiv?.getBoundingClientRect();
+    if (!rect) return;
+    this.mousePosInContentDiv.x = event.clientX - rect.left;
+    this.mousePosInContentDiv.y = event.clientY - rect.top;
+  }
 
   private updateMarkerPosition(): void {
     // Force Angular to detect changes

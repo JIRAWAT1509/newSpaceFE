@@ -753,3 +753,86 @@ button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ==================== ATTACHMENTS SECTION ==================== */
+.attachments-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e5e7eb;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.375rem 0;
+}
+
+.section-title i {
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+.section-subtitle {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 0 0 1.25rem 0;
+}
+
+.attachment-item {
+  margin-bottom: 1.5rem;
+}
+
+.attachment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.attachment-header i {
+  font-size: 1rem;
+  color: #3b82f6;
+}
+
+.attachment-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.attachment-badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.attachment-badge.optional {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.location-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  color: #1e40af;
+}
+
+.location-note i {
+  font-size: 1rem;
+  color: #3b82f6;
+  flex-shrink: 0;
+  margin-top: 0.0625rem;
+}

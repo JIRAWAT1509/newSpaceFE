@@ -1,5 +1,12 @@
 /* meter-input-card.component.css - FINAL CORRECTED */
 
+/* Host element must be block for grid layout */
+:host {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+}
+
 /* ==================== COMPACT MODE (Default: 250px x 200px) ==================== */
 .meter-card.compact {
   @apply relative bg-white rounded-xl p-4 border-2 border-gray-200;
@@ -55,10 +62,11 @@
 .meter-card.inline-square {
   @apply flex flex-col rounded-xl border-2 border-gray-200 bg-white;
   @apply transition-all duration-200;
-  width: 270px;
-  min-height: 260px;
+  width: 100%;
+  min-height: 0;
   padding: 0.875rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
 .meter-card.inline-square:hover {
@@ -278,10 +286,9 @@
 
 @media (max-width: 640px) {
   .meter-card.inline-square {
-    width: 270px;
-    min-width: 270px;
-    min-height: 260px;
-    justify-self: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
   }
 
   .square-input-row {

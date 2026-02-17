@@ -1,4 +1,4 @@
-// activities-section.component.ts - CORRECTED VERSION
+// activities-section.component.ts - FULL WITH CHECK-IN HANDLER
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DateTime } from 'luxon';
@@ -10,17 +10,23 @@ import {
   ActivityStatus,
   MOCK_ACTIVITIES,
   MOCK_TEAM_ACTIVITY_FEED,
-  TeamActivityFeedItem
+  TeamActivityFeedItem,
 } from '@core/data/activities.mock';
 import { User, CURRENT_USER, MOCK_USERS } from '@core/data/users.mock';
 import { Role, MOCK_ROLES } from '@core/data/roles.mock';
+
+// Import services
+import { CheckInService } from '@core/services/checkin.service';
 
 // Import child components
 import { ActivityCalendarComponent } from './calendar/activity-calendar.component';
 import { TeamActivityFeedComponent } from './activity-feed/team-activity-feed.component';
 import { ActivityListComponent } from './activity-list/activity-list.component';
 import { ActivityDrawerComponent } from './activity-drawer/activity-drawer.component';
-import { ActivityFiltersComponent, ActivityFilters } from './activity-filters/activity-filters.component';
+import {
+  ActivityFiltersComponent,
+  ActivityFilters,
+} from './activity-filters/activity-filters.component';
 
 @Component({
   selector: 'app-activities-section',
@@ -34,7 +40,7 @@ import { ActivityFiltersComponent, ActivityFilters } from './activity-filters/ac
     ActivityFiltersComponent,
   ],
   templateUrl: './activities-section.component.html',
-  styleUrl: './activities-section.component.css'
+  styleUrl: './activities-section.component.css',
 })
 export class ActivitiesSectionComponent implements OnInit {
   // ==================== SIGNALS ====================
@@ -45,6 +51,7 @@ export class ActivitiesSectionComponent implements OnInit {
   users = signal<User[]>([]);
   roles = signal<Role[]>([]);
   currentUser = signal<User>(CURRENT_USER);
+  expandedActivityId = signal<string | null>(null);
 
   // UI State
   isLoading = signal<boolean>(false);
@@ -55,10 +62,14 @@ export class ActivitiesSectionComponent implements OnInit {
   // Calendar State
   calendarView = signal<'month' | 'week'>('month');
   currentDate = signal<DateTime>(DateTime.now());
-  selectedDate = signal<DateTime | null>(null); // NEW: Track selected date
+  selectedDate = signal<DateTime | null>(null);
 
   // Filter State
   activeFilters = signal<ActivityFilters>({ types: [], statuses: [] });
+
+  // ==================== CONSTRUCTOR ====================
+
+  constructor(private checkInService: CheckInService) {}
 
   // ==================== COMPUTED ====================
 
@@ -74,31 +85,41 @@ export class ActivitiesSectionComponent implements OnInit {
       const dayStart = selectedDate.startOf('day');
       const dayEnd = selectedDate.endOf('day');
 
-      filtered = filtered.filter(activity => {
+      filtered = filtered.filter((activity) => {
         const startDate = DateTime.fromISO(activity.startDate);
         const endDate = DateTime.fromISO(activity.endDate);
 
-        return (startDate >= dayStart && startDate <= dayEnd) ||
-               (endDate >= dayStart && endDate <= dayEnd) ||
-               (startDate <= dayStart && endDate >= dayEnd);
+        return (
+          (startDate >= dayStart && startDate <= dayEnd) ||
+          (endDate >= dayStart && endDate <= dayEnd) ||
+          (startDate <= dayStart && endDate >= dayEnd)
+        );
       });
     }
 
     // Apply type filters
     if (filters.types.length > 0) {
-      filtered = filtered.filter(activity => {
+      filtered = filtered.filter((activity) => {
         // Check regular types
-        if (filters.types.includes('assignment') && activity.type === 'assignment') {
+        if (
+          filters.types.includes('assignment') &&
+          activity.type === 'assignment'
+        ) {
           return true;
         }
-        if (filters.types.includes('personal') && activity.type === 'personal') {
+        if (
+          filters.types.includes('personal') &&
+          activity.type === 'personal'
+        ) {
           return true;
         }
 
         // Check "assigned by me"
         if (filters.types.includes('assigned-by-me')) {
-          return activity.type === 'assignment' &&
-                 activity.createdBy === currentUserId;
+          return (
+            activity.type === 'assignment' &&
+            activity.createdBy === currentUserId
+          );
         }
 
         return false;
@@ -107,7 +128,7 @@ export class ActivitiesSectionComponent implements OnInit {
 
     // Apply status filters
     if (filters.statuses.length > 0) {
-      filtered = filtered.filter(activity => {
+      filtered = filtered.filter((activity) => {
         // Check regular statuses
         if (filters.statuses.includes(activity.status)) {
           return true;
@@ -115,9 +136,10 @@ export class ActivitiesSectionComponent implements OnInit {
 
         // Check overdue
         if (filters.statuses.includes('overdue')) {
-          const isOverdue = activity.status !== 'finished' &&
-                           activity.status !== 'canceled' &&
-                           DateTime.fromISO(activity.endDate) < DateTime.now();
+          const isOverdue =
+            activity.status !== 'finished' &&
+            activity.status !== 'canceled' &&
+            DateTime.fromISO(activity.endDate) < DateTime.now();
           return isOverdue;
         }
 
@@ -132,12 +154,12 @@ export class ActivitiesSectionComponent implements OnInit {
   selectedActivity = computed(() => {
     const id = this.selectedActivityId();
     if (!id) return null;
-    return this.activities().find(a => a.id === id) || null;
+    return this.activities().find((a) => a.id === id) || null;
   });
 
   // Activities for calendar view (all activities)
   calendarActivities = computed(() => {
-    return this.activities();
+    return this.filteredActivities();
   });
 
   // Selected date text for display
@@ -165,7 +187,7 @@ export class ActivitiesSectionComponent implements OnInit {
     const filtered = this.filteredActivities();
     return {
       total: filtered.length,
-      hasActivities: filtered.length > 0
+      hasActivities: filtered.length > 0,
     };
   });
 
@@ -184,12 +206,11 @@ export class ActivitiesSectionComponent implements OnInit {
     // Simulate API call
     setTimeout(() => {
       this.activities.set([...MOCK_ACTIVITIES]);
-      this.teamActivityFeed.set([...MOCK_TEAM_ACTIVITY_FEED].slice(0, 10));
+      this.teamActivityFeed.set([...MOCK_TEAM_ACTIVITY_FEED]);
       this.users.set([...MOCK_USERS]);
       this.roles.set([...MOCK_ROLES]);
 
       this.isLoading.set(false);
-      ////console.log('Activities data loaded:', this.activities().length);
     }, 500);
   }
 
@@ -201,7 +222,7 @@ export class ActivitiesSectionComponent implements OnInit {
   }
 
   refreshTeamActivityFeed(): void {
-    ////console.log('Team activity feed refreshed');
+    // console.log('Team activity feed refreshed');
   }
 
   // ==================== FILTER MANAGEMENT ====================
@@ -233,34 +254,79 @@ export class ActivitiesSectionComponent implements OnInit {
       this.currentDate.set(
         direction === 'next'
           ? current.plus({ months: 1 })
-          : current.minus({ months: 1 })
+          : current.minus({ months: 1 }),
       );
     } else {
       this.currentDate.set(
         direction === 'next'
           ? current.plus({ weeks: 1 })
-          : current.minus({ weeks: 1 })
+          : current.minus({ weeks: 1 }),
       );
     }
   }
 
   goToToday(): void {
     this.currentDate.set(DateTime.now());
-    this.selectedDate.set(null); // Clear date filter when going to today
+    this.selectedDate.set(null);
   }
 
   // ==================== ACTIVITY SELECTION ====================
 
   selectActivity(activityId: string): void {
-    if (this.selectedActivityId() === activityId) {
-      this.selectedActivityId.set(null);
-    } else {
-      this.selectedActivityId.set(activityId);
-    }
+    console.log('🎯 Activity selected from calendar:', activityId);
+
+    // Set selected
+    this.selectedActivityId.set(activityId);
+
+    // ✅ Set expanded
+    this.expandedActivityId.set(activityId);
+
+    // ✅ Scroll to activity in list
+    setTimeout(() => {
+      this.scrollToActivityInList(activityId);
+    }, 150);
   }
 
   deselectActivity(): void {
     this.selectedActivityId.set(null);
+  }
+
+  private scrollToActivityInList(activityId: string): void {
+    // Find activity element by data attribute
+    const activityElement = document.querySelector(
+      `[data-activity-id="${activityId}"]`,
+    ) as HTMLElement;
+
+    if (!activityElement) {
+      console.warn('⚠️ Activity element not found:', activityId);
+      return;
+    }
+
+    // Find scroll container
+    const scrollContainer = document.querySelector(
+      '.activity-list-section',
+    ) as HTMLElement;
+
+    if (!scrollContainer) {
+      console.warn('⚠️ Scroll container not found');
+      return;
+    }
+
+    // Calculate scroll position
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const elementRect = activityElement.getBoundingClientRect();
+
+    // Calculate relative position
+    const relativeTop = elementRect.top - containerRect.top;
+    const scrollTop = scrollContainer.scrollTop + relativeTop - 20; // 20px offset from top
+
+    // Smooth scroll
+    scrollContainer.scrollTo({
+      top: scrollTop,
+      behavior: 'smooth',
+    });
+
+    console.log('📜 Scrolled to activity in list:', activityId);
   }
 
   // ==================== DRAWER MANAGEMENT ====================
@@ -302,28 +368,30 @@ export class ActivitiesSectionComponent implements OnInit {
         assignedTo: activityData.assignedTo || [],
         assignedToRoles: activityData.assignedToRoles || [],
         finishRequirement: activityData.finishRequirement,
+        location: activityData.location,
+        checkIns: [],
         files: [],
         comments: [],
         createdAt: DateTime.now().toISO(),
         updatedAt: DateTime.now().toISO(),
-        color: activityData.type === 'assignment' ? '#3b82f6' : '#8b5cf6'
+        color: activityData.type === 'assignment' ? '#3b82f6' : '#8b5cf6',
       };
 
-      this.activities.update(activities => [...activities, newActivity]);
+      this.activities.update((activities) => [...activities, newActivity]);
 
       if (newActivity.type === 'assignment') {
         this.addTeamActivityFeedItem({
           activityId: newActivity.id,
           activityTitle: newActivity.title,
           action: 'created',
-          description: 'Created new assignment'
+          description: 'Created new assignment',
         });
       }
 
       this.isLoading.set(false);
       this.closeDrawer();
 
-      ////console.log('Activity created:', newActivity);
+      console.log('✅ Activity created:', newActivity);
     }, 500);
   }
 
@@ -331,18 +399,18 @@ export class ActivitiesSectionComponent implements OnInit {
     this.isLoading.set(true);
 
     setTimeout(() => {
-      this.activities.update(activities =>
-        activities.map(a =>
+      this.activities.update((activities) =>
+        activities.map((a) =>
           a.id === activityId
             ? { ...a, ...updates, updatedAt: DateTime.now().toISO() }
-            : a
-        )
+            : a,
+        ),
       );
 
       this.isLoading.set(false);
       this.closeDrawer();
 
-      ////console.log('Activity updated:', activityId);
+      console.log('✅ Activity updated:', activityId);
     }, 500);
   }
 
@@ -354,14 +422,14 @@ export class ActivitiesSectionComponent implements OnInit {
     this.isLoading.set(true);
 
     setTimeout(() => {
-      this.activities.update(activities =>
-        activities.filter(a => a.id !== activityId)
+      this.activities.update((activities) =>
+        activities.filter((a) => a.id !== activityId),
       );
 
       this.isLoading.set(false);
       this.deselectActivity();
 
-      ////console.log('Activity deleted:', activityId);
+      console.log('✅ Activity deleted:', activityId);
     }, 300);
   }
 
@@ -371,14 +439,14 @@ export class ActivitiesSectionComponent implements OnInit {
     activityId: string,
     status: ActivityStatus,
     reason?: string,
-    finishNote?: string
+    finishNote?: string,
   ): void {
     this.isLoading.set(true);
 
     setTimeout(() => {
       const updates: Partial<Activity> = {
         status,
-        updatedAt: DateTime.now().toISO()
+        updatedAt: DateTime.now().toISO(),
       };
 
       if (status === 'finished') {
@@ -390,25 +458,75 @@ export class ActivitiesSectionComponent implements OnInit {
         updates.returnReason = reason;
       }
 
-      this.activities.update(activities =>
-        activities.map(a =>
-          a.id === activityId ? { ...a, ...updates } : a
-        )
+      this.activities.update((activities) =>
+        activities.map((a) => (a.id === activityId ? { ...a, ...updates } : a)),
       );
 
-      const activity = this.activities().find(a => a.id === activityId);
+      const activity = this.activities().find((a) => a.id === activityId);
       if (activity?.type === 'assignment') {
         this.addTeamActivityFeedItem({
           activityId,
           activityTitle: activity.title,
           action: status as any,
-          description: reason || finishNote || `Updated status to ${status}`
+          description: reason || finishNote || `Updated status to ${status}`,
         });
       }
 
       this.isLoading.set(false);
-      ////console.log('Activity status updated:', activityId, status);
+      console.log('✅ Activity status updated:', activityId, status);
     }, 500);
+  }
+
+  // ==================== CHECK-IN MANAGEMENT ====================
+
+  async handleCheckIn(activityId: string): Promise<void> {
+    const activity = this.activities().find((a) => a.id === activityId);
+    if (!activity) {
+      console.error('❌ Activity not found:', activityId);
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    try {
+      // Perform check-in via service
+      const result = await this.checkInService.performCheckIn(
+        activity,
+        this.currentUser().id,
+        this.currentUser().name,
+      );
+
+      if (result.success && result.checkIn) {
+        // Update activity with new check-in
+        this.activities.update((activities) =>
+          activities.map((a) =>
+            a.id === activityId
+              ? { ...a, checkIns: [...(a.checkIns || []), result.checkIn!] }
+              : a,
+          ),
+        );
+
+        // Add to team activity feed
+        this.addTeamActivityFeedItem({
+          activityId,
+          activityTitle: activity.title,
+          action: 'checked-in' as any,
+          description: `Checked in at ${result.checkIn.address || 'location'}${
+            result.checkIn.distanceFromLocation
+              ? ` (${result.checkIn.distanceFromLocation}m away)`
+              : ''
+          }`,
+        });
+
+        console.log('✅ Check-in successful:', result.checkIn);
+      } else {
+        console.error('❌ Check-in failed:', result.error);
+      }
+    } catch (error: any) {
+      console.error('❌ Check-in error:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   // ==================== TEAM ACTIVITY FEED ====================
@@ -416,7 +534,13 @@ export class ActivitiesSectionComponent implements OnInit {
   addTeamActivityFeedItem(data: {
     activityId: string;
     activityTitle: string;
-    action: 'created' | 'updated' | 'finished' | 'canceled' | 'returned';
+    action:
+      | 'created'
+      | 'updated'
+      | 'finished'
+      | 'canceled'
+      | 'returned'
+      | 'checked-in';
     description: string;
   }): void {
     const newItem: TeamActivityFeedItem = {
@@ -428,19 +552,74 @@ export class ActivitiesSectionComponent implements OnInit {
       userAvatar: this.currentUser().avatar,
       action: data.action,
       description: data.description,
-      timestamp: DateTime.now().toISO()
+      timestamp: DateTime.now().toISO(),
     };
 
-    this.teamActivityFeed.update(feed => [newItem, ...feed].slice(0, 10));
+    this.teamActivityFeed.update((feed) => [newItem, ...feed].slice(0, 50));
   }
 
   // ==================== UTILITY ====================
 
   getUserById(userId: string): User | undefined {
-    return this.users().find(u => u.id === userId);
+    return this.users().find((u) => u.id === userId);
   }
 
   getRoleById(roleId: string): Role | undefined {
-    return this.roles().find(r => r.id === roleId);
+    return this.roles().find((r) => r.id === roleId);
+  }
+  // ==================== ADD METHOD ====================
+
+  duplicateActivity(data: {
+    originalId: string;
+    duplicatedData: Partial<Activity>;
+  }): void {
+    this.isLoading.set(true);
+
+    setTimeout(() => {
+      const original = this.activities().find((a) => a.id === data.originalId);
+      if (!original) {
+        console.error('Original activity not found');
+        this.isLoading.set(false);
+        return;
+      }
+
+      const newActivity: Activity = {
+        id: `act-${Date.now()}`,
+        type: data.duplicatedData.type || original.type,
+        title: data.duplicatedData.title || original.title,
+        description: data.duplicatedData.description || original.description,
+        startDate: data.duplicatedData.startDate!,
+        endDate: data.duplicatedData.endDate!,
+        status: 'pending',
+        createdBy: this.currentUser().id,
+        createdByName: this.currentUser().name,
+        assignedTo: data.duplicatedData.assignedTo || [],
+        assignedToRoles: data.duplicatedData.assignedToRoles || [],
+        finishRequirement: data.duplicatedData.finishRequirement,
+        location: data.duplicatedData.location,
+        checkIns: [],
+        files: [],
+        comments: [],
+        createdAt: DateTime.now().toISO()!,
+        updatedAt: DateTime.now().toISO()!,
+        color: data.duplicatedData.color || original.color,
+      };
+
+      this.activities.update((activities) => [...activities, newActivity]);
+
+      // Add to team feed
+      if (newActivity.type === 'assignment') {
+        this.addTeamActivityFeedItem({
+          activityId: newActivity.id,
+          activityTitle: newActivity.title,
+          action: 'created',
+          description: `Duplicated from "${original.title}"`,
+        });
+      }
+
+      this.isLoading.set(false);
+
+      console.log('✅ Activity duplicated:', newActivity);
+    }, 500);
   }
 }

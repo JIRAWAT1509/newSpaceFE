@@ -3,61 +3,72 @@
   <!-- Header with Actions -->
   <div class="content-header">
     <div>
-      <h2 class="page-title">ตารางรายการสัญญาที่พร้อมเรียกเก็บในเดือนนี้</h2>
-      <p class="page-subtitle">เลือกรายการเพื่อออกใบแจ้งหนี้</p>
+      <h2 class="page-title">
+        {{
+          showHistory()
+            ? "ประวัติการออกใบแจ้งหนี้"
+            : "ตารางรายการรอออกใบแจ้งหนี้ในเดือนนี้"
+        }}
+      </h2>
+      <p class="page-subtitle">
+        {{
+          showHistory()
+            ? "จัดการและติดตามใบแจ้งหนี้ที่ออกไปแล้ว"
+            : "เลือกรายการเพื่อออกใบแจ้งหนี้"
+        }}
+      </p>
     </div>
+
     <!-- Top Right Actions -->
-    <div class="header-actions" style="display: flex; align-items: center; gap: 12px;">
-
-      <!-- Split Button with Dropdown (always shown) -->
-      <div class="split-button-wrapper" style="position: relative;">
-        <button
-          class="btn btn-primary"
-          (click)="toggleActionDropdown()"
-          style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; white-space: nowrap;">
-          <span>ดูประวัติ การออกใบแจ้งหนี้</span>
-          <i class="pi" [ngClass]="showActionDropdown() ? 'pi-chevron-up' : 'pi-chevron-down'" style="font-size: 12px;"></i>
+    <div class="header-actions">
+      @if (showHistory()) {
+        <!-- Search in History View -->
+        <div class="search-box">
+          <i class="pi pi-search"></i>
+          <input
+            type="text"
+            placeholder="ค้นหา..."
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+          />
+        </div>
+        <!-- Back Button -->
+        <button class="btn-icon" (click)="toggleHistoryView()" title="กลับ">
+          <i class="pi pi-arrow-left"></i>
         </button>
-        @if (showActionDropdown()) {
-          <div class="dropdown-menu" style="position: absolute; top: 100%; right: 0; margin-top: 8px; background: white; border: 1px solid #e0e0e0; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 250px; z-index: 1000;">
-            <button
-              class="dropdown-item"
-              (click)="onIssueInvoice('ออกใบแจ้งหนี้')"
-              style="display: block; width: 100%; padding: 12px 16px; text-align: left; border: none; background: transparent; cursor: pointer; font-size: 14px; transition: background 0.2s;"
-              onmouseover="this.style.background='#f5f5f5'"
-              onmouseout="this.style.background='transparent'">
-              ออกใบแจ้งหนี้
-            </button>
-            <button
-              class="dropdown-item"
-              (click)="onIssueInvoice('ออกใบแจ้งหนี้ + พิมพ์เอกสาร')"
-              style="display: block; width: 100%; padding: 12px 16px; text-align: left; border: none; background: transparent; cursor: pointer; font-size: 14px; transition: background 0.2s;"
-              onmouseover="this.style.background='#f5f5f5'"
-              onmouseout="this.style.background='transparent'">
-              ออกใบแจ้งหนี้ + พิมพ์เอกสาร
-            </button>
-            <button
-              class="dropdown-item"
-              (click)="onIssueInvoice('ออกใบแจ้งหนี้ + ส่งอีเมล')"
-              style="display: block; width: 100%; padding: 12px 16px; text-align: left; border: none; background: transparent; cursor: pointer; font-size: 14px; transition: background 0.2s;"
-              onmouseover="this.style.background='#f5f5f5'"
-              onmouseout="this.style.background='transparent'">
-              ออกใบแจ้งหนี้ + ส่งอีเมล
-            </button>
-          </div>
-        }
-      </div>
-
-      <!-- Create Button (always shown) -->
-      <button
-        class="btn btn-create"
-        (click)="openCreateDrawer()"
-        style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; white-space: nowrap;">
-        <i class="pi pi-plus" style="font-size: 14px;"></i>
-        <span>สร้างใบแจ้งหนี้ - อื่นๆ Manual</span>
-      </button>
+      } @else {
+        <!-- Main View Actions -->
+        <button class="btn btn-primary" (click)="toggleHistoryView()">
+          <i class="pi pi-history"></i>
+          <span>ดูประวัติการออกใบแจ้งหนี้</span>
+        </button>
+        <button class="btn btn-create" (click)="openCreateDrawer()">
+          <i class="pi pi-plus"></i>
+          <span>สร้างใบแจ้งหนี้</span>
+        </button>
+      }
     </div>
   </div>
+
+  <!-- Sub-tab Navigation (only in history view) -->
+  @if (showHistory()) {
+    <div class="sub-tab-navigation">
+      <button
+        class="sub-tab-btn"
+        [class.active]="activeHistoryTab() === 'invoice'"
+        (click)="setHistoryTab('invoice')"
+      >
+        ประวัติการออกใบแจ้งหนี้
+      </button>
+      <button
+        class="sub-tab-btn"
+        [class.active]="activeHistoryTab() === 'credit'"
+        (click)="setHistoryTab('credit')"
+      >
+        ประวัติการออกใบลดหนี้ใบแจ้งหนี้
+      </button>
+    </div>
+  }
 
   <!-- Invoice Table -->
   <div class="table-container">
@@ -71,17 +82,48 @@
               (change)="toggleSelectAll($event)"
             />
           </th>
-          <th>เลขที่สัญญาเช่า</th>
-          <th>ชื่อลูกค้า</th>
-          <th>รายการเรียกเก็บหลัก</th>
-          <th>ยอดเงิน (รวมภาษี)</th>
-          <th>วันที่เริ่มต้นเรียกเก็บ</th>
-          <th>สถานะ</th>
+          <th (click)="sortBy('contractNumber')">
+            <!-- ✅ FIX #1: Change header based on tab -->
+            @if (showHistory() && activeHistoryTab() === 'credit') {
+              เลขที่ใบลดหนี้ใบแจ้งหนี้
+            } @else if (showHistory()) {
+              เลขที่ใบแจ้งหนี้
+            } @else {
+              เลขที่สัญญาเช่า
+            }
+            <i
+              class="pi sort-icon"
+              [ngClass]="getSortIcon('contractNumber')"
+            ></i>
+          </th>
+          <th (click)="sortBy('customerName')">
+            ชื่อลูกค้า
+            <i class="pi sort-icon" [ngClass]="getSortIcon('customerName')"></i>
+          </th>
+          <th (click)="sortBy('collectionItem')">
+            รายการเรียกเก็บหลัก
+            <i
+              class="pi sort-icon"
+              [ngClass]="getSortIcon('collectionItem')"
+            ></i>
+          </th>
+          <th (click)="sortBy('amount')">
+            ยอดเงิน (รวมภาษี)
+            <i class="pi sort-icon" [ngClass]="getSortIcon('amount')"></i>
+          </th>
+          <th (click)="sortBy('startDate')">
+            วันที่เริ่มต้นเรียกเก็บ
+            <i class="pi sort-icon" [ngClass]="getSortIcon('startDate')"></i>
+          </th>
+          <th (click)="sortBy('status')">
+            สถานะ
+            <i class="pi sort-icon" [ngClass]="getSortIcon('status')"></i>
+          </th>
           <th class="text-center">Actions</th>
         </tr>
       </thead>
       <tbody>
-        @for (invoice of invoices(); track invoice.id) {
+        @for (invoice of getCurrentViewInvoices(); track invoice.id) {
           <tr [class.selected]="isSelected(invoice.id)">
             <td class="checkbox-col">
               <input
@@ -107,140 +149,220 @@
             </td>
             <td>
               <span class="status-badge" [ngClass]="'status-' + invoice.status">
-                {{ invoice.status === 'ready' ? 'Ready' : invoice.status }}
+                {{
+                  invoice.status === "ready"
+                    ? "Ready"
+                    : invoice.status === "open"
+                      ? "Open"
+                      : "Cancelled"
+                }}
               </span>
             </td>
             <td>
               <div class="row-actions">
-                <button class="action-btn" title="Preview" (click)="onPreview(invoice)">
-                  <i class="pi pi-eye"></i>
-                </button>
-                <button class="action-btn" title="Edit" (click)="onEdit(invoice)">
-                  <i class="pi pi-pencil"></i>
-                </button>
-                <button class="action-btn danger" title="Cancel" (click)="onCancel(invoice)">
-                  <i class="pi pi-times"></i>
-                </button>
+                @if (showHistory()) {
+                  <!-- History View Actions -->
+                  <button
+                    class="action-btn"
+                    title="Preview"
+                    (click)="onPreview(invoice)"
+                  >
+                    <i class="pi pi-eye"></i>
+                  </button>
+                  <button
+                    class="action-btn"
+                    title="พิมพ์"
+                    (click)="onPrint(invoice)"
+                  >
+                    <i class="pi pi-print"></i>
+                  </button>
+                  <button
+                    class="action-btn"
+                    title="ส่งอีเมล"
+                    (click)="onEmail(invoice)"
+                  >
+                    <i class="pi pi-send"></i>
+                  </button>
+                  <button
+                    class="action-btn"
+                    title="เพิ่มเติม"
+                    (click)="toggleRowMenu(invoice.id, $event)"
+                  >
+                    <i class="pi pi-ellipsis-v"></i>
+                  </button>
+                } @else {
+                  <!-- Main View Actions -->
+                  <button
+                    class="action-btn"
+                    title="Preview"
+                    (click)="onPreview(invoice)"
+                  >
+                    <i class="pi pi-eye"></i>
+                  </button>
+                  <button
+                    class="action-btn"
+                    title="Edit"
+                    (click)="onEdit(invoice)"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button
+                    class="action-btn danger"
+                    title="Cancel"
+                    (click)="onCancel(invoice)"
+                  >
+                    <i class="pi pi-times"></i>
+                  </button>
+                  <button
+                    class="action-btn"
+                    title="เพิ่มเติม"
+                    (click)="toggleRowMenu(invoice.id, $event)"
+                  >
+                    <i class="pi pi-ellipsis-v"></i>
+                  </button>
+                }
               </div>
             </td>
           </tr>
         }
       </tbody>
     </table>
+
+    @if (getCurrentViewInvoices().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <h3>ไม่มีข้อมูล</h3>
+        <p>
+          {{
+            showHistory()
+              ? "ยังไม่มีประวัติ"
+              : "ไม่พบรายการที่พร้อมออกใบแจ้งหนี้"
+          }}
+        </p>
+      </div>
+    }
   </div>
 
-<!-- Bottom Action Bar (shown when items selected) -->
-@if (showBulkActions()) {
-  <div class="bottom-action-bar" style="position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 2px solid #e0e0e0; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 1000;">
-    <div style="display: flex; align-items: center; gap: 16px;">
-      <span style="color: #666; font-size: 14px; font-weight: 500;">
-        เลือกแล้ว <strong style="color: #6366f1;">{{ getSelectedCount() }}</strong> รายการ
-      </span>
+  <!-- Bottom Action Bar -->
+  @if (showBulkActions()) {
+    <div class="bottom-action-bar">
+      <div class="selection-info">
+        <span class="selected-text"
+          >เลือกแล้ว <strong>{{ getSelectedCount() }}</strong> รายการ</span
+        >
+      </div>
+      <div class="bulk-actions">
+        <button class="btn btn-secondary" (click)="toggleSelectAll($event)">
+          ยกเลิกการเลือก
+        </button>
+        @if (showHistory()) {
+          <button class="btn btn-primary" (click)="onBulkEmail()">
+            <i class="pi pi-send"></i>
+            <span>ส่งอีเมล</span>
+          </button>
+          <button class="btn btn-primary" (click)="onBulkPrint()">
+            <i class="pi pi-print"></i>
+            <span>พิมพ์เอกสาร</span>
+          </button>
+        } @else {
+          <button class="btn btn-create" (click)="onBulkIssueInvoice()">
+            <i class="pi pi-file-check"></i>
+            <span>ออกใบแจ้งหนี้</span>
+          </button>
+        }
+      </div>
     </div>
-    <div style="display: flex; gap: 12px;">
-      <button
-        class="btn btn-secondary"
-        (click)="toggleSelectAll($event)"
-        style="padding: 10px 20px; background: #f3f4f6; color: #374151; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
-        ยกเลิกการเลือก
-      </button>
-      <button
-        class="btn btn-primary"
-        onclick="alert('ออกใบแจ้งหนี้แล้ว')"
-        style="padding: 10px 24px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
-        ออกใบแจ้งหนี้
-      </button>
-    </div>
-  </div>
-}
-
+  }
 </div>
 
-<!-- Create Invoice Drawer (Right Side) -->
-@if (showCreateDrawer()) {
-  <div class="drawer-overlay" (click)="closeCreateDrawer()"></div>
-  <div class="drawer-panel">
-    <div class="drawer-header">
-      <h3>สร้างใบแจ้งหนี้ - อื่นๆ Manual</h3>
-      <button class="close-btn" (click)="closeCreateDrawer()">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
-    <div class="drawer-content">
-      <!-- Form Fields (Mock) -->
-      <div class="form-group">
-        <label>ลูกค้า</label>
-        <input type="text" placeholder="Placeholder..." />
-      </div>
-      <div class="form-group">
-        <label>ชื่อกิจการ</label>
-        <input type="text" placeholder="Placeholder..." />
-      </div>
-      <div class="form-group">
-        <label>เลขที่สัญญาเช่า บ. หลัก</label>
-        <input type="text" placeholder="Placeholder..." />
-      </div>
-      <div class="form-group">
-        <label>อาคาร:</label>
-        <input type="text" placeholder="Placeholder..." />
-      </div>
-      <div class="form-group">
-        <label>หมวดสินค้า/บริการ:</label>
-        <input type="text" placeholder="Placeholder..." />
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>ประเภทสัญญา</label>
-          <input type="text" placeholder="Placeholder..." />
-        </div>
-        <div class="form-group">
-          <label>สถานะสัญญาเช่า</label>
-          <input type="text" placeholder="Placeholder..." />
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="toggle-label">
-          <span>สัญญาหลัก</span>
-          <input type="checkbox" />
-        </label>
-      </div>
-      <div class="form-group">
-        <label class="toggle-label">
-          <span>สัญญาเสริม</span>
-          <input type="checkbox" />
-        </label>
-      </div>
-      <div class="form-group">
-        <label class="toggle-label">
-          <span>Discount</span>
-          <input type="checkbox" />
-        </label>
-      </div>
-    </div>
-    <div class="drawer-footer">
-      <button class="btn btn-secondary" (click)="closeCreateDrawer()">
-        ยกเลิก
-      </button>
-      <button class="btn btn-primary" (click)="onCreateInvoice()">
-        ออกใบเรียกเก็บ
-      </button>
+<!-- Kebab Menu -->
+@if (showRowMenu() && currentInvoice()) {
+  <div
+    class="action-menu-portal"
+    [style.top.px]="menuPosition().top"
+    [style.left.px]="menuPosition().left"
+  >
+    <div class="action-menu">
+      @if (!showHistory()) {
+        <!-- Ready Invoices Menu -->
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้')"
+        >
+          <i class="pi pi-file-check"></i>
+          <span>ออกใบแจ้งหนี้</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="
+            onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้ + พิมพ์เอกสาร')
+          "
+        >
+          <i class="pi pi-print"></i>
+          <span>ออกใบแจ้งหนี้ + พิมพ์เอกสาร</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้ + ส่งอีเมล')"
+        >
+          <i class="pi pi-send"></i>
+          <span>ออกใบแจ้งหนี้ + ส่งอีเมล</span>
+        </button>
+        <button
+          class="menu-item danger"
+          (click)="onMenuAction(currentInvoice()!, 'ลบสัญญา')"
+        >
+          <i class="pi pi-trash"></i>
+          <span>ลบสัญญา</span>
+        </button>
+      } @else {
+        <!-- Issued Invoices Menu -->
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'ออกใบลดหนี้')"
+        >
+          <i class="pi pi-minus-circle"></i>
+          <span>ออกใบลดหนี้</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'พิมพ์เอกสาร (PDF)')"
+        >
+          <i class="pi pi-file-pdf"></i>
+          <span>พิมพ์เอกสาร (PDF)</span>
+        </button>
+        <button
+          class="menu-item"
+          (click)="onMenuAction(currentInvoice()!, 'ส่งทางอีเมล')"
+        >
+          <i class="pi pi-envelope"></i>
+          <span>ส่งทางอีเมล</span>
+        </button>
+      }
     </div>
   </div>
 }
 
-<!-- Confirmation Modal -->
+@if (showRowMenu()) {
+  <div class="menu-overlay" (click)="closeRowMenu()"></div>
+}
+
+<!-- Modals -->
 <app-confirmation-modal
   [isOpen]="showConfirmModal()"
   type="warning"
   title="ยกเลิกใบแจ้งหนี้"
-  [message]="'คุณต้องการยกเลิกใบแจ้งหนี้ ' + (pendingCancelInvoice()?.contractNumber || '') + ' หรือไม่?'"
+  [message]="
+    'คุณต้องการยกเลิกใบแจ้งหนี้ ' +
+    (pendingCancelInvoice()?.contractNumber || '') +
+    ' หรือไม่?'
+  "
   confirmText="ยกเลิกใบแจ้งหนี้"
   confirmIcon="pi-times"
   (confirm)="onConfirmCancel()"
   (cancel)="onCancelConfirm()"
 />
 
-<!-- Message Modal -->
 <app-warning-modal
   [isOpen]="showMessageModal()"
   [title]="messageTitle()"
@@ -248,3 +370,163 @@
   buttonText="ตกลง"
   (onClose)="closeMessageModal()"
 />
+
+@if (showDocumentModal() && selectedDocumentType() && currentInvoice()) {
+  <app-finance-document-modal
+    [documentType]="selectedDocumentType()!"
+    [debtData]="currentInvoice()!"
+    (close)="closeDocumentModal()"
+    (submit)="onDocumentSubmit($event)"
+  />
+}
+
+<!-- ✅ FIX #3: Pass source info to detail modal -->
+@if (showDetailModal() && currentInvoice()) {
+  <app-invoice-detail-modal
+    [invoice]="currentInvoice()!"
+    [isFromReadyList]="!showHistory()"
+    (close)="closeDetailModal()"
+    (issueInvoice)="onIssueInvoiceFromDetail($event)"
+  />
+}
+
+<!-- ✅ FIX #4: Edit Modal as Popup (not drawer) -->
+@if (showEditModal() && editingInvoice()) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="edit-modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>แก้ไขใบแจ้งหนี้</h3>
+        <button class="close-btn" (click)="closeEditModal()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>เลขที่สัญญาเช่า</label>
+          <input
+            type="text"
+            [value]="getEditContractNumber()"
+            (input)="setEditContractNumber($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label>ชื่อลูกค้า</label>
+          <input
+            type="text"
+            [value]="getEditCustomerName()"
+            (input)="setEditCustomerName($any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label>รายการเรียกเก็บหลัก</label>
+          <input
+            type="text"
+            [value]="getEditCollectionItem()"
+            (input)="setEditCollectionItem($any($event.target).value)"
+          />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ยอดเงิน</label>
+            <input
+              type="number"
+              [value]="getEditAmount()"
+              (input)="setEditAmount($any($event.target).value)"
+            />
+          </div>
+          <div class="form-group">
+            <label>วันที่เริ่มต้นเรียกเก็บ</label>
+            <input
+              type="date"
+              [value]="getEditStartDate()"
+              (input)="setEditStartDate($any($event.target).value)"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeEditModal()">
+          ยกเลิก
+        </button>
+        <button class="btn btn-primary" (click)="onSaveEdit()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Create Drawer -->
+@if (showCreateDrawer()) {
+  <div class="drawer-overlay" (click)="closeCreateDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <h3>สร้างใบแจ้งหนี้แบบ Manual</h3>
+      <button class="close-btn" (click)="closeCreateDrawer()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+    <div class="drawer-content">
+      <div class="form-group">
+        <label>เลขที่สัญญาเช่า</label>
+        <input
+          type="text"
+          [value]="newInvoiceData().contractNumber"
+          (input)="
+            updateNewInvoiceField('contractNumber', $any($event.target).value)
+          "
+          placeholder="กรอกเลขที่สัญญา"
+        />
+      </div>
+      <div class="form-group">
+        <label>ชื่อลูกค้า</label>
+        <input
+          type="text"
+          [value]="newInvoiceData().customerName"
+          (input)="
+            updateNewInvoiceField('customerName', $any($event.target).value)
+          "
+          placeholder="กรอกชื่อลูกค้า"
+        />
+      </div>
+      <div class="form-group">
+        <label>รายการเรียกเก็บหลัก</label>
+        <input
+          type="text"
+          [value]="newInvoiceData().collectionItem"
+          (input)="
+            updateNewInvoiceField('collectionItem', $any($event.target).value)
+          "
+          placeholder="กรอกรายการเรียกเก็บ"
+        />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>ยอดเงิน (รวมภาษี)</label>
+          <input
+            type="number"
+            [value]="newInvoiceData().amount"
+            (input)="updateNewInvoiceField('amount', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label>วันที่เริ่มต้นเรียกเก็บ</label>
+          <input
+            type="date"
+            [value]="newInvoiceData().startDate"
+            (input)="
+              updateNewInvoiceField('startDate', $any($event.target).value)
+            "
+          />
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" (click)="closeCreateDrawer()">
+        ยกเลิก
+      </button>
+      <button class="btn btn-create" (click)="onCreateInvoice()">
+        <i class="pi pi-plus"></i>
+        <span>สร้างใบแจ้งหนี้</span>
+      </button>
+    </div>
+  </div>
+}

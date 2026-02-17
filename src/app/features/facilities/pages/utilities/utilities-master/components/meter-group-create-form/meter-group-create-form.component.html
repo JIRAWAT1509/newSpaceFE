@@ -1,14 +1,29 @@
-<!-- meter-group-create-form.component.html -->
+<!-- meter-group-create-form.component.html - UPDATED with rate & transfer list -->
 
 <div class="group-management-container">
   <!-- Header -->
   <div class="page-header">
     <div>
-      <h2 class="page-title">กลุ่มมิเตอร์ (Meter Groups)</h2>
-      <p class="page-subtitle">จัดการกลุ่มมิเตอร์และเพิ่มมิเตอร์ใหม่</p>
+      <h2 class="page-title">การจัดการกลุ่มมิเตอร์</h2>
+      <p class="page-subtitle">จัดกลุ่มมิเตอร์และกำหนดอัตราค่าบริการ</p>
     </div>
 
     <div class="header-actions">
+      <!-- Filter by type -->
+      <div class="filter-group">
+        <label class="filter-label">ประเภท</label>
+        <select
+          class="filter-select"
+          [value]="filterType()"
+          (change)="filterType.set($any($event.target).value)"
+        >
+          <option value="all">ทั้งหมด</option>
+          @for (type of meterTypes; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+          }
+        </select>
+      </div>
+
       <button class="btn btn-secondary" (click)="openCreateMeterDrawer()">
         <i class="pi pi-plus"></i>
         <span>เพิ่มมิเตอร์</span>
@@ -26,34 +41,40 @@
     <table class="groups-table">
       <thead>
         <tr>
+          <th>ประเภท</th>
           <th>ชื่อกลุ่ม</th>
-          <th>คำอธิบาย</th>
           <th>จำนวนมิเตอร์</th>
-          <th>วันที่สร้าง</th>
+          <th>กำหนด Rate</th>
           <th>อัพเดทล่าสุด</th>
-          <th class="text-center">Actions</th>
+          <th class="text-center">จัดการ</th>
         </tr>
       </thead>
       <tbody>
-        @for (group of groups(); track group.id) {
+        @for (group of filteredGroups(); track group.id) {
           <tr>
             <td>
-              <div class="group-name">
-                <i class="pi pi-sitemap text-blue-600"></i>
-                <span>{{ group.name }}</span>
+              <div class="type-badge" [style.background]="getMeterTypeColor(group.meterType) + '18'" [style.color]="getMeterTypeColor(group.meterType)">
+                <i class="pi" [ngClass]="getMeterTypeIcon(group.meterType)"></i>
+                <span>{{ getMeterTypeLabel(group.meterType) }}</span>
               </div>
             </td>
             <td>
-              <div class="group-description">{{ group.description }}</div>
+              <div class="group-name-cell">
+                <span class="group-name-text">{{ group.name }}</span>
+                <span class="group-desc">{{ group.description }}</span>
+              </div>
             </td>
             <td>
               <div class="meter-count">
                 <span class="count-badge">{{ getMeterCount(group) }}</span>
-                <span class="count-label">meters</span>
+                <span class="count-label">มิเตอร์</span>
               </div>
             </td>
             <td>
-              <div class="date">{{ group.createdDate }}</div>
+              <div class="rate-cell">
+                <span class="rate-value">{{ group.rate }}</span>
+                <span class="rate-unit">{{ group.currency }}/หน่วย</span>
+              </div>
             </td>
             <td>
               <div class="date">{{ group.updatedDate }}</div>
@@ -81,11 +102,11 @@
       </tbody>
     </table>
 
-    @if (groups().length === 0) {
+    @if (filteredGroups().length === 0) {
       <div class="empty-state">
         <i class="pi pi-inbox"></i>
         <h3>ยังไม่มีกลุ่มมิเตอร์</h3>
-        <p>เริ่มต้นสร้างกลุ่มมิเตอร์เพื่อจัดการได้ง่ายขึ้น</p>
+        <p>เริ่มต้นสร้างกลุ่มมิเตอร์เพื่อจัดการอัตราค่าบริการ</p>
         <button class="btn btn-primary" (click)="openCreateGroupDrawer()">
           <i class="pi pi-plus"></i>
           <span>สร้างกลุ่มแรก</span>
@@ -95,72 +116,166 @@
   </div>
 </div>
 
-<!-- Group Create/Edit Drawer -->
+<!-- Group Create/Edit Drawer (Figma-style with rate + transfer list) -->
 @if (showGroupDrawer()) {
   <div class="drawer-overlay" (click)="closeGroupDrawer()"></div>
   <div class="drawer-panel">
     <div class="drawer-header">
-      <h3>{{ editingGroup() ? 'แก้ไขกลุ่มมิเตอร์' : 'สร้างกลุ่มมิเตอร์ใหม่' }}</h3>
+      <div class="drawer-title-row">
+        <i class="pi pi-sitemap drawer-title-icon"></i>
+        <h3>{{ editingGroup() ? 'แก้ไขกลุ่มมิเตอร์' : 'สร้างกลุ่มมิเตอร์ใหม่' }}</h3>
+      </div>
       <button class="close-btn" (click)="closeGroupDrawer()">
         <i class="pi pi-times"></i>
       </button>
     </div>
 
     <div class="drawer-content">
-      <!-- Group Name -->
-      <div class="form-group">
-        <label class="form-label">ชื่อกลุ่ม *</label>
-        <input
-          type="text"
-          class="form-input"
-          placeholder="เช่น Building A - Floor 1 Electric"
-          [value]="groupName()"
-          (input)="groupName.set($any($event.target).value)"
-        />
+      <!-- Top form row: Type, Name, Rate (matching Figma) -->
+      <div class="form-top-row">
+        <div class="form-group">
+          <label class="form-label">ประเภท</label>
+          <select
+            class="form-select"
+            [value]="groupMeterType()"
+            (change)="onMeterTypeChange($any($event.target).value)"
+          >
+            @for (type of meterTypes; track type.value) {
+              <option [value]="type.value">{{ type.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group form-group-grow">
+          <label class="form-label">ชื่อกลุ่ม / มิเตอร์</label>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="เช่น Building A - Floor 1 Electric"
+            [value]="groupName()"
+            (input)="groupName.set($any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-group form-group-rate">
+          <label class="form-label">กำหนด rate</label>
+          <div class="rate-input-row">
+            <input
+              type="number"
+              class="rate-form-input"
+              placeholder="0.00"
+              [value]="groupRate()"
+              (input)="groupRate.set(+$any($event.target).value)"
+              step="0.1"
+              min="0"
+            />
+            <span class="rate-currency-tag">THB</span>
+          </div>
+        </div>
       </div>
 
       <!-- Description -->
       <div class="form-group">
         <label class="form-label">คำอธิบาย</label>
-        <textarea
-          class="form-textarea"
-          rows="3"
-          placeholder="อธิบายรายละเอียดของกลุ่มนี้"
+        <input
+          type="text"
+          class="form-input"
+          placeholder="อธิบายรายละเอียดกลุ่มนี้"
           [value]="groupDescription()"
           (input)="groupDescription.set($any($event.target).value)"
-        ></textarea>
+        />
       </div>
 
-      <!-- Meter Selection -->
-      <div class="form-group">
-        <label class="form-label">
-          เลือกมิเตอร์
-          <span class="selected-count">(เลือกแล้ว {{ selectedMeterIds().size }} รายการ)</span>
-        </label>
-
-        <div class="meter-selection-list">
-          @for (meter of allMeters(); track meter.id) {
-            <div
-              class="meter-selection-item"
-              [class.selected]="isMeterSelected(meter.id)"
-              (click)="toggleMeterSelection(meter.id)"
-            >
-              <input
-                type="checkbox"
-                [checked]="isMeterSelected(meter.id)"
-                (click)="$event.stopPropagation()"
-              />
-              <div class="meter-info">
-                <div class="meter-name">
-                  <i class="pi" [ngClass]="'pi-bolt'"></i>
-                  <span>{{ meter.roomNumber }} - {{ meter.meterNumber }}</span>
-                </div>
-                <div class="meter-details">
-                  {{ meter.tenantName }} | {{ meter.meterType }}
+      <!-- Transfer List (Figma: unassigned <-> assigned) -->
+      <div class="transfer-container">
+        <!-- Unassigned Column -->
+        <div class="transfer-column">
+          <div class="transfer-column-header">
+            <span class="transfer-column-title">หน่วยที่ยังไม่ได้กำหนด</span>
+            <span class="transfer-column-count">{{ unassignedMeters().length }}</span>
+          </div>
+          <div class="transfer-search">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              placeholder="ค้นหามิเตอร์..."
+              [value]="searchUnassigned()"
+              (input)="searchUnassigned.set($any($event.target).value)"
+            />
+          </div>
+          <div class="transfer-list">
+            @for (meter of unassignedMeters(); track meter.id) {
+              <div
+                class="transfer-item"
+                [class.selected]="isUnassignedSelected(meter.id)"
+                (click)="toggleUnassigned(meter.id)"
+              >
+                <input type="checkbox" [checked]="isUnassignedSelected(meter.id)" (click)="$event.stopPropagation()" />
+                <div class="transfer-item-info">
+                  <span class="transfer-item-name">{{ meter.meterNumber }}</span>
+                  <span class="transfer-item-detail">ห้อง {{ meter.roomNumber }} - {{ meter.tenantName }}</span>
                 </div>
               </div>
-            </div>
-          }
+            }
+            @if (unassignedMeters().length === 0) {
+              <div class="transfer-empty">ไม่มีมิเตอร์ที่ว่าง</div>
+            }
+          </div>
+        </div>
+
+        <!-- Transfer Buttons -->
+        <div class="transfer-actions">
+          <button
+            class="transfer-btn"
+            [disabled]="selectedUnassigned().size === 0"
+            (click)="assignSelected()"
+            title="เพิ่มเข้ากลุ่ม"
+          >
+            <i class="pi pi-angle-right"></i>
+          </button>
+          <button
+            class="transfer-btn reverse"
+            [disabled]="selectedAssigned().size === 0"
+            (click)="unassignSelected()"
+            title="นำออกจากกลุ่ม"
+          >
+            <i class="pi pi-angle-left"></i>
+          </button>
+        </div>
+
+        <!-- Assigned Column -->
+        <div class="transfer-column assigned">
+          <div class="transfer-column-header">
+            <span class="transfer-column-title">หน่วยในกลุ่ม</span>
+            <span class="transfer-column-count highlight">{{ assignedMeters().length }}</span>
+          </div>
+          <div class="transfer-search">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              placeholder="ค้นหามิเตอร์..."
+              [value]="searchAssigned()"
+              (input)="searchAssigned.set($any($event.target).value)"
+            />
+          </div>
+          <div class="transfer-list">
+            @for (meter of assignedMeters(); track meter.id) {
+              <div
+                class="transfer-item"
+                [class.selected]="isAssignedSelected(meter.id)"
+                (click)="toggleAssigned(meter.id)"
+              >
+                <input type="checkbox" [checked]="isAssignedSelected(meter.id)" (click)="$event.stopPropagation()" />
+                <div class="transfer-item-info">
+                  <span class="transfer-item-name">{{ meter.meterNumber }}</span>
+                  <span class="transfer-item-detail">ห้อง {{ meter.roomNumber }} - {{ meter.tenantName }}</span>
+                </div>
+              </div>
+            }
+            @if (assignedMeters().length === 0) {
+              <div class="transfer-empty">ยังไม่มีมิเตอร์ในกลุ่ม</div>
+            }
+          </div>
         </div>
       </div>
     </div>
@@ -172,10 +287,10 @@
       <button
         class="btn btn-primary"
         (click)="saveGroup()"
-        [disabled]="!groupName() || selectedMeterIds().size === 0"
+        [disabled]="!isGroupFormValid()"
       >
         <i class="pi pi-check"></i>
-        <span>{{ editingGroup() ? 'อัพเดท' : 'สร้างกลุ่ม' }}</span>
+        <span>บันทึก</span>
       </button>
     </div>
   </div>
@@ -186,14 +301,16 @@
   <div class="drawer-overlay" (click)="closeCreateMeterDrawer()"></div>
   <div class="drawer-panel">
     <div class="drawer-header">
-      <h3>เพิ่มมิเตอร์ใหม่</h3>
+      <div class="drawer-title-row">
+        <i class="pi pi-plus-circle drawer-title-icon"></i>
+        <h3>เพิ่มมิเตอร์ใหม่</h3>
+      </div>
       <button class="close-btn" (click)="closeCreateMeterDrawer()">
         <i class="pi pi-times"></i>
       </button>
     </div>
 
     <div class="drawer-content">
-      <!-- Include meter create form component here -->
       <app-meter-create-form />
     </div>
   </div>

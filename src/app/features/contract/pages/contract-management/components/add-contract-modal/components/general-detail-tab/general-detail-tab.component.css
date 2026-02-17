@@ -76,14 +76,28 @@
   @apply w-1 h-6 bg-blue-600 rounded;
 }
 
-/* ==================== Auto-generated fields (กดไม่ได้, สีเทา) ==================== */
+/* ==================== Auto-generated fields (กดไม่ได้, สีเทาจาง — ผู้ใช้ไม่ต้องสนใจ) ==================== */
+.auto-field-group {
+  opacity: 0.5;
+}
+
+.auto-field-group label {
+  @apply text-gray-400 font-normal !important;
+}
+
 .field-auto {
-  @apply bg-gray-100 text-gray-600 cursor-not-allowed;
-  @apply border-gray-300;
+  @apply bg-gray-100 cursor-not-allowed !important;
+  color: #9ca3af !important; /* gray-400 */
+  border-color: #e5e7eb !important; /* gray-200 */
+}
+
+.field-auto::placeholder {
+  color: #d1d5db !important; /* gray-300 */
 }
 
 .field-auto:focus {
-  @apply outline-none ring-0 border-gray-300;
+  @apply outline-none ring-0 !important;
+  border-color: #e5e7eb !important;
 }
 
 /* ==================== Form Grid ==================== */
@@ -215,7 +229,8 @@
   }
 
   .progress-steps {
-    @apply justify-start;
+    @apply justify-start overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .step-name {
@@ -224,5 +239,63 @@
 
   .step-arrow {
     @apply mx-1;
+  }
+
+  .step-circle {
+    @apply w-10 h-10 text-sm;
+  }
+
+  .step-letter {
+    @apply text-base;
+  }
+
+  .subsection {
+    @apply p-3 mt-3;
+  }
+
+  .section-title {
+    @apply text-base mb-3;
+  }
+
+  .progress-indicator {
+    @apply mb-3 p-2;
+  }
+
+  .selector-modal-content {
+    @apply max-w-[calc(100vw-2rem)] mx-2;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-circle {
+    @apply w-8 h-8 text-xs;
+  }
+
+  .step-letter {
+    @apply text-sm;
+  }
+
+  .step-arrow {
+    @apply mx-0.5 text-lg;
+  }
+
+  .progress-indicator {
+    @apply mb-2 p-1;
+  }
+
+  .subsection {
+    @apply p-2 mt-2;
+  }
+
+  .form-group label {
+    @apply text-xs;
+  }
+
+  .action-btn {
+    @apply px-2 py-1.5 text-xs;
+  }
+
+  .radio-group {
+    @apply flex-col gap-2;
   }
 }

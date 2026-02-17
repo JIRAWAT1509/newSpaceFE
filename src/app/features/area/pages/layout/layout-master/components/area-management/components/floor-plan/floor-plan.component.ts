@@ -1,3 +1,5 @@
+/* floor-plan.component.ts */
+
 import { Component, OnInit, input, output, signal, computed, effect, ElementRef, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

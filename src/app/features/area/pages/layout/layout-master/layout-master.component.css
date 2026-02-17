@@ -58,3 +58,21 @@
     @apply min-h-[300px];
   }
 }
+
+@media (max-width: 480px) {
+  .layout-master-container {
+    @apply p-2 gap-2;
+  }
+
+  .section {
+    @apply rounded-lg;
+  }
+
+  .section-area-management {
+    @apply min-h-[350px];
+  }
+
+  .section-data-display {
+    @apply min-h-[200px];
+  }
+}

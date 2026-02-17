@@ -1,3 +1,5 @@
+/* marker-list-panel.component.ts */
+
 import { Component, input, output, signal, viewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Area, AreaStatus, AreaType } from '@core/models/area.model';

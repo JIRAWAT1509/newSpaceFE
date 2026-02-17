@@ -32,30 +32,27 @@
   @apply text-muted mt-0.5 text-sm;
 }
 
+/* Tab Navigation - compact */
 .tab-navigation {
-  @apply flex gap-2 border-b-2 border-gray-200 mb-6;
+  @apply flex gap-2 p-2 bg-card rounded-lg border border-border;
 }
 
 .tab-btn {
-  @apply flex items-center gap-2 px-6 py-3;
-  @apply font-semibold text-gray-600;
-  @apply border-b-2 border-transparent;
-  @apply transition-all duration-200;
-  @apply no-underline; /* ✅ เพิ่มเพื่อลบ underline ของ <a> */
-  cursor: pointer;
+  @apply flex items-center gap-2 px-4 py-2 rounded-md text-sm;
+  @apply text-muted font-medium transition-all duration-300;
+  @apply border-none bg-transparent cursor-pointer;
 }
 
 .tab-btn:hover {
-  @apply text-blue-600 border-blue-300;
+  @apply bg-bg;
 }
 
-/* ✅ ใช้ .active แทน [class.active] */
 .tab-btn.active {
-  @apply text-blue-600 border-blue-600;
+  @apply bg-primary text-primary-foreground shadow-sm;
 }
 
 .tab-btn i {
-  @apply text-lg;
+  @apply text-base;
 }
 
 /* Tab Content */
@@ -136,15 +133,42 @@
 }
 
 @media (max-width: 480px) {
+  .finance-container {
+    @apply p-2 gap-2;
+  }
+
+  .finance-header {
+    @apply rounded-lg;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .header-icon {
+    @apply w-8 h-8 text-base rounded-md;
+  }
+
   .header-title {
-    @apply text-lg;
+    @apply text-base;
   }
 
   .tab-navigation {
-    @apply flex-wrap;
+    @apply flex-wrap p-1 gap-1 rounded-md;
   }
 
   .tab-btn {
-    @apply basis-[calc(50%-0.25rem)];
+    @apply basis-[calc(50%-0.25rem)] px-2 py-1.5 text-xs;
+  }
+
+  .tab-btn i {
+    @apply text-sm;
+  }
+
+  .placeholder-content,
+  .coming-soon-section {
+    @apply py-10;
+  }
+
+  .placeholder-content h3,
+  .coming-soon-section h3 {
+    @apply text-lg;
   }
 }

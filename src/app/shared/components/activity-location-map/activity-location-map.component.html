@@ -1,0 +1,39 @@
+<!-- activity-location-map.component.html -->
+
+<div class="location-map-container" [class.compact]="compact">
+
+  <!-- Location Info -->
+  <div class="location-info">
+    <div class="location-header">
+      <i class="pi pi-map-marker location-icon"></i>
+      <div class="location-details">
+        <span class="location-name">{{ location.name }}</span>
+        <span class="location-address">{{ location.address }}</span>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="btn-open-map"
+      (click)="openInGoogleMaps($event)"
+      title="เปิดใน Google Maps"
+    >
+      <i class="pi pi-external-link"></i>
+      <span>เปิดแผนที่</span>
+    </button>
+  </div>
+
+  <!-- Mini Map -->
+  <div class="map-preview" (click)="openInGoogleMaps($event)">
+    <iframe
+      [src]="getStaticMapUrl() | sanitizeUrl"
+      class="map-iframe"
+      scrolling="no"
+    ></iframe>
+    <div class="map-overlay">
+      <i class="pi pi-external-link"></i>
+      <span>คลิกเพื่อเปิดใน Google Maps</span>
+    </div>
+  </div>
+
+</div>

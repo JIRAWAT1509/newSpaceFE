@@ -1,4 +1,4 @@
-/* meter-group-create-form.component.css */
+/* meter-group-create-form.component.css - UPDATED with rate & transfer list */
 
 .group-management-container {
   @apply space-y-6;
@@ -6,26 +6,51 @@
 
 /* Header */
 .page-header {
-  @apply flex items-start justify-between gap-4 mb-6;
+  @apply flex items-start justify-between gap-4 flex-wrap;
 }
 
 .page-title {
-  @apply text-2xl font-bold text-gray-800;
+  @apply text-xl font-bold;
+  color: rgb(var(--fg));
 }
 
 .page-subtitle {
-  @apply text-gray-600 mt-1;
+  @apply text-sm mt-1;
+  color: rgb(var(--muted));
 }
 
 .header-actions {
-  @apply flex items-center gap-3;
+  @apply flex items-center gap-3 flex-wrap;
+}
+
+/* Filter */
+.filter-group {
+  @apply flex items-center gap-2;
+}
+
+.filter-label {
+  @apply text-sm font-medium;
+  color: rgb(var(--muted));
+}
+
+.filter-select {
+  @apply px-3 py-2 rounded-lg text-sm;
+  background: rgb(var(--bg));
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--fg));
+  cursor: pointer;
+  outline: none;
+}
+
+.filter-select:focus {
+  border-color: rgb(var(--primary) / 0.5);
 }
 
 /* Buttons */
 .btn {
   @apply flex items-center gap-2 px-4 py-2;
   @apply font-semibold rounded-lg transition-all duration-200;
-  @apply border-none cursor-pointer;
+  @apply border-none cursor-pointer text-sm;
 }
 
 .btn:disabled {
@@ -33,16 +58,29 @@
 }
 
 .btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white;
+  background: rgb(var(--primary));
+  color: rgb(var(--primary-foreground));
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(0.9);
 }
 
 .btn-secondary {
-  @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
+  background: rgb(var(--bg));
+  color: rgb(var(--fg));
+  border: 1px solid rgb(var(--border));
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgb(var(--border) / 0.5);
 }
 
 /* Table */
 .table-container {
-  @apply bg-white rounded-xl border border-gray-200 overflow-hidden;
+  @apply rounded-xl overflow-hidden;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
 }
 
 .groups-table {
@@ -50,32 +88,46 @@
 }
 
 .groups-table thead {
-  @apply bg-gray-50;
+  background: rgb(var(--bg));
 }
 
 .groups-table th {
-  @apply px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200;
+  @apply px-4 py-3 text-left text-sm font-semibold;
+  color: rgb(var(--muted));
+  border-bottom: 1px solid rgb(var(--border));
 }
 
 .groups-table td {
-  @apply px-4 py-4 border-b border-gray-200;
+  @apply px-4 py-4;
+  border-bottom: 1px solid rgb(var(--border));
 }
 
 .groups-table tbody tr {
-  @apply transition-colors duration-200;
+  transition: background 0.15s ease;
 }
 
 .groups-table tbody tr:hover {
-  @apply bg-blue-50;
+  background: rgb(var(--primary) / 0.03);
+}
+
+/* Type Badge */
+.type-badge {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
 }
 
 /* Table Content */
-.group-name {
-  @apply flex items-center gap-2 font-semibold text-gray-800;
+.group-name-cell {
+  @apply flex flex-col gap-0.5;
 }
 
-.group-description {
-  @apply text-gray-600 text-sm;
+.group-name-text {
+  @apply font-semibold text-sm;
+  color: rgb(var(--fg));
+}
+
+.group-desc {
+  @apply text-xs;
+  color: rgb(var(--muted));
 }
 
 .meter-count {
@@ -84,16 +136,34 @@
 
 .count-badge {
   @apply inline-flex items-center justify-center;
-  @apply px-3 py-1 bg-blue-100 text-blue-700 rounded-full;
+  @apply px-2.5 py-0.5 rounded-full;
   @apply text-sm font-bold;
+  background: rgb(var(--primary) / 0.1);
+  color: rgb(var(--primary));
 }
 
 .count-label {
-  @apply text-xs text-gray-500;
+  @apply text-xs;
+  color: rgb(var(--muted));
+}
+
+.rate-cell {
+  @apply flex items-baseline gap-1;
+}
+
+.rate-value {
+  @apply font-bold text-sm;
+  color: rgb(var(--fg));
+}
+
+.rate-unit {
+  @apply text-xs;
+  color: rgb(var(--muted));
 }
 
 .date {
-  @apply text-sm text-gray-600;
+  @apply text-sm;
+  color: rgb(var(--muted));
 }
 
 /* Row Actions */
@@ -101,33 +171,34 @@
   @apply flex items-center justify-center gap-2;
 }
 
-/* Edit action button - dark pencil, no bg */
 .action-btn {
   @apply flex items-center justify-center;
   width: 34px;
   height: 34px;
   background-color: transparent;
-  color: #374151;
+  color: rgb(var(--muted));
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
+
 .action-btn:hover {
-  background-color: #f3f4f6;
-  color: #1f2937;
+  background: rgb(var(--bg));
+  color: rgb(var(--fg));
 }
 
-/* Delete action - white icon in coral circle */
 .action-btn.danger {
   background-color: #E8847C;
   color: #ffffff;
   border-radius: 50%;
 }
+
 .action-btn.danger:hover {
   background-color: #D6726A;
   color: #ffffff;
 }
+
 .action-btn.danger i {
   color: #ffffff;
 }
@@ -138,27 +209,33 @@
 }
 
 .empty-state i {
-  @apply text-6xl text-gray-300 mb-4;
+  @apply text-5xl mb-4;
+  color: rgb(var(--muted) / 0.4);
 }
 
 .empty-state h3 {
-  @apply text-xl font-bold text-gray-700 mb-2;
+  @apply text-lg font-bold mb-2;
+  color: rgb(var(--fg));
 }
 
 .empty-state p {
-  @apply text-gray-500 mb-4;
+  @apply text-sm mb-4;
+  color: rgb(var(--muted));
 }
 
 /* Drawer */
 .drawer-overlay {
-  @apply fixed inset-0 bg-black bg-opacity-50 z-40;
+  @apply fixed inset-0 z-40;
+  background: rgba(0, 0, 0, 0.5);
   animation: fadeIn 0.3s ease;
 }
 
 .drawer-panel {
-  @apply fixed top-0 right-0 h-full w-full md:w-2/3 lg:w-1/2;
-  @apply bg-white shadow-2xl z-50;
+  @apply fixed top-0 right-0 h-full z-50;
   @apply flex flex-col;
+  width: min(720px, 90vw);
+  background: rgb(var(--card));
+  box-shadow: -4px 0 24px rgb(var(--shadow) / 0.15);
   animation: slideInRight 0.3s ease;
 }
 
@@ -173,90 +250,268 @@
 }
 
 .drawer-header {
-  @apply flex items-center justify-between px-6 py-4 border-b border-gray-200;
+  @apply flex items-center justify-between px-6 py-4;
+  border-bottom: 1px solid rgb(var(--border));
+}
+
+.drawer-title-row {
+  @apply flex items-center gap-2;
+}
+
+.drawer-title-icon {
+  color: rgb(var(--primary));
+  font-size: 1.25rem;
 }
 
 .drawer-header h3 {
-  @apply text-xl font-bold text-gray-800;
+  @apply text-lg font-bold;
+  color: rgb(var(--fg));
 }
 
 .close-btn {
   @apply w-8 h-8 flex items-center justify-center;
-  @apply text-gray-600 hover:text-red-600 hover:bg-red-50;
   @apply rounded-lg transition-all duration-200;
   @apply border-none cursor-pointer;
+  color: rgb(var(--muted));
+  background: transparent;
+}
+
+.close-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
 }
 
 .drawer-content {
-  @apply flex-1 overflow-y-auto px-6 py-4 space-y-4;
+  @apply flex-1 overflow-y-auto px-6 py-5 space-y-5;
 }
 
 .drawer-footer {
-  @apply flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200;
+  @apply flex items-center justify-end gap-3 px-6 py-4;
+  border-top: 1px solid rgb(var(--border));
 }
 
-/* Form */
+/* ===== FORM ===== */
+.form-top-row {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
 .form-group {
-  @apply space-y-2;
+  @apply flex flex-col gap-1.5;
+}
+
+.form-group-grow {
+  @apply flex-1;
+  min-width: 0;
+}
+
+.form-group-rate {
+  min-width: 180px;
 }
 
 .form-label {
-  @apply text-sm font-semibold text-gray-700 flex items-center gap-2;
-}
-
-.selected-count {
-  @apply text-blue-600 font-normal;
+  @apply text-sm font-semibold;
+  color: rgb(var(--fg));
 }
 
 .form-input,
-.form-textarea {
-  @apply w-full px-4 py-2 border-2 border-gray-300 rounded-lg;
-  @apply transition-all duration-200;
+.form-select {
+  @apply w-full px-3 py-2 rounded-lg text-sm;
+  background: rgb(var(--bg));
+  border: 1.5px solid rgb(var(--border));
+  color: rgb(var(--fg));
+  outline: none;
+  transition: border-color 0.2s ease;
 }
 
 .form-input:focus,
-.form-textarea:focus {
-  @apply outline-none border-blue-500;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+.form-select:focus {
+  border-color: rgb(var(--primary) / 0.5);
+  box-shadow: 0 0 0 3px rgb(var(--primary) / 0.08);
 }
 
-/* Meter Selection List */
-.meter-selection-list {
-  @apply max-h-96 overflow-y-auto space-y-2 border border-gray-200 rounded-lg p-2;
+.form-input::placeholder {
+  color: rgb(var(--muted) / 0.6);
 }
 
-.meter-selection-item {
-  @apply flex items-center gap-3 p-3 rounded-lg;
-  @apply transition-all duration-200 cursor-pointer;
-  @apply border-2 border-transparent;
+.rate-input-row {
+  @apply flex items-center gap-0;
+  border: 1.5px solid rgb(var(--border));
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgb(var(--bg));
+  transition: border-color 0.2s ease;
 }
 
-.meter-selection-item:hover {
-  @apply bg-blue-50;
+.rate-input-row:focus-within {
+  border-color: rgb(var(--primary) / 0.5);
+  box-shadow: 0 0 0 3px rgb(var(--primary) / 0.08);
 }
 
-.meter-selection-item.selected {
-  @apply bg-blue-100 border-blue-500;
+.rate-form-input {
+  @apply border-none px-3 py-2 text-sm flex-1;
+  background: transparent;
+  color: rgb(var(--fg));
+  outline: none;
+  min-width: 0;
 }
 
-.meter-selection-item input[type="checkbox"] {
+.rate-form-input::-webkit-inner-spin-button,
+.rate-form-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.rate-currency-tag {
+  @apply px-3 py-2 text-xs font-bold;
+  background: rgb(var(--primary) / 0.08);
+  color: rgb(var(--primary));
+  border-left: 1px solid rgb(var(--border));
+}
+
+/* ===== TRANSFER LIST ===== */
+.transfer-container {
+  @apply flex gap-3 items-stretch;
+  min-height: 320px;
+}
+
+.transfer-column {
+  @apply flex-1 flex flex-col rounded-xl overflow-hidden;
+  border: 1px solid rgb(var(--border));
+  background: rgb(var(--bg));
+}
+
+.transfer-column.assigned {
+  border-color: rgb(var(--primary) / 0.3);
+}
+
+.transfer-column-header {
+  @apply flex items-center justify-between px-3 py-2.5;
+  border-bottom: 1px solid rgb(var(--border));
+}
+
+.transfer-column-title {
+  @apply text-sm font-semibold;
+  color: rgb(var(--fg));
+}
+
+.transfer-column-count {
+  @apply text-xs font-bold px-2 py-0.5 rounded-full;
+  background: rgb(var(--muted) / 0.1);
+  color: rgb(var(--muted));
+}
+
+.transfer-column-count.highlight {
+  background: rgb(var(--primary) / 0.1);
+  color: rgb(var(--primary));
+}
+
+.transfer-search {
+  @apply flex items-center gap-2 px-3 py-2;
+  border-bottom: 1px solid rgb(var(--border));
+}
+
+.transfer-search i {
+  @apply text-sm;
+  color: rgb(var(--muted));
+}
+
+.transfer-search input {
+  @apply flex-1 bg-transparent border-none outline-none text-sm;
+  color: rgb(var(--fg));
+}
+
+.transfer-search input::placeholder {
+  color: rgb(var(--muted) / 0.6);
+}
+
+.transfer-list {
+  @apply flex-1 overflow-y-auto p-2 space-y-1;
+  max-height: 280px;
+}
+
+.transfer-item {
+  @apply flex items-center gap-2.5 px-3 py-2 rounded-lg cursor-pointer;
+  transition: all 0.15s ease;
+  border: 1.5px solid transparent;
+}
+
+.transfer-item:hover {
+  background: rgb(var(--primary) / 0.04);
+}
+
+.transfer-item.selected {
+  background: rgb(var(--primary) / 0.08);
+  border-color: rgb(var(--primary) / 0.3);
+}
+
+.transfer-item input[type="checkbox"] {
   @apply w-4 h-4 cursor-pointer;
+  accent-color: rgb(var(--primary));
 }
 
-.meter-info {
-  @apply flex-1;
+.transfer-item-info {
+  @apply flex flex-col;
 }
 
-.meter-name {
-  @apply flex items-center gap-2 font-medium text-gray-800;
+.transfer-item-name {
+  @apply text-sm font-medium;
+  color: rgb(var(--fg));
 }
 
-.meter-name i {
-  @apply text-yellow-500;
+.transfer-item-detail {
+  @apply text-xs;
+  color: rgb(var(--muted));
 }
 
-.meter-details {
-  @apply text-xs text-gray-600 mt-1;
+.transfer-empty {
+  @apply text-center py-8 text-sm;
+  color: rgb(var(--muted) / 0.6);
+}
+
+/* Transfer Buttons */
+.transfer-actions {
+  @apply flex flex-col items-center justify-center gap-2;
+  padding: 0 4px;
+}
+
+.transfer-btn {
+  @apply flex items-center justify-center rounded-lg border-none cursor-pointer;
+  width: 36px;
+  height: 36px;
+  background: rgb(var(--primary));
+  color: rgb(var(--primary-foreground));
+  transition: all 0.15s ease;
+}
+
+.transfer-btn.reverse {
+  background: rgb(var(--muted) / 0.15);
+  color: rgb(var(--fg));
+}
+
+.transfer-btn:hover:not(:disabled) {
+  filter: brightness(0.9);
+  transform: scale(1.05);
+}
+
+.transfer-btn:disabled {
+  @apply opacity-30 cursor-not-allowed;
+  background: rgb(var(--muted) / 0.15);
+  color: rgb(var(--muted));
+  transform: none;
+  filter: none;
+}
+
+.transfer-btn i {
+  font-size: 1.1rem;
+}
+
+/* Selected count in form */
+.selected-count {
+  @apply font-normal;
+  color: rgb(var(--primary));
 }
 
 /* Responsive */
@@ -266,10 +521,26 @@
   }
 
   .header-actions {
-    @apply w-full flex-col;
+    @apply w-full flex-wrap;
   }
 
-  .btn {
-    @apply w-full justify-center;
+  .form-top-row {
+    grid-template-columns: 1fr;
+  }
+
+  .transfer-container {
+    @apply flex-col;
+  }
+
+  .transfer-actions {
+    @apply flex-row py-2;
+  }
+
+  .transfer-btn i {
+    transform: rotate(90deg);
+  }
+
+  .drawer-panel {
+    width: 100vw;
   }
 }

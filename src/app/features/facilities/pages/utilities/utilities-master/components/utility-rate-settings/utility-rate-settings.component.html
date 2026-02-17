@@ -1,0 +1,387 @@
+<!-- utility-rate-settings.component.html -->
+
+<div class="rate-settings-container">
+
+  <!-- ===== SECTION 1: อัตราค่าบริการเริ่มต้น (Default Rates) ===== -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-title-group">
+        <i class="pi pi-money-bill section-icon"></i>
+        <div>
+          <h2 class="section-title">อัตราค่าบริการเริ่มต้น</h2>
+          <p class="section-subtitle">กำหนดอัตราค่าบริการตามประเภทมิเตอร์</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rate-cards-grid">
+      @for (rate of defaultRates(); track rate.id) {
+        <div class="rate-card" [style.--accent]="getMeterTypeColor(rate.meterType)">
+          <div class="rate-card-header">
+            <div class="rate-type-badge" [style.background]="getMeterTypeColor(rate.meterType) + '18'" [style.color]="getMeterTypeColor(rate.meterType)">
+              <i class="pi" [ngClass]="getMeterTypeIcon(rate.meterType)"></i>
+              <span>{{ getMeterTypeLabel(rate.meterType) }}</span>
+            </div>
+            <span class="rate-unit-label">{{ rate.currency }}/{{ rate.unit }}</span>
+          </div>
+
+          <div class="rate-card-body">
+            @if (editingRateId() === rate.id) {
+              <!-- Editing mode -->
+              <div class="rate-edit-form">
+                <div class="rate-input-group">
+                  <span class="rate-currency">฿</span>
+                  <input
+                    type="number"
+                    class="rate-input"
+                    [value]="editRateValue()"
+                    (input)="editRateValue.set(+$any($event.target).value)"
+                    step="0.1"
+                    min="0"
+                  />
+                  <span class="rate-per-unit">/{{ rate.unit }}</span>
+                </div>
+                <div class="rate-edit-actions">
+                  <button class="btn-icon btn-save" (click)="saveEditRate(rate)" title="บันทึก">
+                    <i class="pi pi-check"></i>
+                  </button>
+                  <button class="btn-icon btn-cancel" (click)="cancelEditRate()" title="ยกเลิก">
+                    <i class="pi pi-times"></i>
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <!-- Display mode -->
+              <div class="rate-display">
+                <div class="rate-value">
+                  <span class="rate-number">{{ rate.rate }}</span>
+                  <span class="rate-suffix">{{ rate.currency }}/{{ rate.unit }}</span>
+                </div>
+                <button class="btn-icon btn-edit" (click)="startEditRate(rate)" title="แก้ไข">
+                  <i class="pi pi-pencil"></i>
+                </button>
+              </div>
+            }
+          </div>
+
+          <div class="rate-card-footer">
+            <span class="rate-effective">มีผลตั้งแต่ {{ rate.effectiveDate }}</span>
+            <span class="rate-status" [class.active]="rate.isActive">
+              {{ rate.isActive ? 'ใช้งาน' : 'ปิดใช้งาน' }}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2: การจัดการกลุ่มมิเตอร์ (Group Rate Management) ===== -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="section-title-group">
+        <i class="pi pi-sitemap section-icon"></i>
+        <div>
+          <h2 class="section-title">การจัดการกลุ่มมิเตอร์</h2>
+          <p class="section-subtitle">จัดกลุ่มมิเตอร์และกำหนด rate เฉพาะกลุ่ม</p>
+        </div>
+      </div>
+
+      <div class="section-actions">
+        <!-- Filter by type -->
+        <div class="filter-group">
+          <label class="filter-label">ประเภท</label>
+          <select
+            class="filter-select"
+            [value]="filterType()"
+            (change)="filterType.set($any($event.target).value)"
+          >
+            <option value="all">ทั้งหมด</option>
+            @for (type of meterTypes; track type.value) {
+              <option [value]="type.value">{{ type.label }}</option>
+            }
+          </select>
+        </div>
+
+        <button class="btn btn-primary" (click)="openCreateGroupDrawer()">
+          <i class="pi pi-plus"></i>
+          <span>สร้างกลุ่มใหม่</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Groups Table -->
+    <div class="table-wrapper">
+      <table class="groups-table">
+        <thead>
+          <tr>
+            <th>ประเภท</th>
+            <th>ชื่อกลุ่ม</th>
+            <th>จำนวนมิเตอร์</th>
+            <th>กำหนด Rate</th>
+            <th>อัพเดทล่าสุด</th>
+            <th class="text-center">จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (group of filteredGroups(); track group.id) {
+            <tr>
+              <td>
+                <div class="type-badge" [style.background]="getMeterTypeColor(group.meterType) + '18'" [style.color]="getMeterTypeColor(group.meterType)">
+                  <i class="pi" [ngClass]="getMeterTypeIcon(group.meterType)"></i>
+                  <span>{{ getMeterTypeLabel(group.meterType) }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="group-name-cell">
+                  <span class="group-name">{{ group.name }}</span>
+                  <span class="group-desc">{{ group.description }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="meter-count-cell">
+                  <span class="count-badge">{{ getGroupMeterCount(group) }}</span>
+                  <span class="count-label">มิเตอร์</span>
+                </div>
+              </td>
+              <td>
+                <div class="rate-cell">
+                  <span class="rate-value-inline">{{ group.rate }}</span>
+                  <span class="rate-unit-inline">{{ group.currency }}/หน่วย</span>
+                </div>
+              </td>
+              <td>
+                <span class="date-cell">{{ group.updatedDate }}</span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button class="action-btn" title="แก้ไข" (click)="openEditGroupDrawer(group)">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button class="action-btn danger" title="ลบ" (click)="deleteGroup(group)">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (filteredGroups().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <h3>ยังไม่มีกลุ่มมิเตอร์</h3>
+          <p>เริ่มต้นสร้างกลุ่มมิเตอร์เพื่อจัดการอัตราค่าบริการ</p>
+          <button class="btn btn-primary" (click)="openCreateGroupDrawer()">
+            <i class="pi pi-plus"></i>
+            <span>สร้างกลุ่มแรก</span>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- ===== GROUP CREATE/EDIT DRAWER ===== -->
+@if (showGroupDrawer()) {
+  <div class="drawer-overlay" (click)="closeGroupDrawer()"></div>
+  <div class="drawer-panel">
+    <!-- Drawer Header -->
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <i class="pi pi-sitemap drawer-title-icon"></i>
+        <h3>{{ editingGroup() ? 'แก้ไขกลุ่มมิเตอร์' : 'สร้างกลุ่มมิเตอร์ใหม่' }}</h3>
+      </div>
+      <button class="close-btn" (click)="closeGroupDrawer()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Content -->
+    <div class="drawer-content">
+      <!-- Top form row: Type, Name/Meter, Rate -->
+      <div class="form-top-row">
+        <div class="form-group">
+          <label class="form-label">ประเภท</label>
+          <select
+            class="form-select"
+            [value]="groupForm().meterType"
+            (change)="updateGroupFormField('meterType', $any($event.target).value)"
+          >
+            @for (type of meterTypes; track type.value) {
+              <option [value]="type.value">{{ type.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group flex-grow">
+          <label class="form-label">ชื่อกลุ่ม / มิเตอร์</label>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="เช่น Building A - Floor 1 Electric"
+            [value]="groupForm().name"
+            (input)="updateGroupFormField('name', $any($event.target).value)"
+          />
+        </div>
+
+        <div class="form-group rate-group">
+          <label class="form-label">กำหนด rate</label>
+          <div class="rate-input-row">
+            <input
+              type="number"
+              class="form-input rate-form-input"
+              placeholder="0.00"
+              [value]="groupForm().rate"
+              (input)="updateGroupFormField('rate', +$any($event.target).value)"
+              step="0.1"
+              min="0"
+            />
+            <span class="rate-currency-tag">THB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label">คำอธิบาย</label>
+        <input
+          type="text"
+          class="form-input"
+          placeholder="อธิบายรายละเอียดกลุ่มนี้"
+          [value]="groupForm().description"
+          (input)="updateGroupFormField('description', $any($event.target).value)"
+        />
+      </div>
+
+      <!-- Transfer List -->
+      <div class="transfer-list-container">
+        <!-- Unassigned Column -->
+        <div class="transfer-column">
+          <div class="transfer-column-header">
+            <span class="transfer-column-title">หน่วยที่ยังไม่ได้กำหนด</span>
+            <span class="transfer-column-count">{{ unassignedMeters().length }}</span>
+          </div>
+          <div class="transfer-search">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              placeholder="ค้นหามิเตอร์..."
+              [value]="searchUnassigned()"
+              (input)="searchUnassigned.set($any($event.target).value)"
+            />
+          </div>
+          <div class="transfer-list">
+            @for (meter of unassignedMeters(); track meter.id) {
+              <div
+                class="transfer-item"
+                [class.selected]="isUnassignedSelected(meter.id)"
+                (click)="toggleUnassigned(meter.id)"
+              >
+                <input type="checkbox" [checked]="isUnassignedSelected(meter.id)" (click)="$event.stopPropagation()" />
+                <div class="transfer-item-info">
+                  <span class="transfer-item-name">{{ meter.meterNumber }}</span>
+                  <span class="transfer-item-detail">ห้อง {{ meter.roomNumber }} - {{ meter.tenantName }}</span>
+                </div>
+              </div>
+            }
+            @if (unassignedMeters().length === 0) {
+              <div class="transfer-empty">ไม่มีมิเตอร์ที่ว่าง</div>
+            }
+          </div>
+        </div>
+
+        <!-- Transfer Buttons -->
+        <div class="transfer-actions">
+          <button
+            class="transfer-btn"
+            [disabled]="selectedUnassigned().size === 0"
+            (click)="assignSelected()"
+            title="เพิ่มเข้ากลุ่ม"
+          >
+            <i class="pi pi-angle-right"></i>
+          </button>
+          <button
+            class="transfer-btn"
+            [disabled]="selectedAssigned().size === 0"
+            (click)="unassignSelected()"
+            title="นำออกจากกลุ่ม"
+          >
+            <i class="pi pi-angle-left"></i>
+          </button>
+        </div>
+
+        <!-- Assigned Column -->
+        <div class="transfer-column assigned">
+          <div class="transfer-column-header">
+            <span class="transfer-column-title">หน่วยในกลุ่ม</span>
+            <span class="transfer-column-count">{{ assignedMeters().length }}</span>
+          </div>
+          <div class="transfer-search">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              placeholder="ค้นหามิเตอร์..."
+              [value]="searchAssigned()"
+              (input)="searchAssigned.set($any($event.target).value)"
+            />
+          </div>
+          <div class="transfer-list">
+            @for (meter of assignedMeters(); track meter.id) {
+              <div
+                class="transfer-item"
+                [class.selected]="isAssignedSelected(meter.id)"
+                (click)="toggleAssigned(meter.id)"
+              >
+                <input type="checkbox" [checked]="isAssignedSelected(meter.id)" (click)="$event.stopPropagation()" />
+                <div class="transfer-item-info">
+                  <span class="transfer-item-name">{{ meter.meterNumber }}</span>
+                  <span class="transfer-item-detail">ห้อง {{ meter.roomNumber }} - {{ meter.tenantName }}</span>
+                </div>
+              </div>
+            }
+            @if (assignedMeters().length === 0) {
+              <div class="transfer-empty">ยังไม่มีมิเตอร์ในกลุ่ม</div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" (click)="closeGroupDrawer()">
+        ยกเลิก
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="saveGroup()"
+        [disabled]="!isGroupFormValid()"
+      >
+        <i class="pi pi-check"></i>
+        <span>บันทึก</span>
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  type="danger"
+  title="ลบกลุ่มมิเตอร์"
+  [message]="'คุณต้องการลบกลุ่ม \'' + (pendingDeleteGroup()?.name || '') + '\' หรือไม่?'"
+  confirmText="ลบ"
+  confirmIcon="pi-trash"
+  (confirm)="onConfirmDelete()"
+  (cancel)="onCancelDelete()"
+/>
+
+<!-- Message Modal -->
+<app-warning-modal
+  [isOpen]="showMessageModal()"
+  [title]="messageTitle()"
+  [message]="messageText()"
+  buttonText="ตกลง"
+  (onClose)="closeMessageModal()"
+/>

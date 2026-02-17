@@ -59,6 +59,8 @@ export class AddContractModalComponent implements OnInit {
   activeTabIndex = signal<number>(0);
   /** เก็บค่าฟอร์มรายละเอียดสัญญาเมื่อออกจากแท็บ 1 (ใช้ตอนส่งจากแท็บสรุป) */
   lastContractDetailValue = signal<Record<string, unknown>>({});
+  /** Track which tabs the user has visited (for navigation) */
+  visitedTabs = signal<Set<number>>(new Set([0]));
   tabs: Tab[] = [
     { id: 'general', label: 'รายละเอียดทั่วไป', completed: false },
     { id: 'contract', label: 'รายละเอียดสัญญา', completed: false },
@@ -134,7 +136,7 @@ export class AddContractModalComponent implements OnInit {
       subCategory: ['', Validators.required],
       category: [''],
       profitCenter: [''],
-      businessName: [''],
+      businessName: ['', Validators.required],
       productType1: [''],
       productType2: [''],
       productType3: [''],
@@ -148,6 +150,7 @@ export class AddContractModalComponent implements OnInit {
       areaUnitNumber: ['', Validators.required],
       areaTotal: [''],
       areaType: [''],
+      areaMonthlyRent: [''],
 
       // Section D: ข้อมูลผู้ติดต่อ (ชื่อ + เบอร์โทร)
       contactName: ['', Validators.required],
@@ -170,9 +173,9 @@ export class AddContractModalComponent implements OnInit {
       serviceRate: [0],
       creditTermRent: [0, Validators.required],
       creditTermUtility: [0, Validators.required],
-      paymentFrequency: [''],
+      paymentFrequency: ['', Validators.required],
       rentAdjustmentPercent: [0],
-      depositAmount: [0],
+      depositAmount: [0, Validators.required],
 
       // Section 3: เงื่อนไขพิเศษ
       advanceNoticeDays: [0],
@@ -296,11 +299,14 @@ export class AddContractModalComponent implements OnInit {
 
     // Restore tab state
     this.activeTabIndex.set(draft.currentTab);
+    const visited = new Set<number>([0]);
     draft.completedTabs.forEach(tabIndex => {
       if (tabIndex < this.tabs.length) {
-        this.tabs[tabIndex].completed = true;
+        visited.add(tabIndex);
       }
     });
+    visited.add(draft.currentTab);
+    this.visitedTabs.set(visited);
 
     // Contract details will be loaded when the tab is visited
     if (draft.formData.contractDetails) {
@@ -317,9 +323,7 @@ export class AddContractModalComponent implements OnInit {
       documents: this.documentForm.value
     };
 
-    const completedTabs = this.tabs
-      .map((tab, index) => tab.completed ? index : -1)
-      .filter(index => index !== -1);
+    const completedTabs = Array.from(this.visitedTabs());
 
     let draft: DraftContract;
 
@@ -358,46 +362,61 @@ export class AddContractModalComponent implements OnInit {
 
   goToTab(index: number): void {
     if (this.canNavigateToTab(index)) {
-      if (this.activeTabIndex() === 1 && this.contractDetailTab?.contractInfoTab?.form) {
-        this.lastContractDetailValue.set(this.contractDetailTab.contractInfoTab.form.value);
-      }
+      this.saveCurrentTabState();
+      this.markTabVisited(index);
       this.activeTabIndex.set(index);
     }
   }
 
   nextTab(): void {
     if (this.activeTabIndex() < this.tabs.length - 1) {
-      if (this.activeTabIndex() === 1 && this.contractDetailTab?.contractInfoTab?.form) {
-        this.lastContractDetailValue.set(this.contractDetailTab.contractInfoTab.form.value);
-      }
-      this.markTabCompleted(this.activeTabIndex());
-      this.activeTabIndex.update(i => i + 1);
+      this.saveCurrentTabState();
+      const nextIndex = this.activeTabIndex() + 1;
+      this.markTabVisited(nextIndex);
+      this.activeTabIndex.set(nextIndex);
     }
   }
 
   previousTab(): void {
     if (this.activeTabIndex() > 0) {
+      this.saveCurrentTabState();
       this.activeTabIndex.update(i => i - 1);
     }
   }
 
+  /** Save current tab state before leaving */
+  private saveCurrentTabState(): void {
+    if (this.activeTabIndex() === 1 && this.contractDetailTab?.contractInfoTab?.form) {
+      this.lastContractDetailValue.set(this.contractDetailTab.contractInfoTab.form.value);
+    }
+  }
+
+  /** Mark a tab as visited (for navigation purposes) */
+  private markTabVisited(index: number): void {
+    this.visitedTabs.update(set => {
+      const newSet = new Set(set);
+      newSet.add(index);
+      return newSet;
+    });
+  }
+
   canNavigateToTab(index: number): boolean {
+    // Can always go to current tab
+    if (index === this.activeTabIndex()) return true;
+
     // Can always go back
     if (index < this.activeTabIndex()) return true;
 
-    // Can go forward if current tab is valid
-    if (index === this.activeTabIndex() + 1) {
-      return this.isCurrentTabValid();
-    }
+    // Can go to the next tab
+    if (index === this.activeTabIndex() + 1) return true;
 
-    // Can jump to any completed tab
-    return this.tabs[index].completed;
+    // Can jump to any visited tab
+    return this.visitedTabs().has(index);
   }
 
-  isCurrentTabValid(): boolean {
-    // Allow navigating forward from any tab.
-    // User can fill data in any order and come back later.
-    return true;
+  /** Check if tab has been visited but not the current active tab */
+  isTabVisited(index: number): boolean {
+    return this.visitedTabs().has(index) && index !== this.activeTabIndex();
   }
 
   isAllFormsValid(): boolean {
@@ -457,18 +476,40 @@ export class AddContractModalComponent implements OnInit {
   isContractDetailFormValid(): boolean {
     const form = this.contractDetailTab?.contractInfoTab?.form;
     if (!form) {
-      // ถ้ายังไม่ได้เข้า tab นี้ ให้ผ่านไปก่อน
-      return true;
+      // ถ้ายังไม่ได้เข้า tab นี้ → ตรวจจากค่าที่เก็บไว้
+      const saved = this.lastContractDetailValue();
+      if (!saved || Object.keys(saved).length === 0) return false;
+      // ตรวจว่าฟิลบังคับกรอกมีค่าหรือยัง
+      const requiredFields = ['contractMaker', 'legalEntityName', 'registeredAddress', 'contactPerson', 'email'];
+      return requiredFields.every(f => {
+        const v = saved[f];
+        return v !== null && v !== undefined && String(v).trim() !== '';
+      });
     }
     return form.valid;
   }
 
+  /** ตรวจสอบว่า tab นี้กรอกข้อมูลครบจริงหรือยัง (ตรวจจาก form validity) */
   isTabCompleted(index: number): boolean {
-    return this.tabs[index].completed;
+    switch (index) {
+      case 0: // รายละเอียดทั่วไป
+        return this.generalDetailForm.valid;
+      case 1: // รายละเอียดสัญญา
+        return this.isContractDetailFormValid();
+      case 2: // เงื่อนไขอื่นๆ
+        return this.conditionsForm.valid;
+      case 3: // เอกสารแนบ (optional — ถือว่าเสร็จเมื่อเคยเข้าดูแล้ว)
+        return this.visitedTabs().has(3);
+      case 4: // สรุป (ไม่ต้องเช็ค)
+        return false;
+      default:
+        return false;
+    }
   }
 
-  markTabCompleted(index: number): void {
-    this.tabs[index].completed = true;
+  /** ตรวจว่า tab เคยเข้าดูแล้ว แต่ยังกรอกไม่ครบ */
+  isTabIncomplete(index: number): boolean {
+    return this.isTabVisited(index) && !this.isTabCompleted(index);
   }
 
   // ==================== ACTIONS ====================
@@ -564,8 +605,8 @@ export class AddContractModalComponent implements OnInit {
     });
     if (hasDocData) return true;
 
-    // เช็คว่ามี tab ที่ completed แล้วหรือไม่
-    if (this.tabs.some(t => t.completed)) return true;
+    // เช็คว่าเคยไป tab อื่นแล้วหรือไม่
+    if (this.visitedTabs().size > 1) return true;
 
     return false;
   }

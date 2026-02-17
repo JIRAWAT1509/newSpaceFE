@@ -1,5 +1,5 @@
-// activity-calendar.component.ts - FIXED VERSION WITH DAY CLICK
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, signal, computed, effect } from '@angular/core';
+// activity-calendar.component.ts - BOTH FIXES: Z-INDEX + SCROLL
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, signal, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DateTime } from 'luxon';
 import { Activity } from '@core/data/activities.mock';
@@ -51,35 +51,42 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
 
   protected readonly DateTime = DateTime;
 
-  // ==================== INPUTS ====================
   @Input() activities: Activity[] = [];
   @Input() view: 'month' | 'week' = 'month';
   @Input() currentDate: DateTime = DateTime.now();
-  @Input() selectedDate: DateTime | null = null; // NEW: Selected date to highlight
+  @Input() selectedDate: DateTime | null = null;
 
-  // ==================== OUTPUTS ====================
   @Output() activityClick = new EventEmitter<string>();
-  @Output() dayClick = new EventEmitter<DateTime>(); // NEW: Emit when day is clicked
+  @Output() dayClick = new EventEmitter<DateTime>();
 
-  // ==================== SIGNALS ====================
   calendarWeeks = signal<CalendarWeek[]>([]);
   weekViewDays = signal<WeekViewDay[]>([]);
   timeSlots = signal<TimeSlot[]>([]);
   monthLabel = signal<string>('');
   weekLabel = signal<string>('');
 
-  // ==================== CONSTANTS ====================
   weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   weekdaysTh = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
 
-  // ==================== LIFECYCLE ====================
+  private hasScrolled = false;
 
   constructor() {
     effect(() => {
+      const days = this.weekViewDays();
+
+      if (this.view === 'week' && days && days.length > 0 && !this.hasScrolled) {
+        this.hasScrolled = true;
+
+        // ✅ ใช้ untracked เพื่อป้องกัน infinite loop
+        untracked(() => {
+          setTimeout(() => {
+            this.scrollToFirstEvent();
+          }, 200);
+        });
+      }
+
       if (this.view === 'month') {
-        this.generateMonthView();
-      } else {
-        this.generateWeekView();
+        this.hasScrolled = false;
       }
     });
   }
@@ -94,6 +101,10 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentDate'] || changes['view']) {
+      this.hasScrolled = false;
+    }
+
     if (changes['activities'] || changes['currentDate'] || changes['view']) {
       if (this.view === 'month') {
         this.generateMonthView();
@@ -102,8 +113,6 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
       }
     }
   }
-
-  // ==================== MONTH VIEW ====================
 
   generateMonthView(): void {
     const start = this.currentDate.startOf('month').startOf('week');
@@ -144,49 +153,37 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
       const startDate = DateTime.fromISO(activity.startDate).startOf('day');
       const endDate = DateTime.fromISO(activity.endDate).startOf('day');
 
-      // Activity is on this date if the date falls within its range
       return checkDate >= startDate && checkDate <= endDate;
-    }).slice(0, 3); // Show max 3 activities per day
+    }).slice(0, 3);
   }
 
-  // Check if activity is the first day in current week view
   isFirstDayInWeek(activity: Activity, currentDate: DateTime): boolean {
     const startDate = DateTime.fromISO(activity.startDate).startOf('day');
     const cellDate = currentDate.startOf('day');
 
-    // Is first day if: it starts on this day OR this is Monday (start of week)
     return cellDate.equals(startDate) || cellDate.weekday === 1;
   }
 
-  // Check if activity is the last day in current week view
   isLastDayInWeek(activity: Activity, currentDate: DateTime): boolean {
     const endDate = DateTime.fromISO(activity.endDate).startOf('day');
     const cellDate = currentDate.startOf('day');
 
-    // Is last day if: it ends on this day OR this is Sunday (end of week)
     return cellDate.equals(endDate) || cellDate.weekday === 7;
   }
 
-  // Get activity bar style for month view
-  getActivityBarStyle(activity: Activity, currentDate: DateTime): any {
-    const isFirst = this.isFirstDayInWeek(activity, currentDate);
-    const isLast = this.isLastDayInWeek(activity, currentDate);
+getActivityBarStyle(activity: Activity, currentDate: DateTime): any {
+  const start = DateTime.fromISO(activity.startDate).startOf('day');
+  const end = DateTime.fromISO(activity.endDate).startOf('day');
+  const current = currentDate.startOf('day');
 
-    let borderRadius = '0';
-    if (isFirst && isLast) {
-      borderRadius = '6px';
-    } else if (isFirst) {
-      borderRadius = '6px 0 0 6px';
-    } else if (isLast) {
-      borderRadius = '0 6px 6px 0';
-    }
-
-    return {
-      'border-radius': borderRadius
-    };
+  // ✅ Multi-day: ซ่อนในวันที่ไม่ใช่วันแรก
+  if (!start.equals(end) && !current.equals(start)) {
+    return { 'display': 'none' };
   }
 
-  // ==================== WEEK VIEW ====================
+  // Single-day: ปกติ
+  return {};
+}
 
   generateWeekView(): void {
     const startOfWeek = this.currentDate.startOf('week');
@@ -230,15 +227,27 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
       const startDate = DateTime.fromISO(activity.startDate);
       const endDate = DateTime.fromISO(activity.endDate);
 
-      const effectiveStart = startDate < dayStart ? dayStart : startDate;
-      const effectiveEnd = endDate > dayEnd ? dayEnd : endDate;
+      let effectiveStart: DateTime;
+      let effectiveEnd: DateTime;
+
+      if (startDate.hasSame(date, 'day')) {
+        effectiveStart = startDate;
+      } else {
+        effectiveStart = dayStart;
+      }
+
+      if (endDate.hasSame(date, 'day')) {
+        effectiveEnd = endDate;
+      } else {
+        effectiveEnd = dayEnd;
+      }
 
       const startMinutes = effectiveStart.hour * 60 + effectiveStart.minute;
       const endMinutes = effectiveEnd.hour * 60 + effectiveEnd.minute;
       const durationMinutes = endMinutes - startMinutes;
 
-      const top = (startMinutes / 60) * 60;
-      const height = Math.max((durationMinutes / 60) * 60, 30);
+      const top = 60 + startMinutes;
+      const height = Math.max(durationMinutes, 30);
 
       const spansDays = Math.ceil(endDate.diff(startDate, 'days').days);
 
@@ -256,10 +265,9 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
 
   generateTimeSlots(): void {
     const slots: TimeSlot[] = [];
-
     slots.push({ hour: -1, label: 'GMT+07' });
 
-    for (let hour = 1; hour <= 23; hour++) {
+    for (let hour = 0; hour <= 23; hour++) {
       slots.push({ hour, label: `${hour} ${hour < 12 ? 'AM' : 'PM'}` });
     }
 
@@ -273,7 +281,45 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
     return `${hour - 12} PM`;
   }
 
-  // ==================== EVENT HANDLERS ====================
+scrollToFirstEvent(): void {
+  if (this.view !== 'week') return;
+
+  const container = document.querySelector('.week-grid-container') as HTMLElement;
+  if (!container) return;
+
+  const allActivities: ActivityWithTime[] = [];
+  this.weekViewDays().forEach(day => allActivities.push(...day.activities));
+
+  if (allActivities.length === 0) {
+    container.scrollTop = 60 + (8 * 60);
+    return;
+  }
+
+  // ✅ กรอง events ที่เริ่มหลังเที่ยงคืน (ไม่ใช่ multi-day continuations)
+  const todayStartingEvents = allActivities.filter(act => {
+    return act.startTime.hour > 0 || act.startTime.minute > 0;
+  });
+
+  // ใช้ events ที่เริ่มวันนั้นจริงๆ ถ้ามี
+  const eventsToConsider = todayStartingEvents.length > 0
+    ? todayStartingEvents
+    : allActivities;
+
+  eventsToConsider.sort((a, b) => a.top - b.top);
+  const firstActivity = eventsToConsider[0];
+
+  const scrollTop = Math.max(0, firstActivity.top - 100);
+  container.scrollTop = scrollTop;
+
+  console.log('🎯 Scrolled to:', firstActivity.activity.title, 'at', firstActivity.startTime.toFormat('HH:mm'));
+}
+
+  scrollToTime(hour: number, minute: number = 0): void {
+    const container = document.querySelector('.week-grid-container') as HTMLElement;
+    if (!container) return;
+
+    container.scrollTop = 60 + (hour * 60 + minute);
+  }
 
   onActivityClick(activityId: string, event: Event): void {
     event.stopPropagation();
@@ -285,21 +331,16 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
     this.dayClick.emit(date);
   }
 
-  // Check if date is the selected date
   isSelectedDate(date: DateTime): boolean {
     if (!this.selectedDate) return false;
     return date.hasSame(this.selectedDate, 'day');
   }
 
-  // ==================== DISPLAY HELPERS ====================
-
   getActivityTimeDisplay(activity: Activity): string {
     const startDate = DateTime.fromISO(activity.startDate);
     const endDate = DateTime.fromISO(activity.endDate);
 
-    if (!startDate.hasSame(endDate, 'day')) {
-      return '';
-    }
+    if (!startDate.hasSame(endDate, 'day')) return '';
 
     return `${startDate.toFormat('HH:mm')} - ${endDate.toFormat('HH:mm')}`;
   }
@@ -324,15 +365,17 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
     return title.substring(0, maxLength) + '...';
   }
 
-  getWeekViewActivityStyle(activityWithTime: ActivityWithTime): any {
-    return {
-      'top.px': activityWithTime.top,
-      'height.px': activityWithTime.height,
-      'z-index': 10
-    };
-  }
+getWeekViewActivityStyle(activityWithTime: ActivityWithTime): any {
+  const baseZ = 100 - Math.floor(activityWithTime.height / 10);
+  const limitedZ = Math.min(baseZ, 40); // ✅ เปลี่ยนจาก 90 → 40
 
-  // Check if activity is overdue
+  return {
+    'top': `${activityWithTime.top}px`,
+    'height': `${activityWithTime.height}px`,
+    'z-index': limitedZ.toString()
+  };
+}
+
   isOverdue(activity: Activity): boolean {
     if (activity.status === 'finished' || activity.status === 'canceled') {
       return false;
@@ -340,4 +383,20 @@ export class ActivityCalendarComponent implements OnInit, OnChanges {
     const endDate = DateTime.fromISO(activity.endDate);
     return endDate < DateTime.now();
   }
+
+  getMultiDayClasses(activity: Activity, currentDate: DateTime): { [key: string]: boolean } {
+  const start = DateTime.fromISO(activity.startDate).startOf('day');
+  const end = DateTime.fromISO(activity.endDate).startOf('day');
+  const current = currentDate.startOf('day');
+
+  if (start.equals(end)) {
+    return { 'single-day': true };
+  }
+
+  return {
+    'multi-day-start': current.equals(start),
+    'multi-day-end': current.equals(end),
+    'multi-day-middle': current > start && current < end
+  };
+}
 }

@@ -73,8 +73,8 @@
           }
         </div>
 
-        <!-- Row 2: ระบบเจน AUTO ให้ แก้ไขไม่ได้ -->
-        <div class="form-group required">
+        <!-- Row 2: ระบบเจน AUTO ให้ แก้ไขไม่ได้ (แสดงเป็นสีเทาจางให้ผู้ใช้ไม่ต้องสนใจ) -->
+        <div class="form-group auto-field-group">
           <label>เลขที่ใบเสนอราคา (น.หลัก)</label>
           <input
             type="text"
@@ -86,7 +86,7 @@
           />
         </div>
 
-        <div class="form-group">
+        <div class="form-group auto-field-group">
           <label>เลขที่ใบเสนอราคา (น.ร่วม)</label>
           <input
             type="text"
@@ -99,7 +99,7 @@
         </div>
 
         <!-- Row 3 -->
-        <div class="form-group">
+        <div class="form-group auto-field-group">
           <label>สถานะใบเสนอราคา</label>
           <input
             type="text"
@@ -203,7 +203,7 @@
           />
         </div>
 
-        <div class="form-group full-width">
+        <div class="form-group full-width required">
           <label>ชื่อกิจการ/ชื่อร้าน</label>
           <textarea
             pInputTextarea
@@ -307,32 +307,42 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group auto-field-group">
           <label>พื้นที่รวม (ตร.ม.)</label>
           <input
             type="number"
             pInputText
             formControlName="areaTotal"
-            placeholder="0.00"
-            class="w-full"
+            placeholder="ดึงจาก Area Management"
+            readonly
+            class="w-full field-auto"
             step="0.01"
             min="0"
           />
         </div>
 
-        <div class="form-group full-width">
-          <label>ประเภทพื้นที่ (Retail / Kiosk / ฯลฯ)</label>
-          <div class="selector-field" (click)="openSelector('areaType')">
-            <input
-              type="text"
-              pInputText
-              formControlName="areaType"
-              placeholder="เลือกประเภทพื้นที่"
-              readonly
-              class="w-full"
-            />
-            <i class="pi pi-search selector-icon"></i>
-          </div>
+        <div class="form-group auto-field-group">
+          <label>ประเภทพื้นที่</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="areaType"
+            placeholder="ดึงจาก Area Management"
+            readonly
+            class="w-full field-auto"
+          />
+        </div>
+
+        <div class="form-group auto-field-group">
+          <label>ค่าเช่า/เดือน (บาท)</label>
+          <input
+            type="text"
+            pInputText
+            formControlName="areaMonthlyRent"
+            placeholder="ดึงจาก Area Management"
+            readonly
+            class="w-full field-auto"
+          />
         </div>
       </div>
     </div>

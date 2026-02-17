@@ -1,3 +1,5 @@
+/* area-list.component.css */
+
 .area-list-container {
   @apply h-full flex flex-col p-4 bg-white;
 }

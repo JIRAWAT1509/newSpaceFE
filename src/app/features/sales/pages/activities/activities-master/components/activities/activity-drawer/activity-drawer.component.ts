@@ -6,6 +6,8 @@ import { DateTime } from 'luxon';
 import { Activity, ActivityType, ActivityRequirement } from '@core/data/activities.mock';
 import { User } from '@core/data/users.mock';
 import { Role } from '@core/data/roles.mock';
+import { LocationPickerComponent } from '@shared/components/location-picker/location-picker.component';
+import { ActivityLocation } from '@core/data/activities.mock';
 
 interface FormData {
   type: ActivityType;
@@ -17,13 +19,14 @@ interface FormData {
   endTime: string;
   assignedTo: string[];
   assignedToRoles: string[];
+  location: ActivityLocation | null;  // ✅ ADD THIS
   finishRequirement: ActivityRequirement;
 }
 
 @Component({
   selector: 'app-activity-drawer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LocationPickerComponent],
   templateUrl: './activity-drawer.component.html',
   styleUrl: './activity-drawer.component.css'
 })
@@ -44,21 +47,22 @@ export class ActivityDrawerComponent implements OnInit {
   @Output() cancel = new EventEmitter<void>();
 
   // ==================== FORM SIGNALS ====================
-  formData = signal<FormData>({
-    type: 'personal',
-    title: '',
-    description: '',
-    startDate: DateTime.now().toFormat('yyyy-MM-dd'),
-    startTime: DateTime.now().toFormat('HH:mm'),
-    endDate: DateTime.now().toFormat('yyyy-MM-dd'),
-    endTime: DateTime.now().plus({ hours: 1 }).toFormat('HH:mm'),
-    assignedTo: [],
-    assignedToRoles: [],
-    finishRequirement: {
-      type: 'none',
-      description: ''
-    }
-  });
+formData = signal<FormData>({
+  type: 'personal',
+  title: '',
+  description: '',
+  startDate: DateTime.now().toFormat('yyyy-MM-dd'),
+  startTime: DateTime.now().toFormat('HH:mm'),
+  endDate: DateTime.now().toFormat('yyyy-MM-dd'),
+  endTime: DateTime.now().plus({ hours: 1 }).toFormat('HH:mm'),
+  assignedTo: [],
+  assignedToRoles: [],
+  location: null,  // ✅ ADD THIS
+  finishRequirement: {
+    type: 'none',
+    description: ''
+  }
+});
 
   // UI State
   showAssigneeSearch = signal<boolean>(false);
@@ -144,28 +148,29 @@ export class ActivityDrawerComponent implements OnInit {
 
   // ==================== FORM LOADING ====================
 
-  loadActivityData(): void {
-    if (!this.activity) return;
+loadActivityData(): void {
+  if (!this.activity) return;
 
-    const startDateTime = DateTime.fromISO(this.activity.startDate);
-    const endDateTime = DateTime.fromISO(this.activity.endDate);
+  const startDateTime = DateTime.fromISO(this.activity.startDate);
+  const endDateTime = DateTime.fromISO(this.activity.endDate);
 
-    this.formData.set({
-      type: this.activity.type,
-      title: this.activity.title,
-      description: this.activity.description,
-      startDate: startDateTime.toFormat('yyyy-MM-dd'),
-      startTime: startDateTime.toFormat('HH:mm'),
-      endDate: endDateTime.toFormat('yyyy-MM-dd'),
-      endTime: endDateTime.toFormat('HH:mm'),
-      assignedTo: this.activity.assignedTo || [],
-      assignedToRoles: this.activity.assignedToRoles || [],
-      finishRequirement: this.activity.finishRequirement || {
-        type: 'none',
-        description: ''
-      }
-    });
-  }
+  this.formData.set({
+    type: this.activity.type,
+    title: this.activity.title,
+    description: this.activity.description,
+    startDate: startDateTime.toFormat('yyyy-MM-dd'),
+    startTime: startDateTime.toFormat('HH:mm'),
+    endDate: endDateTime.toFormat('yyyy-MM-dd'),
+    endTime: endDateTime.toFormat('HH:mm'),
+    assignedTo: this.activity.assignedTo || [],
+    assignedToRoles: this.activity.assignedToRoles || [],
+    location: this.activity.location || null,  // ✅ ADD THIS
+    finishRequirement: this.activity.finishRequirement || {
+      type: 'none',
+      description: ''
+    }
+  });
+}
 
   // ==================== FORM HANDLERS ====================
 
@@ -193,6 +198,16 @@ export class ActivityDrawerComponent implements OnInit {
       this.updateField('finishRequirement', { type: 'none', description: '' });
     }
   }
+
+  // ==================== LOCATION MANAGEMENT ====================
+
+onLocationSelect(location: ActivityLocation): void {
+  this.updateField('location', location);
+}
+
+onLocationClear(): void {
+  this.updateField('location', null);
+}
 
   // ==================== ASSIGNEE MANAGEMENT ====================
 
@@ -350,34 +365,35 @@ export class ActivityDrawerComponent implements OnInit {
 
   // ==================== FORM SUBMISSION ====================
 
-  onSubmit(): void {
-    if (!this.validateForm()) {
-      return;
-    }
-
-    const data = this.formData();
-
-    // Combine date and time into ISO strings
-    const startDateTime = DateTime.fromISO(`${data.startDate}T${data.startTime}`);
-    const endDateTime = DateTime.fromISO(`${data.endDate}T${data.endTime}`);
-
-    const activityData: Partial<Activity> = {
-      type: data.type,
-      title: data.title.trim(),
-      description: data.description.trim(),
-      startDate: startDateTime.toISO() ?? undefined,
-      endDate: endDateTime.toISO() ?? undefined,
-    };
-
-    // Add assignment-specific fields
-    if (data.type === 'assignment') {
-      activityData.assignedTo = data.assignedTo;
-      activityData.assignedToRoles = data.assignedToRoles;
-      activityData.finishRequirement = data.finishRequirement;
-    }
-
-    this.save.emit(activityData);
+onSubmit(): void {
+  if (!this.validateForm()) {
+    return;
   }
+
+  const data = this.formData();
+
+  // Combine date and time into ISO strings
+  const startDateTime = DateTime.fromISO(`${data.startDate}T${data.startTime}`);
+  const endDateTime = DateTime.fromISO(`${data.endDate}T${data.endTime}`);
+
+  const activityData: Partial<Activity> = {
+    type: data.type,
+    title: data.title.trim(),
+    description: data.description.trim(),
+    startDate: startDateTime.toISO() ?? undefined,
+    endDate: endDateTime.toISO() ?? undefined,
+    location: data.location || undefined,  // ✅ ADD THIS
+  };
+
+  // Add assignment-specific fields
+  if (data.type === 'assignment') {
+    activityData.assignedTo = data.assignedTo;
+    activityData.assignedToRoles = data.assignedToRoles;
+    activityData.finishRequirement = data.finishRequirement;
+  }
+
+  this.save.emit(activityData);
+}
 
   onCancel(): void {
     this.cancel.emit();
