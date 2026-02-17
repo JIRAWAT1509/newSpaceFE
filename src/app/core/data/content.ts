@@ -271,16 +271,21 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
         icon: 'pi-chart-bar',
         route: '/finance/master',
       },
-      /* {
+      {
+        name: 'asdas',
+        icon: 'pi-chart-bar',
+        route: '/collection/invoice/daily',
+      },
+      /* /* {
         name: 'invoices',
         icon: 'pi-money-bill',
         route: '/collection/invoice/daily',
-      },
+      }, */
       {
         name: 'finance_receipts',
         icon: 'pi-receipt',
         route: '/finance/receipt/daily',
-      }, */
+      },
       /* {
         name: 'finance_receipts',
         icon: 'assets/icons/business-outline.svg',

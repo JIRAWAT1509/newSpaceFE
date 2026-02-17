@@ -7,6 +7,8 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
+  AbstractControl,
+  ValidationErrors
 } from '@angular/forms';
 // ✅ ลบ CalendarModule และ DropdownModule ออก
 import {
@@ -79,6 +81,24 @@ export class FinanceDocumentModalComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.setModalContent();
+  }
+
+  dateRangeValidator(control: AbstractControl): ValidationErrors | null {
+    const dateFrom = control.get('dateFrom')?.value;
+    const dateTo = control.get('dateTo')?.value;
+
+    if (!dateFrom || !dateTo) {
+      return null;
+    }
+
+    const startDate = new Date(dateFrom);
+    const endDate = new Date(dateTo);
+
+    if (endDate < startDate) {
+      return { dateRangeInvalid: true };
+    }
+
+    return null;
   }
 
   // ✅ Helper: แปลง Date เป็น string format YYYY-MM-DD สำหรับ input[type="date"]
