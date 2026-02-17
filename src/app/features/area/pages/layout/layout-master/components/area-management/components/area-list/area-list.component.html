@@ -28,37 +28,89 @@
       </div>
     } @else {
       @for (area of paginatedAreas(); track area.id) {
-        <div
-          class="area-item"
-          [class.selected]="isSelected(area.id)"
-          (click)="onAreaClick(area.id)"
-        >
-          <!-- Status Indicator -->
-          <div class="status-dot" [style.backgroundColor]="getStatusColor(area.status)"></div>
+        <div class="area-item-wrapper">
+          <div
+            class="area-item"
+            [class.selected]="isSelected(area.id)"
+            [class.expanded]="isExpanded(area.id)"
+            (click)="onAreaClick(area.id)"
+          >
+            <!-- Status Indicator -->
+            <div class="status-dot" [style.backgroundColor]="getStatusColor(area.status)"></div>
 
-          <!-- Area Info -->
-          <div class="area-info">
-            <div class="room-number">Room: {{ area.roomNumber }}</div>
-            <div class="tenant-info">
-              @if (area.currentTenant) {
-                <span class="tenant-name">{{ area.currentTenant.name }}</span>
-              } @else {
-                <span class="no-tenant">{{ getStatusLabel(area.status) }}</span>
-              }
+            <!-- Area Info -->
+            <div class="area-info">
+              <div class="room-number">{{ area.roomNumber }}</div>
+              <div class="tenant-info">
+                @if (area.currentTenant) {
+                  <span class="tenant-name">{{ area.currentTenant.name }}</span>
+                } @else {
+                  <span class="no-tenant">{{ getStatusLabel(area.status) }}</span>
+                }
+              </div>
+            </div>
+
+            <!-- Expand Icon -->
+            <div class="expand-icon">
+              <i [class]="isExpanded(area.id) ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
             </div>
           </div>
 
-          <!-- Action Button -->
-          <div class="area-action">
-            <!-- <button
-              type="button"
-              class="action-button"
-              (click)="onActionClick($event, area.id)"
-            >
-              {{ getActionLabel(area.status) }}
-            </button> -->
-            <i class="pi pi-chevron-right"></i>
-          </div>
+          <!-- Expanded Details -->
+          @if (isExpanded(area.id)) {
+            <div class="area-details">
+              <div class="detail-row">
+                <span class="detail-label">Room Number</span>
+                <span class="detail-value">{{ area.roomNumber }}</span>
+              </div>
+
+              <div class="detail-row">
+                <span class="detail-label">Area Type</span>
+                <span class="detail-value">{{ getTypeLabel(area.type) }}</span>
+              </div>
+
+              @if (area.size) {
+                <div class="detail-row">
+                  <span class="detail-label">Size</span>
+                  <span class="detail-value">{{ formatNumber(area.size) }} sq.m.</span>
+                </div>
+              }
+
+              <div class="detail-row">
+                <span class="detail-label">Current Status</span>
+                <span class="status-badge" [style.backgroundColor]="getStatusColor(area.status)">
+                  {{ getStatusLabel(area.status) }}
+                </span>
+              </div>
+
+              @if (area.monthlyRent) {
+                <div class="detail-row">
+                  <span class="detail-label">Monthly Rent</span>
+                  <span class="detail-value">฿{{ formatNumber(area.monthlyRent) }}</span>
+                </div>
+              }
+
+              @if (area.currentTenant) {
+                <div class="detail-row">
+                  <span class="detail-label">Tenant</span>
+                  <span class="detail-value">{{ area.currentTenant.name }}</span>
+                </div>
+                @if (area.currentTenant.contactPhone) {
+                  <div class="detail-row">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value">{{ area.currentTenant.contactPhone }}</span>
+                  </div>
+                }
+              }
+
+              <div class="detail-actions">
+                <button type="button" class="btn-view-details">
+                  <i class="pi pi-external-link"></i>
+                  ทำใบเสนอราคา
+                </button>
+              </div>
+            </div>
+          }
         </div>
       }
     }
