@@ -1,0 +1,97 @@
+<!-- top-customers-table.component.html -->
+
+<div class="customers-table-container">
+
+  <div class="table-header">
+    <div>
+      <h4 class="table-title">Top Customers</h4>
+      <p class="table-subtitle">10 ลูกค้าอันดับต้น ๆ</p>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-skeleton"></div>
+    </div>
+  }
+
+  @if (!isLoading && customers.length > 0) {
+    <div class="table-wrapper">
+      <table class="customers-table">
+        <thead>
+          <tr>
+            <th class="sortable" (click)="sortBy('name')">
+              <span>Customer</span>
+              <i [class]="getSortIcon('name')"></i>
+            </th>
+            <th class="sortable text-center" (click)="sortBy('class')">
+              <span>Class</span>
+              <i [class]="getSortIcon('class')"></i>
+            </th>
+            <th class="sortable" (click)="sortBy('segment')">
+              <span>Segment</span>
+              <i [class]="getSortIcon('segment')"></i>
+            </th>
+            <th class="sortable text-right" (click)="sortBy('arr')">
+              <span>ARR</span>
+              <i [class]="getSortIcon('arr')"></i>
+            </th>
+            <th class="sortable text-center" (click)="sortBy('csat')">
+              <span>CSAT</span>
+              <i [class]="getSortIcon('csat')"></i>
+            </th>
+            <th class="text-center">Risk</th>
+            <th class="text-center">Contracts</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (customer of customers; track customer.id) {
+            <tr>
+              <td>
+                <div class="customer-info">
+                  <div class="customer-name">{{ customer.name }}</div>
+                  @if (customer.companyName) {
+                    <div class="company-name">{{ customer.companyName }}</div>
+                  }
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="class-badge" [ngClass]="getClassBadgeClass(customer.class)">
+                  {{ customer.class }}
+                </span>
+              </td>
+              <td>
+                <span class="segment-label">{{ customer.segment }}</span>
+              </td>
+              <td class="text-right">
+                <span class="arr-value">{{ formatCurrency(customer.arr) }}</span>
+              </td>
+              <td class="text-center">
+                <div class="csat-rating">
+                  <i class="pi pi-star-fill"></i>
+                  <span>{{ customer.csat }}</span>
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="risk-badge" [ngClass]="getRiskBadgeClass(customer.churnRisk)">
+                  {{ customer.churnRisk }}
+                </span>
+              </td>
+              <td class="text-center">
+                <span class="contract-count">{{ customer.activeContracts }}</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (!isLoading && customers.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-users"></i>
+      <p>No customer data available</p>
+    </div>
+  }
+
+</div>

@@ -1,0 +1,112 @@
+<!-- team-performance.component.html -->
+
+<div class="team-performance-container">
+
+  <div class="section-header">
+    <div class="header-content">
+      <div class="header-title">
+        <i class="pi pi-users"></i>
+        <div>
+          <h3 class="title">Team Performance</h3>
+          <p class="subtitle">ผลการปฏิบัติงานของทีม</p>
+        </div>
+      </div>
+      <button
+        class="btn-refresh"
+        (click)="refresh()"
+        [disabled]="isLoading()"
+        title="Refresh data"
+      >
+        <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+      <button class="btn-retry" (click)="refresh()">
+        <i class="pi pi-refresh"></i>
+        <span>Try Again</span>
+      </button>
+    </div>
+  }
+
+  @if (teamData()) {
+    <div class="performance-content">
+
+      <!-- Team Summary Cards -->
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="card-icon blue">
+            <i class="pi pi-dollar"></i>
+          </div>
+          <div class="card-content">
+            <div class="card-label">Team YTD</div>
+            <div class="card-value">{{ formatCurrency(teamData()!.teamTotals.totalYTD) }}</div>
+            <div class="card-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="teamData()!.teamTotals.teamAttainment"></div>
+              </div>
+              <span class="progress-label">{{ teamData()!.teamTotals.teamAttainment.toFixed(0) }}% of target</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="card-icon green">
+            <i class="pi pi-chart-line"></i>
+          </div>
+          <div class="card-content">
+            <div class="card-label">Total Pipeline</div>
+            <div class="card-value">{{ formatCurrency(teamData()!.teamTotals.totalPipeline) }}</div>
+            <div class="card-meta">{{ teamData()!.teamTotals.totalDeals }} active deals</div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="card-icon purple">
+            <i class="pi pi-percentage"></i>
+          </div>
+          <div class="card-content">
+            <div class="card-label">Team Win Rate</div>
+            <div class="card-value">{{ teamData()!.teamTotals.teamWinRate.toFixed(0) }}%</div>
+            <div class="card-meta">Across all deals</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Leaderboard -->
+      <app-team-leaderboard
+        [members]="teamData()!.leaderboard"
+        [isLoading]="isLoading()"
+        (memberSelect)="onMemberSelect($event)"
+      ></app-team-leaderboard>
+
+      <!-- Top Performers Cards -->
+      @if (teamData()!.topPerformers.length > 0) {
+        <div class="top-performers-section">
+          <h3 class="section-title">Top Performers</h3>
+          <div class="rep-cards-scroll">
+            @for (member of teamData()!.topPerformers; track member.id) {
+              <app-rep-performance-card
+                [member]="member"
+                (cardClick)="onMemberSelect($event)"
+              ></app-rep-performance-card>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+  }
+
+  <!-- Rep Detail Modal -->
+  <app-rep-detail-modal
+    [member]="selectedMember()"
+    [isVisible]="isModalVisible()"
+    (close)="onModalClose()"
+  ></app-rep-detail-modal>
+
+</div>

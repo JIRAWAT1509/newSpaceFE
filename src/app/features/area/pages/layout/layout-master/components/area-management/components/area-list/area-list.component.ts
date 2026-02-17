@@ -28,6 +28,7 @@ export class AreaListComponent {
 
   allAreas = signal<Area[]>([]);
   selectedSort = signal<'roomNumber' | 'status' | 'tenant'>('roomNumber');
+  expandedAreaId = signal<string | null>(null);
 
   currentPage = signal<number>(1);
   itemsPerPage = 6;
@@ -192,12 +193,26 @@ export class AreaListComponent {
     return this.selectedAreaId() === areaId;
   }
 
+  isExpanded(areaId: string): boolean {
+    return this.expandedAreaId() === areaId;
+  }
+
   onAreaClick(areaId: string): void {
     const currentSelectedId = this.selectedAreaId();
+    const currentExpandedId = this.expandedAreaId();
+
+    // Toggle selection
     if (currentSelectedId === areaId) {
       this.areaSelected.emit(null);
     } else {
       this.areaSelected.emit(areaId);
+    }
+
+    // Toggle expansion
+    if (currentExpandedId === areaId) {
+      this.expandedAreaId.set(null);
+    } else {
+      this.expandedAreaId.set(areaId);
     }
   }
 
@@ -268,5 +283,19 @@ export class AreaListComponent {
       'inactive': 'View'
     };
     return actionLabels[status] || 'View';
+  }
+
+  getTypeLabel(type: string): string {
+    const typeLabels: { [key: string]: string } = {
+      'log': 'Log',
+      'kiosk': 'Kiosk',
+      'open-plan': 'Open Plan'
+    };
+    return typeLabels[type] || type;
+  }
+
+  formatNumber(num: number | undefined): string {
+    if (!num) return 'N/A';
+    return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
 }

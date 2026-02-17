@@ -1,0 +1,59 @@
+<!-- pipeline-funnel-chart.component.html -->
+
+<div class="funnel-chart-container">
+
+  <!-- Header with Summary -->
+  <div class="chart-header">
+    <div class="header-info">
+      <h4 class="chart-title">Pipeline Funnel</h4>
+      <p class="chart-subtitle">การไหลของดีลในแต่ละขั้นตอน</p>
+    </div>
+    <div class="summary-stats">
+      <div class="stat-item">
+        <span class="stat-label">Total Value</span>
+        <span class="stat-value">{{ getTotalValue() }}</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">Total Deals</span>
+        <span class="stat-value">{{ getTotalDeals() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-skeleton"></div>
+    </div>
+  }
+
+  <!-- Chart Canvas -->
+  @if (!isLoading && stages.length > 0) {
+    <div class="chart-wrapper">
+      <canvas #chartCanvas></canvas>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && stages.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-chart-bar"></i>
+      <p>No pipeline data available</p>
+    </div>
+  }
+
+  <!-- Legend -->
+  @if (!isLoading && stages.length > 0) {
+    <div class="chart-legend">
+      @for (stage of stages; track stage.stageId) {
+        <div class="legend-item">
+          <div class="legend-color" [style.background]="stage.color"></div>
+          <span class="legend-label">{{ stage.stageName }}</span>
+          <span class="legend-value">{{ stage.dealCount }} deals</span>
+        </div>
+      }
+    </div>
+  }
+
+</div>

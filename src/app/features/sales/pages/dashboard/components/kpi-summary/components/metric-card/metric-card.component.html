@@ -1,0 +1,44 @@
+<!-- metric-card.component.html -->
+
+<div class="metric-card" [class.loading]="isLoading">
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-skeleton">
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-content">
+        <div class="skeleton-label"></div>
+        <div class="skeleton-value"></div>
+        <div class="skeleton-trend"></div>
+      </div>
+    </div>
+  } @else {
+
+    <!-- Card Header with Icon -->
+    <div class="card-header">
+      <div class="metric-icon" [style.background]="metric.color">
+        <i [class]="metric.icon"></i>
+      </div>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body">
+
+      <!-- Label -->
+      <div class="metric-label">{{ metric.label }}</div>
+
+      <!-- Value (Big Number) -->
+      <div class="metric-value">{{ getFormattedValue() }}</div>
+
+      <!-- Trend -->
+      <div class="metric-trend" [ngClass]="getTrendClass()">
+        <i [class]="getTrendIcon()"></i>
+        <span class="trend-value">{{ getFormattedTrend() }}</span>
+        <span class="trend-label">{{ metric.trendLabel }}</span>
+      </div>
+
+    </div>
+
+  }
+
+</div>

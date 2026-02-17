@@ -1,0 +1,119 @@
+<!-- rep-detail-modal.component.html -->
+
+@if (isVisible && member) {
+  <div class="modal-backdrop" (click)="onBackdropClick($event)">
+    <div class="modal-container">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="header-content">
+          @if (member.avatar) {
+            <span class="member-avatar">{{ member.avatar }}</span>
+          }
+          <div>
+            <h2 class="member-name">{{ member.name }}</h2>
+            <p class="member-role">{{ member.role }} • Rank #{{ member.rank }}</p>
+          </div>
+        </div>
+        <button class="btn-close" (click)="onClose()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+
+        <!-- Performance Overview -->
+        <div class="section">
+          <h3 class="section-title">Performance Overview</h3>
+          <div class="overview-grid">
+            <div class="overview-card" [ngClass]="getAttainmentClass(member.attainment)">
+              <div class="card-label">YTD Attainment</div>
+              <div class="card-value">{{ member.attainment }}%</div>
+              <div class="card-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="member.attainment > 100 ? 100 : member.attainment"></div>
+                </div>
+                <div class="progress-text">{{ formatCurrency(member.ytdSales) }} / {{ formatCurrency(member.ytdTarget) }}</div>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-label">This Month</div>
+                <div class="stat-value">{{ formatCurrency(member.thisMonthSales) }}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">This Week</div>
+                <div class="stat-value">{{ formatCurrency(member.thisWeekSales) }}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Avg Deal Size</div>
+                <div class="stat-value">{{ formatCurrency(member.avgDealSize) }}</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">Avg Days to Close</div>
+                <div class="stat-value">{{ member.avgDaysToClose }}d</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline Details -->
+        <div class="section">
+          <h3 class="section-title">Pipeline Details</h3>
+          <div class="pipeline-grid">
+            <div class="pipeline-card">
+              <i class="pi pi-chart-line card-icon blue"></i>
+              <div class="card-content">
+                <div class="card-label">Pipeline Value</div>
+                <div class="card-value">{{ formatCurrency(member.pipelineValue) }}</div>
+                <div class="card-meta">{{ member.pipelineDeals }} active deals</div>
+              </div>
+            </div>
+
+            <div class="pipeline-card">
+              <i class="pi pi-trophy card-icon green"></i>
+              <div class="card-content">
+                <div class="card-label">Win Rate</div>
+                <div class="card-value">{{ member.winRate }}%</div>
+                <div class="card-meta">{{ member.dealsWon }} won / {{ member.dealsLost }} lost</div>
+              </div>
+            </div>
+
+            <div class="pipeline-card">
+              <i class="pi pi-calendar card-icon purple"></i>
+              <div class="card-content">
+                <div class="card-label">Activities This Week</div>
+                <div class="card-value">{{ member.activitiesThisWeek }}</div>
+                <div class="card-meta">Last: {{ member.lastActivityDate ? (member.lastActivityDate | date: 'short') : 'N/A' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Trend -->
+        <div class="section">
+          <h3 class="section-title">Performance Trend</h3>
+          <div class="trend-card">
+            <div class="trend-icon" [class.positive]="member.trend > 0" [class.negative]="member.trend < 0">
+              <i [class]="member.trend > 0 ? 'pi pi-arrow-up' : member.trend < 0 ? 'pi pi-arrow-down' : 'pi pi-minus'"></i>
+            </div>
+            <div class="trend-content">
+              <div class="trend-value">{{ member.trend > 0 ? '+' : '' }}{{ member.trend }}%</div>
+              <div class="trend-label">vs last month</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="onClose()">Close</button>
+        <button class="btn-primary">View Full Details</button>
+      </div>
+
+    </div>
+  </div>
+}
