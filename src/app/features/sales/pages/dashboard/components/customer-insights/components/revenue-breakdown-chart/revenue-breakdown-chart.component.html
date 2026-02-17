@@ -1,0 +1,61 @@
+<!-- revenue-breakdown-chart.component.html -->
+
+<div class="revenue-chart-container">
+
+  <div class="chart-header">
+    <div>
+      <h4 class="chart-title">Revenue by Segment</h4>
+      <p class="chart-subtitle">รายได้แยกตามกลุ่มธุรกิจ</p>
+    </div>
+    <div class="summary-stats">
+      <div class="stat-item">
+        <span class="stat-label">Total ARR</span>
+        <span class="stat-value">{{ getTotalARR() }}</span>
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-skeleton"></div>
+    </div>
+  }
+
+  @if (!isLoading && segments.length > 0) {
+    <div class="chart-content">
+      <div class="chart-wrapper">
+        <canvas #chartCanvas></canvas>
+        <div class="chart-center-text">
+          <div class="center-value">{{ getTotalCustomers() }}</div>
+          <div class="center-label">Customers</div>
+        </div>
+      </div>
+
+      <div class="legend-list">
+        @for (segment of segments; track segment.segment) {
+          <div class="legend-item">
+            <div class="legend-color" [style.background]="segment.color"></div>
+            <div class="legend-info">
+              <div class="legend-name">{{ segment.segment }}</div>
+              <div class="legend-details">
+                <span class="legend-arr">{{ (segment.arr / 1000000).toFixed(1) }}M</span>
+                <span class="legend-separator">•</span>
+                <span class="legend-percentage">{{ segment.percentage.toFixed(0) }}%</span>
+                <span class="legend-separator">•</span>
+                <span class="legend-count">{{ segment.customerCount }} cust</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && segments.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-chart-pie"></i>
+      <p>No revenue data available</p>
+    </div>
+  }
+
+</div>

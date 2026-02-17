@@ -1,0 +1,74 @@
+<!-- customer-insights.component.html -->
+
+<div class="customer-insights-container">
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <div class="header-content">
+      <div class="header-title">
+        <i class="pi pi-users"></i>
+        <div>
+          <h3 class="title">Customer Insights</h3>
+          <p class="subtitle">ข้อมูลเชิงลึกเกี่ยวกับลูกค้า</p>
+        </div>
+      </div>
+      <button
+        class="btn-refresh"
+        (click)="refresh()"
+        [disabled]="isLoading()"
+        title="Refresh data"
+      >
+        <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+      <button class="btn-retry" (click)="refresh()">
+        <i class="pi pi-refresh"></i>
+        <span>Try Again</span>
+      </button>
+    </div>
+  }
+
+  <!-- Main Content -->
+  @if (insights()) {
+    <div class="insights-grid">
+
+      <!-- Charts Row -->
+      <div class="charts-row">
+
+        <!-- Revenue Breakdown Chart -->
+        <app-revenue-breakdown-chart
+          [segments]="insights()!.revenueBreakdown"
+          [isLoading]="isLoading()"
+        ></app-revenue-breakdown-chart>
+
+        <!-- Customer Classification Chart -->
+        <app-customer-classification-chart
+          [classification]="insights()!.classification"
+          [isLoading]="isLoading()"
+        ></app-customer-classification-chart>
+
+      </div>
+
+      <!-- Top Customers Table -->
+      <app-top-customers-table
+        [customers]="insights()!.topCustomers"
+        [isLoading]="isLoading()"
+      ></app-top-customers-table>
+
+      <!-- At-Risk Customers Alert -->
+      <app-at-risk-customers-alert
+        [customers]="insights()!.atRiskCustomers"
+        [isLoading]="isLoading()"
+      ></app-at-risk-customers-alert>
+
+    </div>
+  }
+
+</div>

@@ -1,0 +1,97 @@
+<!-- stage-analysis-table.component.html -->
+
+<div class="stage-table-container">
+
+  <!-- Header -->
+  <div class="table-header">
+    <h4 class="table-title">Stage Analysis</h4>
+    <p class="table-subtitle">รายละเอียดแต่ละขั้นตอน</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-skeleton"></div>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!isLoading && stages.length > 0) {
+    <div class="table-wrapper">
+      <table class="stage-table">
+        <thead>
+          <tr>
+            <th class="text-left">Stage</th>
+            <th class="text-center">Deals</th>
+            <th class="text-right">Value</th>
+            <th class="text-right">Avg Deal</th>
+            <th class="text-center">Conversion</th>
+            <th class="text-center">Avg Days</th>
+            <th class="text-center">Win Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (stage of stages; track stage.stageId; let i = $index) {
+            <tr class="stage-row">
+              <!-- Stage Name with Color -->
+              <td class="stage-name-cell">
+                <div class="stage-name">
+                  <div class="stage-indicator" [style.background]="stage.color"></div>
+                  <span>{{ stage.stageName }}</span>
+                </div>
+              </td>
+
+              <!-- Deal Count -->
+              <td class="text-center">
+                <span class="deal-count">{{ stage.dealCount }}</span>
+              </td>
+
+              <!-- Total Value -->
+              <td class="text-right">
+                <span class="value-amount">{{ formatCurrency(stage.totalValue) }}</span>
+              </td>
+
+              <!-- Average Deal Size -->
+              <td class="text-right">
+                <span class="avg-deal">{{ formatCurrency(stage.totalValue / stage.dealCount) }}</span>
+              </td>
+
+              <!-- Conversion Rate -->
+              <td class="text-center">
+                @if (getConversionForStage(i); as conversion) {
+                  <span
+                    class="conversion-rate"
+                    [ngClass]="getConversionClass(conversion.conversionRate)"
+                  >
+                    {{ formatPercentage(conversion.conversionRate) }}
+                  </span>
+                } @else {
+                  <span class="no-data">—</span>
+                }
+              </td>
+
+              <!-- Average Days in Stage -->
+              <td class="text-center">
+                <span class="days-badge">{{ stage.averageDays }}d</span>
+              </td>
+
+              <!-- Win Rate -->
+              <td class="text-center">
+                <span class="win-rate">{{ formatPercentage(stage.winRate) }}</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && stages.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-table"></i>
+      <p>No stage data available</p>
+    </div>
+  }
+
+</div>

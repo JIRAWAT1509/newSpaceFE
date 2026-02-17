@@ -1,0 +1,61 @@
+<!-- rep-performance-card.component.html -->
+
+<div class="rep-card" (click)="onCardClick()" [class]="getAttainmentClass()">
+
+  <!-- Card Header -->
+  <div class="card-header">
+    <div class="rep-info">
+      @if (member.avatar) {
+        <span class="rep-avatar">{{ member.avatar }}</span>
+      }
+      <div class="rep-details">
+        <div class="rep-name">{{ member.name }}</div>
+        <div class="rep-role">{{ member.role }}</div>
+      </div>
+    </div>
+    <div class="rank-badge">
+      #{{ member.rank }}
+    </div>
+  </div>
+
+  <!-- Attainment Section -->
+  <div class="attainment-section">
+    <div class="attainment-label">Attainment</div>
+    <div class="attainment-value">{{ member.attainment }}%</div>
+    <div class="attainment-bar">
+      <div class="attainment-fill" [style.width.%]="member.attainment > 100 ? 100 : member.attainment"></div>
+    </div>
+    <div class="attainment-subtitle">
+      {{ formatCurrency(member.ytdSales) }} / {{ formatCurrency(member.ytdTarget) }}
+    </div>
+  </div>
+
+  <!-- Metrics Grid -->
+  <div class="metrics-grid">
+    <div class="metric-item">
+      <div class="metric-label">Pipeline</div>
+      <div class="metric-value">{{ formatCurrency(member.pipelineValue) }}</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-label">Win Rate</div>
+      <div class="metric-value">{{ member.winRate }}%</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-label">Deals</div>
+      <div class="metric-value">{{ member.pipelineDeals }}</div>
+    </div>
+    <div class="metric-item">
+      <div class="metric-label">Activities</div>
+      <div class="metric-value">{{ member.activitiesThisWeek }}</div>
+    </div>
+  </div>
+
+  <!-- Trend Footer -->
+  <div class="card-footer">
+    <div class="trend-indicator" [ngClass]="getTrendClass()">
+      <i [class]="getTrendIcon()"></i>
+      <span>{{ member.trend > 0 ? '+' : '' }}{{ member.trend }}% vs last month</span>
+    </div>
+  </div>
+
+</div>
