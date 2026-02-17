@@ -40,7 +40,7 @@
 
 /* Area List Content */
 .area-list-content {
-  @apply flex-1 overflow-y-auto space-y-2 mb-3;
+  @apply flex-1 overflow-y-auto space-y-3 mb-3;
   min-height: 400px;
 }
 
@@ -63,20 +63,40 @@
   @apply flex flex-col items-center justify-center h-full text-center;
 }
 
+/* Area Item Wrapper */
+.area-item-wrapper {
+  @apply mb-3;
+}
+
 /* Area Item */
 .area-item {
-  @apply flex items-center gap-3 p-3 rounded-lg border border-gray-200;
+  @apply flex items-center gap-4 px-4 py-4 rounded-lg border-2 border-gray-200;
   @apply hover:bg-gray-50 hover:border-blue-300 cursor-pointer;
   @apply transition-all duration-200;
+  min-height: 68px;
 }
 
 .area-item.selected {
-  @apply bg-blue-50 border-blue-400 shadow-sm;
+  @apply bg-blue-600 border-blue-500 shadow-md;
+}
+
+.area-item.selected .room-number,
+.area-item.selected .tenant-name,
+.area-item.selected .no-tenant {
+  @apply text-white;
+}
+
+.area-item.selected .expand-icon i {
+  @apply text-blue-100;
+}
+
+.area-item.expanded {
+  @apply rounded-b-none border-b-0;
 }
 
 .status-dot {
-  @apply w-3 h-3 rounded-full flex-shrink-0;
-  @apply shadow-sm;
+  @apply w-4 h-4 rounded-full flex-shrink-0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .area-info {
@@ -84,11 +104,12 @@
 }
 
 .room-number {
-  @apply text-sm font-semibold text-gray-800 mb-1;
+  @apply text-base font-semibold text-gray-800 mb-1.5;
+  @apply truncate;
 }
 
 .tenant-info {
-  @apply text-xs text-gray-600;
+  @apply text-sm text-gray-600;
 }
 
 .tenant-name {
@@ -99,23 +120,55 @@
   @apply text-gray-500 italic;
 }
 
-.area-action {
-  @apply flex items-center gap-2 flex-shrink-0;
+.expand-icon {
+  @apply text-gray-400 flex-shrink-0;
 }
 
-.action-button {
-  @apply px-3 py-1 text-xs font-medium rounded-md;
-  @apply bg-gray-100 text-gray-700 border border-gray-300;
-  @apply hover:bg-blue-500 hover:text-white hover:border-blue-500;
-  @apply transition-colors duration-200;
+.expand-icon i {
+  @apply text-sm;
 }
 
-.area-item.selected .action-button {
-  @apply bg-blue-100 border-blue-300 text-blue-700;
+/* Area Details (Expanded) */
+.area-details {
+  @apply px-4 py-4 bg-white border-2 border-t-0 border-gray-200 rounded-b-lg;
+  @apply space-y-3.5;
 }
 
-.area-action i {
-  @apply text-gray-400 text-xs;
+.detail-row {
+  @apply flex items-center justify-between gap-3;
+  @apply py-1;
+}
+
+.detail-label {
+  @apply text-sm text-gray-600 font-medium;
+  min-width: 100px;
+}
+
+.detail-value {
+  @apply text-sm text-gray-900 font-medium;
+  @apply text-right;
+}
+
+.status-badge {
+  @apply px-3 py-1.5 rounded-md text-xs text-white font-semibold;
+  @apply uppercase tracking-wide;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.detail-actions {
+  @apply flex gap-2.5 pt-3 mt-1 border-t border-gray-200;
+}
+
+.btn-view-details {
+  @apply w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg;
+  @apply text-sm font-semibold transition-all duration-200;
+  @apply bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md;
+  @apply shadow-sm;
+  min-height: 40px;
+}
+
+.btn-view-details i {
+  @apply text-sm;
 }
 
 /* Pagination Controls */
@@ -169,6 +222,10 @@
   }
 
   .area-item {
-    @apply p-2;
+    @apply px-3 py-3;
+  }
+
+  .area-details {
+    @apply px-3 py-3;
   }
 }

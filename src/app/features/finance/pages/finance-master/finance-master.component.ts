@@ -29,6 +29,7 @@ export class FinanceMasterComponent {
   tabs: Tab[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'pi-chart-bar' },
     { id: 'invoices', label: 'ใบแจ้งหนี้', icon: 'pi-money-bill' },
+    { id: 'pre-invoices', label: 'รอออกใบเสร็จรับเงิน', icon: 'pi-money-bill' },
     { id: 'receipts', label: 'ใบเสร็จรับเงิน', icon: 'pi-receipt' }
   ];
 
