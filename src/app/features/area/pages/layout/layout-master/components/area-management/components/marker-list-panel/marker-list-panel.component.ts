@@ -1,6 +1,13 @@
 /* marker-list-panel.component.ts */
 
-import { Component, input, output, signal, viewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  signal,
+  viewChild,
+  ElementRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Area, AreaStatus, AreaType } from '@core/models/area.model';
 
@@ -9,7 +16,7 @@ import { Area, AreaStatus, AreaType } from '@core/models/area.model';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './marker-list-panel.component.html',
-  styleUrl: './marker-list-panel.component.css'
+  styleUrl: './marker-list-panel.component.css',
 })
 export class MarkerListPanelComponent {
   activeAreas = input<Area[]>([]);
@@ -50,8 +57,27 @@ export class MarkerListPanelComponent {
     const current = this.expandedAreaId();
     this.expandedAreaId.set(current === areaId ? null : areaId);
   }
+  // เพิ่ม signals
+  private activeSectionCollapsed = signal(false);
+  private inactiveSectionCollapsed = signal(false);
 
-  onDragStart(event: DragEvent, areaId: string, source: 'active' | 'inactive'): void {
+  // เพิ่ม getters
+  isActiveSectionCollapsed = this.activeSectionCollapsed.asReadonly();
+  isInactiveSectionCollapsed = this.inactiveSectionCollapsed.asReadonly();
+
+  // เพิ่ม methods
+  toggleActiveSection(): void {
+    this.activeSectionCollapsed.update((value) => !value);
+  }
+
+  toggleInactiveSection(): void {
+    this.inactiveSectionCollapsed.update((value) => !value);
+  }
+  onDragStart(
+    event: DragEvent,
+    areaId: string,
+    source: 'active' | 'inactive',
+  ): void {
     this.draggedAreaId = areaId;
     this.dragSource = source;
 
@@ -73,10 +99,14 @@ export class MarkerListPanelComponent {
     this.dragStarted.emit({ areaId, source });
   }
 
-  private createDragGhost(areaId: string, source: 'active' | 'inactive'): HTMLElement {
-    const area = source === 'active'
-      ? this.activeAreas().find(a => a.id === areaId)
-      : this.inactiveAreas().find(a => a.id === areaId);
+  private createDragGhost(
+    areaId: string,
+    source: 'active' | 'inactive',
+  ): HTMLElement {
+    const area =
+      source === 'active'
+        ? this.activeAreas().find((a) => a.id === areaId)
+        : this.inactiveAreas().find((a) => a.id === areaId);
 
     if (!area) {
       const div = document.createElement('div');
@@ -218,29 +248,29 @@ export class MarkerListPanelComponent {
 
   getStatusColor(status: AreaStatus): string {
     const statusColors: { [key: string]: string } = {
-      'vacant': '#80E08E',
-      'leased': '#FFD05F',
-      'quotation': '#4CA3FF',
-      'unallocated': '#FF6384'
+      vacant: '#80E08E',
+      leased: '#FFD05F',
+      quotation: '#4CA3FF',
+      unallocated: '#FF6384',
     };
     return statusColors[status] || '#9CA3AF';
   }
 
   getStatusLabel(status: AreaStatus): string {
     const statusLabels: { [key: string]: string } = {
-      'vacant': 'ว่าง',
-      'leased': 'เช่า',
-      'quotation': 'คำใบเสนอราคา',
-      'unallocated': 'ยังไม่พร้อม'
+      vacant: 'ว่าง',
+      leased: 'เช่า',
+      quotation: 'คำใบเสนอราคา',
+      unallocated: 'ยังไม่พร้อม',
     };
     return statusLabels[status] || status;
   }
 
   getTypeLabel(type: AreaType): string {
     const typeLabels: { [key: string]: string } = {
-      'log': 'Log',
-      'kiosk': 'Kiosk',
-      'open-plan': 'Open Plan'
+      log: 'Log',
+      kiosk: 'Kiosk',
+      'open-plan': 'Open Plan',
     };
     return typeLabels[type] || type;
   }
