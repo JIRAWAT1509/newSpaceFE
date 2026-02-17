@@ -1,0 +1,198 @@
+<!-- finance-document-modal.component.html -->
+
+<div class="modal-overlay" (click)="onCancel()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">{{ modalTitle() }}</h2>
+      <button class="close-btn" (click)="onCancel()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <form [formGroup]="form">
+        <!-- Receipt Number -->
+        @if (hasField("receiptNumber")) {
+          <div class="form-field">
+            <label class="field-label">เลขที่ใบเสร็จ</label>
+            <input
+              type="text"
+              class="field-input"
+              formControlName="receiptNumber"
+              [class.disabled]="isFieldDisabled('receiptNumber')"
+            />
+          </div>
+        }
+
+        <!-- Customer Name -->
+        @if (hasField("customerName")) {
+          <div class="form-field">
+            <label class="field-label">ลูกค้า</label>
+            <input
+              type="text"
+              class="field-input"
+              formControlName="customerName"
+              [class.disabled]="isFieldDisabled('customerName')"
+            />
+          </div>
+        }
+
+        <!-- Credit Note Number -->
+        @if (hasField("creditNoteNumber")) {
+          <div class="form-field">
+            <label class="field-label">เลขที่ใบลดหนี้</label>
+            <input
+              type="text"
+              class="field-input"
+              formControlName="creditNoteNumber"
+              [class.disabled]="isFieldDisabled('creditNoteNumber')"
+            />
+          </div>
+        }
+
+        <!-- Invoice Number -->
+        @if (hasField("invoiceNumber")) {
+          <div class="form-field">
+            <label class="field-label">เลขที่ใบแจ้งหนี้</label>
+            <input
+              type="text"
+              class="field-input"
+              formControlName="invoiceNumber"
+              [class.disabled]="isFieldDisabled('invoiceNumber')"
+            />
+          </div>
+        }
+
+        @if (hasField("cancelInvoiceNumber")) {
+          <div class="form-field">
+            <label class="field-label">เลขที่ใบยกเลิก</label>
+            <input
+              type="text"
+              class="field-input"
+              formControlName="cancelInvoiceNumber"
+              [class.disabled]="isFieldDisabled('cancelInvoiceNumber')"
+            />
+          </div>
+        }
+
+        <!-- Date Range -->
+        @if (hasField("dateFrom")) {
+          <div class="form-field-group">
+            <div class="form-field">
+              <label class="field-label required">
+                วันที่
+                @if (documentType() === "credit_note") {
+                  ใบลดหนี้
+                } @else if (
+                  documentType() === "invoice" ||
+                  documentType() === "cancel_invoice"
+                ) {
+                  ใบแจ้งหนี้
+                }
+              </label>
+              <input
+                type="date"
+                class="field-input"
+                formControlName="dateFrom"
+                [class.disabled]="isFieldDisabled('dateFrom')"
+              />
+            </div>
+            <span class="range-separator">ถึง</span>
+            <div class="form-field">
+              <label class="field-label required">&nbsp;</label>
+              <input
+                type="date"
+                class="field-input"
+                formControlName="dateTo"
+                [class.disabled]="isFieldDisabled('dateTo')"
+              />
+            </div>
+          </div>
+        }
+
+        <!-- Contract Number -->
+        @if (hasField("contractNumber")) {
+          <div class="form-field">
+            <label class="field-label">เลขที่สัญญาเช่า</label>
+            <input
+              type="text"
+              class="field-input"
+              formControlName="contractNumber"
+              [class.disabled]="isFieldDisabled('contractNumber')"
+            />
+          </div>
+        }
+
+        <!-- Invoice Status -->
+        @if (hasField("invoiceStatus")) {
+          <div class="form-field">
+            <label class="field-label">สถานะใบแจ้งหนี้</label>
+            <select class="field-input" formControlName="invoiceStatus">
+              @for (option of invoiceStatusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <!-- Print Status -->
+        @if (hasField("printStatus")) {
+          <div class="form-field">
+            <label class="field-label">สถานะการพิมพ์</label>
+            <select class="field-input" formControlName="printStatus">
+              @for (option of printStatusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <!-- Transfer Status -->
+        @if (hasField("transferStatus")) {
+          <div class="form-field">
+            <label class="field-label">สถานะการโอน</label>
+            <select class="field-input" formControlName="transferStatus">
+              @for (option of transferStatusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <!-- Debt Status -->
+        @if (hasField("debtStatus")) {
+          <div class="form-field">
+            <label class="field-label">สถานะหนี้คงเหลือ</label>
+            <select class="field-input" formControlName="debtStatus">
+              @for (option of debtStatusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <!-- Receipt Status -->
+        @if (hasField("status")) {
+          <div class="form-field">
+            <label class="field-label">สถานะ</label>
+            <select class="field-input" formControlName="status">
+              @for (option of receiptStatusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        }
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="onCancel()">ยกเลิก</button>
+      <button class="btn-submit" (click)="onSubmit()">
+        {{ submitButtonLabel() }}
+      </button>
+    </div>
+  </div>
+</div>
