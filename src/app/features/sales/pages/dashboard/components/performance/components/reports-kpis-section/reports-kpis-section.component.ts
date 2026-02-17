@@ -60,7 +60,7 @@ export class ReportsKpisSectionComponent implements OnInit {
     // Set executive summary
     if (this.executiveSummary) {
       this.summaryData.set({ ...this.executiveSummary });
-      console.log('Executive Summary Initialized:', this.executiveSummary);
+      ////console.log('Executive Summary Initialized:', this.executiveSummary);
     }
 
     // Transform managers data and calculate metrics
@@ -87,7 +87,7 @@ export class ReportsKpisSectionComponent implements OnInit {
       });
 
       this.managersData.set(managersPerformance);
-      console.log('Managers Performance Initialized:', managersPerformance);
+      ////console.log('Managers Performance Initialized:', managersPerformance);
     }
   }
 
@@ -206,7 +206,7 @@ export class ReportsKpisSectionComponent implements OnInit {
       this.sortDirection.set('desc');
     }
 
-    console.log(`Sorted by ${field} ${this.sortDirection()}`);
+    ////console.log(`Sorted by ${field} ${this.sortDirection()}`);
   }
 
   // Check if field is currently sorted
@@ -231,7 +231,7 @@ export class ReportsKpisSectionComponent implements OnInit {
     }
 
     const manager = this.managersData().find(m => m.id === managerId);
-    console.log('Selected manager:', manager);
+    ////console.log('Selected manager:', manager);
   }
 
   // Check if manager is selected
@@ -312,7 +312,7 @@ export class ReportsKpisSectionComponent implements OnInit {
       timestamp: new Date().toISOString()
     };
 
-    console.log('Exported Executive Summary:', exportData);
+    ////console.log('Exported Executive Summary:', exportData);
 
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
@@ -344,7 +344,7 @@ export class ReportsKpisSectionComponent implements OnInit {
       timestamp: new Date().toISOString()
     };
 
-    console.log('Exported Managers Performance:', exportData);
+    ////console.log('Exported Managers Performance:', exportData);
 
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
@@ -374,7 +374,7 @@ export class ReportsKpisSectionComponent implements OnInit {
       timestamp: new Date().toISOString()
     };
 
-    console.log('Exported All Reports & KPIs Data:', exportData);
+    ////console.log('Exported All Reports & KPIs Data:', exportData);
 
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
@@ -393,7 +393,7 @@ export class ReportsKpisSectionComponent implements OnInit {
 
   // Refresh data
   refreshData(): void {
-    console.log('Refreshing Reports & KPIs data...');
+    ////console.log('Refreshing Reports & KPIs data...');
     this.initializeData();
   }
 }

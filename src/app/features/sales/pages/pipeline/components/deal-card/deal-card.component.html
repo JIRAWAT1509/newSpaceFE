@@ -1,0 +1,59 @@
+<!-- deal-card.component.html (CUSTOM DRAG - WORKING) -->
+
+<div
+  class="deal-card"
+  [class.overdue]="deal().daysUntilDue < 0"
+  [class.near-due]="deal().daysUntilDue >= 0 && deal().daysUntilDue <= 2"
+  [class.holding]="isHolding()"
+  [class.dragging]="isDragging()"
+  (mousedown)="onCardMouseDown($event)"
+>
+  <!-- Card Header -->
+  <div class="card-header">
+    <div class="priority-badge" [class]="'priority-' + deal().priority">
+      @if (deal().priority === 'high') {
+        🔴
+      } @else if (deal().priority === 'medium') {
+        🟡
+      } @else {
+        ⚪
+      }
+    </div>
+
+    <div class="header-actions">
+      <button
+        class="card-menu-btn"
+        (click)="onMenuClick($event)"
+        title="More options"
+      >
+        ⋮
+      </button>
+    </div>
+  </div>
+
+  <!-- Deal Title -->
+  <div class="card-title">{{ deal().title }}</div>
+
+  <!-- Deal Value -->
+  <div class="card-value">{{ formatCurrency(deal().value) }}</div>
+
+  <!-- Due Date -->
+  <div class="card-due-date" [class]="getDueDateClass()">
+    <span class="due-icon">📅</span>
+    <span class="due-text">{{ formatDueDate() }}</span>
+  </div>
+
+  <!-- Sales Owner -->
+  <div class="card-owner">
+    <span class="owner-icon">👤</span>
+    <span class="owner-name">{{ deal().ownerName }}</span>
+  </div>
+
+  <!-- Hold Indicator (shows during long press) -->
+  @if (isHolding()) {
+    <div class="hold-indicator">
+      <div class="hold-progress"></div>
+    </div>
+  }
+
+</div>

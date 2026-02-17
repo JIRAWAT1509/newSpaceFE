@@ -88,7 +88,7 @@ export class ChurnChartComponent {
   selectPeriod(period: TimePeriod): void {
     this.selectedPeriod.set(period);
     // In production, this would trigger data reload
-    console.log('Selected period:', period);
+    ////console.log('Selected period:', period);
   }
 
   isPeriodSelected(period: TimePeriod): boolean {

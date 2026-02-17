@@ -1,0 +1,56 @@
+<!-- pipeline-filters.component.html (SIMPLIFIED) -->
+
+<div class="pipeline-filters">
+
+  <!-- Search -->
+  <div class="filter-item search-filter">
+    <span class="filter-icon">🔍</span>
+    <input
+      type="text"
+      pInputText
+      [ngModel]="searchQuery()"
+      (ngModelChange)="onSearchChange($event)"
+      placeholder="Search deals, customers, areas..."
+      class="search-input"
+    />
+  </div>
+
+  <!-- Owner Filter -->
+  <div class="filter-item">
+    <p-select
+      [ngModel]="selectedOwner()"
+      (ngModelChange)="onOwnerChange($event)"
+      [options]="ownerOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Filter by owner"
+      styleClass="filter-select"
+    />
+  </div>
+
+  <!-- Priority Filter -->
+  <div class="filter-item">
+    <p-select
+      [ngModel]="selectedPriority()"
+      (ngModelChange)="onPriorityChange($event)"
+      [options]="priorityOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Filter by priority"
+      styleClass="filter-select"
+    />
+  </div>
+
+  <!-- Clear Filters -->
+  @if (searchQuery() || selectedOwner() || selectedPriority()) {
+    <button
+      class="clear-filters-btn"
+      (click)="clearFilters()"
+      type="button"
+    >
+      <span class="btn-icon">✕</span>
+      <span class="btn-label">Clear</span>
+    </button>
+  }
+
+</div>

@@ -1,0 +1,76 @@
+<!-- stage-column.component.html (FIXED - NO DRAGGING HANDLER) -->
+
+<div class="stage-column">
+
+  <!-- Stage Header -->
+  <div class="stage-header">
+    <div class="stage-header-top">
+      <div class="stage-info">
+        <div class="stage-color" [style.background]="stage().color"></div>
+        <h3 class="stage-name">{{ stage().name }}</h3>
+        <span class="stage-count">{{ deals().length }}</span>
+      </div>
+      <button
+        class="stage-settings-btn"
+        (click)="onSettingsClick()"
+        title="Stage settings"
+      >
+        ⚙️
+      </button>
+    </div>
+
+    <!-- Sort Dropdown -->
+    <div class="stage-sort">
+      <p-select
+        [(ngModel)]="viewConfig().sortBy"
+        (ngModelChange)="onSortChange($event)"
+        [options]="sortOptions"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="sort-select"
+      >
+        <ng-template let-option pTemplate="item">
+          <div class="sort-option">
+            <span>{{ option.label }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+    </div>
+  </div>
+
+  <!-- Deals List (Scrollable) -->
+  <div
+    class="deals-list"
+    [class.drag-over]="isDragOver()"
+  >
+    @for (deal of paginatedDeals(); track deal.id) {
+      <app-deal-card
+        [deal]="deal"
+        (cardClick)="onDealClick($event)"
+        (menuClick)="onDealMenu($event)"
+        (dragStart)="onDealDragStart($event)"
+        (dragEnd)="onDealDragEnd($event)"
+      />
+    }
+
+    @if (deals().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <div class="empty-text">No deals in this stage</div>
+      </div>
+    }
+  </div>
+
+  <!-- Pagination Component -->
+  @if (deals().length > 0) {
+    <app-stage-pagination
+      [currentPage]="viewConfig().currentPage"
+      [totalPages]="totalPages()"
+      [totalDeals]="deals().length"
+      [cardsPerPage]="viewConfig().cardsPerPage"
+      (pageChange)="onPageChange($event)"
+      (cardsPerPageChange)="onCardsPerPageChange($event)"
+    />
+  }
+
+</div>

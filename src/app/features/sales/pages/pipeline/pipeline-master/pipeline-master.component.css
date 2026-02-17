@@ -1,198 +1,184 @@
-.page-container {
-  width: 100%;
+/* pipeline-master.component.css */
+
+/* ==================== PAGE CONTAINER ==================== */
+.pipeline-page {
+  padding: 24px;
+  background: #f5f7fa;
   min-height: 100vh;
-  padding: 1.5rem;
-  background-color: #f8f9fa;
 }
 
 /* ==================== PAGE HEADER ==================== */
 .page-header {
   background: white;
   border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.header-content {
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .header-icon {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  color: white;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-  flex-shrink: 0;
+  font-size: 24px;
 }
 
-/* Color variations for different pages */
-.header-icon.customer {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-}
-
-.header-icon.budget {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-}
-
-.header-icon.pipeline {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-}
-
-.header-title {
-  font-size: 1.875rem;
-  font-weight: 700;
+.header-title h1 {
+  font-size: 24px;
   color: #1f2937;
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 4px 0;
+  font-weight: 700;
 }
 
-.header-subtitle {
-  font-size: 0.875rem;
+.header-title p {
+  font-size: 14px;
   color: #6b7280;
   margin: 0;
 }
 
-/* ==================== PLACEHOLDER CONTENT ==================== */
-.placeholder-content {
+.header-actions {
   display: flex;
-  flex-direction: column;
+  gap: 12px;
+}
+
+/* ==================== BUTTONS ==================== */
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 60vh;
-  text-align: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
   background: white;
-  border-radius: 16px;
-  border: 2px dashed #e5e7eb;
-  padding: 3rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.placeholder-icon {
-  font-size: 4rem;
-  color: #cbd5e1;
-  margin-bottom: 1rem;
-}
-
-.placeholder-title {
-  font-size: 1.875rem;
-  font-weight: 700;
   color: #374151;
-  margin: 0 0 0.5rem 0;
+  border: 2px solid #e5e7eb;
 }
 
-.placeholder-text {
-  font-size: 1rem;
-  color: #6b7280;
-  margin: 0 0 1.5rem 0;
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
 }
 
-/* ==================== FEATURE LIST ==================== */
-.feature-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-  max-width: 500px;
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 
-.feature-list li {
-  color: #6b7280;
-  font-size: 0.9375rem;
-  margin: 0.625rem 0;
-  padding-left: 1.5rem;
-  position: relative;
+.btn-icon {
+  font-size: 16px;
 }
 
-.feature-list li::before {
-  content: "→";
-  position: absolute;
-  left: 0;
-  color: #3b82f6;
-  font-weight: 700;
-  font-size: 1rem;
+.btn-label {
+  font-size: 14px;
+}
+
+/* ==================== KANBAN CONTAINER ==================== */
+.kanban-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 /* ==================== RESPONSIVE ==================== */
-@media (max-width: 768px) {
-  .page-container {
-    padding: 1rem;
+@media (max-width: 1024px) {
+  .pipeline-page {
+    padding: 16px;
   }
 
   .page-header {
-    padding: 1.25rem;
+    padding: 20px;
   }
 
-  .header-icon {
-    width: 48px;
-    height: 48px;
-    font-size: 1.5rem;
+  .header-title h1 {
+    font-size: 20px;
   }
 
-  .header-title {
-    font-size: 1.5rem;
-  }
-
-  .header-subtitle {
-    font-size: 0.75rem;
-  }
-
-  .placeholder-content {
-    padding: 2rem 1.5rem;
-    min-height: 50vh;
-  }
-
-  .placeholder-icon {
-    font-size: 3rem;
-  }
-
-  .placeholder-title {
-    font-size: 1.5rem;
-  }
-
-  .placeholder-text {
-    font-size: 0.875rem;
-  }
-
-  .feature-list li {
-    font-size: 0.875rem;
+  .header-title p {
+    font-size: 13px;
   }
 }
 
-@media (max-width: 640px) {
-  .header-content {
-    gap: 0.75rem;
+@media (max-width: 768px) {
+  .pipeline-page {
+    padding: 12px;
   }
 
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .header-left {
+    width: 100%;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
   .header-icon {
     width: 40px;
     height: 40px;
-    font-size: 1.25rem;
+    font-size: 20px;
   }
 
-  .header-title {
-    font-size: 1.25rem;
+  .header-title h1 {
+    font-size: 18px;
   }
 
-  .placeholder-content {
-    padding: 1.5rem 1rem;
+  .header-title p {
+    font-size: 12px;
   }
 
-  .placeholder-title {
-    font-size: 1.25rem;
+  .header-actions {
+    flex-direction: column;
   }
 
-  .feature-list {
-    max-width: 100%;
+  .btn {
+    width: 100%;
   }
 }

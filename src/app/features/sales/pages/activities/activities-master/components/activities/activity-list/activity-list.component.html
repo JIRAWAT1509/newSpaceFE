@@ -1,16 +1,17 @@
-<!-- activity-list.component.html -->
+<!-- activity-list.component.html - FULL CHECK-IN INTEGRATED -->
 
 <div class="activity-list-container">
 
   <!-- ==================== ACTIVITY ITEMS ==================== -->
   @for (activity of activities; track activity.id) {
     <div
-      class="activity-item"
-      [class.expanded]="isExpanded(activity.id)"
-      [class.selected]="isSelected(activity.id)"
-      [class.overdue]="isOverdue(activity)"
-      (click)="onActivityClick(activity.id)"
-    >
+  class="activity-item"
+  [attr.data-activity-id]="activity.id"
+  [class.expanded]="isExpanded(activity.id)"
+  [class.selected]="isSelected(activity.id)"
+  [class.overdue]="isOverdue(activity)"
+  (click)="onActivityClick(activity.id)"
+>
 
       <!-- ========== COLLAPSED VIEW ========== -->
       <div class="activity-header">
@@ -136,6 +137,33 @@
             </div>
           }
 
+          <!-- Location -->
+          @if (activity.location) {
+            <div class="detail-section">
+              <h4 class="detail-title">สถานที่</h4>
+              <app-activity-location-map
+                [location]="activity.location"
+                [compact]="true"
+              ></app-activity-location-map>
+            </div>
+          }
+
+          <!-- ✅ NEW: Check-In Section (for activities with location) -->
+          <!-- @if (activity.location && canUpdateStatus(activity)) { -->
+            <div class="checkin-section">
+              <h4 class="detail-title">
+                <i class="pi pi-map-marker"></i>
+                <span>เช็คอิน</span>
+              </h4>
+
+              <app-activity-checkin-button
+                [activity]="activity"
+                [currentUser]="currentUser"
+                (checkInSuccess)="onCheckInSuccess(activity.id)"
+              ></app-activity-checkin-button>
+            </div>
+          <!-- } -->
+
           <!-- Files -->
           @if (activity.files.length > 0) {
             <div class="detail-section">
@@ -236,6 +264,16 @@
                 </button>
               }
 
+               @if (canEdit(activity)) {
+      <button
+        class="btn-action btn-duplicate"
+        (click)="onDuplicate(activity, $event)"
+      >
+        <i class="pi pi-copy"></i>
+        <span>คัดลอก</span>
+      </button>
+    }
+
               @if (canDelete(activity)) {
                 <button
                   class="btn-action btn-delete"
@@ -309,4 +347,12 @@
       </button>
     </div>
   </div>
+}
+
+@if (showDuplicateDialog() && activityToDuplicate()) {
+  <app-activity-duplicate-dialog
+    [activity]="activityToDuplicate()!"
+    (duplicate)="onDuplicateConfirm($event)"
+    (cancel)="closeDuplicateDialog()"
+  ></app-activity-duplicate-dialog>
 }

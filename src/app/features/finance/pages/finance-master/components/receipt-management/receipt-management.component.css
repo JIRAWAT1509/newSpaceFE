@@ -517,3 +517,11 @@
     max-height: 90vh;
   }
 }
+
+@media (max-width: 480px) {
+  .edit-modal-container {
+    width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}

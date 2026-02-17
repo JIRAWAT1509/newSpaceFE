@@ -16,14 +16,17 @@
         *ngFor="let tab of tabs; let i = index"
         class="tab-btn"
         [class.active]="activeTabIndex() === i"
-        [class.completed]="isTabCompleted(i)"
+        [class.completed]="isTabCompleted(i) && activeTabIndex() !== i"
+        [class.incomplete]="isTabIncomplete(i)"
         [disabled]="!canNavigateToTab(i)"
         (click)="goToTab(i)"
       >
         <span class="tab-number">{{ i + 1 }}</span>
         <span class="tab-label">{{ tab.label }}</span>
-        @if (isTabCompleted(i)) {
+        @if (isTabCompleted(i) && activeTabIndex() !== i) {
           <i class="pi pi-check tab-check"></i>
+        } @else if (isTabIncomplete(i)) {
+          <i class="pi pi-exclamation-circle tab-warning"></i>
         }
       </button>
     </div>
@@ -187,6 +190,11 @@
                 <span class="summary-label">ประเภทพื้นที่:</span>
                 <span class="summary-value">{{ getFormValue('areaType') || '-' }}</span>
               </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ค่าเช่า/เดือน (บาท):</span>
+                <span class="summary-value">{{ getFormValue('areaMonthlyRent') || '-' }}</span>
+              </div>
             </div>
 
             <!-- Section D: ข้อมูลผู้ติดต่อ -->
@@ -261,11 +269,6 @@
               <div class="summary-item">
                 <span class="summary-label">ที่อยู่จัดส่งเอกสาร:</span>
                 <span class="summary-value">{{ getContractDetailValue('documentDeliveryAddress') || '-' }}</span>
-              </div>
-
-              <div class="summary-item">
-                <span class="summary-label">เบอร์โทรศัพท์:</span>
-                <span class="summary-value">{{ getContractDetailValue('phone') || '-' }}</span>
               </div>
 
               <div class="summary-item">

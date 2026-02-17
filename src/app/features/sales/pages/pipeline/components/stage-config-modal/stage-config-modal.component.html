@@ -1,0 +1,182 @@
+<!-- stage-config-modal.component.html (UPDATED - LOCK DELETE FOR STAGES WITH DEALS) -->
+
+@if (visible()) {
+  <div class="modal-overlay" (click)="onClose()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="header-content">
+          <h2 class="modal-title">
+            <span class="title-icon">⚙️</span>
+            <span>Configure Pipeline Stages</span>
+          </h2>
+          <p class="modal-subtitle">Customize your sales pipeline stages</p>
+        </div>
+        <button class="btn-close" (click)="onClose()">
+          <span>✕</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+
+        <!-- Stages List -->
+        <div class="stages-list">
+          @for (stage of stages(); track stage.id; let i = $index) {
+            <div
+              class="stage-item"
+              [attr.data-stage-id]="stage.id"
+              draggable="true"
+              (dragstart)="onDragStart(i)"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop(i)"
+              (dragend)="onDragEnd()"
+            >
+              <!-- Drag Handle -->
+              <div class="drag-handle">
+                <span>⋮⋮</span>
+              </div>
+
+              <!-- Stage Order Number -->
+              <div class="stage-order">{{ i + 1 }}</div>
+
+              <!-- Color Picker -->
+              <div class="stage-color">
+                <input
+                  type="color"
+                  [ngModel]="stage.color"
+                  (ngModelChange)="updateStage(i, 'color', $event)"
+                  class="color-input"
+                  title="Stage color"
+                />
+              </div>
+
+              <!-- Stage Name -->
+              <input
+                type="text"
+                pInputText
+                class="stage-name-input"
+                placeholder="Stage name..."
+                [ngModel]="stage.name"
+                (ngModelChange)="updateStage(i, 'name', $event)"
+              />
+
+              <!-- Deal Count Badge -->
+              @if (getDealCount(stage.id) > 0) {
+                <div class="deal-count-badge">
+                  <span class="badge-icon">📊</span>
+                  <span class="badge-count">{{ getDealCount(stage.id) }}</span>
+                </div>
+              }
+
+              <!-- Win Rate -->
+              <div class="stage-win-rate">
+                <p-inputNumber
+                  [ngModel]="stage.forecastWinRate"
+                  (ngModelChange)="updateStage(i, 'forecastWinRate', $event)"
+                  [min]="0"
+                  [max]="100"
+                  [showButtons]="true"
+                  [step]="5"
+                  suffix="%"
+                  placeholder="Win %"
+                  styleClass="compact-input"
+                ></p-inputNumber>
+              </div>
+
+              <!-- Default Due Days -->
+              <div class="stage-due-days">
+                <p-inputNumber
+                  [ngModel]="stage.defaultDueDays"
+                  (ngModelChange)="updateStage(i, 'defaultDueDays', $event)"
+                  [min]="1"
+                  [max]="365"
+                  [showButtons]="true"
+                  suffix="d"
+                  placeholder="Days"
+                  styleClass="compact-input"
+                ></p-inputNumber>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="stage-actions">
+                @if (i > 0) {
+                  <button
+                    class="btn-move-up"
+                    (click)="moveStageUp(i)"
+                    title="Move up"
+                  >
+                    ↑
+                  </button>
+                }
+                @if (i < stages().length - 1) {
+                  <button
+                    class="btn-move-down"
+                    (click)="moveStageDown(i)"
+                    title="Move down"
+                  >
+                    ↓
+                  </button>
+                }
+                @if (canDeleteStage()) {
+                  <button
+                    class="btn-delete"
+                    [class.disabled]="!canDeleteSpecificStage(stage.id)"
+                    [disabled]="!canDeleteSpecificStage(stage.id)"
+                    (click)="deleteStage(i)"
+                    [title]="canDeleteSpecificStage(stage.id)
+                      ? 'Delete stage'
+                      : 'Cannot delete - has ' + getDealCount(stage.id) + ' deal' + (getDealCount(stage.id) > 1 ? 's' : '')"
+                  >
+                    🗑️
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Add Stage Button -->
+        @if (canAddStage()) {
+          <button class="add-stage-btn" (click)="addStage()">
+            <span class="btn-icon">+</span>
+            <span class="btn-label">Add Stage ({{ stages().length }}/7)</span>
+          </button>
+        }
+
+        <!-- Info Box -->
+        <div class="info-box">
+          <span class="info-icon">ℹ️</span>
+          <div class="info-content">
+            <p class="info-title">Pipeline stages:</p>
+            <ul class="info-list">
+              <li>Minimum 5 stages, maximum 7 stages</li>
+              <li>Drag to reorder or use ↑↓ buttons</li>
+              <li>Win rate affects weighted value calculation</li>
+              <li>Due days sets default deadline when deal enters stage</li>
+              <li><strong>⚠️ Stages with deals cannot be deleted</strong></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="onClose()">
+          <span>Cancel</span>
+        </button>
+        <button
+          class="btn-save"
+          (click)="onSave()"
+          [disabled]="!isFormValid()"
+        >
+          <span class="btn-icon">💾</span>
+          <span class="btn-label">Save Configuration</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

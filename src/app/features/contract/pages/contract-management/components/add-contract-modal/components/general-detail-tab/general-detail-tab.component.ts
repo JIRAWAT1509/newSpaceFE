@@ -299,6 +299,14 @@ export class GeneralDetailTabComponent implements OnInit {
           areaTypeControl.setValue(this.mapAreaType(selectedArea.type));
           areaTypeControl.markAsTouched();
         }
+
+        // Auto-fill ค่าเช่า/เดือน (จาก monthlyRent หรือ currentTenant.monthlyRent)
+        const rentControl = this.form().get('areaMonthlyRent');
+        if (rentControl) {
+          const rent = selectedArea.monthlyRent ?? selectedArea.currentTenant?.monthlyRent ?? 0;
+          rentControl.setValue(rent > 0 ? rent.toLocaleString('th-TH') : '-');
+          rentControl.markAsTouched();
+        }
       }
     } else if (field === 'areaBuilding') {
       // เมื่อเลือก building → set label, track ID, and clear dependent fields
@@ -313,10 +321,12 @@ export class GeneralDetailTabComponent implements OnInit {
       const unitControl = this.form().get('areaUnitNumber');
       const totalControl = this.form().get('areaTotal');
       const typeControl = this.form().get('areaType');
+      const rentControl = this.form().get('areaMonthlyRent');
       if (floorControl) floorControl.setValue('');
       if (unitControl) unitControl.setValue('');
       if (totalControl) totalControl.setValue('');
       if (typeControl) typeControl.setValue('');
+      if (rentControl) rentControl.setValue('');
     } else if (field === 'areaFloor') {
       // เมื่อเลือก floor → set label, track ID, and clear unit
       this.selectedFloorId.set(item.value);
@@ -327,9 +337,11 @@ export class GeneralDetailTabComponent implements OnInit {
       const unitControl = this.form().get('areaUnitNumber');
       const totalControl = this.form().get('areaTotal');
       const typeControl = this.form().get('areaType');
+      const rentControl = this.form().get('areaMonthlyRent');
       if (unitControl) unitControl.setValue('');
       if (totalControl) totalControl.setValue('');
       if (typeControl) typeControl.setValue('');
+      if (rentControl) rentControl.setValue('');
     } else {
       if (control) {
         control.setValue(item.label);

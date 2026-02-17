@@ -1,0 +1,130 @@
+/* pipeline-filters.component.css */
+
+.pipeline-filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== SEARCH FILTER ==================== */
+.search-filter {
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-icon {
+  font-size: 20px;
+  color: #9ca3af;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
+}
+
+/* ==================== FILTER DROPDOWNS ==================== */
+.filter-item {
+  min-width: 200px;
+}
+
+::ng-deep .filter-select .p-select {
+  width: 100%;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+::ng-deep .filter-select .p-select:hover {
+  border-color: #d1d5db;
+}
+
+::ng-deep .filter-select .p-select-focused {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ==================== CLEAR BUTTON ==================== */
+.clear-filters-btn {
+  padding: 10px 20px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.clear-filters-btn:hover {
+  background: #f9fafb;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.btn-icon {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.btn-label {
+  font-size: 14px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .pipeline-filters {
+    flex-wrap: wrap;
+  }
+
+  .search-filter {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .filter-item {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pipeline-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-item {
+    width: 100%;
+  }
+
+  .clear-filters-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

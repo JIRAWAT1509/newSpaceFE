@@ -1,0 +1,242 @@
+<!-- deal-detail-modal.component.html (REBUILT WITH CUSTOM OVERLAY) -->
+
+@if (visible()) {
+  <div class="modal-overlay" (click)="onClose()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="header-left">
+          <div class="header-icon">📊</div>
+          <div class="header-title">
+            <h2>{{ deal()!.title }}</h2>
+            <p>{{ deal()!.customerName }} • {{ deal()!.companyName }}</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="action-btn edit-btn" (click)="onEdit()" title="Edit deal">
+            ✏️ Edit
+          </button>
+          <button class="action-btn delete-btn" (click)="onDelete()" title="Delete deal">
+            🗑️ Delete
+          </button>
+          <button class="action-btn close-btn" (click)="onClose()" title="Close">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Stage Navigation -->
+      <div class="stage-navigation">
+        <button
+          class="stage-nav-btn prev-btn"
+          (click)="onMoveToPreviousStage()"
+          [disabled]="!canMoveToPreviousStage()"
+          [title]="previousStage() ? 'Move to ' + previousStage()!.name : 'Cannot move back'"
+        >
+          <span class="btn-icon">←</span>
+          <span class="btn-label">
+            @if (previousStage()) {
+              {{ previousStage()!.name }}
+            } @else {
+              Previous
+            }
+          </span>
+        </button>
+
+        <div class="current-stage-indicator">
+          <span class="stage-icon">📍</span>
+          <span class="stage-text">Current: {{ deal()!.stageName }}</span>
+        </div>
+
+        <button
+          class="stage-nav-btn next-btn"
+          (click)="onMoveToNextStage()"
+          [disabled]="!canMoveToNextStage()"
+          [title]="nextStage() ? 'Move to ' + nextStage()!.name : 'Last stage'"
+        >
+          <span class="btn-label">
+            @if (nextStage()) {
+              {{ nextStage()!.name }}
+            } @else {
+              Next
+            }
+          </span>
+          <span class="btn-icon">→</span>
+        </button>
+      </div>
+
+      <!-- Deal Status Bar -->
+      <div class="deal-status-bar">
+        <div class="status-item">
+          <div class="status-label">Stage</div>
+          <div class="status-value stage-badge" [style.background]="currentStage()?.color">
+            {{ deal()!.stageName }}
+          </div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Value</div>
+          <div class="status-value">{{ formatCurrency(deal()!.value) }}</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Weighted Value</div>
+          <div class="status-value">{{ formatCurrency(deal()!.weightedValue) }}</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Win Rate</div>
+          <div class="status-value">{{ deal()!.actualWinRate }}%</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Priority</div>
+          <div class="status-value">{{ getPriorityBadge(deal()!.priority) }}</div>
+        </div>
+        <div class="status-item">
+          <div class="status-label">Due Date</div>
+          <div class="status-value" [class]="getDueStatus(deal()!.daysUntilDue).class">
+            {{ getDueStatus(deal()!.daysUntilDue).label }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body with Tabs -->
+      <div class="modal-body">
+        <p-tabs [value]="activeTab()" styleClass="deal-tabs">
+          <p-tablist>
+            <p-tab value="0">📋 Overview</p-tab>
+            <p-tab value="1">📍 Area/Location</p-tab>
+            <p-tab value="2">📄 Contract</p-tab>
+            <p-tab value="3">⏱️ Timeline</p-tab>
+            <p-tab value="4">📎 Documents</p-tab>
+          </p-tablist>
+
+          <p-tabpanels>
+            <!-- Overview Tab -->
+            <p-tabpanel value="0">
+              <div class="tab-content">
+                <div class="tab-section">
+                  <h3 class="section-title">
+                    <span class="section-icon">ℹ️</span>
+                    Basic Information
+                  </h3>
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <div class="info-label">Customer</div>
+                      <div class="info-value">{{ deal()!.customerName }}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Company</div>
+                      <div class="info-value">{{ deal()!.companyName || '-' }}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Contact Person</div>
+                      <div class="info-value">{{ deal()!.contactPerson || '-' }}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Phone</div>
+                      <div class="info-value">{{ deal()!.contactPhone || '-' }}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Email</div>
+                      <div class="info-value">{{ deal()!.contactEmail || '-' }}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Owner</div>
+                      <div class="info-value">{{ deal()!.ownerName }}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Created</div>
+                      <div class="info-value">{{ formatDate(deal()!.createdAt) }}</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">Days in Stage</div>
+                      <div class="info-value">{{ deal()!.daysInStage }} days</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-section">
+                  <h3 class="section-title">
+                    <span class="section-icon">🏷️</span>
+                    Tags
+                  </h3>
+                  @if (deal()!.tags && deal()!.tags.length > 0) {
+                    <div class="tags-list">
+                      @for (tag of deal()!.tags; track tag) {
+                        <span class="tag-badge">{{ tag }}</span>
+                      }
+                    </div>
+                  } @else {
+                    <p class="info-value">No tags</p>
+                  }
+                </div>
+
+                <div class="tab-section">
+                  <h3 class="section-title">
+                    <span class="section-icon">📝</span>
+                    Notes
+                  </h3>
+                  <p class="info-value">{{ deal()!.notes || 'No notes added yet' }}</p>
+                </div>
+              </div>
+            </p-tabpanel>
+
+            <!-- Area/Location Tab -->
+            <p-tabpanel value="1">
+              <div class="tab-content">
+                <div class="info-grid">
+                  <div class="info-item">
+                    <div class="info-label">Area</div>
+                    <div class="info-value">{{ deal()!.areaName || '-' }}</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">Building</div>
+                    <div class="info-value">{{ deal()!.buildingName || '-' }}</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">Floor</div>
+                    <div class="info-value">{{ deal()!.floorNumber || '-' }}</div>
+                  </div>
+                </div>
+              </div>
+            </p-tabpanel>
+
+            <!-- Contract Tab -->
+            <p-tabpanel value="2">
+              <div class="tab-content">
+                <p class="info-value">Contract details will be displayed here</p>
+              </div>
+            </p-tabpanel>
+
+            <!-- Timeline Tab -->
+            <p-tabpanel value="3">
+              <div class="tab-content">
+                <div class="activities-list">
+                  @for (activity of activities(); track activity.id) {
+                    <div class="activity-item">
+                      <div class="activity-icon">{{ getActivityIcon(activity.type) }}</div>
+                      <div class="activity-content">
+                        <div class="activity-header">
+                          <span class="activity-user">{{ activity.user }}</span>
+                          <span class="activity-time">{{ formatTimeAgo(activity.timestamp) }}</span>
+                        </div>
+                        <div class="activity-description">{{ activity.description }}</div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </p-tabpanel>
+
+            <!-- Documents Tab -->
+            <p-tabpanel value="4">
+              <div class="tab-content">
+                <p class="info-value">{{ deal()!.attachmentCount || 0 }} attachments</p>
+              </div>
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
+      </div>
+
+    </div>
+  </div>
+}

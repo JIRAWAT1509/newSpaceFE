@@ -249,13 +249,18 @@ export class ContractManagementComponent implements OnInit {
     return typeMap[code] || 'QUOTATION_AGREEMENT';
   }
 
-  /** ยกเลิกใบเสนอราคา/สัญญาจอง/สัญญาเช่า: ลบออกจากรายการทันที */
+  /** ยกเลิกใบเสนอราคา/สัญญาจอง/สัญญาเช่า: เปลี่ยนสถานะเป็น TERMINATED */
   onContractCancelRequest(payload: { contract: Contract; cancelType: CancelType }): void {
     const { contract } = payload;
     const id = contract.CONTRACT_ID;
 
-    // ลบสัญญาออกจากรายการเลย (ไม่แสดงในตารางอีก)
-    this.contractsList.update(list => list.filter(c => c.CONTRACT_ID !== id));
+    // เปลี่ยนสถานะเป็น TERMINATED แทนการลบ (เก็บข้อมูลไว้ เพื่อความสมบูรณ์ของข้อมูล)
+    this.contractsList.update(list =>
+      list.map(c => c.CONTRACT_ID === id
+        ? { ...c, STATUS: 'TERMINATED' as any }
+        : c
+      )
+    );
     this.contractService.saveContracts(this.contractsList());
   }
 }

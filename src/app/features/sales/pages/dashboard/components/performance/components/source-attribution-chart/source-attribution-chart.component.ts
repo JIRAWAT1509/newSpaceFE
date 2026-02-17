@@ -62,7 +62,7 @@ export class SourceAttributionChartComponent implements OnInit {
     }));
 
     this.attributionData.set(processedData);
-    console.log('Source Attribution Data Initialized:', processedData);
+    ////console.log('Source Attribution Data Initialized:', processedData);
   }
 
   // ==================== COMPUTED ====================
@@ -155,10 +155,10 @@ export class SourceAttributionChartComponent implements OnInit {
   onSegmentClick(source: string): void {
     if (this.selectedSource() === source) {
       this.selectedSource.set(null);
-      console.log('Deselected source:', source);
+      ////console.log('Deselected source:', source);
     } else {
       this.selectedSource.set(source);
-      console.log('Selected source:', source, this.getSourceData(source));
+      ////console.log('Selected source:', source, this.getSourceData(source));
     }
   }
 
@@ -243,7 +243,7 @@ export class SourceAttributionChartComponent implements OnInit {
       topSource: this.topSource()
     };
 
-    console.log('Exported Source Attribution Data:', data);
+    ////console.log('Exported Source Attribution Data:', data);
 
     // In production, this could download as JSON file
     const dataStr = JSON.stringify(data, null, 2);
@@ -259,7 +259,7 @@ export class SourceAttributionChartComponent implements OnInit {
 
   // Refresh data (simulate data refresh from backend)
   refreshData(): void {
-    console.log('Refreshing source attribution data...');
+    ////console.log('Refreshing source attribution data...');
     this.initializeData();
   }
 }

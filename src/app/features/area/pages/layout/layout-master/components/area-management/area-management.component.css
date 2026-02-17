@@ -38,3 +38,17 @@
     @apply min-h-[300px];
   }
 }
+
+@media (max-width: 480px) {
+  .area-management-container {
+    @apply gap-2;
+  }
+
+  .floor-plan-section {
+    @apply min-h-[300px];
+  }
+
+  .area-list-section {
+    @apply min-h-[250px];
+  }
+}

@@ -1,0 +1,24 @@
+<!-- pipeline-metrics.component.html (FIXED) -->
+
+<div class="pipeline-metrics">
+
+  @for (card of metricCards(); track card.label) {
+    <div
+      class="metric-card"
+      [class.active]="card.isActive"
+      [class.clickable]="card.filter !== undefined"
+      (click)="card.filter ? onMetricClick(card.filter) : null"
+    >
+      <div class="metric-header">
+        <span class="metric-icon">{{ card.icon }}</span>
+        <span class="metric-label">{{ card.label }}</span>
+      </div>
+      <div class="metric-value">{{ card.value }}</div>
+
+      @if (card.isActive) {
+        <div class="active-indicator"></div>
+      }
+    </div>
+  }
+
+</div>

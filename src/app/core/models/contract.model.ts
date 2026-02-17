@@ -45,7 +45,8 @@ export interface Contract {
   RECORD_DATE?: string;                   // วันที่บันทึก
   APPROVAL_DATE?: string;                 // วันที่อนุมัติ
   INTENTION_LETTER?: string;              // ใบแสดงเจตนา
-  TRANSFER_TO_BOOKING?: string;           // การโอน
+  TRANSFER_TO_BOOKING?: string;           // การโอนไปสัญญาจอง
+  TRANSFER_TO_LEASE?: string;             // การโอนไปสัญญาเช่า
 
   // Provider Section (6 fields)
   CONTRACT_LOCATION: string;              // สถานที่ทำสัญญา

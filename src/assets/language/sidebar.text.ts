@@ -41,8 +41,6 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_finance: 'Finance',
     report_collection: 'Collection',
     dashboard: 'Dashboard',
-    invoices: 'Invoices',
-    finance_receipts: 'Finance Receipts',
 
     // --- Sub-menu Items ---
     view_all_areas: 'View All Areas',
@@ -226,9 +224,6 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_budget: 'งบประมาณ',
     report_finance: 'การเงิน',
     report_collection: 'การจัดเก็บ',
-    dashboard: 'แดชบอร์ด',
-    invoices: 'ใบแจ้งหนี้',
-    finance_receipts: 'ใบเสร็จการเงิน',
 
     // --- Sub-menu Items ---
     view_all_areas: 'ดูพื้นที่ทั้งหมด',
@@ -343,6 +338,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     budget_alerts: 'แจ้งเตือนงบประมาณ',
     budget_settings: 'ตั้งค่างบประมาณ',
     main_dashboard: 'แดชบอร์ดหลัก',
+    dashboard: 'แดชบอร์ด',
     quick_stats: 'สถิติเร็ว',
     recent_activity: 'กิจกรรมล่าสุด',
     notifications: 'การแจ้งเตือน',

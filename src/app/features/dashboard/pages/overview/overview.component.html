@@ -199,17 +199,23 @@
       </div>
     </div>
 
-    <!-- Right: Donut + Bars + Performance table -->
-    <div class="exec-right-stack">
-      <div class="exec-card exec-card-sm exec-card-occupancy">
-        <div class="exec-mini-title">Occupancy by Business Type</div>
-        <div class="exec-occupancy-chart exec-chart-horizontal">
-          <div class="exec-donut-wrap-center">
+    <!-- Right: 2-column widget grid -->
+    <div class="exec-right-grid">
+      <!-- Widget 1: Occupancy Donut -->
+      <div class="exec-card exec-widget exec-card-occupancy">
+        <div class="exec-widget-header">
+          <div class="exec-widget-icon exec-widget-icon--indigo">
+            <i class="pi pi-chart-pie"></i>
+          </div>
+          <div class="exec-widget-title">Occupancy by Business Type</div>
+        </div>
+        <div class="exec-widget-body exec-widget-body--center">
+          <div class="exec-donut-wrap-widget">
             <canvas #occupancyDonutChart></canvas>
           </div>
-          <div class="exec-legend-horizontal">
+          <div class="exec-legend-widget">
             @for (seg of occupancyByBusinessType; track seg.type; let i = $index) {
-              <div class="exec-legend-item-h">
+              <div class="exec-legend-item-w">
                 <span class="exec-legend-dot" [style.background]="occupancyPalette[i]"></span>
                 <span class="exec-legend-label">{{ seg.type }}</span>
               </div>
@@ -218,43 +224,63 @@
         </div>
       </div>
 
-      <div class="exec-card exec-card-sm exec-card-portfolio">
-        <div class="exec-portfolio-header">
-          <div class="exec-mini-title">Portfolio by Business Type</div>
-          <div class="exec-mini-subtitle">Mix &amp; Occupancy</div>
+      <!-- Widget 2: Portfolio Mix — radial gauge cards -->
+      <div class="exec-card exec-widget exec-card-portfolio">
+        <div class="exec-widget-header">
+          <div class="exec-widget-icon exec-widget-icon--cyan">
+            <i class="pi pi-objects-column"></i>
+          </div>
+          <div class="exec-widget-title">Portfolio Mix &amp; Occupancy</div>
         </div>
-        <div class="exec-bars">
-          @for (mix of portfolioMix; track mix.type; let i = $index) {
-            <div class="exec-bar-row">
-              <div class="exec-bar-label">{{ mix.type }}</div>
-              <div class="exec-bar-track">
-                <div class="exec-bar-fill" [style.width.%]="mix.percent" [style.background]="portfolioBarPalette[i]"></div>
+        <div class="exec-widget-body">
+          <div class="portfolio-card-grid">
+            @for (mix of portfolioMix; track mix.type; let i = $index) {
+              <div class="portfolio-item-card">
+                <div class="portfolio-ring-wrap">
+                  <svg viewBox="0 0 36 36" class="portfolio-ring-svg">
+                    <path
+                      class="portfolio-ring-bg"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="portfolio-ring-fill"
+                      [style.stroke]="portfolioBarPalette[i]"
+                      [attr.stroke-dasharray]="mix.percent + ', 100'"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <div class="portfolio-ring-pct">{{ mix.percent }}%</div>
+                </div>
+                <div class="portfolio-item-label">{{ mix.type }}</div>
               </div>
-              <div class="exec-bar-val">{{ mix.percent }}%</div>
-            </div>
-          }
+            }
+          </div>
         </div>
       </div>
 
-      <div class="exec-card exec-card-sm">
-        <div class="exec-mini-title">Building Performance Analytics</div>
-        <div class="exec-table">
-          <div class="exec-table-head">
-            <div class="exec-col-asset">ASSET</div>
-            <div class="exec-col-occ">OCC.</div>
-            <div class="exec-col-trend">TREND</div>
+      <!-- Widget 3: Building Performance (spans full width) -->
+      <div class="exec-card exec-widget exec-widget--full">
+        <div class="exec-widget-header">
+          <div class="exec-widget-icon exec-widget-icon--emerald">
+            <i class="pi pi-building"></i>
           </div>
-          @for (row of buildingPerformance; track row.assetName) {
-            <div class="exec-table-row">
-              <div class="exec-col-asset">{{ row.assetName }}</div>
-              <div class="exec-col-occ">{{ row.occupancy }}%</div>
-              <div class="exec-col-trend">
+          <div class="exec-widget-title">Building Performance Analytics</div>
+        </div>
+        <div class="exec-widget-body">
+          <div class="exec-perf-grid">
+            @for (row of buildingPerformance; track row.assetName) {
+              <div class="exec-perf-card">
+                <div class="exec-perf-name">{{ row.assetName }}</div>
+                <div class="exec-perf-occ">{{ row.occupancy }}%</div>
+                <div class="exec-perf-bar-track">
+                  <div class="exec-perf-bar-fill" [style.width.%]="row.occupancy" [ngClass]="'exec-perf-fill--' + row.trend.toLowerCase()"></div>
+                </div>
                 <span class="exec-trend-pill" [class]="getBuildingTrendClass(row.trend)">
                   {{ row.trend }}
                 </span>
               </div>
-            </div>
-          }
+            }
+          </div>
         </div>
       </div>
     </div>
@@ -262,13 +288,18 @@
   <!-- ==================== DEEP DIVE + RIGHT COLUMN ==================== -->
   <div class="exec-deep-grid">
     <!-- Left: Building Performance Deep-Dive -->
-    <div class="exec-card exec-card-deep">
-      <div class="exec-deep-head">
-        <div>
-          <div class="exec-card-title">Building Performance Deep-Dive</div>
-          <div class="exec-deep-sub">Asset: {{ selectedAsset }}</div>
+    <div class="exec-card exec-card-deep deep-v2">
+      <!-- Deep-dive header -->
+      <div class="deep-v2-head">
+        <div class="deep-v2-head-left">
+          <div class="deep-v2-icon">
+            <i class="pi pi-search"></i>
+          </div>
+          <div>
+            <div class="deep-v2-title">Building Performance Deep-Dive</div>
+            <div class="deep-v2-sub">Asset: {{ selectedAsset }}</div>
+          </div>
         </div>
-
         <div class="exec-asset-select">
           <div class="exec-select-wrap">
             <select
@@ -286,16 +317,23 @@
         </div>
       </div>
 
-      <div class="exec-deep-body">
-        <div class="exec-deep-left">
-          <div class="exec-mini-title">Revenue Mix by Segment</div>
-          <div class="exec-revenue-mix-chart exec-chart-horizontal">
-            <div class="exec-donut-wrap-center exec-donut-lg">
+      <!-- Deep-dive body: 3-column layout -->
+      <div class="deep-v2-body">
+        <!-- Col 1: Revenue Mix Donut (same style as Occupancy widget) -->
+        <div class="deep-v2-section deep-v2-donut-section">
+          <div class="deep-v2-section-head">
+            <div class="deep-v2-section-icon deep-v2-section-icon--violet">
+              <i class="pi pi-chart-pie"></i>
+            </div>
+            <div class="deep-v2-section-title">Revenue Mix by Segment</div>
+          </div>
+          <div class="deep-v2-donut-content">
+            <div class="exec-donut-wrap-widget">
               <canvas #deepDiveDonutChart></canvas>
             </div>
-            <div class="exec-legend-horizontal">
+            <div class="exec-legend-widget">
               @for (seg of deepDiveRevenueMix; track seg.type; let i = $index) {
-                <div class="exec-legend-item-h">
+                <div class="exec-legend-item-w">
                   <span class="exec-legend-dot" [style.background]="deepDivePalette[i]"></span>
                   <span class="exec-legend-label">{{ seg.type }}</span>
                 </div>
@@ -304,67 +342,134 @@
           </div>
         </div>
 
-        <div class="exec-deep-mid">
-          <div class="exec-mini-title">Performance Index vs Last Year</div>
+        <!-- Col 2: Performance Index Chart -->
+        <div class="deep-v2-section deep-v2-chart-section">
+          <div class="deep-v2-section-head">
+            <div class="deep-v2-section-icon deep-v2-section-icon--blue">
+              <i class="pi pi-chart-bar"></i>
+            </div>
+            <div class="deep-v2-section-title">Performance Index vs Last Year</div>
+          </div>
           <div class="exec-chart-wrap exec-chart-mid">
             <canvas #performanceIndexChart></canvas>
           </div>
+        </div>
 
-          <div class="exec-card exec-card-inset">
-            <div class="exec-portfolio-header">
-              <div class="exec-mini-title">Portfolio by Business Type</div>
-              <div class="exec-mini-subtitle">Mix &amp; Occupancy</div>
+        <!-- Col 3 (below chart): Portfolio by Business Type radial cards -->
+        <div class="deep-v2-section deep-v2-portfolio-section">
+          <div class="deep-v2-section-head">
+            <div class="deep-v2-section-icon deep-v2-section-icon--teal">
+              <i class="pi pi-objects-column"></i>
             </div>
-            <div class="exec-bars compact">
-              @for (mix of deepDivePortfolioMix; track mix.type; let i = $index) {
-                <div class="exec-bar-row">
-                  <div class="exec-bar-label">{{ mix.type }}</div>
-                  <div class="exec-bar-track">
-                    <div class="exec-bar-fill" [style.width.%]="mix.percent" [style.background]="portfolioBarPalette[i]"></div>
-                  </div>
-                  <div class="exec-bar-val">{{ mix.percent }}%</div>
+            <div>
+              <div class="deep-v2-section-title">Portfolio by Business Type</div>
+              <div class="deep-v2-section-sub">Mix &amp; Occupancy</div>
+            </div>
+          </div>
+          <div class="deep-v2-portfolio-grid">
+            @for (mix of deepDivePortfolioMix; track mix.type; let i = $index) {
+              <div class="deep-v2-portfolio-card">
+                <div class="portfolio-ring-wrap portfolio-ring-wrap--sm">
+                  <svg viewBox="0 0 36 36" class="portfolio-ring-svg">
+                    <path
+                      class="portfolio-ring-bg"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="portfolio-ring-fill"
+                      [style.stroke]="portfolioBarPalette[i]"
+                      [attr.stroke-dasharray]="mix.percent + ', 100'"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <div class="portfolio-ring-pct portfolio-ring-pct--sm">{{ mix.percent }}%</div>
                 </div>
-              }
-            </div>
+                <div class="deep-v2-portfolio-label">{{ mix.type }}</div>
+              </div>
+            }
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Right column cards -->
-    <div class="exec-right-col">
-      <div class="exec-card exec-card-side exec-card-sales">
-        <div class="exec-card-title">Sales Team vs. Budget</div>
-        <div class="exec-side-list">
-          @for (person of salesTeamPerformance; track person.name) {
-            <div class="exec-side-row" [ngClass]="getSalesRowClass(person.percent)">
-              <div class="exec-side-name">{{ person.name }}</div>
-              <div class="exec-side-track">
-                <div class="exec-side-fill" [style.width.%]="person.percent > 100 ? 100 : person.percent"></div>
-              </div>
-              <div class="exec-side-pct">{{ person.percent }}%</div>
-            </div>
-          }
+    <!-- Right column: redesigned widget cards -->
+    <div class="exec-right-col-v2">
+      <!-- Sales Team vs. Budget — individual cards -->
+      <div class="exec-card exec-widget exec-widget-sales">
+        <div class="exec-widget-header">
+          <div class="exec-widget-icon exec-widget-icon--rose">
+            <i class="pi pi-users"></i>
+          </div>
+          <div class="exec-widget-title">Sales Team vs. Budget</div>
         </div>
-        <button type="button" class="exec-side-btn">VIEW LEADERBOARD</button>
+        <div class="exec-widget-body">
+          <div class="sales-card-grid">
+            @for (person of salesTeamPerformance; track person.name) {
+              <div class="sales-person-card" [ngClass]="getSalesRowClass(person.percent)">
+                <div class="sales-person-avatar">
+                  <i class="pi pi-user"></i>
+                </div>
+                <div class="sales-person-name">{{ person.name }}</div>
+                <div class="sales-person-pct">{{ person.percent }}%</div>
+                <div class="sales-person-ring">
+                  <svg viewBox="0 0 36 36" class="sales-ring-svg">
+                    <path
+                      class="sales-ring-bg"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="sales-ring-fill"
+                      [attr.stroke-dasharray]="(person.percent > 100 ? 100 : person.percent) + ', 100'"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                </div>
+                <div class="sales-person-status">
+                  @if (person.percent >= 100) {
+                    <span class="sales-badge sales-badge--over"><i class="pi pi-arrow-up"></i> Over</span>
+                  } @else if (person.percent >= 90) {
+                    <span class="sales-badge sales-badge--track"><i class="pi pi-check"></i> On Track</span>
+                  } @else {
+                    <span class="sales-badge sales-badge--risk"><i class="pi pi-exclamation-triangle"></i> At Risk</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          <button type="button" class="exec-leaderboard-btn">
+            <i class="pi pi-trophy"></i>
+            VIEW LEADERBOARD
+          </button>
+        </div>
       </div>
 
-      <div class="exec-card exec-card-side exec-card-aging">
-        <div class="exec-card-title">Revenue Collection Aging</div>
-        <div class="exec-aging-list">
-          @for (bucket of collectionAging; track bucket.bucket; let i = $index) {
-            <div class="exec-aging-row">
-              <div class="exec-aging-label">{{ bucket.bucket }}</div>
-              <div class="exec-aging-track">
-                <div
-                  class="exec-aging-fill"
-                  [style.width.%]="maxAgingAmount ? (bucket.amount / maxAgingAmount) * 100 : 0"
-                  [style.background]="agingBarPalette[i]"
-                ></div>
+      <!-- Revenue Collection Aging — individual cards -->
+      <div class="exec-card exec-widget exec-widget-aging">
+        <div class="exec-widget-header">
+          <div class="exec-widget-icon exec-widget-icon--amber">
+            <i class="pi pi-clock"></i>
+          </div>
+          <div class="exec-widget-title">Revenue Collection Aging</div>
+        </div>
+        <div class="exec-widget-body">
+          <div class="aging-card-grid">
+            @for (bucket of collectionAging; track bucket.bucket; let i = $index) {
+              <div class="aging-bucket-card">
+                <div class="aging-bucket-icon" [style.background]="agingBarPalette[i]">
+                  <i class="pi pi-wallet"></i>
+                </div>
+                <div class="aging-bucket-label">{{ bucket.bucket }}</div>
+                <div class="aging-bucket-amount">{{ formatMoney(bucket.amount) }}</div>
+                <div class="aging-bucket-bar-track">
+                  <div
+                    class="aging-bucket-bar-fill"
+                    [style.width.%]="maxAgingAmount ? (bucket.amount / maxAgingAmount) * 100 : 0"
+                    [style.background]="agingBarPalette[i]"
+                  ></div>
+                </div>
               </div>
-              <div class="exec-aging-val">{{ formatMoney(bucket.amount) }}</div>
-            </div>
-          }
+            }
+          </div>
         </div>
       </div>
     </div>

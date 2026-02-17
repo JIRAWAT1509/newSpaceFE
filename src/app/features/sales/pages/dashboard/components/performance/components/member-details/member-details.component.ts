@@ -69,12 +69,12 @@ export class MemberDetailsComponent {
   }
 
   onActivityClick(activityId: string): void {
-    console.log('Activity clicked:', activityId);
+    ////console.log('Activity clicked:', activityId);
     // Handle activity click if needed
   }
 
   onDayClick(date: DateTime): void {
-    console.log('Day clicked:', date.toISO());
+    ////console.log('Day clicked:', date.toISO());
     // Handle day click if needed
   }
 

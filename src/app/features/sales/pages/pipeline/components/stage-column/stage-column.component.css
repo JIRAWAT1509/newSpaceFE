@@ -1,0 +1,235 @@
+/* stage-column.component.css (FIXED - NO HOVER HIGHLIGHT) */
+
+/* ==================== COLUMN CONTAINER ==================== */
+.stage-column {
+  flex: 0 0 270px; /* Width: Reduced from 320px to fit 5 columns */
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  height: 680px; /* Fixed height = header + 3 cards + pagination */
+  min-height: 680px; /* Ensure minimum height */
+  max-height: 680px; /* Ensure maximum height */
+}
+
+/* ==================== STAGE HEADER ==================== */
+.stage-header {
+  padding: 14px;
+  border-bottom: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0; /* Don't shrink header */
+}
+
+.stage-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.stage-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stage-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.stage-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.stage-count {
+  background: #e5e7eb;
+  color: #6b7280;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stage-settings-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.stage-settings-btn:hover {
+  background: #f3f4f6;
+}
+
+/* ==================== STAGE METRICS ==================== */
+.stage-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.metric-value {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 700;
+}
+
+/* ==================== SORT SELECTOR ==================== */
+.stage-sort {
+  width: 100%;
+}
+
+::ng-deep .sort-select {
+  width: 100%;
+}
+
+::ng-deep .sort-select .p-select {
+  width: 100%;
+}
+
+::ng-deep .sort-select .p-select-label {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+/* ==================== DEALS LIST (SCROLLABLE AREA) ==================== */
+.deals-list {
+  position: relative;
+  flex: 1; /* Take remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0; /* Critical: Allow flex item to shrink below content size */
+  max-height: 470px; /* Fixed height for exactly 3 cards + gaps + padding */
+}
+
+/* Custom scrollbar */
+.deals-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.deals-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.deals-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.deals-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Drop zone highlight - ONLY when drag-over class is present */
+.deals-list.drag-over {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 3px dashed #3b82f6;
+  border-radius: 8px;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ==================== PAGINATION ==================== */
+/* Pagination component stays at bottom */
+/* Height is controlled by pagination component itself (~100px) */
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .stage-column {
+    flex: 0 0 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stage-column {
+    flex: 0 0 260px;
+    height: 600px; /* Shorter on mobile */
+    min-height: 600px;
+    max-height: 600px;
+  }
+
+  .deals-list {
+    max-height: 390px; /* Adjusted for mobile */
+  }
+
+  .stage-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==================== DROP ZONE ANIMATION ==================== */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* "Drop here" indicator - ONLY shown when drag-over */
+.deals-list.drag-over::before {
+  content: 'Drop here';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #3b82f6;
+  font-size: 18px;
+  font-weight: 700;
+  pointer-events: none;
+  animation: pulse 1s infinite;
+  z-index: 10;
+}

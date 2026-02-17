@@ -110,7 +110,7 @@
     <div class="actions-right">
       <button class="action-btn add-btn" (click)="openAddModal()">
         <i class="pi pi-plus"></i>
-        <span>สร้างใบเสนอราคา</span>
+        <span>{{ getAddButtonLabel() }}</span>
       </button>
     </div>
   </div>
@@ -169,7 +169,7 @@
           <th>ประเภทสัญญา</th>
           <th>วันเริ่มต้นสัญญา</th>
           <th>วันสิ้นสุดสัญญา</th>
-          <th>เลขที่สัญญาจอง</th>
+          <th>{{ getReferenceNumberColumnLabel() }}</th>
           <th>รหัสลูกค้า</th>
           <th class="actions-col"></th>
         </tr>
@@ -188,11 +188,30 @@
               <div class="contract-number-cell">
                 <div
                   class="status-dot"
+                  [class.status-dot--transferred]="!!item.TRANSFER_TO_BOOKING || !!item.TRANSFER_TO_LEASE"
                   [style.background-color]="getStatusDotColor(item)"
                 ></div>
                 <div class="contract-info">
                   <div class="contract-number">{{ item.CONTRACT_NUMBER }}</div>
-                  <div class="company-name">{{ item.TENANT_NAME_TH }}</div>
+                  <div class="company-name">{{ item.TENANT_NAME_TH || 'N/A' }}</div>
+                  @if (item.TRANSFER_TO_BOOKING) {
+                    <div class="transferred-badge">
+                      <i class="pi pi-check-circle"></i>
+                      โอนเป็นสัญญาจองแล้ว
+                    </div>
+                  }
+                  @if (item.TRANSFER_TO_LEASE) {
+                    <div class="transferred-badge">
+                      <i class="pi pi-check-circle"></i>
+                      โอนเป็นสัญญาเช่าแล้ว
+                    </div>
+                  }
+                  @if (item.STATUS === 'TERMINATED') {
+                    <div class="terminated-badge">
+                      <i class="pi pi-times-circle"></i>
+                      ยกเลิกแล้ว
+                    </div>
+                  }
                 </div>
               </div>
             </td>
@@ -208,45 +227,63 @@
 
               @if (activeRowMenu() === item.CONTRACT_ID) {
                 <div class="row-actions-menu">
-                  <!-- ทุกประเภท (ตามรูป: ไอคอนดินสอ + คัดลอก) -->
-                  <button class="menu-item" (click)="onRowAction('edit', item)">
-                    <i class="pi pi-pencil"></i>
-                    <span>แก้ไขข้อมูล</span>
-                  </button>
+                  <!-- แก้ไข: เฉพาะสัญญาที่ยังไม่ถูกโอนหรือยกเลิก -->
+                  @if (!isContractLocked(item)) {
+                    <button class="menu-item" (click)="onRowAction('edit', item)">
+                      <i class="pi pi-pencil"></i>
+                      <span>แก้ไขข้อมูล</span>
+                    </button>
+                  }
                   <button class="menu-item" (click)="onRowAction('copy-contract', item)">
                     <i class="pi pi-copy"></i>
                     <span>{{ getCopyContractLabel() }}</span>
                   </button>
 
-                  <!-- ใบเสนอราคา (ตามรูป: แก้ไข, คัดลอก, คัดลอกไปเป็นสัญญาจอง, ยกเลิกและภาคผนวก) -->
+                  <!-- ใบเสนอราคา -->
                   @if (contractType() === 'quotation') {
-                    <button class="menu-item" (click)="onRowAction('transfer-to-booking', item)">
-                      <i class="pi pi-copy"></i>
-                      <span>คัดลอกใบเสนอราคาไปเป็นสัญญาจอง</span>
-                    </button>
-                    <button class="menu-item" (click)="onRowAction('cancel-quotation', item)">
-                      <i class="pi pi-file-plus"></i>
-                      <span>ยกเลิกใบเสนอราคาและภาคผนวก</span>
-                    </button>
+                    @if (!isContractLocked(item)) {
+                      <button class="menu-item" (click)="onRowAction('transfer-to-booking', item)">
+                        <i class="pi pi-arrow-right-arrow-left"></i>
+                        <span>โอนเป็นสัญญาจอง</span>
+                      </button>
+                      <button class="menu-item menu-item--danger" (click)="onRowAction('cancel-quotation', item)">
+                        <i class="pi pi-times-circle"></i>
+                        <span>ยกเลิกใบเสนอราคา</span>
+                      </button>
+                    }
+                    @if (item.TRANSFER_TO_BOOKING) {
+                      <button class="menu-item menu-item--disabled" disabled>
+                        <i class="pi pi-check-circle"></i>
+                        <span>โอนเป็นสัญญาจองแล้ว</span>
+                      </button>
+                    }
                   }
 
-                  <!-- สัญญาจอง (ตามรูป: แก้ไข, คัดลอก, คัดลอกไปเป็นใบเสนอราคา, โอนเป็นสัญญาเช่า, ยกเลิกและภาคผนวก) -->
+                  <!-- สัญญาจอง -->
                   @if (contractType() === 'booking') {
                     <button class="menu-item" (click)="onRowAction('copy-booking-to-quotation', item)">
                       <i class="pi pi-copy"></i>
                       <span>คัดลอกสัญญาจองไปเป็นใบเสนอราคา</span>
                     </button>
-                    <button class="menu-item" (click)="onRowAction('transfer-to-lease', item)">
-                      <i class="pi pi-arrow-right-arrow-left"></i>
-                      <span>โอนเป็นสัญญาเช่า</span>
-                    </button>
-                    <button class="menu-item" (click)="onRowAction('cancel-booking', item)">
-                      <i class="pi pi-file-plus"></i>
-                      <span>ยกเลิกสัญญาจองและภาคผนวก</span>
-                    </button>
+                    @if (!isContractLocked(item)) {
+                      <button class="menu-item" (click)="onRowAction('transfer-to-lease', item)">
+                        <i class="pi pi-arrow-right-arrow-left"></i>
+                        <span>โอนเป็นสัญญาเช่า</span>
+                      </button>
+                      <button class="menu-item menu-item--danger" (click)="onRowAction('cancel-booking', item)">
+                        <i class="pi pi-times-circle"></i>
+                        <span>ยกเลิกสัญญาจอง</span>
+                      </button>
+                    }
+                    @if (item.TRANSFER_TO_LEASE) {
+                      <button class="menu-item menu-item--disabled" disabled>
+                        <i class="pi pi-check-circle"></i>
+                        <span>โอนเป็นสัญญาเช่าแล้ว</span>
+                      </button>
+                    }
                   }
 
-                  <!-- สัญญาเช่า (ตามตัวอย่าง) -->
+                  <!-- สัญญาเช่า -->
                   @if (contractType() === 'lease') {
                     <button class="menu-item" (click)="onRowAction('copy-to-booking', item)">
                       <i class="pi pi-copy"></i>
@@ -256,10 +293,12 @@
                       <i class="pi pi-copy"></i>
                       <span>คัดลอกสัญญาเช่าไปเป็นใบเสนอราคา</span>
                     </button>
-                    <button class="menu-item" (click)="onRowAction('addendum', item)">
-                      <i class="pi pi-file-plus"></i>
-                      <span>ยกเลิกสัญญาและภาคผนวก</span>
-                    </button>
+                    @if (!isContractLocked(item)) {
+                      <button class="menu-item menu-item--danger" (click)="onRowAction('cancel-lease', item)">
+                        <i class="pi pi-times-circle"></i>
+                        <span>ยกเลิกสัญญาเช่า</span>
+                      </button>
+                    }
                   }
                 </div>
               }
@@ -331,12 +370,16 @@
   (cancel)="onConfirmModalCancel()"
 />
 
-<!-- Decline Info Modal (เด้งตอนกดยกเลิกสัญญา ให้กรอกเหตุผล) -->
-<app-decline-info-modal
-  [isOpen]="showDeclineModal()"
-  [contractNumber]="declineContractNumber()"
-  [quotationNumber]="declineQuotationNumber()"
-  [customerName]="declineCustomerName()"
-  (confirm)="onDeclineConfirm($event)"
-  (cancel)="onDeclineCancel()"
+<!-- Cancel Contract Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showCancelConfirm()"
+  type="danger"
+  [title]="cancelConfirmTitle()"
+  [message]="cancelConfirmMessage()"
+  confirmText="ยืนยันยกเลิก"
+  cancelText="ไม่ยกเลิก"
+  confirmIcon="pi-trash"
+  (confirm)="onCancelConfirm()"
+  (cancel)="onCancelDismiss()"
 />
+

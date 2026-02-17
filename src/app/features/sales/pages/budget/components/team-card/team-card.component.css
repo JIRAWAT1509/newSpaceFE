@@ -1,0 +1,284 @@
+/* team-card.component.css */
+
+.team-card {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.team-card.expanded {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+/* ==================== TEAM HEADER ==================== */
+.team-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.team-header:hover {
+  background: #f3f4f6;
+}
+
+.team-card.expanded .team-header {
+  background: #eff6ff;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* ==================== EXPAND ICON ==================== */
+.expand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: #6b7280;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.expand-icon i {
+  font-size: 0.875rem;
+}
+
+.expand-icon.rotated {
+  transform: rotate(90deg);
+}
+
+/* ==================== TEAM INFO ==================== */
+.team-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.team-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.team-leader {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.team-leader i {
+  font-size: 0.75rem;
+}
+
+/* ==================== TEAM BUDGET ==================== */
+.team-budget {
+  flex: 2;
+  min-width: 0;
+}
+
+/* ==================== TEAM ACTIONS ==================== */
+.team-actions {
+  display: flex;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.icon-btn:active {
+  transform: translateY(0);
+}
+
+.icon-btn.danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.icon-btn i {
+  font-size: 0.875rem;
+}
+
+/* ==================== MEMBERS SECTION ==================== */
+.members-section {
+  padding: 1.25rem;
+  background: white;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+/* ==================== MEMBERS HEADER ==================== */
+.members-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.members-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.members-title i {
+  font-size: 0.875rem;
+}
+
+.btn-add-member {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-member:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-add-member:active {
+  transform: translateY(0);
+}
+
+.btn-add-member i {
+  font-size: 0.75rem;
+}
+
+/* ==================== MEMBERS LIST ==================== */
+.members-list {
+  /* Member cards have their own spacing */
+}
+
+.no-members {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+}
+
+.no-members i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+.no-members p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .team-header {
+    flex-wrap: wrap;
+  }
+
+  .team-budget {
+    flex: 1 1 100%;
+    order: 3;
+  }
+
+  .team-actions {
+    order: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .team-card {
+    margin-bottom: 0.75rem;
+  }
+
+  .team-header {
+    padding: 0.875rem;
+  }
+
+  .team-name {
+    font-size: 0.9375rem;
+  }
+
+  .team-leader {
+    font-size: 0.75rem;
+  }
+
+  .members-section {
+    padding: 1rem;
+  }
+
+  .members-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .btn-add-member {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .team-actions {
+    flex-wrap: wrap;
+  }
+
+  .icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .icon-btn i {
+    font-size: 0.75rem;
+  }
+}

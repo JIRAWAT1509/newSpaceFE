@@ -1,0 +1,348 @@
+/* team-column.component.css */
+
+/* ==================== COLUMN CONTAINER ==================== */
+.team-column {
+  flex: 0 0 300px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  height: 875px;
+  min-height: 875px;
+  max-height: 875px;
+}
+
+/* ==================== TEAM HEADER ==================== */
+.team-header {
+  padding: 14px;
+  border-bottom: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
+}
+
+.team-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.team-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.team-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #374151;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-count {
+  background: #e5e7eb;
+  color: #6b7280;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.team-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.team-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+  padding: 0;
+  color: #6b7280;
+}
+
+.team-action-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.team-action-btn.danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.team-action-btn i {
+  font-size: 14px;
+}
+
+/* Team Leader */
+.team-leader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.team-leader i {
+  font-size: 12px;
+}
+
+/* Team Budget */
+.team-budget {
+  margin-bottom: 12px;
+}
+
+/* ==================== SORT SELECTOR ==================== */
+.team-sort {
+  width: 100%;
+}
+
+::ng-deep .sort-select {
+  width: 100%;
+}
+
+::ng-deep .sort-select .p-select {
+  width: 100%;
+}
+
+::ng-deep .sort-select .p-select-label {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+/* ==================== MEMBERS LIST (SCROLLABLE AREA) ==================== */
+.members-list {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  max-height: 1000px;
+}
+
+/* Custom scrollbar */
+.members-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.members-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.members-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.members-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Drop zone highlight */
+.members-list.drag-over {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 3px dashed #3b82f6;
+  border-radius: 8px;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.btn-add-first {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-first:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-add-first i {
+  font-size: 12px;
+}
+
+/* ==================== ADD MEMBER SECTION ==================== */
+.add-member-section {
+  padding: 10px;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  flex-shrink: 0;
+}
+
+.btn-add-member {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-member:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-add-member i {
+  font-size: 12px;
+}
+
+/* ==================== DROP ZONE ANIMATION ==================== */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.members-list.drag-over::before {
+  content: 'Drop here';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #3b82f6;
+  font-size: 18px;
+  font-weight: 700;
+  pointer-events: none;
+  animation: pulse 1s infinite;
+  z-index: 10;
+}
+/* ==================== UNALLOCATED BUDGET CARD ==================== */
+.unallocated-budget-card {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px dashed #f59e0b;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.unallocated-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unallocated-icon {
+  font-size: 24px;
+}
+
+.unallocated-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.unallocated-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #b45309;
+  text-align: center;
+  padding: 4px 0;
+}
+
+.unallocated-hint {
+  font-size: 12px;
+  color: #92400e;
+  text-align: center;
+  opacity: 0.8;
+}
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .team-column {
+    flex: 0 0 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .team-column {
+    flex: 0 0 260px;
+    height: 600px;
+    min-height: 600px;
+    max-height: 600px;
+  }
+
+  .members-list {
+    max-height: 320px;
+  }
+}

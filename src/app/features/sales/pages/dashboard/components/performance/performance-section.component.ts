@@ -126,7 +126,7 @@ export class PerformanceSectionComponent implements OnInit {
       this.salesActivities.set([...MOCK_SALES_ACTIVITIES]);
 
       this.isLoading.set(false);
-      console.log('Performance data loaded');
+      ////console.log('Performance data loaded');
     }, 800);
   }
 
@@ -182,7 +182,7 @@ export class PerformanceSectionComponent implements OnInit {
       });
 
       this.isMonteCarloRunning.set(false);
-      console.log('Monte Carlo simulation completed');
+      ////console.log('Monte Carlo simulation completed');
     }, 2500);
   }
 

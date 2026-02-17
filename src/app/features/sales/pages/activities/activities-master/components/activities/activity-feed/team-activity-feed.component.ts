@@ -1,5 +1,5 @@
-// team-activity-feed.component.ts
-import { Component, Input, Output, EventEmitter, OnInit, signal, effect } from '@angular/core';
+// team-activity-feed.component.ts - FIXED
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DateTime } from 'luxon';
 import { TeamActivityFeedItem } from '@core/data/activities.mock';
@@ -11,16 +11,16 @@ import { TeamActivityFeedItem } from '@core/data/activities.mock';
   templateUrl: './team-activity-feed.component.html',
   styleUrl: './team-activity-feed.component.css'
 })
-export class TeamActivityFeedComponent implements OnInit {
+export class TeamActivityFeedComponent implements OnInit, OnDestroy, OnChanges {
 
   // ==================== EXPOSE DateTime TO TEMPLATE ====================
   protected readonly DateTime = DateTime;
 
   // ==================== INPUTS ====================
   @Input() feedItems: TeamActivityFeedItem[] = [];
-  @Input() maxItems: number = 10;
+  @Input() initialDisplayCount: number = 10;
   @Input() autoRefresh: boolean = true;
-  @Input() refreshInterval: number = 30000; // 30 seconds
+  @Input() refreshInterval: number = 30000;
 
   // ==================== OUTPUTS ====================
   @Output() activityClick = new EventEmitter<string>();
@@ -29,14 +29,52 @@ export class TeamActivityFeedComponent implements OnInit {
   // ==================== SIGNALS ====================
   isLoading = signal<boolean>(false);
   lastRefreshTime = signal<DateTime>(DateTime.now());
+  isExpanded = signal<boolean>(false);
+
+  // ✅ NEW: Internal signal for feedItems
+  private feedItemsSignal = signal<TeamActivityFeedItem[]>([]);
+
+  // ✅ FIXED: Use internal signal in computed
+  displayedItems = computed(() => {
+    const items = this.feedItemsSignal(); // ✅ Use signal, not input
+    const count = this.initialDisplayCount;
+    const expanded = this.isExpanded();
+
+    if (!items || items.length === 0) {
+      return [];
+    }
+
+    return expanded ? items : items.slice(0, count);
+  });
+
+  hasMoreItems = computed(() => {
+    const items = this.feedItemsSignal(); // ✅ Use signal
+    return items.length > this.initialDisplayCount;
+  });
+
+  hiddenItemsCount = computed(() => {
+    const items = this.feedItemsSignal(); // ✅ Use signal
+    return Math.max(0, items.length - this.initialDisplayCount);
+  });
 
   // ==================== LIFECYCLE ====================
 
   private refreshTimer?: any;
 
   ngOnInit(): void {
+    // ✅ Initialize signal with input value
+    this.feedItemsSignal.set(this.feedItems);
+
     if (this.autoRefresh) {
       this.startAutoRefresh();
+    }
+  }
+
+  // ✅ NEW: Update signal when input changes
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['feedItems']) {
+      this.feedItemsSignal.set(this.feedItems);
+      console.log('🔄 Feed items updated:', this.feedItems.length);
     }
   }
 
@@ -47,8 +85,7 @@ export class TeamActivityFeedComponent implements OnInit {
   // ==================== AUTO REFRESH ====================
 
   startAutoRefresh(): void {
-    this.stopAutoRefresh(); // Clear any existing timer
-
+    this.stopAutoRefresh();
     this.refreshTimer = setInterval(() => {
       this.refreshFeed();
     }, this.refreshInterval);
@@ -69,11 +106,15 @@ export class TeamActivityFeedComponent implements OnInit {
   manualRefresh(): void {
     this.isLoading.set(true);
     this.refreshFeed();
-
-    // Simulate loading delay
     setTimeout(() => {
       this.isLoading.set(false);
     }, 500);
+  }
+
+  // ==================== EXPAND/COLLAPSE ====================
+
+  toggleExpand(): void {
+    this.isExpanded.update(v => !v);
   }
 
   // ==================== EVENT HANDLERS ====================
@@ -84,60 +125,48 @@ export class TeamActivityFeedComponent implements OnInit {
   }
 
   // ==================== UTILITY METHODS ====================
+  // (keep all existing utility methods - getRelativeTime, etc.)
 
-// Get relative time (e.g., "14 mins ago", "2 hours ago")
-getRelativeTime(timestamp: string | null): string {
-  if (!timestamp) return 'Just now';  // ✅ ADD THIS LINE
-
-  const time = DateTime.fromISO(timestamp);
-  const now = DateTime.now();
-  const diff = now.diff(time, ['days', 'hours', 'minutes', 'seconds']);
-
-  if (diff.days >= 1) {
-    const days = Math.floor(diff.days);
-    return days === 1 ? '1 day ago' : `${days} days ago`;
+  getRelativeTime(timestamp: string | null): string {
+    if (!timestamp) return 'Just now';
+    const time = DateTime.fromISO(timestamp);
+    const now = DateTime.now();
+    const diff = now.diff(time, ['days', 'hours', 'minutes', 'seconds']);
+    if (diff.days >= 1) {
+      const days = Math.floor(diff.days);
+      return days === 1 ? '1 day ago' : `${days} days ago`;
+    }
+    if (diff.hours >= 1) {
+      const hours = Math.floor(diff.hours);
+      return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+    }
+    if (diff.minutes >= 1) {
+      const minutes = Math.floor(diff.minutes);
+      return minutes === 1 ? '1 min ago' : `${minutes} mins ago`;
+    }
+    return 'Just now';
   }
 
-  if (diff.hours >= 1) {
-    const hours = Math.floor(diff.hours);
-    return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+  getRelativeTimeTh(timestamp: string | null): string {
+    if (!timestamp) return 'เมื่อสักครู่';
+    const time = DateTime.fromISO(timestamp);
+    const now = DateTime.now();
+    const diff = now.diff(time, ['days', 'hours', 'minutes', 'seconds']);
+    if (diff.days >= 1) {
+      const days = Math.floor(diff.days);
+      return `${days} วันที่แล้ว`;
+    }
+    if (diff.hours >= 1) {
+      const hours = Math.floor(diff.hours);
+      return `${hours} ชั่วโมงที่แล้ว`;
+    }
+    if (diff.minutes >= 1) {
+      const minutes = Math.floor(diff.minutes);
+      return `${minutes} นาทีที่แล้ว`;
+    }
+    return 'เมื่อสักครู่';
   }
 
-  if (diff.minutes >= 1) {
-    const minutes = Math.floor(diff.minutes);
-    return minutes === 1 ? '1 min ago' : `${minutes} mins ago`;
-  }
-
-  return 'Just now';
-}
-
-// Get Thai relative time
-getRelativeTimeTh(timestamp: string | null): string {
-  if (!timestamp) return 'เมื่อสักครู่';  // ✅ ADD THIS LINE
-
-  const time = DateTime.fromISO(timestamp);
-  const now = DateTime.now();
-  const diff = now.diff(time, ['days', 'hours', 'minutes', 'seconds']);
-
-  if (diff.days >= 1) {
-    const days = Math.floor(diff.days);
-    return `${days} วันที่แล้ว`;
-  }
-
-  if (diff.hours >= 1) {
-    const hours = Math.floor(diff.hours);
-    return `${hours} ชั่วโมงที่แล้ว`;
-  }
-
-  if (diff.minutes >= 1) {
-    const minutes = Math.floor(diff.minutes);
-    return `${minutes} นาทีที่แล้ว`;
-  }
-
-  return 'เมื่อสักครู่';
-}
-
-  // Get action display text (English)
   getActionText(action: string): string {
     const actionMap: { [key: string]: string } = {
       'created': 'created',
@@ -149,7 +178,6 @@ getRelativeTimeTh(timestamp: string | null): string {
     return actionMap[action] || action;
   }
 
-  // Get action display text (Thai)
   getActionTextTh(action: string): string {
     const actionMap: { [key: string]: string } = {
       'created': 'สร้าง',
@@ -161,7 +189,6 @@ getRelativeTimeTh(timestamp: string | null): string {
     return actionMap[action] || action;
   }
 
-  // Get action icon class
   getActionIconClass(action: string): string {
     const iconMap: { [key: string]: string } = {
       'created': 'pi-plus-circle',
@@ -173,7 +200,6 @@ getRelativeTimeTh(timestamp: string | null): string {
     return `pi ${iconMap[action] || 'pi-circle'}`;
   }
 
-  // Get action color class
   getActionColorClass(action: string): string {
     const colorMap: { [key: string]: string } = {
       'created': 'action-created',
@@ -185,12 +211,10 @@ getRelativeTimeTh(timestamp: string | null): string {
     return colorMap[action] || 'action-default';
   }
 
-  // Format full timestamp for tooltip
   getFullTimestamp(timestamp: string): string {
     return DateTime.fromISO(timestamp).toFormat('MMM d, yyyy HH:mm');
   }
 
-  // Get user initials for avatar fallback
   getUserInitials(userName: string): string {
     const names = userName.split(' ');
     if (names.length >= 2) {
@@ -199,13 +223,11 @@ getRelativeTimeTh(timestamp: string | null): string {
     return userName.substring(0, 2).toUpperCase();
   }
 
-  // Truncate activity title if too long
   truncateTitle(title: string, maxLength: number = 40): string {
     if (title.length <= maxLength) return title;
     return title.substring(0, maxLength) + '...';
   }
 
-  // Check if item is recent (within last 5 minutes)
   isRecentItem(timestamp: string): boolean {
     const time = DateTime.fromISO(timestamp);
     const now = DateTime.now();

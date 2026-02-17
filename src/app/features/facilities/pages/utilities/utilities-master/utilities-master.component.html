@@ -1,4 +1,4 @@
-<!-- utilities-master.component.html - FINAL -->
+<!-- utilities-master.component.html -->
 
 <div class="utilities-container">
   <!-- Header -->
@@ -9,7 +9,7 @@
       </div>
       <div>
         <h1 class="header-title">Utilities Management</h1>
-        <p class="header-subtitle">Manage meters and utility readings</p>
+        <p class="header-subtitle">Manage meters, groups, and utility rates</p>
       </div>
     </div>
   </div>
@@ -34,8 +34,6 @@
     @if (isActiveTab('dashboard')) {
       <div class="tab-panel">
         <app-stats-overview />
-
-        <!-- Analytics & Charts -->
         <app-analytics-charts />
       </div>
     }
@@ -47,6 +45,13 @@
       </div>
     }
 
+    <!-- Rate Settings Tab (NEW) -->
+    @if (isActiveTab('rates')) {
+      <div class="tab-panel">
+        <app-utility-rate-settings />
+      </div>
+    }
+
     <!-- Fill Readings Tab -->
     @if (isActiveTab('fill')) {
       <div class="tab-panel">
@@ -54,7 +59,7 @@
       </div>
     }
 
-    <!-- Meter List Tab (NEW) -->
+    <!-- Meter List / Summary Tab -->
     @if (isActiveTab('list')) {
       <div class="tab-panel">
         <app-meter-list />

@@ -1,27 +1,199 @@
-<div class="page-container">
+<!-- budget-master.component.html -->
+
+<div class="budget-master-container">
+
+  <!-- ==================== PAGE HEADER ==================== -->
   <div class="page-header">
     <div class="header-content">
-      <div class="header-icon budget">
-        <i class="pi pi-wallet"></i>
+      <div class="header-icon">
+        <i class="pi pi-chart-bar"></i>
       </div>
-      <div>
-        <h1 class="header-title">Budget Management</h1>
-        <p class="header-subtitle">จัดการงบประมาณและเป้าหมายการขาย</p>
+      <div class="header-text">
+        <h1 class="page-title">Budget Management</h1>
+        <p class="page-subtitle">จัดการงบประมาณ บริษัท ทีม และสมาชิก</p>
       </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-add" (click)="openAddCompanyModal()">
+        <i class="pi pi-plus"></i>
+        <span>Add Company</span>
+      </button>
     </div>
   </div>
 
-  <div class="placeholder-content">
-    <i class="pi pi-wallet placeholder-icon"></i>
-    <h2 class="placeholder-title">Budget Management</h2>
-    <p class="placeholder-text">This page will contain:</p>
-    <ul class="feature-list">
-      <li>Sales Budget Allocation</li>
-      <li>Sales Targets & Goals</li>
-      <li>Budget vs Actual Tracking</li>
-      <li>Team Budget Distribution</li>
-      <li>Quarterly/Monthly Budget Plans</li>
-      <li>Budget Reports & Analysis</li>
-    </ul>
-  </div>
+  <!-- ==================== COMPANY SELECTOR & CONTROLS ==================== -->
+  @if (companies().length > 0) {
+    <app-company-selector
+      [companies]="companies()"
+      [selectedCompanyId]="selectedCompanyId()"
+      [viewMode]="viewMode()"
+      (companyChange)="onCompanyChange($event)"
+      (viewModeChange)="onViewModeChange($event)"
+    ></app-company-selector>
+  }
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  @if (selectedCompany()) {
+
+    <!-- Company Budget Card -->
+    <app-company-budget-card
+      [company]="selectedCompany()!"
+      (edit)="onEditCompany($event)"
+      (viewMonthly)="onViewMonthlyBreakdown($event)"
+    ></app-company-budget-card>
+
+    <!-- ==================== NEW KANBAN BOARD ==================== -->
+    <div class="kanban-section">
+      <div class="section-header">
+        <h3 class="section-title">Teams</h3>
+        <button class="btn-add-team" (click)="openAddTeamModal()">
+          <i class="pi pi-plus"></i>
+          <span>Add Team</span>
+        </button>
+      </div>
+
+      @if (selectedCompany()!.teams.length > 0) {
+        <div class="kanban-container">
+          <app-budget-kanban-board
+            [teams]="selectedCompany()!.teams"
+            [teamViewConfigs]="teamViewConfigs()"
+            (teamSortChange)="onTeamSortChange($event)"
+            (teamPageChange)="onTeamPageChange($event)"
+            (teamCardsPerPageChange)="onTeamCardsPerPageChange($event)"
+            (editTeam)="onEditTeam($event)"
+            (deleteTeam)="onDeleteTeam($event)"
+            (addMember)="onAddMember($event)"
+            (editMember)="onEditMember($event)"
+            (memberMoved)="onMemberMoved($event)"
+          />
+        </div>
+      } @else {
+        <div class="empty-state">
+          <i class="pi pi-users"></i>
+          <h3>No Teams Yet</h3>
+          <p>Create your first team to start allocating budgets</p>
+          <button class="btn-add-empty" (click)="openAddTeamModal()">
+            <i class="pi pi-plus"></i>
+            <span>Add First Team</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- ==================== OLD TEAMS LIST (COMMENTED) ==================== -->
+    <!--
+    <div class="teams-section">
+      <div class="section-header">
+        <h3 class="section-title">Teams</h3>
+        <button class="btn-add-team" (click)="openAddTeamModal()">
+          <i class="pi pi-plus"></i>
+          <span>Add Team</span>
+        </button>
+      </div>
+
+      @if (selectedCompany()!.teams.length > 0) {
+        <div class="teams-list">
+          @for (team of selectedCompany()!.teams; track team.id) {
+            <app-team-card
+              [team]="team"
+              [isExpanded]="isTeamExpanded(team.id)"
+              (toggleExpand)="onToggleTeamExpand($event)"
+              (editTeam)="onEditTeam($event)"
+              (deleteTeam)="onDeleteTeam($event)"
+              (moveUp)="onMoveTeamUp($event)"
+              (moveDown)="onMoveTeamDown($event)"
+              (addMember)="onAddMember($event)"
+              (editMember)="onEditMember($event)"
+              (removeMember)="onRemoveMember($event)"
+            ></app-team-card>
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <i class="pi pi-users"></i>
+          <h3>No Teams Yet</h3>
+          <p>Create your first team to start allocating budgets</p>
+          <button class="btn-add-empty" (click)="openAddTeamModal()">
+            <i class="pi pi-plus"></i>
+            <span>Add First Team</span>
+          </button>
+        </div>
+      }
+    </div>
+    -->
+
+    <!-- Budget Summary -->
+    <!-- <app-budget-summary
+      [company]="selectedCompany()!"
+    ></app-budget-summary> -->
+
+  } @else {
+    <!-- No Company Selected -->
+    <div class="no-company-state">
+      <i class="pi pi-building"></i>
+      <h2>No Company Selected</h2>
+      <p>Please add a company to start managing budgets</p>
+      <button class="btn-add-large" (click)="openAddCompanyModal()">
+        <i class="pi pi-plus"></i>
+        <span>Add Company</span>
+      </button>
+    </div>
+  }
+
 </div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Add Company Modal -->
+@if (isAddCompanyModalOpen()) {
+  <app-add-company-modal
+    (close)="closeAddCompanyModal()"
+    (save)="onAddCompany($event)"
+  ></app-add-company-modal>
+}
+
+<!-- Add Team Modal -->
+@if (isAddTeamModalOpen() && selectedCompany()) {
+  <app-add-team-modal
+    [availableUsers]="availableUsers()"
+    [maxBudget]="getRemainingCompanyBudget()"
+    (close)="closeAddTeamModal()"
+    (save)="onAddTeam($event)"
+  ></app-add-team-modal>
+}
+
+<!-- Add Member Modal -->
+@if (isAddMemberModalOpen() && selectedCompany() && currentTeamId()) {
+  <app-add-member-modal
+    [teamName]="getCurrentTeamName()"
+    [availableUsers]="availableUsersForTeam()"
+    [maxBudget]="getRemainingTeamBudget()"
+    (close)="closeAddMemberModal()"
+    (save)="onAddMemberSubmit($event)"
+  ></app-add-member-modal>
+}
+
+<!-- Edit Budget Modal -->
+@if (isEditBudgetModalOpen() && getEditBudgetData()) {
+  <app-edit-budget-modal
+    [type]="getEditBudgetData()!.type"
+    [name]="getEditBudgetData()!.name"
+    [currentActual]="getEditBudgetData()!.actual"
+    [currentForecast]="getEditBudgetData()!.forecast"
+    [maxBudget]="getEditBudgetData()!.maxBudget"
+    (close)="closeEditBudgetModal()"
+    (save)="onSaveEditBudget($event)"
+  ></app-edit-budget-modal>
+}
+
+<!-- Monthly Breakdown Modal -->
+@if (isMonthlyBreakdownModalOpen() && selectedCompany()) {
+  <app-monthly-breakdown-modal
+    [companyName]="selectedCompany()!.name"
+    [year]="selectedCompany()!.year"
+    [yearlyForecast]="selectedCompany()!.budget.forecast"
+    [currentBreakdown]="selectedCompany()!.monthlyBreakdown"
+    (close)="closeMonthlyBreakdownModal()"
+    (save)="onSaveMonthlyBreakdown($event)"
+  ></app-monthly-breakdown-modal>
+}

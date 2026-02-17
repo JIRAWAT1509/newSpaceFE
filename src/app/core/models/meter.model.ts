@@ -24,9 +24,24 @@ export interface MeterGroup {
   id: string;
   name: string;
   description: string;
-  meterIds: string[]; // Array of meter IDs in this group
+  meterType: MeterType;        // ประเภทมิเตอร์ในกลุ่ม
+  meterIds: string[];           // Array of meter IDs in this group
+  rate: number;                 // อัตราค่าบริการ (บาท/หน่วย)
+  currency: string;             // สกุลเงิน (default: 'THB')
   createdDate: string;
   updatedDate: string;
+}
+
+/** อัตราค่าบริการเริ่มต้นตามประเภทมิเตอร์ */
+export interface UtilityRate {
+  id: string;
+  meterType: MeterType;
+  rate: number;                 // บาท/หน่วย
+  unit: string;                 // หน่วย เช่น kWh, m³
+  currency: string;             // สกุลเงิน
+  effectiveDate: string;        // วันที่มีผลบังคับ
+  description: string;
+  isActive: boolean;
 }
 
 export type MeterType = 'electricity' | 'water' | 'gas' | 'ac';

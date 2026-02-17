@@ -69,7 +69,7 @@ export class MonteCarloForecastComponent implements OnInit {
     }
 
     this.simulationData.set(initialData);
-    console.log('Monte Carlo Data Initialized:', initialData);
+    ////console.log('Monte Carlo Data Initialized:', initialData);
   }
 
   // ==================== COMPUTED ====================
@@ -178,7 +178,7 @@ export class MonteCarloForecastComponent implements OnInit {
     // Add to history
     this.addToHistory(updatedData);
 
-    console.log('Recalculated Monte Carlo Metrics:', updatedData);
+    ////console.log('Recalculated Monte Carlo Metrics:', updatedData);
   }
 
   // ==================== SIMULATION ====================
@@ -187,7 +187,7 @@ export class MonteCarloForecastComponent implements OnInit {
   onRunSimulation(): void {
     if (this.isSimulating()) return;
 
-    console.log('Starting Monte Carlo simulation...');
+    ////console.log('Starting Monte Carlo simulation...');
 
     this.isSimulating.set(true);
     this.simulationProgress.set(0);
@@ -228,7 +228,7 @@ export class MonteCarloForecastComponent implements OnInit {
         this.simulationProgress.set(0);
       }, 500);
 
-      console.log('Monte Carlo simulation completed');
+      ////console.log('Monte Carlo simulation completed');
     }, 2500);
   }
 
@@ -342,7 +342,7 @@ export class MonteCarloForecastComponent implements OnInit {
       timestamp: new Date().toISOString()
     };
 
-    console.log('Exported Monte Carlo Data:', exportData);
+    ////console.log('Exported Monte Carlo Data:', exportData);
 
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
@@ -357,7 +357,7 @@ export class MonteCarloForecastComponent implements OnInit {
 
   // Refresh data
   refreshData(): void {
-    console.log('Refreshing Monte Carlo data...');
+    ////console.log('Refreshing Monte Carlo data...');
     this.initializeData();
   }
 }

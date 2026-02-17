@@ -1,0 +1,55 @@
+<!-- company-selector.component.html -->
+
+<div class="controls-bar">
+
+  <!-- Company Selector -->
+  <div class="control-card">
+    <label class="control-label">Company</label>
+    <p-select
+      [options]="companies()"
+      [(ngModel)]="selectedCompany"
+      (onChange)="onCompanyChange($event)"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Select company..."
+      styleClass="w-full"
+    ></p-select>
+  </div>
+
+  <!-- Year & Budget Info -->
+  @if (getCurrentCompany()) {
+    <div class="control-card">
+      <div class="year-view-controls">
+        <div class="info-group">
+          <span class="info-label">Year</span>
+          <span class="info-value">{{ getCurrentCompany()!.year }}</span>
+        </div>
+
+        <div class="info-group">
+          <span class="info-label">Total Budget</span>
+          <span class="info-value">{{ formatCurrency(getCurrentCompany()!.budget.forecast) }}</span>
+        </div>
+
+        <div class="view-toggle">
+          <button
+            class="toggle-btn"
+            [class.active]="viewMode() === 'yearly'"
+            (click)="onViewModeChange('yearly')"
+          >
+            <i class="pi pi-circle"></i>
+            <span>Yearly</span>
+          </button>
+          <button
+            class="toggle-btn"
+            [class.active]="viewMode() === 'monthly'"
+            (click)="onViewModeChange('monthly')"
+          >
+            <i class="pi pi-calendar"></i>
+            <span>Monthly</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

@@ -97,6 +97,7 @@
             <th>ค่ามิเตอร์ปัจจุบัน</th>
             <th>Avg. Consumption</th>
             <th>ค่าใช้จ่าย (฿)</th>
+            <th class="actions-col"></th>
           </tr>
         </thead>
         <tbody>
@@ -178,10 +179,17 @@
               <td>
                 <span class="cost-value">฿{{ formatCost(row.currentCost) }}</span>
               </td>
+
+              <!-- 11. Actions -->
+              <td class="actions-col">
+                <button class="btn-edit-row" (click)="openEditModal(row)" title="แก้ไขข้อมูล Meter">
+                  <i class="pi pi-pencil"></i>
+                </button>
+              </td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="10" class="empty-state-cell">
+              <td colspan="11" class="empty-state-cell">
                 <div class="empty-state">
                   <i class="pi pi-inbox"></i>
                   <p>ไม่พบข้อมูล Meter</p>
@@ -194,6 +202,92 @@
     </div>
   </div>
 </div>
+
+<!-- Edit Meter Modal -->
+@if (showEditModal()) {
+  <div class="edit-modal-backdrop" (click)="cancelEditModal()">
+    <div class="edit-modal-content" (click)="$event.stopPropagation()">
+      <div class="edit-modal-header">
+        <h3>แก้ไขข้อมูล Meter</h3>
+        <button class="modal-close-btn" (click)="cancelEditModal()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="edit-modal-body">
+        <div class="edit-form-grid">
+          <div class="edit-form-group">
+            <label>ชื่อ Meter / เลขที่ Meter</label>
+            <input
+              type="text"
+              class="edit-form-input"
+              [(ngModel)]="editForm.meterNumber"
+              placeholder="กรอกชื่อ Meter"
+            />
+          </div>
+
+          <div class="edit-form-group">
+            <label>ประเภท Meter</label>
+            <select class="edit-form-input" [(ngModel)]="editForm.meterType">
+              <option value="electricity">Electricity</option>
+              <option value="water">Water</option>
+              <option value="gas">Gas</option>
+              <option value="ac">Air Conditioning</option>
+            </select>
+          </div>
+
+          <div class="edit-form-group">
+            <label>อาคาร</label>
+            <input
+              type="text"
+              class="edit-form-input"
+              [(ngModel)]="editForm.building"
+              placeholder="กรอกชื่ออาคาร"
+            />
+          </div>
+
+          <div class="edit-form-group">
+            <label>ห้อง</label>
+            <input
+              type="text"
+              class="edit-form-input"
+              [(ngModel)]="editForm.room"
+              placeholder="กรอกเลขห้อง"
+            />
+          </div>
+
+          <div class="edit-form-group">
+            <label>ชื่อผู้เช่า</label>
+            <input
+              type="text"
+              class="edit-form-input"
+              [(ngModel)]="editForm.tenantName"
+              placeholder="กรอกชื่อผู้เช่า"
+            />
+          </div>
+
+          <div class="edit-form-group">
+            <label>หน่วย</label>
+            <input
+              type="text"
+              class="edit-form-input"
+              [(ngModel)]="editForm.unit"
+              placeholder="เช่น kWh, m³"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-modal-footer">
+        <button class="btn-cancel" (click)="cancelEditModal()">ยกเลิก</button>
+        <button class="btn-save" (click)="saveEditModal()">
+          <i class="pi pi-check"></i>
+          <span>บันทึก</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}
 
 <!-- Confirmation Modal: out-of-range reading -->
 <app-confirmation-modal
