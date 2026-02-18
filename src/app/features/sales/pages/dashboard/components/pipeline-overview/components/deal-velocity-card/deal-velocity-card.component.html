@@ -1,0 +1,110 @@
+<!-- deal-velocity-card.component.html -->
+
+<div class="velocity-card-container">
+
+  <!-- Header -->
+  <div class="card-header">
+    <div class="header-content">
+      <i class="pi pi-bolt header-icon"></i>
+      <div>
+        <h4 class="card-title">Deal Velocity</h4>
+        <p class="card-subtitle">ความเร็วในการปิดดีล</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="skeleton-item"></div>
+      <div class="skeleton-item"></div>
+      <div class="skeleton-item"></div>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!isLoading && velocity) {
+    <div class="card-body">
+
+      <!-- Average Days to Close -->
+      <div class="metric-section">
+        <div class="metric-main">
+          <span class="metric-value">{{ velocity.averageDaysToClose }}</span>
+          <span class="metric-unit">days</span>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Avg time to close</span>
+          <span class="metric-trend" [ngClass]="getTrendClass()">
+            <i [class]="getTrendIcon()"></i>
+            {{ getTrendLabel() }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider"></div>
+
+      <!-- Closing Stats -->
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-icon-wrapper blue">
+            <i class="pi pi-calendar-times"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-value">{{ velocity.closingThisWeek }}</span>
+            <span class="stat-label">Closing this week</span>
+          </div>
+        </div>
+
+        <div class="stat-item">
+          <div class="stat-icon-wrapper green">
+            <i class="pi pi-calendar-plus"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-value">{{ velocity.closingThisMonth }}</span>
+            <span class="stat-label">Closing this month</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stuck Deals Alert -->
+      @if (velocity.stuckDeals.length > 0) {
+        <div class="stuck-deals-alert">
+          <div class="alert-header">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>{{ velocity.stuckDeals.length }} Stuck Deals (>30 days)</span>
+          </div>
+          <div class="stuck-deals-list">
+            @for (deal of velocity.stuckDeals.slice(0, 3); track deal.id) {
+              <div class="stuck-deal-item">
+                <div class="deal-info">
+                  <span class="deal-title">{{ deal.title }}</span>
+                  <span class="deal-stage">{{ deal.stageName }}</span>
+                </div>
+                <div class="deal-meta">
+                  <span class="deal-days">{{ deal.daysInStage }}d</span>
+                  <span class="deal-value">{{ formatCurrency(deal.value) }}</span>
+                </div>
+              </div>
+            }
+            @if (velocity.stuckDeals.length > 3) {
+              <div class="view-more">
+                +{{ velocity.stuckDeals.length - 3 }} more stuck deals
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && !velocity) {
+    <div class="empty-state">
+      <i class="pi pi-inbox"></i>
+      <p>No velocity data available</p>
+    </div>
+  }
+
+</div>

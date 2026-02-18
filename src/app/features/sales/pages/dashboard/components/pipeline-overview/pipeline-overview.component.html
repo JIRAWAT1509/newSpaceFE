@@ -1,0 +1,71 @@
+<!-- pipeline-overview.component.html -->
+
+<div class="pipeline-overview-container">
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <div class="header-content">
+      <div class="header-title">
+        <i class="pi pi-chart-line"></i>
+        <div>
+          <h3 class="title">Pipeline Overview</h3>
+          <p class="subtitle">ภาพรวมไปป์ไลน์การขาย</p>
+        </div>
+      </div>
+      <button
+        class="btn-refresh"
+        (click)="refresh()"
+        [disabled]="isLoading()"
+        title="Refresh data"
+      >
+        <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+      <button class="btn-retry" (click)="refresh()">
+        <i class="pi pi-refresh"></i>
+        <span>Try Again</span>
+      </button>
+    </div>
+  }
+
+  <!-- Main Grid -->
+  @if (pipelineData()) {
+    <div class="pipeline-grid">
+
+      <!-- Left Column: Funnel Chart + Velocity Card -->
+      <div class="left-column">
+
+        <!-- Pipeline Funnel Chart -->
+        <app-pipeline-funnel-chart
+          [stages]="pipelineData()!.stages"
+          [isLoading]="isLoading()"
+        ></app-pipeline-funnel-chart>
+
+        <!-- Deal Velocity Card -->
+        <app-deal-velocity-card
+          [velocity]="velocityData()"
+          [isLoading]="isLoading()"
+        ></app-deal-velocity-card>
+
+      </div>
+
+      <!-- Right Column: Stage Analysis Table -->
+      <div class="right-column">
+        <app-stage-analysis-table
+          [stages]="pipelineData()!.stages"
+          [conversions]="pipelineData()!.conversionRates"
+          [isLoading]="isLoading()"
+        ></app-stage-analysis-table>
+      </div>
+
+    </div>
+  }
+
+</div>

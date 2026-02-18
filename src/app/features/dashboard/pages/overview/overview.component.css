@@ -835,7 +835,7 @@
 .exec-card-occupancy .exec-legend-horizontal {
   flex-direction: column;
   gap: 3px !important;
-  align-items: flex-start;
+  align-items: flex-start;  
 }
 
 .exec-occupancy-chart .exec-mini-grid {

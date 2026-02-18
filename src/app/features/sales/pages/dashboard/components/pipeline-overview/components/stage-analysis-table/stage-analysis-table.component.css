@@ -1,0 +1,292 @@
+/* stage-analysis-table.component.css */
+
+/* ==================== CONTAINER ==================== */
+.stage-table-container {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* ==================== HEADER ==================== */
+.table-header {
+  margin-bottom: 1.25rem;
+}
+
+.table-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.table-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ==================== LOADING STATE ==================== */
+.loading-state {
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-skeleton {
+  width: 100%;
+  height: 250px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ==================== TABLE ==================== */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #f3f4f6;
+}
+
+.stage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+/* Table Header */
+.stage-table thead {
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.stage-table th {
+  padding: 0.875rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* Table Body */
+.stage-table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.2s;
+}
+
+.stage-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.stage-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.stage-table td {
+  padding: 1rem;
+  color: #1f2937;
+}
+
+/* ==================== STAGE NAME CELL ==================== */
+.stage-name-cell {
+  font-weight: 500;
+}
+
+.stage-name {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stage-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ==================== DEAL COUNT ==================== */
+.deal-count {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* ==================== VALUE CELLS ==================== */
+.value-amount {
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.avg-deal {
+  color: #6b7280;
+}
+
+/* ==================== CONVERSION RATE ==================== */
+.conversion-rate {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.conversion-high {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.conversion-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.conversion-low {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.no-data {
+  color: #9ca3af;
+}
+
+/* ==================== DAYS BADGE ==================== */
+.days-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  background: #f3f4f6;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #4b5563;
+  font-size: 0.875rem;
+}
+
+/* ==================== WIN RATE ==================== */
+.win-rate {
+  font-weight: 600;
+  color: #10b981;
+}
+
+/* ==================== TEXT ALIGNMENT ==================== */
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* ==================== EMPTY STATE ==================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 250px;
+  color: #9ca3af;
+}
+
+.empty-state i {
+  font-size: 3rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 1280px) {
+  .stage-table {
+    font-size: 0.8125rem;
+  }
+
+  .stage-table th,
+  .stage-table td {
+    padding: 0.75rem 0.875rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .stage-table-container {
+    padding: 1.25rem;
+  }
+
+  .stage-table th {
+    font-size: 0.6875rem;
+    padding: 0.75rem 0.75rem;
+  }
+
+  .stage-table td {
+    padding: 0.875rem 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-wrapper {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .stage-table {
+    min-width: 800px;
+  }
+
+  .stage-table th,
+  .stage-table td {
+    padding: 0.75rem 0.625rem;
+  }
+}
+
+/* ==================== ANIMATIONS ==================== */
+
+.stage-table-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stage-row {
+  animation: slideIn 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.stage-row:nth-child(1) { animation-delay: 0.05s; }
+.stage-row:nth-child(2) { animation-delay: 0.1s; }
+.stage-row:nth-child(3) { animation-delay: 0.15s; }
+.stage-row:nth-child(4) { animation-delay: 0.2s; }
+.stage-row:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

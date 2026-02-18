@@ -1,0 +1,249 @@
+/* rep-performance-card.component.css */
+
+.rep-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 280px;
+}
+
+.rep-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.rep-card.excellent {
+  border-color: #10b981;
+}
+
+.rep-card.excellent:hover {
+  border-color: #059669;
+  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.2);
+}
+
+.rep-card.good {
+  border-color: #3b82f6;
+}
+
+.rep-card.good:hover {
+  border-color: #2563eb;
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.2);
+}
+
+.rep-card.fair {
+  border-color: #f59e0b;
+}
+
+.rep-card.fair:hover {
+  border-color: #d97706;
+  box-shadow: 0 12px 24px rgba(245, 158, 11, 0.2);
+}
+
+.rep-card.low {
+  border-color: #ef4444;
+}
+
+.rep-card.low:hover {
+  border-color: #dc2626;
+  box-shadow: 0 12px 24px rgba(239, 68, 68, 0.2);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.rep-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.rep-avatar {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.rep-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rep-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.rep-role {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: capitalize;
+}
+
+.rank-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.attainment-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.attainment-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.attainment-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.attainment-bar {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+
+.attainment-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.excellent .attainment-fill {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.good .attainment-fill {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.fair .attainment-fill {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.low .attainment-fill {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.attainment-subtitle {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.metric-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.card-footer {
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.trend-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.trend-indicator i {
+  font-size: 0.875rem;
+}
+
+.trend-positive {
+  color: #10b981;
+}
+
+.trend-negative {
+  color: #ef4444;
+}
+
+.trend-neutral {
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .rep-card {
+    min-width: 240px;
+  }
+
+  .attainment-value {
+    font-size: 1.75rem;
+  }
+
+  .metric-value {
+    font-size: 1rem;
+  }
+}
+
+.rep-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

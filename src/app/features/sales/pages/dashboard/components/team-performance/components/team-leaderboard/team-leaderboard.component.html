@@ -1,0 +1,115 @@
+<!-- team-leaderboard.component.html -->
+
+<div class="leaderboard-container">
+
+  <div class="table-header">
+    <h4 class="table-title">Team Leaderboard</h4>
+    <p class="table-subtitle">อันดับทีมขาย</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-skeleton"></div>
+    </div>
+  }
+
+  @if (!isLoading && members.length > 0) {
+    <div class="table-wrapper">
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th class="sortable" (click)="sortBy('rank')">
+              <span>Rank</span>
+              <i [class]="getSortIcon('rank')"></i>
+            </th>
+            <th class="sortable" (click)="sortBy('name')">
+              <span>Name</span>
+              <i [class]="getSortIcon('name')"></i>
+            </th>
+            <th class="sortable text-right" (click)="sortBy('ytdSales')">
+              <span>YTD Sales</span>
+              <i [class]="getSortIcon('ytdSales')"></i>
+            </th>
+            <th class="sortable text-center" (click)="sortBy('attainment')">
+              <span>Attainment</span>
+              <i [class]="getSortIcon('attainment')"></i>
+            </th>
+            <th class="sortable text-right" (click)="sortBy('pipelineValue')">
+              <span>Pipeline</span>
+              <i [class]="getSortIcon('pipelineValue')"></i>
+            </th>
+            <th class="sortable text-center" (click)="sortBy('winRate')">
+              <span>Win Rate</span>
+              <i [class]="getSortIcon('winRate')"></i>
+            </th>
+            <th class="text-center">Trend</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of members; track member.id) {
+            <tr class="member-row" (click)="onMemberClick(member.id)">
+              <td>
+                <span class="rank-badge" [ngClass]="getRankBadgeClass(member.rank)">
+                  {{ member.rank }}
+                </span>
+              </td>
+              <td>
+                <div class="member-info">
+                  @if (member.avatar) {
+                    <span class="member-avatar">{{ member.avatar }}</span>
+                  }
+                  <div>
+                    <div class="member-name">{{ member.name }}</div>
+                    <div class="member-role">{{ member.role }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-right">
+                <span class="ytd-value">{{ formatCurrency(member.ytdSales) }}</span>
+              </td>
+              <td class="text-center">
+                <div class="attainment-cell">
+                  <span class="attainment-badge" [ngClass]="getAttainmentClass(member.attainment)">
+                    {{ member.attainment }}%
+                  </span>
+                  <div class="attainment-bar">
+                    <div class="attainment-fill"
+                         [ngClass]="getAttainmentClass(member.attainment)"
+                         [style.width.%]="member.attainment > 100 ? 100 : member.attainment">
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-right">
+                <span class="pipeline-value">{{ formatCurrency(member.pipelineValue) }}</span>
+              </td>
+              <td class="text-center">
+                <span class="win-rate">{{ member.winRate }}%</span>
+              </td>
+              <td class="text-center">
+                <span class="trend-indicator" [ngClass]="getTrendClass(member.trend)">
+                  <i [class]="getTrendIcon(member.trend)"></i>
+                  {{ member.trend > 0 ? '+' : '' }}{{ member.trend }}%
+                </span>
+              </td>
+              <td class="text-center">
+                <button class="btn-view-details">
+                  <i class="pi pi-eye"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (!isLoading && members.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-users"></i>
+      <p>No team members found</p>
+    </div>
+  }
+
+</div>
