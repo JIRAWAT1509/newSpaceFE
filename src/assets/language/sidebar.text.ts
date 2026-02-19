@@ -42,6 +42,38 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_collection: 'Collection',
     dashboard: 'Dashboard',
 
+    // --- Sales ---
+    sales_dashboard: 'Sales Dashboard',
+    customer_management: 'Customer Management',
+    budget_management: 'Budget Management',
+    pipeline_management: 'Pipeline Management',
+    activities_management: 'Activities Management',
+
+    // --- Area ---
+    master_data: 'Master Data',
+
+    // --- Facilities ---
+    utilities: 'Utilities',
+
+    // --- Setting ---
+    user_accounts: 'User Accounts',
+    company_info: 'Company Information',
+    contract_data: 'Contract Data',
+    finance_system_data: 'Finance System Data',
+    user_data_management: 'User Data Management',
+    roles_permissions: 'Roles & Permissions',
+    company_data: 'Company Data',
+    bank_info: 'Bank Information',
+    customer_info: 'Customer Information',
+    contract_preparation_data: 'Contract Preparation Data',
+    finance_basic_data: 'Basic Data',
+    finance_revenue_data: 'Revenue',
+    finance_tax_data: 'Tax',
+    finance_document_type: 'Document Type',
+    interface_settings: 'Interface Settings',
+
+    'view all': 'View All',
+
     // --- Sub-menu Items ---
     view_all_areas: 'View All Areas',
     add_new_area: 'Add New Area',
@@ -216,7 +248,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     alerts: 'การแจ้งเตือน',
     widgets: 'วิดเจ็ต',
     customization: 'การปรับแต่ง',
-    interface_configuration: 'ปรับหน้าตาอินเทอร์เฟซ',
+    interface_configuration: 'ตั้งค่าอินเทอร์เฟซ',
     report_all: 'รายงานทั้งหมด',
     report_area: 'พื้นที่',
     report_service: 'บริการ',
@@ -224,6 +256,38 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_budget: 'งบประมาณ',
     report_finance: 'การเงิน',
     report_collection: 'การจัดเก็บ',
+
+    // --- Sales ---
+    sales_dashboard: 'ภาพรวมฝ่ายขาย',
+    customer_management: 'การจัดการลูกค้า',
+    budget_management: 'การจัดการงบประมาณ',
+    pipeline_management: 'การจัดการแนวทางการขาย',
+    activities_management: 'การจัดการกิจกรรม',
+
+    // --- Area ---
+    master_data: 'ข้อมูลหลัก',
+
+    // --- Facilities ---
+    utilities: 'สาธารณูปโภค',
+
+    // --- Setting ---
+    user_accounts: 'บัญชีผู้ใช้',
+    company_info: 'ข้อมูลบริษัท',
+    contract_data: 'ข้อมูลสัญญา',
+    finance_system_data: 'ข้อมูลระบบการเงิน',
+    user_data_management: 'การจัดการข้อมูลผู้ใช้',
+    roles_permissions: 'บทบาทและสิทธิ์',
+    company_data: 'ข้อมูลบริษัท',
+    bank_info: 'ข้อมูลธนาคาร',
+    customer_info: 'ข้อมูลลูกค้า',
+    contract_preparation_data: 'ข้อมูลการเตรียมสัญญา',
+    finance_basic_data: 'ข้อมูลพื้นฐาน',
+    finance_revenue_data: 'รายได้',
+    finance_tax_data: 'ภาษี',
+    finance_document_type: 'ประเภทเอกสาร',
+    interface_settings: 'ตั้งค่าการเชื่อมต่อ',
+
+    'view all': 'ดูทั้งหมด',
 
     // --- Sub-menu Items ---
     view_all_areas: 'ดูพื้นที่ทั้งหมด',
@@ -337,8 +401,8 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     budget_analysis: 'วิเคราะห์งบประมาณ',
     budget_alerts: 'แจ้งเตือนงบประมาณ',
     budget_settings: 'ตั้งค่างบประมาณ',
-    main_dashboard: 'แดชบอร์ดหลัก',
-    dashboard: 'แดชบอร์ด',
+    main_dashboard: 'แผงควบคุมหลัก',
+    dashboard: 'แผงควบคุม',
     quick_stats: 'สถิติเร็ว',
     recent_activity: 'กิจกรรมล่าสุด',
     notifications: 'การแจ้งเตือน',
@@ -362,7 +426,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     custom_widgets: 'วิดเจ็ตที่กำหนดเอง',
     widget_library: 'ไลบรารีวิดเจ็ต',
     layout_options: 'ตัวเลือกเค้าโครง',
-    theme_settings: 'ตั้งค่าธีม',
+    theme_settings: 'ตั้งค่าลักษณะหน้าตา',
     display_preferences: 'การตั้งค่าการแสดงผล',
     data_sources: 'แหล่งข้อมูล',
     reset_dashboard: 'รีเซ็ตแดชบอร์ด',
@@ -407,6 +471,38 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_budget: '预算',
     report_finance: '财务',
     report_collection: '收款',
+
+    // --- Sales ---
+    sales_dashboard: '销售仪表板',
+    customer_management: '客户管理',
+    budget_management: '预算管理',
+    pipeline_management: '销售管道管理',
+    activities_management: '活动管理',
+
+    // --- Area ---
+    master_data: '主数据',
+
+    // --- Facilities ---
+    utilities: '公用事业',
+
+    // --- Setting ---
+    user_accounts: '用户账户',
+    company_info: '公司信息',
+    company_data: '公司数据',
+    contract_data: '合同数据',
+    finance_system_data: '财务系统数据',
+    user_data_management: '用户数据管理',
+    roles_permissions: '角色与权限',
+    bank_info: '银行信息',
+    customer_info: '客户信息',
+    contract_preparation_data: '合同准备数据',
+    finance_basic_data: '基础数据',
+    finance_revenue_data: '收入',
+    finance_tax_data: '税务',
+    finance_document_type: '文档类型',
+    interface_settings: '界面设置',
+
+    'view all': '查看全部',
 
     // --- Sub-menu Items ---
     view_all_areas: '查看所有区域',

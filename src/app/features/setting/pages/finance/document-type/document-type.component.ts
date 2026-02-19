@@ -298,6 +298,11 @@ export class DocumentTypeComponent implements OnInit {
     this.filteredDocumentTypes.set(this.documentTypes());
   }
 
+  updateSearchQuery(value: string): void {
+    this.searchQuery.set(value);
+    this.onSearch();
+  }
+
   // ==================== DRAWER ACTIONS ====================
 
   openCreateDrawer(): void {

@@ -52,6 +52,12 @@
               @if (errors['COST_CENTER_CODE']) {
                 <p class="error-message">{{ errors['COST_CENTER_CODE'] }}</p>
               }
+              @if (mode === 'edit') {
+                <p class="text-xs text-gray-500 mt-1">
+                  <i class="pi pi-info-circle"></i>
+                  ไม่สามารถแก้ไขรหัส Profit Center ได้
+                </p>
+              }
             </div>
 
             <!-- ชื่อ Profit Center -->
@@ -90,6 +96,12 @@
               @if (errors['BUS_TYPE_CODE']) {
                 <p class="error-message">{{ errors['BUS_TYPE_CODE'] }}</p>
               }
+              @if (mode === 'edit') {
+                <p class="text-xs text-gray-500 mt-1">
+                  <i class="pi pi-info-circle"></i>
+                  ไม่สามารถแก้ไขรหัสประเภทธุรกิจได้
+                </p>
+              }
             </div>
 
             <!-- ชื่อประเภทธุรกิจ -->
@@ -127,6 +139,12 @@
               />
               @if (errors['BUS_SUBTYPE_CODE']) {
                 <p class="error-message">{{ errors['BUS_SUBTYPE_CODE'] }}</p>
+              }
+              @if (mode === 'edit') {
+                <p class="text-xs text-gray-500 mt-1">
+                  <i class="pi pi-info-circle"></i>
+                  ไม่สามารถแก้ไขรหัสประเภทธุรกิจย่อยได้
+                </p>
               }
             </div>
 

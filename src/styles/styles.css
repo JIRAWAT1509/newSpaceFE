@@ -90,6 +90,10 @@ body {
 .drawer-backdrop {
   z-index: 9998 !important;
 }
+/* Panel ต้องอยู่เหนือ overlay เสมอ เพื่อให้คลิกและพิมพ์ในฟอร์มได้ */
+.drawer-panel {
+  z-index: 9999 !important;
+}
 /* Modal overlay (กล่องกลางจอ): ให้หัวข้ออยู่ใต้ header เสมอ */
 .modal-overlay {
   z-index: 9998 !important;

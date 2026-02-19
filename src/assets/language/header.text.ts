@@ -1,5 +1,6 @@
 export interface HeaderTexts {
   logoText: string;
+  home: string;
   greeting: string;
   searchPlaceholder: string;
   languageLabel: string;
@@ -13,6 +14,7 @@ export interface HeaderTexts {
 export const HEADER_TEXTS: { [key: string]: HeaderTexts } = {
   en: {
     logoText: 'S P A C E',
+    home: 'Home',
     greeting: 'Hello',
     searchPlaceholder: 'Search for...',
     languageLabel: 'Select Language',
@@ -23,6 +25,7 @@ export const HEADER_TEXTS: { [key: string]: HeaderTexts } = {
   },
   th: {
     logoText: 'S P A C E',
+    home: 'หน้าหลัก',
     greeting: 'สวัสดี',
     searchPlaceholder: 'ค้นหา...',
     languageLabel: 'เลือกภาษา',
@@ -33,6 +36,7 @@ export const HEADER_TEXTS: { [key: string]: HeaderTexts } = {
   },
   zh: {
     logoText: 'S P A C E',
+    home: '首页',
     greeting: '你好',
     searchPlaceholder: '搜索...',
     languageLabel: '选择语言',

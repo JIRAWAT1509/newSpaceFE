@@ -1,20 +1,44 @@
 /* revenue-form-drawer.component.css */
 
+/* Drawer แบบ flex: หัว-ท้ายคงที่ ส่วนกลางเลื่อนได้ ไม่ตัดปุ่มล่าง */
+.drawer-panel--revenue {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-panel--revenue .drawer-header {
+  flex-shrink: 0;
+}
+
+.drawer-panel--revenue .drawer-body {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.drawer-panel--revenue .drawer-footer {
+  flex-shrink: 0;
+}
+
 /* Custom scrollbar */
+.drawer-body::-webkit-scrollbar,
 .overflow-y-auto::-webkit-scrollbar {
   width: 8px;
 }
 
+.drawer-body::-webkit-scrollbar-track,
 .overflow-y-auto::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
 
+.drawer-body::-webkit-scrollbar-thumb,
 .overflow-y-auto::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 4px;
 }
 
+.drawer-body::-webkit-scrollbar-thumb:hover,
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #555;
 }

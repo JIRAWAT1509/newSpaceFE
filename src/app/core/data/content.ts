@@ -22,27 +22,27 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       {
         name: 'sales_dashboard',
-        icon: 'assets/icons/dashboard.svg',
+        icon: 'pi-th-large',
         route: '/sales/dashboard',
       },
       {
         name: 'customer_management',
-        icon: 'assets/icons/users.svg',
+        icon: 'pi-users',
         route: '/sales/customer',
       },
       {
         name: 'budget_management',
-        icon: 'assets/icons/wallet.svg',
+        icon: 'pi-wallet',
         route: '/sales/budget',
       },
       {
         name: 'pipeline_management',
-        icon: 'assets/icons/sitemap.svg',
+        icon: 'pi-sitemap',
         route: '/sales/pipeline',
       },
       {
         name: 'activities_management',
-        icon: 'assets/icons/calendar.svg',
+        icon: 'pi-calendar',
         route: '/sales/activities',
       },
     ],
@@ -56,7 +56,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       {
         name: 'master_data',
-        icon: 'assets/icons/briefcase-outline.svg',
+        icon: 'pi-map',
         route: '/area/layout/master',
         hasDeeper: true,
         deeperNote: 'Contains: Building, Floor, Zone, Layout, Price List, etc.',
@@ -124,7 +124,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       {
         name: 'contract_management',
-        icon: 'assets/icons/business-outline.svg',
+        icon: 'pi-file-edit',
         route: '/contract/management',
         // sub: [
         //   {
@@ -411,7 +411,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       {
         name: 'utilities',
-        icon: 'assets/icons/briefcase-outline.svg',
+        icon: 'pi-bolt',
         route: '/facilities/utilities/master',
       },
       // --- UTILITIES SECTION ---
@@ -525,7 +525,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       {
         name: 'report_all',
-        icon: 'assets/icons/clipboard-outline.svg',
+        icon: 'pi-chart-line',
         sub: [
           {
             name: 'view all',
@@ -574,7 +574,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       // --- USER SETTING ---
       {
         name: 'user_accounts',
-        icon: 'assets/icons/briefcase-outline.svg',
+        icon: 'pi-users',
         sub: [
           {
             name: 'user_data_management',
@@ -596,7 +596,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       // --- COMPANY SETTING ---
       {
         name: 'company_info',
-        icon: 'assets/icons/clipboard-outline.svg',
+        icon: 'pi-building',
         sub: [
           {
             name: 'company_data',
@@ -621,7 +621,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       // --- SYSTEM SETTING ---
       {
         name: 'contract_data',
-        icon: 'assets/icons/business-outline.svg',
+        icon: 'pi-file-edit',
         // ✅ ให้คลิกที่ชั้นนี้ได้เลย
         route: '/setting/system/contract',
         sub: [
@@ -636,7 +636,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       },
       {
         name: 'finance_system_data',
-        icon: 'assets/icons/clipboard-outline.svg',
+        icon: 'pi-wallet',
 
         sub: [
           {
@@ -670,7 +670,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
 
       {
         name: 'interface_configuration',
-        icon: 'assets/icons/business-outline.svg',
+        icon: 'pi-sliders-h',
         sub: [
           {
             name: 'interface_settings',

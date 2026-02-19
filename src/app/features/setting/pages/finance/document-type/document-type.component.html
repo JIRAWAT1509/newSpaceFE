@@ -27,8 +27,8 @@
             type="text"
             class="search-input"
             placeholder="ค้นหารหัส หรือชื่อเอกสาร..."
-            [(ngModel)]="searchQuery"
-            (ngModelChange)="onSearch()"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="updateSearchQuery($event)"
           />
         </div>
 

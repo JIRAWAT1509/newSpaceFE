@@ -11,13 +11,14 @@
 <!-- Drawer -->
 @if (isOpen) {
   <div
-    class="drawer-panel fixed z-50 bg-white shadow-2xl transition-all duration-300 ease-in-out overflow-hidden
+    class="drawer-panel drawer-panel--revenue fixed z-50 bg-white shadow-2xl transition-all duration-300 ease-in-out
+           flex flex-col
            md:top-0 md:right-0 md:h-full md:w-[700px]
            max-md:top-1/2 max-md:left-1/2 max-md:transform max-md:-translate-x-1/2 max-md:-translate-y-1/2
            max-md:rounded-lg max-md:w-[95%] max-md:max-w-[600px] max-md:max-h-[90vh]"
   >
     <!-- Header (สไตล์เดียวกับฟอร์มอื่น: ไม่มีพื้นหลังสีน้ำเงิน) -->
-    <div class="bg-gray-50 border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+    <div class="drawer-header flex-shrink-0 bg-gray-50 border-b border-gray-200 px-6 py-4 flex items-center justify-between">
       <h2 class="text-xl font-bold text-gray-800">
         {{ mode === 'create' ? 'เพิ่มรายได้' : 'แก้ไขรายได้' }}
       </h2>
@@ -32,7 +33,7 @@
     </div>
 
     <!-- Form Content (Scrollable) -->
-    <div class="overflow-y-auto p-6" style="max-height: calc(100vh - 140px);">
+    <div class="drawer-body flex-1 min-h-0 overflow-y-auto p-6">
       <form>
         <div class="space-y-4">
 
@@ -282,8 +283,8 @@
       </form>
     </div>
 
-    <!-- Footer Actions -->
-    <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3">
+    <!-- Footer Actions (อยู่ล่างเสมอ ไม่ถูกตัด) -->
+    <div class="drawer-footer flex-shrink-0 border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3">
       <p-button
         label="ยกเลิก"
         icon="pi pi-times"
