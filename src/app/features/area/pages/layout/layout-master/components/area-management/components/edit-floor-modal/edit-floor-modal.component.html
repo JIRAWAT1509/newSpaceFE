@@ -1,7 +1,7 @@
 <p-dialog
   [visible]="visible()"
   [modal]="true"
-  [closable]="true"
+  [closable]="false"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: '90vw', height: '85vh' }"
@@ -22,6 +22,14 @@
             Draft saved
           </span>
         }
+        <button
+          type="button"
+          class="btn-close-header"
+          (click)="onClose()"
+          title="Close (Save Draft)"
+        >
+          <i class="pi pi-times"></i>
+        </button>
       </div>
     </div>
   </ng-template>

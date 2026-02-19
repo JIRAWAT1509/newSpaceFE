@@ -1,0 +1,347 @@
+/* src/app/features/finance/components/pre-receipt-management/pre-receipt-management.component.css */
+
+.receipt-container {
+  @apply space-y-6;
+}
+
+/* Header */
+.content-header {
+  @apply flex items-start justify-between gap-4 mb-6;
+}
+
+.page-title {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+.page-subtitle {
+  @apply text-gray-600 mt-1;
+}
+
+/* Table */
+.table-container {
+  @apply bg-white rounded-xl border border-gray-200 overflow-hidden;
+}
+
+.receipt-table {
+  @apply w-full border-collapse;
+}
+
+.receipt-table thead {
+  @apply bg-gray-50;
+}
+
+.receipt-table th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.receipt-table th:hover {
+  @apply bg-gray-100;
+}
+
+.receipt-table td {
+  @apply px-4 py-3 border-b border-gray-200;
+}
+
+.receipt-table tbody tr {
+  @apply transition-colors duration-200;
+}
+
+.receipt-table tbody tr:hover {
+  @apply bg-blue-50;
+}
+
+.receipt-table tbody tr.selected {
+  @apply bg-blue-100;
+}
+
+.checkbox-col {
+  @apply w-12;
+}
+
+.checkbox-col input[type="checkbox"] {
+  @apply w-4 h-4 cursor-pointer;
+}
+
+/* Table Content */
+.contract-number {
+  @apply font-mono text-sm text-gray-800;
+}
+
+.customer-name {
+  @apply font-medium text-gray-800;
+}
+
+.collection-item {
+  @apply text-gray-700;
+}
+
+.amount {
+  @apply font-bold text-gray-800;
+}
+
+.date {
+  @apply text-gray-600;
+}
+
+/* Sort Icon */
+.sort-icon {
+  @apply ml-2 text-gray-400;
+  font-size: 0.875rem;
+}
+
+/* Status Badge */
+.status-badge {
+  @apply inline-block px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-badge.status-ready {
+  background: rgb(var(--info) / 0.18);
+  color: rgb(var(--info));
+}
+
+.status-badge.status-open {
+  background: rgb(var(--success) / 0.18);
+  color: rgb(var(--success));
+}
+
+.status-badge.status-cancel {
+  background: rgb(var(--danger) / 0.18);
+  color: rgb(var(--danger));
+}
+
+/* Row Actions */
+.row-actions {
+  @apply flex items-center justify-center gap-2;
+}
+
+.action-btn {
+  @apply w-8 h-8 flex items-center justify-center;
+  background-color: transparent;
+  color: #3b82f6;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.action-btn.danger {
+  background-color: transparent;
+  color: #ef4444;
+  border-radius: 50%;
+}
+
+.action-btn.danger:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+/* Kebab Menu */
+.action-menu-portal {
+  position: fixed;
+  z-index: 200;
+}
+
+.action-menu {
+  @apply w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-item {
+  @apply w-full flex items-center gap-3 px-4 py-2;
+  @apply text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600;
+  @apply transition-colors duration-200;
+  @apply border-none bg-transparent cursor-pointer;
+}
+
+.menu-item i {
+  @apply text-lg;
+}
+
+.menu-item.danger {
+  @apply hover:bg-red-50 hover:text-red-600;
+}
+
+.menu-overlay {
+  @apply fixed inset-0;
+  z-index: 150;
+}
+
+/* Bottom Action Bar */
+.bottom-action-bar {
+  @apply fixed bottom-0 left-0 right-0;
+  @apply bg-white border-t-2 border-gray-200 p-4;
+  @apply flex items-center justify-between;
+  @apply shadow-[0_-4px_12px_rgba(0,0,0,0.1)];
+  z-index: 1000;
+}
+
+.selection-info {
+  @apply flex items-center gap-4;
+}
+
+.selected-text {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.selected-text strong {
+  @apply text-blue-600;
+}
+
+.bulk-actions {
+  @apply flex gap-3;
+}
+
+/* Buttons */
+.btn {
+  @apply flex items-center gap-2 px-4 py-2;
+  @apply font-semibold rounded-lg transition-all duration-200;
+  @apply border-none cursor-pointer;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700;
+}
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
+}
+
+.btn-create {
+  @apply bg-gradient-to-r from-green-500 to-green-600;
+  @apply hover:from-green-600 hover:to-green-700 text-white;
+}
+
+/* Empty State */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-16 text-center;
+}
+
+.empty-state i {
+  @apply text-6xl text-gray-300 mb-4;
+}
+
+.empty-state h3 {
+  @apply text-xl font-bold text-gray-800 mb-2;
+}
+
+.empty-state p {
+  @apply text-gray-600;
+}
+
+/* Edit Modal */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.edit-modal-container {
+  @apply bg-white rounded-xl shadow-2xl;
+  width: 90%;
+  max-width: 600px;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  @apply flex items-center justify-between p-6 border-b border-gray-200;
+}
+
+.modal-header h3 {
+  @apply text-xl font-bold text-gray-800;
+}
+
+.close-btn {
+  @apply w-8 h-8 flex items-center justify-center;
+  @apply text-gray-500 hover:text-gray-700 hover:bg-gray-100;
+  @apply rounded-lg transition-colors;
+  @apply border-none cursor-pointer;
+}
+
+.modal-body {
+  @apply p-6 space-y-4;
+}
+
+.modal-footer {
+  @apply flex items-center justify-end gap-3 p-6 border-t border-gray-200;
+}
+
+.form-group {
+  @apply flex flex-col gap-2;
+}
+
+.form-group label {
+  @apply text-sm font-semibold text-gray-700;
+}
+
+.form-group input {
+  @apply w-full px-4 py-2 border-2 border-gray-300 rounded-lg;
+  @apply transition-all duration-200;
+}
+
+.form-group input:focus {
+  @apply outline-none border-blue-500;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-row {
+  @apply grid grid-cols-2 gap-4;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-header {
+    @apply flex-col items-start;
+  }
+
+  .form-row {
+    @apply grid-cols-1;
+  }
+
+  .bottom-action-bar {
+    @apply flex-col gap-3;
+  }
+
+  .bulk-actions {
+    @apply w-full flex-col;
+  }
+
+  .btn {
+    @apply w-full justify-center;
+  }
+}

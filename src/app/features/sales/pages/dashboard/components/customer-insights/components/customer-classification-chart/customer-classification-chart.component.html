@@ -1,0 +1,59 @@
+<!-- customer-classification-chart.component.html -->
+
+<div class="classification-chart-container">
+
+  <div class="chart-header">
+    <h4 class="chart-title">Customer Classification</h4>
+    <p class="chart-subtitle">การจัดกลุ่มลูกค้า A/B/C/D</p>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-skeleton"></div>
+    </div>
+  }
+
+  @if (!isLoading && classification) {
+    <div class="chart-content">
+      <div class="chart-wrapper">
+        <canvas #chartCanvas></canvas>
+      </div>
+
+      <div class="class-grid">
+        @for (className of classNames; track className) {
+          @if (getClassData(className); as classData) {
+            <div class="class-card">
+              <div class="class-header" [style.background]="classData.color">
+                <span class="class-label">Class {{ className }}</span>
+              </div>
+              <div class="class-body">
+                <div class="class-metric">
+                  <span class="metric-value">{{ classData.count }}</span>
+                  <span class="metric-label">Customers</span>
+                </div>
+                <div class="class-details">
+                  <div class="detail-item">
+                    <span class="detail-label">ARR:</span>
+                    <span class="detail-value">฿{{ (classData.totalARR / 1000000).toFixed(1) }}M</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">CSAT:</span>
+                    <span class="detail-value">{{ classData.avgCSAT }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && !classification) {
+    <div class="empty-state">
+      <i class="pi pi-chart-pie"></i>
+      <p>No classification data available</p>
+    </div>
+  }
+
+</div>

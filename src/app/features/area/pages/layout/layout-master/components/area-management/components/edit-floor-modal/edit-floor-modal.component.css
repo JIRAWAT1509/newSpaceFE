@@ -1,36 +1,16 @@
 /* edit-floor-modal.component.css */
 
-/* Override PrimeNG Dialog Styles */
-:host ::ng-deep .edit-floor-modal {
-  .p-dialog {
-    @apply rounded-lg shadow-2xl;
-  }
-
-  .p-dialog-header {
-    @apply bg-gradient-to-r from-blue-600 to-blue-500 text-white;
-    @apply px-6 py-4 rounded-t-lg;
-  }
-
-  .p-dialog-content {
-    @apply p-0 overflow-hidden;
-  }
-
-  .p-dialog-footer {
-    @apply px-6 py-4 bg-gray-50 border-t border-gray-200;
-  }
-}
-
 /* Modal Header */
 .modal-header {
   @apply flex items-center justify-between w-full;
 }
 
 .modal-title {
-  @apply text-xl font-bold flex items-center gap-3;
+  @apply text-xl font-bold text-gray-800 flex items-center gap-2;
 }
 
 .modal-title i {
-  @apply text-lg;
+  @apply text-blue-600;
 }
 
 .header-actions {
@@ -38,29 +18,37 @@
 }
 
 .draft-indicator {
-  @apply flex items-center gap-2 px-3 py-1 rounded-full;
-  @apply bg-blue-100 bg-opacity-30 text-white text-sm;
+  @apply flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium;
 }
 
 .draft-indicator i {
   @apply text-xs;
 }
 
+.btn-close-header {
+  @apply w-8 h-8 flex items-center justify-center rounded-lg;
+  @apply text-gray-500 hover:text-gray-700 hover:bg-gray-100;
+  @apply transition-colors duration-200;
+}
+
+.btn-close-header i {
+  @apply text-lg;
+}
+
 /* Modal Content */
 .modal-content {
-  @apply flex h-full;
-  min-height: 70vh;
+  @apply flex gap-4 h-full;
 }
 
 .floor-plan-section {
-  @apply flex-1 bg-gray-50 border-r border-gray-200;
+  @apply flex-1;
   flex: 3;
 }
 
 .marker-list-section {
-  @apply bg-white;
+  @apply flex-shrink-0;
   flex: 1;
-  min-width: 300px;
+  min-width: 320px;
   max-width: 400px;
 }
 
@@ -71,37 +59,31 @@
 
 .btn-cancel,
 .btn-close,
-.btn-save,
-.btn-secondary,
-.btn-danger {
-  @apply flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium;
+.btn-save {
+  @apply flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm;
   @apply transition-all duration-200;
 }
 
 .btn-cancel {
-  @apply bg-white text-gray-700 border-2 border-gray-300;
-  @apply hover:bg-gray-50 hover:border-gray-400;
+  @apply bg-gray-100 text-gray-700 border border-gray-300;
+  @apply hover:bg-gray-200;
 }
 
 .btn-close {
-  @apply bg-blue-600 text-white;
-  @apply hover:bg-blue-700;
+  @apply bg-blue-100 text-blue-700 border border-blue-300;
+  @apply hover:bg-blue-200;
 }
 
 .btn-save {
   @apply bg-blue-600 text-white;
-  @apply hover:bg-blue-700;
-  @apply disabled:bg-gray-300 disabled:cursor-not-allowed;
+  @apply hover:bg-blue-700 hover:shadow-md;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 disabled:hover:shadow-none;
 }
 
-.btn-secondary {
-  @apply bg-white text-gray-700 border-2 border-gray-300;
-  @apply hover:bg-gray-50;
-}
-
-.btn-danger {
-  @apply bg-red-600 text-white;
-  @apply hover:bg-red-700;
+.btn-cancel i,
+.btn-close i,
+.btn-save i {
+  @apply text-sm;
 }
 
 /* Warning Dialog */
@@ -109,25 +91,32 @@
   @apply text-gray-700 mb-4;
 }
 
-/* Responsive */
-@media (max-width: 1280px) {
-  .marker-list-section {
-    min-width: 250px;
-    max-width: 300px;
-  }
+.btn-secondary,
+.btn-danger {
+  @apply px-4 py-2 rounded-lg font-semibold text-sm;
+  @apply transition-colors duration-200;
 }
 
-@media (max-width: 768px) {
-  .modal-content {
-    @apply flex-col;
-  }
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700;
+  @apply hover:bg-gray-200;
+}
 
-  .floor-plan-section,
-  .marker-list-section {
-    @apply w-full border-r-0 border-b;
-  }
+.btn-danger {
+  @apply bg-red-600 text-white;
+  @apply hover:bg-red-700;
+}
 
-  .marker-list-section {
-    max-width: 100%;
-  }
+/* PrimeNG Dialog Overrides */
+:host ::ng-deep .edit-floor-modal .p-dialog-header {
+  @apply px-6 py-4 border-b border-gray-200;
+}
+
+:host ::ng-deep .edit-floor-modal .p-dialog-content {
+  @apply px-6 py-4;
+  height: calc(85vh - 140px);
+}
+
+:host ::ng-deep .edit-floor-modal .p-dialog-footer {
+  @apply px-6 py-4 border-t border-gray-200;
 }

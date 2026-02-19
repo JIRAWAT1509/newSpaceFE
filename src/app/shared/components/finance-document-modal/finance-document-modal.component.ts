@@ -7,8 +7,9 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
+  AbstractControl,
+  ValidationErrors,
 } from '@angular/forms';
-// ✅ ลบ CalendarModule และ DropdownModule ออก
 import {
   DocumentType,
   FinanceDocumentFormData,
@@ -19,7 +20,7 @@ import { Debt } from '@core/models/finance.model';
 @Component({
   selector: 'app-finance-document-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule], // ✅ ลบ CalendarModule, DropdownModule
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './finance-document-modal.component.html',
   styleUrl: './finance-document-modal.component.css',
 })
@@ -81,7 +82,25 @@ export class FinanceDocumentModalComponent implements OnInit {
     this.setModalContent();
   }
 
-  // ✅ Helper: แปลง Date เป็น string format YYYY-MM-DD สำหรับ input[type="date"]
+  // ✅ Custom Validator: วันที่สิ้นสุดต้องมากกว่าวันที่เริ่มต้น
+  dateRangeValidator(control: AbstractControl): ValidationErrors | null {
+    const dateFrom = control.get('dateFrom')?.value;
+    const dateTo = control.get('dateTo')?.value;
+
+    if (!dateFrom || !dateTo) {
+      return null;
+    }
+
+    const startDate = new Date(dateFrom);
+    const endDate = new Date(dateTo);
+
+    if (endDate < startDate) {
+      return { dateRangeInvalid: true };
+    }
+
+    return null;
+  }
+
   formatDateForInput(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -95,62 +114,71 @@ export class FinanceDocumentModalComponent implements OnInit {
 
     switch (type) {
       case 'credit_note':
-        this.form = this.fb.group({
-          customerName: [{ value: debt.customerName, disabled: true }],
-          creditNoteNumber: [
-            {
-              value:
-                this.documentNumberService.generateDocumentNumber(
-                  'credit_note',
-                ),
-              disabled: true,
-            },
-          ],
-          dateFrom: ['', Validators.required],
-          dateTo: ['', Validators.required],
-          contractNumber: [
-            { value: debt.contractFile.replace('.pdf', ''), disabled: true },
-          ],
-          invoiceStatus: ['all'],
-          printStatus: ['all'],
-          transferStatus: ['all'],
-        });
+        this.form = this.fb.group(
+          {
+            customerName: [{ value: debt.customerName, disabled: true }],
+            creditNoteNumber: [
+              {
+                value:
+                  this.documentNumberService.generateDocumentNumber(
+                    'credit_note',
+                  ),
+                disabled: true,
+              },
+            ],
+            dateFrom: ['', Validators.required],
+            dateTo: ['', Validators.required],
+            contractNumber: [
+              { value: debt.contractFile.replace('.pdf', ''), disabled: true },
+            ],
+            invoiceStatus: ['all'],
+            printStatus: ['all'],
+            transferStatus: ['all'],
+          },
+          { validators: this.dateRangeValidator } // ✅ เพิ่ม validator
+        );
         break;
 
       case 'invoice':
-        this.form = this.fb.group({
-          customerName: [{ value: debt.customerName, disabled: true }],
-          invoiceNumber: [
-            {
-              value:
-                this.documentNumberService.generateDocumentNumber('invoice'),
-              disabled: true,
-            },
-          ],
-          dateFrom: ['', Validators.required],
-          dateTo: ['', Validators.required],
-          contractNumber: [
-            { value: debt.contractFile.replace('.pdf', ''), disabled: true },
-          ],
-          invoiceStatus: ['all'],
-          printStatus: ['all'],
-          transferStatus: ['all'],
-          debtStatus: ['all'],
-        });
+        this.form = this.fb.group(
+          {
+            customerName: [{ value: debt.customerName, disabled: true }],
+            invoiceNumber: [
+              {
+                value:
+                  this.documentNumberService.generateDocumentNumber('invoice'),
+                disabled: true,
+              },
+            ],
+            dateFrom: ['', Validators.required],
+            dateTo: ['', Validators.required],
+            contractNumber: [
+              { value: debt.contractFile.replace('.pdf', ''), disabled: true },
+            ],
+            invoiceStatus: ['all'],
+            printStatus: ['all'],
+            transferStatus: ['all'],
+            debtStatus: ['all'],
+          },
+          { validators: this.dateRangeValidator } // ✅ เพิ่ม validator
+        );
         break;
 
       case 'cancel_invoice':
-        this.form = this.fb.group({
-          customerName: [{ value: debt.customerName, disabled: true }],
-          invoiceNumber: [
-            { value: 'INV' + Date.now().toString().slice(-6), disabled: true },
-          ],
-          dateFrom: ['', Validators.required],
-          dateTo: ['', Validators.required],
-          contractNumber: [
-            { value: debt.contractFile.replace('.pdf', ''), disabled: true },
-          ],
-        });
+        this.form = this.fb.group(
+          {
+            customerName: [{ value: debt.customerName, disabled: true }],
+            invoiceNumber: [
+              { value: 'INV' + Date.now().toString().slice(-6), disabled: true },
+            ],
+            dateFrom: ['', Validators.required],
+            dateTo: ['', Validators.required],
+            contractNumber: [
+              { value: debt.contractFile.replace('.pdf', ''), disabled: true },
+            ],
+          },
+          { validators: this.dateRangeValidator } // ✅ เพิ่ม validator
+        );
         break;
 
       case 'receipt_credit':
@@ -201,7 +229,6 @@ export class FinanceDocumentModalComponent implements OnInit {
         });
         break;
 
-      // ✅ เพิ่ม case ใหม่สำหรับ receipt_cancel
       case 'receipt_cancel':
         this.form = this.fb.group({
           receiptNumber: [
@@ -237,7 +264,7 @@ export class FinanceDocumentModalComponent implements OnInit {
       cancel_invoice: 'ออกใบยกเลิก',
       receipt_credit: 'ออกใบเสร็จใบลดหนี้',
       receipt_invoice: 'ออกใบเสร็จใบแจ้งหนี้',
-      receipt_cancel: 'ออกใบเสร็จใบยกเลิก', // ✅ เพิ่ม
+      receipt_cancel: 'ออกใบเสร็จใบยกเลิก',
     };
 
     const buttonLabels: Record<DocumentType, string> = {
@@ -246,7 +273,7 @@ export class FinanceDocumentModalComponent implements OnInit {
       cancel_invoice: 'ออกใบยกเลิก',
       receipt_credit: 'ออกใบเสร็จใบลดหนี้',
       receipt_invoice: 'ออกใบเสร็จใบแจ้งหนี้',
-      receipt_cancel: 'ออกใบเสร็จใบยกเลิก', // ✅ เพิ่ม
+      receipt_cancel: 'ออกใบเสร็จใบยกเลิก',
     };
 
     this.modalTitle.set(titles[type]);
@@ -264,6 +291,11 @@ export class FinanceDocumentModalComponent implements OnInit {
       this.close.emit();
     } else {
       this.markAllAsTouched();
+
+      // ✅ แสดงข้อความ error ถ้า date range ไม่ถูกต้อง
+      if (this.form.errors?.['dateRangeInvalid']) {
+        alert('วันที่สิ้นสุดต้องมากกว่าหรือเท่ากับวันที่เริ่มต้น');
+      }
     }
   }
 
@@ -284,5 +316,10 @@ export class FinanceDocumentModalComponent implements OnInit {
   isFieldDisabled(fieldName: string): boolean {
     const control = this.form.get(fieldName);
     return control ? control.disabled : false;
+  }
+
+  hasDateRangeError(): boolean {
+    return this.form.errors?.['dateRangeInvalid'] &&
+           (this.form.get('dateFrom')?.touched || this.form.get('dateTo')?.touched);
   }
 }

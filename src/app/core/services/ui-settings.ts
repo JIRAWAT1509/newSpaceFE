@@ -562,25 +562,25 @@ export const DEFAULT_FACILITIES_UTILITIES_CONFIG: FacilitiesUtilitiesConfig = {
       label: 'Electricity',
       labelTh: 'ไฟฟ้า',
       color: '#FFD700',
-      icon: 'pi-bolt',        // Lightning bolt for electricity
+      icon: 'pi-bolt', // Lightning bolt for electricity
     },
     water: {
       label: 'Water',
       labelTh: 'น้ำ',
       color: '#4CA3FF',
-      icon: 'pi-wave-pulse',  // Wave icon for water
+      icon: 'pi-wave-pulse', // Wave icon for water
     },
     gas: {
       label: 'Gas',
       labelTh: 'แก๊ส',
       color: '#FF6384',
-      icon: 'pi-gauge',       // Gauge icon for gas meter
+      icon: 'pi-gauge', // Gauge icon for gas meter
     },
     ac: {
       label: 'Air Conditioning',
       labelTh: 'แอร์',
       color: '#80E08E',
-      icon: 'pi-asterisk',    // Asterisk (snowflake-like) for cooling
+      icon: 'pi-asterisk', // Asterisk (snowflake-like) for cooling
     },
   },
   rentableItems: [],
@@ -598,8 +598,8 @@ export const DEFAULT_UI_CONFIG: UiConfig = {
     sales: 'Sales',
     area: 'Area',
     contract: 'Contract',
-    collection_finance: 'collection_finance',
-    facilities: 'facilities',
+    collection_finance: 'Collection & Finance',
+    facilities: 'Facilities',
     report: 'Report',
     report_dashboard: 'Report',
   },
@@ -627,7 +627,8 @@ export const loadUiConfig = (): UiConfig => {
     const resolvedPresetId = UI_PRESETS.some((item) => item.id === presetId)
       ? presetId
       : DEFAULT_UI_CONFIG.activePresetId;
-    const statusPresetId = parsed.activeStatusPresetId ?? DEFAULT_UI_CONFIG.activeStatusPresetId;
+    const statusPresetId =
+      parsed.activeStatusPresetId ?? DEFAULT_UI_CONFIG.activeStatusPresetId;
     const resolvedStatusPresetId = UI_STATUS_PRESETS.some(
       (item) => item.id === statusPresetId,
     )
@@ -701,18 +702,28 @@ export const loadUiConfig = (): UiConfig => {
           ...(DEFAULT_FACILITIES_UTILITIES_CONFIG.meterTypes || {}),
           ...(parsed.moduleOverrides?.facilitiesUtilities?.meterTypes || {}),
         },
-        rentableItems: parsed.moduleOverrides?.facilitiesUtilities?.rentableItems || DEFAULT_FACILITIES_UTILITIES_CONFIG.rentableItems,
+        rentableItems:
+          parsed.moduleOverrides?.facilitiesUtilities?.rentableItems ||
+          DEFAULT_FACILITIES_UTILITIES_CONFIG.rentableItems,
       },
     };
 
+    // Normalize labels: replace raw keys that were never properly set
+    const mergedLabels = {
+      ...DEFAULT_UI_CONFIG.labels,
+      ...(parsed.labels || {}),
+    };
+    // Fix legacy raw-key labels (e.g. 'collection_finance' → 'Collection & Finance')
+    for (const [key, value] of Object.entries(mergedLabels)) {
+      if (value === key) {
+        mergedLabels[key] = DEFAULT_UI_CONFIG.labels[key] || value;
+      }
+    }
     return {
       ...DEFAULT_UI_CONFIG,
       ...parsed,
       tokens: mergedTokens,
-      labels: {
-        ...DEFAULT_UI_CONFIG.labels,
-        ...(parsed.labels || {}),
-      },
+      labels: mergedLabels,
       moduleOverrides: mergedModuleOverrides,
       paletteMode,
       activePresetId: paletteMode === 'preset' ? resolvedPresetId : null,
@@ -796,12 +807,30 @@ const setColorVars = (tokens: UiTokens): void => {
   setColorVar('--link', tokens.link);
   setColorVar('--ring', tokens.primary);
 
-  document.documentElement.style.setProperty('--primary-foreground', 'var(--primary-fg)');
-  document.documentElement.style.setProperty('--secondary-foreground', 'var(--secondary-fg)');
-  document.documentElement.style.setProperty('--success-foreground', 'var(--success-fg)');
-  document.documentElement.style.setProperty('--warning-foreground', 'var(--warning-fg)');
-  document.documentElement.style.setProperty('--danger-foreground', 'var(--danger-fg)');
-  document.documentElement.style.setProperty('--info-foreground', 'var(--info-fg)');
+  document.documentElement.style.setProperty(
+    '--primary-foreground',
+    'var(--primary-fg)',
+  );
+  document.documentElement.style.setProperty(
+    '--secondary-foreground',
+    'var(--secondary-fg)',
+  );
+  document.documentElement.style.setProperty(
+    '--success-foreground',
+    'var(--success-fg)',
+  );
+  document.documentElement.style.setProperty(
+    '--warning-foreground',
+    'var(--warning-fg)',
+  );
+  document.documentElement.style.setProperty(
+    '--danger-foreground',
+    'var(--danger-fg)',
+  );
+  document.documentElement.style.setProperty(
+    '--info-foreground',
+    'var(--info-fg)',
+  );
 };
 
 const setColorVar = (name: string, hex: string): void => {
@@ -809,7 +838,10 @@ const setColorVar = (name: string, hex: string): void => {
   if (!rgb) {
     return;
   }
-  document.documentElement.style.setProperty(name, `${rgb.r} ${rgb.g} ${rgb.b}`);
+  document.documentElement.style.setProperty(
+    name,
+    `${rgb.r} ${rgb.g} ${rgb.b}`,
+  );
 };
 
 const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
@@ -841,10 +873,15 @@ export const getModuleConfig = (moduleId: ModuleId): ModuleStatusConfig => {
   const override = config.moduleOverrides?.[moduleId];
 
   if (moduleId === 'areaAvailability') {
-    return override as AreaAvailabilityConfig || DEFAULT_AREA_AVAILABILITY_CONFIG;
+    return (
+      (override as AreaAvailabilityConfig) || DEFAULT_AREA_AVAILABILITY_CONFIG
+    );
   }
   if (moduleId === 'facilitiesUtilities') {
-    return override as FacilitiesUtilitiesConfig || DEFAULT_FACILITIES_UTILITIES_CONFIG;
+    return (
+      (override as FacilitiesUtilitiesConfig) ||
+      DEFAULT_FACILITIES_UTILITIES_CONFIG
+    );
   }
 
   return DEFAULT_AREA_AVAILABILITY_CONFIG; // fallback
@@ -871,7 +908,7 @@ export const getFacilitiesUtilitiesConfig = (): FacilitiesUtilitiesConfig => {
 export const applyModuleScopedColors = (
   element: HTMLElement,
   moduleId: ModuleId,
-  colorMap: Record<string, string>
+  colorMap: Record<string, string>,
 ): void => {
   if (!element) return;
 
@@ -888,7 +925,11 @@ export const applyModuleScopedColors = (
 /**
  * Get color for a specific module and key with fallback
  */
-export const getModuleColor = (moduleId: ModuleId, key: string, fallback?: string): string => {
+export const getModuleColor = (
+  moduleId: ModuleId,
+  key: string,
+  fallback?: string,
+): string => {
   const config = getModuleConfig(moduleId);
   return config.colors?.[key] || fallback || '#000000';
 };
@@ -896,7 +937,11 @@ export const getModuleColor = (moduleId: ModuleId, key: string, fallback?: strin
 /**
  * Get label for a specific module and key with fallback
  */
-export const getModuleLabel = (moduleId: ModuleId, key: string, fallback?: string): string => {
+export const getModuleLabel = (
+  moduleId: ModuleId,
+  key: string,
+  fallback?: string,
+): string => {
   const config = getModuleConfig(moduleId);
   return config.labels?.[key] || fallback || key;
 };
@@ -904,7 +949,11 @@ export const getModuleLabel = (moduleId: ModuleId, key: string, fallback?: strin
 /**
  * Get English label for a specific module and key with fallback
  */
-export const getModuleLabelEn = (moduleId: ModuleId, key: string, fallback?: string): string => {
+export const getModuleLabelEn = (
+  moduleId: ModuleId,
+  key: string,
+  fallback?: string,
+): string => {
   const config = getModuleConfig(moduleId);
   return config.labelsEn?.[key] || fallback || key;
 };
@@ -912,7 +961,11 @@ export const getModuleLabelEn = (moduleId: ModuleId, key: string, fallback?: str
 /**
  * Get icon for a specific module and key with fallback
  */
-export const getModuleIcon = (moduleId: ModuleId, key: string, fallback?: string): string => {
+export const getModuleIcon = (
+  moduleId: ModuleId,
+  key: string,
+  fallback?: string,
+): string => {
   const config = getModuleConfig(moduleId);
   return config.icons?.[key] || fallback || '';
 };
@@ -920,31 +973,45 @@ export const getModuleIcon = (moduleId: ModuleId, key: string, fallback?: string
 /**
  * Get icon type for a specific module and key
  */
-export const getModuleIconType = (moduleId: ModuleId, key: string): 'library' | 'upload' => {
+export const getModuleIconType = (
+  moduleId: ModuleId,
+  key: string,
+): 'library' | 'upload' => {
   const config = getModuleConfig(moduleId);
-  return config.iconTypes?.[key] || (config.icons?.[key]?.startsWith('data:') ? 'upload' : 'library');
+  return (
+    config.iconTypes?.[key] ||
+    (config.icons?.[key]?.startsWith('data:') ? 'upload' : 'library')
+  );
 };
 
 /**
  * Get status icon for Area Availability module
  */
-export const getAreaStatusIcon = (statusId: string, fallback?: string): string => {
+export const getAreaStatusIcon = (
+  statusId: string,
+  fallback?: string,
+): string => {
   const config = getAreaAvailabilityConfig();
   // Check config first, then fallback, then default from DEFAULT_AREA_AVAILABILITY_CONFIG
-  const icon = config.statusIcons?.[statusId] ||
-               fallback ||
-               DEFAULT_AREA_AVAILABILITY_CONFIG.statusIcons?.[statusId] ||
-               'pi-building';
+  const icon =
+    config.statusIcons?.[statusId] ||
+    fallback ||
+    DEFAULT_AREA_AVAILABILITY_CONFIG.statusIcons?.[statusId] ||
+    'pi-building';
   return icon;
 };
 
 /**
  * Get status icon type for Area Availability module
  */
-export const getAreaStatusIconType = (statusId: string): 'library' | 'upload' => {
+export const getAreaStatusIconType = (
+  statusId: string,
+): 'library' | 'upload' => {
   const config = getAreaAvailabilityConfig();
-  return config.statusIconTypes?.[statusId] ||
-         (config.statusIcons?.[statusId]?.startsWith('data:') ? 'upload' : 'library');
+  return (
+    config.statusIconTypes?.[statusId] ||
+    (config.statusIcons?.[statusId]?.startsWith('data:') ? 'upload' : 'library')
+  );
 };
 
 /**
@@ -964,16 +1031,20 @@ export const fileToDataURL = (file: File): Promise<string> => {
  */
 export const updateModuleConfig = (
   moduleId: ModuleId,
-  updates: Partial<ModuleStatusConfig>
+  updates: Partial<ModuleStatusConfig>,
 ): void => {
   const config = loadUiConfig();
 
   // Get current config with proper typing
   let current: ModuleStatusConfig;
   if (moduleId === 'areaAvailability') {
-    current = config.moduleOverrides?.areaAvailability || DEFAULT_AREA_AVAILABILITY_CONFIG;
+    current =
+      config.moduleOverrides?.areaAvailability ||
+      DEFAULT_AREA_AVAILABILITY_CONFIG;
   } else if (moduleId === 'facilitiesUtilities') {
-    current = config.moduleOverrides?.facilitiesUtilities || DEFAULT_FACILITIES_UTILITIES_CONFIG;
+    current =
+      config.moduleOverrides?.facilitiesUtilities ||
+      DEFAULT_FACILITIES_UTILITIES_CONFIG;
   } else {
     current = DEFAULT_AREA_AVAILABILITY_CONFIG;
   }

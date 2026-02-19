@@ -1,0 +1,69 @@
+<!-- kpi-summary.component.html -->
+
+<div class="kpi-summary-container">
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <div class="header-content">
+      <div class="header-title">
+        <i class="pi pi-chart-line"></i>
+        <div>
+          <h3 class="title">Key Performance Indicators</h3>
+          <p class="subtitle">ตัวชี้วัดผลการดำเนินงานหลัก</p>
+        </div>
+      </div>
+      <button
+        class="btn-refresh"
+        (click)="refresh()"
+        [disabled]="isLoading()"
+        title="Refresh data"
+      >
+        <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <p>{{ error() }}</p>
+      <button class="btn-retry" (click)="refresh()">
+        <i class="pi pi-refresh"></i>
+        <span>Try Again</span>
+      </button>
+    </div>
+  }
+
+  <!-- KPI Cards Grid -->
+  @if (kpiMetrics()) {
+    <div class="kpi-grid">
+
+      <!-- Total ARR Card -->
+      <app-metric-card
+        [metric]="kpiMetrics()!.totalARR"
+        [isLoading]="isLoading()"
+      ></app-metric-card>
+
+      <!-- Pipeline Value Card -->
+      <app-metric-card
+        [metric]="kpiMetrics()!.pipelineValue"
+        [isLoading]="isLoading()"
+      ></app-metric-card>
+
+      <!-- Win Rate Card -->
+      <app-metric-card
+        [metric]="kpiMetrics()!.winRate"
+        [isLoading]="isLoading()"
+      ></app-metric-card>
+
+      <!-- Team Attainment Card -->
+      <app-metric-card
+        [metric]="kpiMetrics()!.teamAttainment"
+        [isLoading]="isLoading()"
+      ></app-metric-card>
+
+    </div>
+  }
+
+</div>

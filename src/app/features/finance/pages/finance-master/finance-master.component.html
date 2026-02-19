@@ -32,19 +32,25 @@
   <div class="tab-content">
     @if (isActiveTab('dashboard')) {
       <div class="tab-panel">
-      <app-finance-dashboard />
+        <app-finance-dashboard />
       </div>
     }
 
     @if (isActiveTab('invoices')) {
       <div class="tab-panel">
-      <app-invoice-management />
+        <app-invoice-management />
+      </div>
+    }
+
+    @if (isActiveTab('pre-receipts')) {
+      <div class="tab-panel">
+        <app-pre-receipt-management />
       </div>
     }
 
     @if (isActiveTab('receipts')) {
       <div class="tab-panel">
-      <app-receipt-management />
+        <app-receipt-management />
       </div>
     }
   </div>
