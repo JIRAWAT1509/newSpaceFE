@@ -1,0 +1,218 @@
+<!-- pre-receipt-management.component.html -->
+
+<div class="receipt-container">
+  <!-- Header -->
+  <div class="content-header">
+    <div>
+      <h2 class="page-title">รายการรอออกใบเสร็จรับเงิน</h2>
+      <p class="page-subtitle">เลือกรายการเพื่อออกใบเสร็จ</p>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table class="receipt-table">
+      <thead>
+        <tr>
+          <th class="checkbox-col">
+            <input
+              type="checkbox"
+              [checked]="isAllSelected()"
+              (change)="toggleSelectAll($event)"
+            />
+          </th>
+          <th (click)="sortBy('contractNumber')">
+            เลขที่ใบแจ้งหนี้
+            <i class="pi sort-icon" [ngClass]="getSortIcon('contractNumber')"></i>
+          </th>
+          <th (click)="sortBy('customerName')">
+            ชื่อลูกค้า
+            <i class="pi sort-icon" [ngClass]="getSortIcon('customerName')"></i>
+          </th>
+          <th (click)="sortBy('collectionItem')">
+            รายการเรียกเก็บหลัก
+            <i class="pi sort-icon" [ngClass]="getSortIcon('collectionItem')"></i>
+          </th>
+          <th (click)="sortBy('amount')">
+            ยอดเงิน (รวมภาษี)
+            <i class="pi sort-icon" [ngClass]="getSortIcon('amount')"></i>
+          </th>
+          <th (click)="sortBy('startDate')">
+            วันที่เริ่มต้นเรียกเก็บ
+            <i class="pi sort-icon" [ngClass]="getSortIcon('startDate')"></i>
+          </th>
+          <th (click)="sortBy('status')">
+            สถานะ
+            <i class="pi sort-icon" [ngClass]="getSortIcon('status')"></i>
+          </th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (receipt of receipts(); track receipt.id) {
+          <tr [class.selected]="isSelected(receipt.id)">
+            <td class="checkbox-col">
+              <input
+                type="checkbox"
+                [checked]="isSelected(receipt.id)"
+                (change)="toggleSelection(receipt.id)"
+              />
+            </td>
+            <td>
+              <div class="contract-number">{{ receipt.contractNumber }}</div>
+            </td>
+            <td>
+              <div class="customer-name">{{ receipt.customerName }}</div>
+            </td>
+            <td>
+              <div class="collection-item">{{ receipt.collectionItem }}</div>
+            </td>
+            <td>
+              <div class="amount">฿{{ receipt.amount.toLocaleString() }}</div>
+            </td>
+            <td>
+              <div class="date">{{ receipt.startDate }}</div>
+            </td>
+            <td>
+              <span class="status-badge status-ready">พร้อมออกใบเสร็จ</span>
+            </td>
+            <td>
+              <div class="row-actions">
+                <button class="action-btn" title="Preview" (click)="onPreview(receipt)">
+                  <i class="pi pi-eye"></i>
+                </button>
+                <button class="action-btn" title="Edit" (click)="onEdit(receipt)">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button class="action-btn danger" title="Cancel" (click)="onCancel(receipt)">
+                  <i class="pi pi-times"></i>
+                </button>
+                <button class="action-btn" title="เพิ่มเติม" (click)="toggleRowMenu(receipt.id, $event)">
+                  <i class="pi pi-ellipsis-v"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (receipts().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <h3>ไม่มีข้อมูล</h3>
+        <p>ไม่พบรายการรอออกใบเสร็จ</p>
+      </div>
+    }
+  </div>
+
+  <!-- Bottom Action Bar -->
+  @if (showBulkActions()) {
+    <div class="bottom-action-bar">
+      <div class="selection-info">
+        <span class="selected-text">
+          เลือกแล้ว <strong>{{ getSelectedCount() }}</strong> รายการ
+        </span>
+      </div>
+      <div class="bulk-actions">
+        <button class="btn btn-secondary" (click)="toggleSelectAll($event)">
+          ยกเลิกการเลือก
+        </button>
+        <button class="btn btn-create" (click)="onBulkCreateReceipts()">
+          <i class="pi pi-file-check"></i>
+          <span>สร้างใบเสร็จรับเงิน</span>
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Kebab Menu -->
+@if (showRowMenu() && currentReceipt()) {
+  <div class="action-menu-portal" [style.top.px]="menuPosition().top" [style.left.px]="menuPosition().left">
+    <div class="action-menu">
+      <button class="menu-item" (click)="onMenuAction(currentReceipt()!, 'ออกใบเสร็จ')">
+        <i class="pi pi-file-check"></i>
+        <span>ออกใบเสร็จ</span>
+      </button>
+      <button class="menu-item" (click)="onMenuAction(currentReceipt()!, 'ออกใบเสร็จ + พิมพ์')">
+        <i class="pi pi-print"></i>
+        <span>ออกใบเสร็จ + พิมพ์เอกสาร</span>
+      </button>
+      <button class="menu-item" (click)="onMenuAction(currentReceipt()!, 'ออกใบเสร็จ + ส่งอีเมล')">
+        <i class="pi pi-send"></i>
+        <span>ออกใบเสร็จ + ส่งอีเมล</span>
+      </button>
+      <button class="menu-item danger" (click)="onMenuAction(currentReceipt()!, 'ลบสัญญา')">
+        <i class="pi pi-trash"></i>
+        <span>ลบสัญญา</span>
+      </button>
+    </div>
+  </div>
+}
+
+@if (showRowMenu()) {
+  <div class="menu-overlay" (click)="closeRowMenu()"></div>
+}
+
+<!-- Detail Modal -->
+@if (showDetailModal() && currentReceipt()) {
+  <app-receipt-detail-modal
+    [receipt]="currentReceipt()!"
+    (close)="closeDetailModal()"
+  />
+}
+
+<!-- Edit Modal -->
+@if (showEditModal() && editingReceipt()) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="edit-modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>แก้ไขข้อมูล</h3>
+        <button class="close-btn" (click)="closeEditModal()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>เลขที่ใบแจ้งหนี้</label>
+          <input type="text" [value]="getEditValue('contractNumber')" (input)="setEditValue('contractNumber', $any($event.target).value)" />
+        </div>
+        <div class="form-group">
+          <label>ชื่อลูกค้า</label>
+          <input type="text" [value]="getEditValue('customerName')" (input)="setEditValue('customerName', $any($event.target).value)" />
+        </div>
+        <div class="form-group">
+          <label>รายการเรียกเก็บหลัก</label>
+          <input type="text" [value]="getEditValue('collectionItem')" (input)="setEditValue('collectionItem', $any($event.target).value)" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ยอดเงิน</label>
+            <input type="number" [value]="getEditValue('amount')" (input)="setEditValue('amount', +$any($event.target).value)" />
+          </div>
+          <div class="form-group">
+            <label>วันที่เริ่มต้นเรียกเก็บ</label>
+            <input type="date" [value]="getEditValue('startDate')" (input)="setEditValue('startDate', $any($event.target).value)" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeEditModal()">ยกเลิก</button>
+        <button class="btn btn-primary" (click)="onSaveEdit()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal()"
+  type="warning"
+  title="ยกเลิกรายการ"
+  [message]="'คุณต้องการยกเลิกรายการ ' + (pendingCancelReceipt()?.contractNumber || '') + ' หรือไม่?'"
+  confirmText="ยืนยัน"
+  confirmIcon="pi-check"
+  (confirm)="onConfirmCancel()"
+  (cancel)="onCancelConfirm()"
+/>
