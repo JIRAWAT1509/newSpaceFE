@@ -184,15 +184,9 @@
   @apply flex items-center justify-center gap-2;
 }
 
+/* ปุ่มแก้ไข/ลบใช้จาก global styles.css */
 .action-btn {
-  @apply w-8 h-8 flex items-center justify-center;
-  @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50;
-  @apply rounded-lg transition-all duration-200;
-  @apply border-none cursor-pointer;
-}
-
-.action-btn.danger {
-  @apply text-red-600 hover:text-red-700 hover:bg-red-50;
+  @apply flex items-center justify-center rounded-lg transition-all duration-200 border-none cursor-pointer;
 }
 
 /* Action Menu */

@@ -1,6 +1,6 @@
 <!-- deposit-tab.component.html -->
 
-<div class="deposit-wrapper">
+<div class="deposit-wrapper" [class.drawer-open]="showGuaranteeDrawer()">
 
   <!-- Back to Top Button -->
   <button
@@ -165,7 +165,7 @@
       }
     </div>
 
-    <!-- Section 2: หลักประกัน (Guarantee Documents) -->
+    <!-- Section 2: หลักประกัน -->
     <div class="form-section" id="section-guarantee">
       <div class="section-header">
         <h4>หลักประกัน</h4>
@@ -227,6 +227,7 @@
             <h6>เงินโอนจากใบเสร็จ</h6>
             <button type="button" class="btn-add-sm" (click)="addReceiptTransfer()">
               <i class="pi pi-plus"></i>
+              <span>เพิ่ม</span>
             </button>
           </div>
 

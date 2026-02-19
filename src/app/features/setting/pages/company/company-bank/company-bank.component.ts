@@ -12,6 +12,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { TextareaModule } from 'primeng/textarea';
 import { TabsModule } from 'primeng/tabs';
 import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface Bank {
   OU_CODE: string;
@@ -85,7 +86,8 @@ interface GLAccount {
     ConfirmDialogModule,
     TextareaModule,
     TabsModule,
-    SelectModule
+    SelectModule,
+    TooltipModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './company-bank.component.html',

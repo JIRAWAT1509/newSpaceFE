@@ -153,13 +153,33 @@
             <h4 class="branch-name-en">{{ branch.BRANCH_NAME_EN }}</h4>
             <p class="branch-name-th">{{ branch.BRANCH_NAME_TH }}</p>
           </div>
-          <div class="branch-card-footer">
+          <div class="branch-card-actions">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              size="small"
+              pTooltip="แก้ไขสาขา"
+              (onClick)="openEditBranchModal(branch); $event.stopPropagation()"
+            ></p-button>
             <p-button
               icon="pi pi-eye"
-              label="View Details"
+              [rounded]="true"
               [text]="true"
+              severity="secondary"
               size="small"
+              pTooltip="ดูรายละเอียดและบัญชี"
               (onClick)="viewBranchDetails(branch); $event.stopPropagation()"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              size="small"
+              pTooltip="ลบสาขา"
+              (onClick)="deleteBranch(branch); $event.stopPropagation()"
             ></p-button>
           </div>
         </div>
@@ -394,12 +414,12 @@
       </div>
     </div>
 
-    <!-- Accounts Table Section -->
+    <!-- รหัสการนำส่งเงินเข้าบัญชีธนาคาร / Account Information -->
     <div class="accounts-section">
       <div class="accounts-header">
         <h3 class="section-title">
           <i class="pi pi-wallet"></i>
-          Account Information
+          รหัสการนำส่งเงินเข้าบัญชีธนาคาร
         </h3>
           <p-button
           label="เพิ่ม"
@@ -422,11 +442,11 @@
   <table class="data-table">
     <thead>
       <tr>
-        <th>Payment Code</th>
-        <th>Account Number</th>
-        <th>Account Type</th>
-        <th>GL Account</th>
-        <th>Description</th>
+        <th>รหัสการนำส่งเงินเข้าบัญชี</th>
+        <th>เลขบัญชี</th>
+        <th>ประเภทบัญชี</th>
+        <th>บัญชีแยกประเภท (GL)</th>
+        <th>รายละเอียด</th>
       </tr>
     </thead>
     <tbody>
@@ -491,7 +511,7 @@
 </p-dialog>
 
 <!-- ============================================ -->
-<!-- MODAL 4: Account Add/Edit Modal -->
+<!-- MODAL 4: Account Add/Edit (รหัสการนำส่งเงินเข้าบัญชีธนาคาร) -->
 <!-- ============================================ -->
 <p-dialog
   [(visible)]="showAccountModal"
@@ -500,9 +520,13 @@
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: '700px', maxWidth: '95vw' }"
-  [header]="isAccountEditMode ? 'Edit Account' : 'Add New Account'"
+  [header]="isAccountEditMode ? 'แก้ไขรหัสการนำส่งเงินเข้าบัญชี' : 'เพิ่มรหัสการนำส่งเงินเข้าบัญชีธนาคาร'"
 >
   <div class="modal-content">
+    <h4 class="modal-section-title">
+      <i class="pi pi-wallet"></i>
+      รหัสการนำส่งเงินเข้าบัญชีธนาคาร
+    </h4>
     <div class="form-row">
       <div class="form-field">
         <label class="form-label">Bank Code</label>
@@ -573,16 +597,21 @@
       ></p-select>
     </div>
 
-    <div class="form-field">
-      <label class="form-label">Payment Code</label>
+    <div class="form-field form-field-paid-for" [class.has-error]="accountErrors['PAID_FOR_CODE']">
+      <label class="form-label required">รหัสการนำส่งเงินเข้าบัญชีธนาคาร</label>
       <input
         type="text"
         pInputText
         [(ngModel)]="accountForm.PAID_FOR_CODE"
         [disabled]="isAccountEditMode"
-        placeholder="Auto-generated if empty"
+        placeholder="กรอกรหัสการนำส่งเงิน (เช่น 001, B001)"
         class="form-input"
       />
+      <div *ngIf="accountErrors['PAID_FOR_CODE']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ accountErrors['PAID_FOR_CODE'] }}</span>
+      </div>
+      <p class="form-hint">รหัสใช้ระบุการนำส่งเงินเข้าบัญชีนี้ (ต้องไม่ซ้ำในระบบ)</p>
     </div>
 
     <div class="form-field">

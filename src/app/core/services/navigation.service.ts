@@ -23,12 +23,36 @@ export class NavigationService {
     public readonly isSidebarExpanded = this.sidebarIsExpanded.asReadonly();
 
 
+  /** Map URL path segment to primary nav (sidebar ต้องแสดงเมนูให้ตรงกับหน้าที่อยู่) */
+  private getPrimaryFromUrl(url: string): string | null {
+    const path = url.split('?')[0];
+    const segments = path.split('/').filter(Boolean);
+    const first = segments[0] || '';
+    const segmentToPrimary: Record<string, string> = {
+      setting: 'setting',
+      sales: 'sales',
+      area: 'area',
+      contract: 'contract',
+      collection: 'collection_finance',
+      finance: 'collection_finance',
+      facilities: 'facilities',
+      reports: 'report_dashboard',
+      dashboard: 'dashboard',
+    };
+    return segmentToPrimary[first] ?? null;
+  }
+
   constructor(private router: Router) {
-    // Listen to router events to automatically update the active sub-route
+    // Sync active sub-route AND primary nav from URL (แก้ปัญหาเมนูซ้ายหายเมื่อเข้าโดยตรง/รีเฟรช)
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
-      this.activeSubRoute.set(event.urlAfterRedirects);
+      const url = event.urlAfterRedirects;
+      this.activeSubRoute.set(url);
+      const primary = this.getPrimaryFromUrl(url);
+      if (primary) {
+        this.activePrimaryNavItem.set(primary);
+      }
     });
   }
 

@@ -1,6 +1,33 @@
 /* user-form-drawer.component.css */
 
+/* Drawer layout: header + scrollable body + footer (ไม่ให้เนื้อหาหรือปุ่มโดนบัง) */
+.drawer-panel {
+  overflow: hidden;
+}
+
+.drawer-body {
+  -webkit-overflow-scrolling: touch;
+  /* ขยับเนื้อหาลง ให้หัวข้อ Basic Information ไม่ชิด header */
+  padding-top: 2rem;
+  padding-bottom: 0.5rem;
+}
+
+/* หัวฟอร์ม บนสุดของเนื้อหา */
+.form-heading-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0.5rem 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.drawer-body form {
+  padding-bottom: 0.5rem;
+}
+
 /* Custom scrollbar for form content */
+.drawer-body::-webkit-scrollbar,
 .overflow-y-auto::-webkit-scrollbar {
   width: 8px;
 }

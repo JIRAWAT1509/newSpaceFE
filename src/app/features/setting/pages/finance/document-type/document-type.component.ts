@@ -308,8 +308,15 @@ export class DocumentTypeComponent implements OnInit {
 
   openEditDrawer(documentType: DocumentType): void {
     this.drawerMode.set('edit');
-    this.selectedDocumentType.set(documentType);
+    this.selectedDocumentType.set({ ...documentType });
     this.isDrawerOpen.set(true);
+  }
+
+  /** เรียกเมื่อกดไอคอนแก้ไข — หยุด bubbling แล้วเปิด drawer */
+  onEditClick(documentType: DocumentType, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.openEditDrawer(documentType);
   }
 
   closeDrawer(): void {

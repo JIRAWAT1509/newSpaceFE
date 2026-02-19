@@ -294,7 +294,10 @@
   [closable]="true"
   [draggable]="false"
   [resizable]="false"
-  [style]="{ width: '500px' }"
+  [style]="{ width: '500px', maxHeight: '85vh' }"
+  [contentStyle]="{ 'overflow-y': 'auto', 'flex': '1 1 auto', 'min-height': '0' }"
+  styleClass="role-permission-dialog"
+  contentStyleClass="role-permission-dialog-content"
   header="Copy Permissions from Another Role"
 >
   <div class="modal-content-body">
@@ -325,13 +328,13 @@
   <ng-template pTemplate="footer">
     <div class="dialog-footer-actions">
       <p-button
-        label="Cancel"
+        label="ยกเลิก"
         severity="secondary"
         [outlined]="true"
         (onClick)="cancelCopyModal()"
       ></p-button>
       <p-button
-        label="Apply / Copy Permissions"
+        label="OK - Copy Permissions"
         icon="pi pi-copy"
         severity="primary"
         [disabled]="!copyFromRole || copyFromRole === selectedRole"
@@ -348,7 +351,10 @@
   [closable]="true"
   [draggable]="false"
   [resizable]="false"
-  [style]="{ width: '600px' }"
+  [style]="{ width: '600px', maxHeight: '85vh' }"
+  [contentStyle]="{ 'overflow-y': 'auto', 'flex': '1 1 auto', 'min-height': '0' }"
+  styleClass="role-permission-dialog"
+  contentStyleClass="role-permission-dialog-content"
   header="Apply Permission Template"
 >
   <div class="modal-content-body">
@@ -391,13 +397,13 @@
   <ng-template pTemplate="footer">
     <div class="dialog-footer-actions">
       <p-button
-        label="Cancel"
+        label="ยกเลิก"
         severity="secondary"
         [outlined]="true"
         (onClick)="cancelTemplateModal()"
       ></p-button>
       <p-button
-        label="Apply Template"
+        label="OK - Apply Template"
         icon="pi pi-check"
         severity="primary"
         [disabled]="!selectedTemplate || selectedTemplate === ''"

@@ -1,5 +1,5 @@
 // business-form-drawer.component.ts
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -26,13 +26,19 @@ export class BusinessFormDrawerComponent implements OnChanges {
   isSubmitting: boolean = false;
   errors: { [key: string]: string } = {};
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['item'] && this.item && this.mode === 'edit') {
+    if (this.mode === 'create') {
+      if (changes['mode']?.currentValue === 'create' || changes['formType']) {
+        this.resetForm();
+      }
+      return;
+    }
+    // โหมดแก้ไข: เติมฟอร์มทุกครั้งที่ drawer เปิดและมี item (แก้ปัญหาแก้ไขไม่ได้)
+    if (this.isOpen && this.mode === 'edit' && this.item) {
       this.populateForm(this.item);
-    } else if (changes['mode'] && this.mode === 'create') {
-      this.resetForm();
-    } else if (changes['formType']) {
-      this.resetForm();
+      this.cdr.markForCheck();
     }
   }
 
@@ -53,12 +59,32 @@ export class BusinessFormDrawerComponent implements OnChanges {
 
   populateForm(item: any): void {
     this.formData = { ...item };
+    // เติมค่าให้ชัดเจนตาม formType
+    if (this.formType === 'profit') {
+      this.formData.COST_CENTER_CODE = item.COST_CENTER_CODE ?? '';
+      this.formData.COST_CENTER_NAME = item.COST_CENTER_NAME ?? '';
+    } else if (this.formType === 'main-business') {
+      this.formData.BUS_TYPE_CODE = item.BUS_TYPE_CODE ?? '';
+      this.formData.BUS_TYPE_NAME = item.BUS_TYPE_NAME ?? '';
+    } else if (this.formType === 'sub-business') {
+      this.formData.BUS_SUBTYPE_CODE = item.BUS_SUBTYPE_CODE ?? '';
+      this.formData.BUS_SUBTYPE_NAME = item.BUS_SUBTYPE_NAME ?? '';
+      this.formData.BUS_TYPE_CODE = item.BUS_TYPE_CODE ?? '';
+      this.formData.COST_CENTER_CODE = item.COST_CENTER_CODE ?? '';
+    }
   }
 
   resetForm(): void {
-    this.formData = {
-      OU_CODE: '001'
-    };
+    const base: any = { OU_CODE: '001' };
+    if (this.formType === 'profit') {
+      this.formData = { ...base, COST_CENTER_CODE: '', COST_CENTER_NAME: '' };
+    } else if (this.formType === 'main-business') {
+      this.formData = { ...base, BUS_TYPE_CODE: '', BUS_TYPE_NAME: '' };
+    } else if (this.formType === 'sub-business') {
+      this.formData = { ...base, BUS_SUBTYPE_CODE: '', BUS_SUBTYPE_NAME: '', BUS_TYPE_CODE: '', COST_CENTER_CODE: '' };
+    } else {
+      this.formData = { ...base };
+    }
     this.errors = {};
   }
 

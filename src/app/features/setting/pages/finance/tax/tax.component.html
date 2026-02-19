@@ -95,12 +95,13 @@
                 <th>รหัสภาษีบัญชีแยกเงิน (SAP)</th>
                 <th>เลขที่บัญชี</th>
                 <th>เลขที่บัญชีรับวิธีการที่เกี่ยวข้องกัน</th>
+                <th style="width: 100px; text-align: center;">จัดการ</th>
               </tr>
             </thead>
             <tbody>
               @for (tax of filteredVATTaxes(); track tax.id) {
-                <tr class="clickable-row" (click)="onVATRowClick(tax)">
-                  <td (click)="$event.stopPropagation()">
+                <tr>
+                  <td>
                     <input type="checkbox" />
                   </td>
                   <td><strong>{{ tax.code }}</strong></td>
@@ -109,6 +110,26 @@
                   <td>{{ tax.sapAccountCode }}</td>
                   <td>{{ tax.accountNumber }}</td>
                   <td>{{ tax.relatedAccountNumber }}</td>
+                  <td class="actions-column">
+                    <div class="flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        class="action-btn action-btn-edit"
+                        (click)="openVATModal(tax)"
+                        title="แก้ไข"
+                      >
+                        <i class="pi pi-pencil"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="action-btn action-btn-delete"
+                        (click)="deleteVAT(tax.id, $event)"
+                        title="ลบ"
+                      >
+                        <i class="pi pi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               }
             </tbody>
@@ -174,12 +195,13 @@
                 <th>อัตราภาษี (%)</th>
                 <th>เลขที่บัญชี</th>
                 <th>เลขที่บัญชีรับวิธีการที่เกี่ยวข้องกัน</th>
+                <th style="width: 100px; text-align: center;">จัดการ</th>
               </tr>
             </thead>
             <tbody>
               @for (tax of filteredWithholdingTaxes(); track tax.id) {
-                <tr class="clickable-row" (click)="onWithholdingRowClick(tax)">
-                  <td (click)="$event.stopPropagation()">
+                <tr>
+                  <td>
                     <input type="checkbox" />
                   </td>
                   <td><strong>{{ tax.code }}</strong></td>
@@ -187,6 +209,26 @@
                   <td>{{ tax.rate | number:'1.2-2' }}</td>
                   <td>{{ tax.accountNumber }}</td>
                   <td>{{ tax.relatedAccountNumber }}</td>
+                  <td class="actions-column">
+                    <div class="flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        class="action-btn action-btn-edit"
+                        (click)="openWithholdingModal(tax)"
+                        title="แก้ไข"
+                      >
+                        <i class="pi pi-pencil"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="action-btn action-btn-delete"
+                        (click)="deleteWithholding(tax.id, $event)"
+                        title="ลบ"
+                      >
+                        <i class="pi pi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               }
             </tbody>
@@ -209,7 +251,7 @@
   [(visible)]="showVATModal"
   [modal]="true"
   [style]="{ width: '600px' }"
-  [header]="isEditMode() ? 'ภาษีมูลค่าเพิ่ม (แก้ไข)' : 'ภาษีมูลค่าเพิ่ม (เพิ่ม)'"
+  [header]="isEditMode() ? 'ภาษีมูลค่าเพิ่ม' : 'ภาษีมูลค่าเพิ่ม (เพิ่ม)'"
   [draggable]="false"
   [resizable]="false">
 
@@ -335,7 +377,7 @@
   [(visible)]="showWithholdingModal"
   [modal]="true"
   [style]="{ width: '600px' }"
-  [header]="isEditMode() ? 'ภาษีหัก ณ ที่จ่าย (แก้ไข)' : 'ภาษีหัก ณ ที่จ่าย (เพิ่ม)'"
+  [header]="isEditMode() ? 'ภาษีหัก ณ ที่จ่าย' : 'ภาษีหัก ณ ที่จ่าย (เพิ่ม)'"
   [draggable]="false"
   [resizable]="false">
 

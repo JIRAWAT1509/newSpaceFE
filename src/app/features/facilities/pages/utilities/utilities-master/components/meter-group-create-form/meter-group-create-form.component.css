@@ -171,36 +171,9 @@
   @apply flex items-center justify-center gap-2;
 }
 
+/* ปุ่มแก้ไข/ลบใช้จาก global styles.css */
 .action-btn {
-  @apply flex items-center justify-center;
-  width: 34px;
-  height: 34px;
-  background-color: transparent;
-  color: rgb(var(--muted));
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.action-btn:hover {
-  background: rgb(var(--bg));
-  color: rgb(var(--fg));
-}
-
-.action-btn.danger {
-  background-color: #E8847C;
-  color: #ffffff;
-  border-radius: 50%;
-}
-
-.action-btn.danger:hover {
-  background-color: #D6726A;
-  color: #ffffff;
-}
-
-.action-btn.danger i {
-  color: #ffffff;
+  @apply flex items-center justify-center border-none cursor-pointer transition-all duration-150;
 }
 
 /* Empty State */

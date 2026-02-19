@@ -329,25 +329,18 @@ export class TaxComponent implements OnInit {
     this.closeWithholdingModal();
   }
 
-  // Row click to edit
-  onVATRowClick(tax: VATTax): void {
-    this.openVATModal(tax);
-  }
-
-  onWithholdingRowClick(tax: WithholdingTax): void {
-    this.openWithholdingModal(tax);
-  }
-
-  // Delete actions (optional)
-  deleteVAT(id: number, event: Event): void {
+  // Delete actions
+  deleteVAT(id: number | undefined, event: Event): void {
     event.stopPropagation();
+    if (id == null) return;
     this.pendingDeleteId.set(id);
     this.pendingDeleteType.set('vat');
     this.showConfirmModal.set(true);
   }
 
-  deleteWithholding(id: number, event: Event): void {
+  deleteWithholding(id: number | undefined, event: Event): void {
     event.stopPropagation();
+    if (id == null) return;
     this.pendingDeleteId.set(id);
     this.pendingDeleteType.set('withholding');
     this.showConfirmModal.set(true);

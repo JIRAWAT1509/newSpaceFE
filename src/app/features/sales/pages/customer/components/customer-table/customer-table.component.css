@@ -253,37 +253,12 @@
   text-align: center;
 }
 
+/* ปุ่มแก้ไข/ลบใช้จาก global styles.css (ขนาดและสีเดียวกันทั้งระบบ) */
 .action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: #6b7280;
-  cursor: pointer;
-  transition: all 0.2s;
   margin: 0 0.25rem;
 }
-
 .action-btn:hover {
   transform: translateY(-1px);
-}
-
-.action-btn.edit:hover {
-  background: #dbeafe;
-  color: #3b82f6;
-}
-
-.action-btn.delete:hover {
-  background: #fee2e2;
-  color: #ef4444;
-}
-
-.action-btn i {
-  font-size: 0.875rem;
 }
 
 /* ==================== RESPONSIVE ==================== */

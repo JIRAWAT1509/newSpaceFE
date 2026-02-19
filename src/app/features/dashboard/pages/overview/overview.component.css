@@ -829,13 +829,13 @@
 .exec-card-occupancy .exec-donut-wrap-center {
   width: 64px !important;
   height: 64px !important;
-  flex-shrink: 0;
+  flex-shrink: 0; 
 }
 
 .exec-card-occupancy .exec-legend-horizontal {
   flex-direction: column;
   gap: 3px !important;
-  align-items: flex-start;  
+  align-items: flex-start;   
 }
 
 .exec-occupancy-chart .exec-mini-grid {

@@ -5,6 +5,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { HeaderService } from '@core/services/header.service';
 import { NavigationService } from '@core/services/navigation.service';
+import { applyUiConfig, loadUiConfig } from '@core/services/ui-settings';
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -46,6 +47,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     if (typeof window !== 'undefined') {
+      // ให้ธีมและสีหลักจากหน้า Interface มีผลทั้งระบบ (sync จาก localStorage ทุกครั้งที่โหลดแอป)
+      applyUiConfig(loadUiConfig());
       this.mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
       this.updateMobileState();
       if (this.isMobile()) {

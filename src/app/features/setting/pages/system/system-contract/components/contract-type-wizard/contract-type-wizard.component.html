@@ -1,28 +1,28 @@
 <!-- contract-type-wizard.component.html -->
 
-<!-- Backdrop -->
+<!-- Backdrop (ใช้ drawer-overlay ให้ z-index สูงกว่า header) -->
 @if (isOpen) {
   <div
-    class="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300"
+    class="drawer-overlay fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300"
     (click)="onBackdropClick()"
   ></div>
 }
 
-<!-- Wizard Modal -->
+<!-- Wizard Modal (เริ่มจากใต้ header เพื่อไม่ให้หัวข้อโดนบัง) -->
 @if (isOpen) {
   <div
-    class="fixed z-50 bg-white rounded-lg shadow-2xl transition-all duration-300 ease-in-out
-           top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-           w-[95%] max-w-[1200px] max-h-[90vh] overflow-hidden"
+    class="fixed z-[60] bg-white rounded-lg shadow-2xl transition-all duration-300 ease-in-out
+           top-[100px] left-1/2 transform -translate-x-1/2
+           w-[95%] max-w-[1200px] max-h-[calc(100vh-120px)] overflow-hidden"
   >
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
-      <h2 class="text-xl font-bold text-white">
+    <!-- Header (สไตล์เดียวกับฟอร์มอื่น: ไม่มีพื้นหลังสีน้ำเงิน) -->
+    <div class="bg-gray-50 border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold text-gray-800">
         {{ mode === 'create' ? 'เพิ่มประเภทสัญญา' : 'แก้ไขประเภทสัญญา' }}
       </h2>
       <button
         (click)="onClose()"
-        class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1 transition-colors"
+        class="text-gray-500 hover:bg-gray-200 hover:text-gray-700 rounded-full p-1 transition-colors"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -725,11 +725,11 @@
   </div>
 }
 
-<!-- Condition Form Modal -->
+<!-- Condition Form Modal (ใช้ drawer-overlay ให้ z-index สูงกว่า header และหัวข้อไม่โดนบัง) -->
 @if (showConditionModal) {
-  <div class="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center" (click)="closeConditionModal()">
-    <div class="bg-white rounded-lg shadow-xl w-[90%] max-w-[600px] p-6" (click)="$event.stopPropagation()">
-      <h3 class="text-lg font-semibold mb-4">{{ conditionEditMode ? 'แก้ไขเงื่อนไข' : 'เพิ่มเงื่อนไข' }}</h3>
+  <div class="drawer-overlay modal-overlay fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center" (click)="closeConditionModal()">
+    <div class="modal-container bg-white rounded-lg shadow-xl w-[90%] max-w-[600px] p-6" (click)="$event.stopPropagation()">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ conditionEditMode ? 'แก้ไขเงื่อนไข' : 'เพิ่มเงื่อนไข' }}</h3>
 
       <div class="space-y-4">
         <div class="form-field">

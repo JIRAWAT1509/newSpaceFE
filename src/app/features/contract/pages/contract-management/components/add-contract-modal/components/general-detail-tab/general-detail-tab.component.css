@@ -170,12 +170,16 @@
 /* ==================== Selector Modal ==================== */
 .selector-modal-backdrop {
   @apply fixed inset-0 bg-black bg-opacity-50 z-[60];
-  @apply flex items-center justify-center p-4;
+  @apply flex justify-center p-4;
+  padding-top: 96px;
+  align-items: flex-start;
+  box-sizing: border-box;
 }
 
 .selector-modal-content {
-  @apply bg-white rounded-lg w-full max-w-md max-h-[80vh];
-  @apply flex flex-col shadow-2xl;
+  @apply bg-white rounded-lg w-full max-w-md shadow-2xl flex flex-col;
+  max-height: calc(100vh - 96px - 1rem);
+  min-height: 200px;
 }
 
 .selector-header {
@@ -206,7 +210,7 @@
 }
 
 .selector-list {
-  @apply flex-1 overflow-auto p-2;
+  @apply flex-1 overflow-y-auto p-2 min-h-0;
 }
 
 .selector-item {

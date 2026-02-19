@@ -17,6 +17,9 @@ interface ContractCondition {
   itemNumber: number;
   title: string;
   content: string;
+  /** เงื่อนไขเพิ่มเติม ส่วนภาษาอังกฤษ */
+  titleEn?: string;
+  contentEn?: string;
 }
 
 @Component({
@@ -71,7 +74,9 @@ export class ConditionsTabComponent implements OnInit {
     this.conditionForm = this.fb.group({
       itemNumber: [1, [Validators.required, Validators.min(1)]],
       title: ['', Validators.required],
-      content: ['', Validators.required]
+      content: ['', Validators.required],
+      titleEn: [''],
+      contentEn: ['']
     });
   }
 
@@ -140,7 +145,9 @@ export class ConditionsTabComponent implements OnInit {
     this.conditionForm.reset({
       itemNumber: nextItemNumber,
       title: '',
-      content: ''
+      content: '',
+      titleEn: '',
+      contentEn: ''
     });
 
     this.showConditionDrawer.set(true);
@@ -153,7 +160,9 @@ export class ConditionsTabComponent implements OnInit {
     this.conditionForm.patchValue({
       itemNumber: condition.itemNumber,
       title: condition.title,
-      content: condition.content
+      content: condition.content,
+      titleEn: condition.titleEn ?? '',
+      contentEn: condition.contentEn ?? ''
     });
 
     this.showConditionDrawer.set(true);

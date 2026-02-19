@@ -318,9 +318,12 @@
   margin: 0;
 }
 
-.branch-card-footer {
+.branch-card-footer,
+.branch-card-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem;
   padding-top: 0.75rem;
   border-top: 1px solid #e5e7eb;
 }
@@ -367,6 +370,28 @@
   flex-direction: column;
   gap: 1.25rem;
   padding: 0.5rem 0;
+}
+
+.modal-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-section-title .pi {
+  color: #3b82f6;
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0 0;
 }
 
 .tab-content {

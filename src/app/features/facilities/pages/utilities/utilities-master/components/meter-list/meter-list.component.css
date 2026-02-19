@@ -294,14 +294,9 @@
   text-align: center !important;
 }
 
+/* .btn-edit-row ใช้จาก global styles.css */
 .btn-edit-row {
-  @apply w-8 h-8 rounded-lg flex items-center justify-center;
-  @apply bg-transparent hover:bg-blue-50 text-gray-400 hover:text-blue-600;
-  @apply border-none cursor-pointer transition-all duration-150;
-}
-
-.btn-edit-row i {
-  @apply text-sm;
+  @apply flex items-center justify-center border-none cursor-pointer transition-all duration-150;
 }
 
 /* ==================== EDIT MODAL ==================== */

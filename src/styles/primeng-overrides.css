@@ -430,10 +430,42 @@ button.p-button-primary {
 
 /* ==================== DIALOG/MODAL FIXES ==================== */
 
+/* ให้ mask เลื่อนได้ ถ้า dialog สูงเกินจอ จะได้เห็นปุ่มล่าง */
+.p-dialog-mask {
+  align-items: flex-start !important;
+  padding: 2rem 1rem 2rem !important;
+  overflow-y: auto !important;
+}
+
+/* ==================== DIALOG/DRAWER: หัวข้อฟอร์มไม่ให้โดน header บัง (ทั้งระบบ) ==================== */
+/* App header ใช้ z-index 200; overlay ต้องอยู่เหนือและ dialog ต้องอยู่ใน safe zone ใต้ header */
+.p-dialog-mask,
+.p-drawer-mask,
+.p-overlay-modal.p-overlay-mask {
+  z-index: 9999 !important;
+}
+/* Dialog mask: จัดให้กล่อง dialog อยู่ใต้ header เสมอ (header สูง ~56–96px) */
+.p-dialog-mask {
+  align-items: flex-start !important;
+  padding-top: 100px !important;
+  overflow-y: auto !important;
+  padding-bottom: 2rem !important;
+}
+/* กล่อง dialog: ไม่สูงเกินพื้นที่ที่เหลือ และมี margin ล่าง */
+.p-dialog-mask .p-dialog {
+  margin: 0 auto 0 !important;
+  max-height: calc(100vh - 120px) !important;
+}
+
 .p-dialog {
   background-color: rgb(var(--card)) !important;
   border-radius: 12px;
   box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15) !important;
+  max-height: 85vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  margin: auto !important;
 }
 
 .p-dialog .p-dialog-header {
@@ -442,12 +474,16 @@ button.p-button-primary {
   border-bottom: 1px solid rgb(var(--border)) !important;
   padding: 1.25rem 1.5rem;
   border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
 }
 
 .p-dialog .p-dialog-content {
   background-color: rgb(var(--card)) !important;
   color: rgb(var(--fg)) !important;
   padding: 1.5rem;
+  overflow-y: auto !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
 }
 
 .p-dialog .p-dialog-footer {
@@ -455,6 +491,45 @@ button.p-button-primary {
   border-top: 1px solid rgb(var(--border)) !important;
   padding: 1rem 1.5rem;
   border-radius: 0 0 12px 12px;
+  flex-shrink: 0 !important;
+}
+
+/* Role & Permission dialogs: บังคับให้ footer (ปุ่ม OK / ยกเลิก) โผล่เสมอและใช้งานได้ */
+.role-permission-dialog.p-dialog {
+  max-height: 85vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+.role-permission-dialog.p-dialog .p-dialog-content {
+  overflow-y: auto !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+}
+.role-permission-dialog.p-dialog .p-dialog-footer {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 56px !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 1rem 1.5rem !important;
+  border-top: 1px solid rgb(var(--border)) !important;
+  background-color: rgb(var(--bg)) !important;
+}
+/* ปุ่มใน footer ของ role-permission dialog (โฟกัสที่ overlay ที่ append ไปที่ body) */
+.role-permission-dialog.p-dialog .p-dialog-footer .dialog-footer-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+}
+.role-permission-dialog.p-dialog .p-dialog-footer .dialog-footer-actions .p-button,
+.role-permission-dialog.p-dialog .p-dialog-footer .dialog-footer-actions p-button {
+  flex-shrink: 0 !important;
 }
 
 /* ==================== FOCUS RING CONSISTENCY ==================== */

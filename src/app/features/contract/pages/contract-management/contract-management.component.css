@@ -1,8 +1,9 @@
 /* contract-management.component.css */
 
-/* ระยะเท่า Area Layout: p-6, ระหว่างบล็อก gap-6 */
+/* ระยะเท่า Area Layout: p-6, ระหว่างบล็อก gap-6 ไม่ชิดเมนูด้านบน */
 .contract-management-container {
-  @apply min-h-screen p-6 flex flex-col gap-6;
+  @apply min-h-screen flex flex-col gap-6;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
   background: rgb(var(--bg));
 }
 

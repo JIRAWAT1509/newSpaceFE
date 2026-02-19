@@ -174,42 +174,14 @@
 }
 
 /* ==================== ACTION BUTTONS ==================== */
+/* ขนาดและสีใช้จาก global styles.css (ปุ่มแก้ไข/ลบทั้งระบบเดียวกัน) */
 .action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
   border: none;
-  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.875rem;
-}
-
-/* Edit/Delete buttons - Consistent system style (PrimeNG-like) */
-.action-btn.action-btn-edit {
-  background-color: transparent !important;
-  border: none !important;
-  color: #3b82f6 !important;
-  border-radius: 50% !important;
-}
-
-.action-btn.action-btn-edit:hover {
-  background-color: #eff6ff !important;
-  color: #2563eb !important;
-}
-
-.action-btn.action-btn-delete {
-  background-color: transparent !important;
-  border: none !important;
-  color: #ef4444 !important;
-  border-radius: 50% !important;
-}
-
-.action-btn.action-btn-delete:hover {
-  background-color: #fef2f2 !important;
-  color: #dc2626 !important;
 }
 
 /* ==================== EMPTY STATE ==================== */
@@ -277,11 +249,7 @@
     padding: 0.625rem 0.75rem;
   }
 
-  .action-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 0.75rem;
-  }
+  /* ปุ่มแก้ไข/ลบใช้ขนาดจาก global */
 }
 
 @media (max-width: 640px) {

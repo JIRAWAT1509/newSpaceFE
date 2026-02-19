@@ -2,6 +2,11 @@
 
 .deposit-wrapper {
   @apply space-y-6 relative;
+  transition: margin-right 0.25s ease;
+}
+
+.deposit-wrapper.drawer-open {
+  margin-right: 520px;
 }
 
 /* ==================== BACK TO TOP ==================== */
@@ -157,46 +162,14 @@
   @apply rounded font-medium text-sm transition-colors;
 }
 
+/* ปุ่ม + เพิ่ม ขนาดเท่ากับ .btn-add */
 .btn-add-sm {
-  @apply flex items-center gap-1 px-2 py-1;
+  @apply flex items-center gap-2 px-4 py-2;
   @apply bg-blue-600 hover:bg-blue-700 text-white;
-  @apply rounded text-xs transition-colors;
+  @apply rounded font-medium text-sm transition-colors;
 }
 
-.btn-icon-delete {
-  /* System consistent: red trash icon (PrimeNG-like) */
-  @apply flex items-center justify-center;
-  width: 34px;
-  height: 34px;
-  background-color: transparent;
-  color: #ef4444;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.btn-icon-delete:hover {
-  background-color: #fef2f2;
-  color: #dc2626;
-}
-
-.btn-icon-delete-sm {
-  /* System consistent small: red trash icon (PrimeNG-like) */
-  @apply flex items-center justify-center;
-  width: 26px;
-  height: 26px;
-  background-color: transparent;
-  color: #ef4444;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-size: 0.75rem;
-}
-.btn-icon-delete-sm:hover {
-  background-color: #fef2f2;
-  color: #dc2626;
-}
+/* ปุ่มลบใช้จาก global styles.css (ขนาดและสีเดียวกันทั้งระบบ) */
 
 .btn-secondary {
   @apply px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700;
@@ -298,18 +271,22 @@
 /* ==================== DRAWER ==================== */
 .drawer-backdrop {
   @apply fixed inset-0 bg-black bg-opacity-50 z-[70];
-  @apply flex items-center justify-end;
+  @apply flex justify-end;
+  padding-top: 96px;
+  align-items: stretch;
+  box-sizing: border-box;
 }
 
 .drawer-panel {
-  @apply bg-white h-full w-full md:w-[500px];
-  @apply flex flex-col shadow-2xl;
+  @apply bg-white w-full md:w-[500px] flex flex-col shadow-2xl;
   @apply animate-slide-in-right;
+  height: calc(100vh - 96px);
 }
 
 .drawer-header {
-  @apply flex items-center justify-between px-6 py-4;
-  @apply border-b border-gray-200 bg-gray-50;
+  @apply flex items-center justify-between px-6 border-b border-gray-200 bg-gray-50;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .drawer-header h3 {
@@ -324,7 +301,9 @@
 }
 
 .drawer-body {
-  @apply flex-1 overflow-auto px-6 py-6 space-y-4;
+  @apply flex-1 overflow-auto px-6 space-y-4;
+  padding-top: 1.25rem;
+  padding-bottom: 1.5rem;
 }
 
 .drawer-footer {
@@ -350,6 +329,10 @@
 @media (max-width: 768px) {
   .drawer-panel {
     @apply w-full;
+  }
+
+  .deposit-wrapper.drawer-open {
+    margin-right: 0;
   }
 
   .deposit-grid {

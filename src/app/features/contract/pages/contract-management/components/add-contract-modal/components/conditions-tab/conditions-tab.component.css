@@ -2,6 +2,11 @@
 
 .conditions-wrapper {
   @apply space-y-6;
+  transition: margin-right 0.25s ease;
+}
+
+.conditions-wrapper.drawer-open {
+  margin-right: 620px;
 }
 
 /* ==================== PROGRESS INDICATOR ==================== */
@@ -152,35 +157,7 @@
   @apply rounded font-medium text-sm transition-colors;
 }
 
-.btn-icon-edit {
-  /* System consistent: blue pencil icon (PrimeNG-like) */
-  @apply w-8 h-8 flex items-center justify-center;
-  background-color: transparent;
-  color: #3b82f6;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.btn-icon-edit:hover {
-  background-color: #eff6ff;
-  color: #2563eb;
-}
-
-.btn-icon-delete {
-  /* System consistent: red trash icon (PrimeNG-like) */
-  @apply w-8 h-8 flex items-center justify-center;
-  background-color: transparent;
-  color: #ef4444;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.btn-icon-delete:hover {
-  background-color: #fef2f2;
-  color: #dc2626;
-}
+/* ปุ่มแก้ไข/ลบใช้จาก global styles.css */
 
 .btn-secondary {
   @apply px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700;
@@ -195,18 +172,22 @@
 /* ==================== DRAWER ==================== */
 .drawer-backdrop {
   @apply fixed inset-0 bg-black bg-opacity-50 z-[70];
-  @apply flex items-center justify-end;
+  @apply flex justify-end;
+  padding-top: 96px;
+  align-items: stretch;
+  box-sizing: border-box;
 }
 
 .drawer-panel {
-  @apply bg-white h-full w-full md:w-[600px];
-  @apply flex flex-col shadow-2xl;
+  @apply bg-white w-full md:w-[600px] flex flex-col shadow-2xl;
   @apply animate-slide-in-right;
+  height: calc(100vh - 96px);
 }
 
 .drawer-header {
-  @apply flex items-center justify-between px-6 py-4;
-  @apply border-b border-gray-200 bg-gray-50;
+  @apply flex items-center justify-between px-6 border-b border-gray-200 bg-gray-50;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .drawer-header h3 {
@@ -221,7 +202,9 @@
 }
 
 .drawer-body {
-  @apply flex-1 overflow-auto px-6 py-6 space-y-4;
+  @apply flex-1 overflow-auto px-6 space-y-4;
+  padding-top: 1.25rem;
+  padding-bottom: 1.5rem;
 }
 
 .drawer-footer {
@@ -247,6 +230,10 @@
 @media (max-width: 768px) {
   .drawer-panel {
     @apply w-full;
+  }
+
+  .conditions-wrapper.drawer-open {
+    margin-right: 0;
   }
 
   .conditions-wrapper {

@@ -1,5 +1,5 @@
 // signer-form-drawer.component.ts
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -28,6 +28,8 @@ export class SignerFormDrawerComponent implements OnChanges {
   isSubmitting: boolean = false;
   errors: { [key: string]: string } = {};
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   // Dropdown options
   repTypeOptions: DropdownOption[] = [
     { label: 'ผู้ให้บริการ (Service Provider)', value: 'P' },
@@ -41,15 +43,34 @@ export class SignerFormDrawerComponent implements OnChanges {
   ];
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['signer'] && this.signer && this.mode === 'edit') {
+    if (this.mode === 'create') {
+      if (changes['mode']?.currentValue === 'create' || changes['isOpen']?.currentValue === true) {
+        this.resetForm();
+      }
+      this.cdr.detectChanges();
+      return;
+    }
+    // โหมดแก้ไข: เติมฟอร์มทุกครั้งที่ drawer เปิดและมี signer (แก้ปัญหาแก้ไขไม่ได้)
+    if (this.isOpen && this.mode === 'edit' && this.signer) {
       this.populateForm(this.signer);
-    } else if (changes['mode'] && this.mode === 'create') {
-      this.resetForm();
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        if (this.mode === 'edit' && this.signer) {
+          this.populateForm(this.signer);
+          this.cdr.detectChanges();
+        }
+      }, 0);
     }
   }
 
   populateForm(signer: any): void {
-    this.formData = { ...signer };
+    this.formData = {
+      ...signer,
+      REPRESENT: signer.REPRESENT ?? '',
+      POSITION_NAME: signer.POSITION_NAME ?? '',
+      REP_TYPE: signer.REP_TYPE ?? '',
+      STATUS: signer.STATUS ?? 'Y'
+    };
   }
 
   resetForm(): void {
