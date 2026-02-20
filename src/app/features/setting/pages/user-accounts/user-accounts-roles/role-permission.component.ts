@@ -79,6 +79,9 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   copyFromRole: string = '';
   selectedTemplate: string = '';
 
+  /** ให้ dropdown ในโมดัล Copy from Role โผล่เหนือ dialog และการ์ดด้านหลัง */
+  copyRoleOverlayOptions = { baseZIndex: 99999 };
+
   // Statistics
   summary: PermissionSummary = {
     totalMenus: 0,
@@ -524,9 +527,10 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
 
     this.hasChanges = true;
     this.updateSummary();
+    const templateName = template.name;
     this.showTemplateModal = false;
     this.selectedTemplate = '';
-    this.showSuccess(`Template "${template.name}" applied successfully`);
+    this.savePermissions(`Template "${templateName}" applied and saved.`);
   }
 
   // ==================== COPY FROM ROLE ====================
@@ -548,7 +552,9 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Copy permissions from another role
+   * Copy permissions from another role into the current role (in memory).
+   * Loads source role's permissions and merges their flags into the current tree.
+   * User must click Save to persist.
    */
   copyFromOtherRole(): void {
     if (!this.copyFromRole || this.copyFromRole === this.selectedRole) {
@@ -557,33 +563,57 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
+    this.clearMessages();
 
-    this.rolePermissionService.copyPermissions({
-      fromRole: this.copyFromRole,
-      toRole: this.selectedRole
-    })
+    this.rolePermissionService
+      .getPermissions({ USER_GROUP: this.copyFromRole })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
+        next: (response) => {
+          const sourceWithMode = response.data.map((p) => {
+            const mode = this.rolePermissionService.calculateAccessMode(p);
+            return { ...p, isEnabled: mode.isEnabled, isViewOnly: mode.isViewOnly };
+          });
+
+          this.permissionTree = this.rolePermissionService.mergePermissionsFromSource(
+            this.permissionTree,
+            sourceWithMode,
+            this.selectedRole
+          );
+          this.permissionTree = this.rolePermissionService.updateIndeterminateStates(
+            this.permissionTree
+          );
+
+          if (this.searchQuery) {
+            this.applySearchFilter(this.searchQuery);
+          } else {
+            this.filteredTree = [...this.permissionTree];
+          }
+          this.buildTabs();
+          this.updateSummary();
+          this.hasChanges = true;
+
+          const copiedLabel = this.roles.find((r) => r.USER_GROUP === this.copyFromRole)?.GROUP_NAME ?? this.copyFromRole;
           this.showCopyModal = false;
           this.copyFromRole = '';
-          this.loadPermissions();
-          this.showSuccess('Permissions copied successfully');
+          this.isLoading = false;
+          this.savePermissions(`Permissions copied from "${copiedLabel}" and saved.`);
         },
         error: (error) => {
           console.error('Error copying permissions:', error);
-          this.showError('Failed to copy permissions');
+          this.showError('Failed to load source role permissions');
           this.isLoading = false;
-        }
+        },
       });
   }
 
   // ==================== SAVE & CANCEL ====================
 
   /**
-   * Save permissions
+   * Save permissions to backend.
+   * @param optionalSuccessMessage If provided, shown on success instead of default message.
    */
-  savePermissions(): void {
+  savePermissions(optionalSuccessMessage?: string): void {
     if (!this.selectedRole) {
       this.showError('Please select a role');
       return;
@@ -612,7 +642,7 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
           this.hasChanges = false;
           this.originalPermissions = JSON.parse(JSON.stringify(this.permissionTree));
           this.isSaving = false;
-          this.showSuccess('Permissions saved successfully');
+          this.showSuccess(optionalSuccessMessage ?? 'Permissions saved successfully');
         },
         error: (error) => {
           console.error('Error saving permissions:', error);

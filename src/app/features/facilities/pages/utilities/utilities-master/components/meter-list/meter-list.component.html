@@ -1,28 +1,37 @@
 <!-- meter-list.component.html - TABLE VERSION -->
 
 <div class="meter-list-container">
-  <!-- Header Stats -->
-  <div class="header-stats">
-    <div class="stat-card stat-card--blue">
-      <div class="stat-icon"><i class="pi pi-th-large"></i></div>
-      <div class="stat-info">
-        <div class="stat-value">{{ totalMeters() }}</div>
-        <div class="stat-label">Total Meters</div>
-      </div>
-    </div>
-    <div class="stat-card stat-card--amber">
-      <div class="stat-icon"><i class="pi pi-clock"></i></div>
-      <div class="stat-info">
-        <div class="stat-value">{{ pendingCount() }}</div>
-        <div class="stat-label">Pending</div>
-      </div>
-    </div>
-    <div class="stat-card stat-card--emerald">
-      <div class="stat-icon"><i class="pi pi-check-circle"></i></div>
-      <div class="stat-info">
-        <div class="stat-value">{{ completeCount() }}</div>
-        <div class="stat-label">Complete</div>
-      </div>
+  <!-- Dashboard Overview (รูปแบบเดียวกับ facilities stats-overview) -->
+  <div class="section-card">
+    <h2 class="section-title">Dashboard Overview</h2>
+    <div class="stats-grid">
+      <article class="stat-card stat-card--primary">
+        <div class="stat-card-icon">
+          <i class="pi pi-th-large"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">Total Meters</p>
+          <p class="stat-value">{{ totalMeters() }}</p>
+        </div>
+      </article>
+      <article class="stat-card stat-card--warning">
+        <div class="stat-card-icon">
+          <i class="pi pi-clock"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">Pending</p>
+          <p class="stat-value">{{ pendingCount() }}</p>
+        </div>
+      </article>
+      <article class="stat-card stat-card--success">
+        <div class="stat-card-icon">
+          <i class="pi pi-check-circle"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">Complete</p>
+          <p class="stat-value">{{ completeCount() }}</p>
+        </div>
+      </article>
     </div>
   </div>
 
@@ -78,7 +87,7 @@
   <div class="table-card">
     <div class="table-header-bar">
       <h3 class="table-title">
-        Meter List
+        รายการมิเตอร์
         <span class="table-count">({{ filteredMeters().length }})</span>
       </h3>
     </div>

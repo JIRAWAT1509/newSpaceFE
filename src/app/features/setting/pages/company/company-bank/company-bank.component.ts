@@ -269,7 +269,30 @@ loadAccountInfo(bankCode: string, branchCode: string) {
   selectBank(bank: Bank) {
     this.selectedBank = bank;
     this.selectedBranch = null;
+    this.accounts = [];
     this.loadBranches(bank.BANK_CODE);
+  }
+
+  /** เลือกสาขา แล้วแสดงหน้าจอ รหัสการนำส่งเงิน + บันทึกข้อมูลสาขาธนาคาร บนหน้าหลัก */
+  selectBranch(branch: Branch) {
+    this.selectedBranch = branch;
+    this.branchForm = { ...branch };
+    this.branchErrors = {};
+    this.loadAccountsForBranch(branch.BANK_CODE, branch.BRANCH_CODE);
+  }
+
+  /** บันทึกข้อมูลสาขาจากหน้าจอบนหน้าหลัก (ไม่ใช้โมดัล) */
+  saveBranchInline() {
+    if (!this.selectedBranch) return;
+    if (!this.validateBranchForm()) return;
+    this.isSaving = true;
+    const index = this.branches.findIndex(b => b.BRANCH_CODE === this.branchForm.BRANCH_CODE);
+    if (index !== -1) {
+      this.branches[index] = { ...this.branchForm };
+      this.selectedBranch = { ...this.branchForm };
+      this.showSuccess('บันทึกข้อมูลสาขาธนาคารเรียบร้อย');
+    }
+    this.isSaving = false;
   }
 
   openAddBankModal() {
@@ -468,6 +491,11 @@ saveBranchModal() {
 
     // Mock
     this.branches = this.branches.filter(b => b.BRANCH_CODE !== branch.BRANCH_CODE);
+    if (this.selectedBranch?.BRANCH_CODE === branch.BRANCH_CODE) {
+      this.selectedBranch = null;
+      this.accounts = [];
+      this.branchForm = this.getEmptyBranch();
+    }
     this.showSuccess('Branch deleted successfully');
   }
 
@@ -523,8 +551,8 @@ viewBranchDetails(branch: Branch) {
 
   closeDetailsModal() {
     this.showDetailsModal = false;
-    this.selectedBranch = null;
     this.selectedAccount = null;
+    /* ไม่ล้าง selectedBranch เพื่อให้หน้าจอ รหัสการนำส่งเงินเข้าบัญชีธนาคาร ยังแสดงบนหน้าหลัก */
   }
 
 editBranchFromDetails() {

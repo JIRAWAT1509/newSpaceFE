@@ -3,6 +3,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
+import { MultiSelect } from 'primeng/multiselect';
 import { Button } from 'primeng/button';
 
 import { User, UserFormData, DropdownOption } from '@core/models/user.model';
@@ -20,6 +21,7 @@ import { WarningModalComponent } from '@shared/components/warning-modal/warning-
     CommonModule,
     FormsModule,
     Select,
+    MultiSelect,
     Button,
     FormInputComponent,
     FormTextareaComponent,
@@ -40,6 +42,51 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
   formData: UserFormData = this.getEmptyFormData();
   roleOptions: DropdownOption[] = [];
   departmentOptions: DropdownOption[] = [];
+  titlePrefixOptions: DropdownOption[] = [
+    { label: 'Mr.', value: 'Mr.' },
+    { label: 'Mrs.', value: 'Mrs.' },
+    { label: 'Miss', value: 'Miss' },
+    { label: 'Ms.', value: 'Ms.' },
+    { label: 'Dr.', value: 'Dr.' },
+  ];
+  officeTypeOptions: DropdownOption[] = [
+    { label: 'Head office', value: 'head' },
+    { label: 'Branch', value: 'branch' },
+  ];
+  debtorTypeOptions: DropdownOption[] = [
+    { label: 'Individual', value: 'individual' },
+    { label: 'Company', value: 'company' },
+    { label: 'Government', value: 'government' },
+  ];
+
+  /** ลำดับการอนุมัติ (1, 2, 3, ...) */
+  approvalSequenceOptions: DropdownOption[] = [
+    { label: 'Level 1', value: '1' },
+    { label: 'Level 2', value: '2' },
+    { label: 'Level 3', value: '3' },
+    { label: 'Level 4', value: '4' },
+    { label: 'Level 5', value: '5' },
+  ];
+
+  /** หน้าจอ/เมนูที่อนุญาต */
+  screenOptions: DropdownOption[] = [
+    { label: 'Dashboard', value: 'dashboard' },
+    { label: 'Area Management', value: 'area' },
+    { label: 'Contract', value: 'contract' },
+    { label: 'Facilities', value: 'facilities' },
+    { label: 'Finance', value: 'finance' },
+    { label: 'Reports', value: 'reports' },
+    { label: 'Setting', value: 'setting' },
+    { label: 'Sales', value: 'sales' },
+  ];
+
+  /** ขอบเขตการเข้าถึงข้อมูล */
+  dataAccessScopeOptions: DropdownOption[] = [
+    { label: 'All data', value: 'all' },
+    { label: 'Branch only', value: 'branch' },
+    { label: 'Department only', value: 'department' },
+    { label: 'Own data only', value: 'own' },
+  ];
 
   isSubmitting: boolean = false;
   showWarning: boolean = false;
@@ -82,15 +129,27 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
     this.formData = {
       userId: user.USER_ID,
       username: user.USER_NAME,
-      displayName: user.USER_NAME, // Assuming same as username
-      fullName: user.DEPARTMENT, // Adjust as needed
-      position: '', // Not in API
+      displayName: user.USER_NAME,
+      fullName: user.DEPARTMENT,
+      position: '',
       status: user.INACTIVE === 'N' ? 'active' : 'inactive',
       role: user.USER_GROUP,
       department: user.DEPARTMENT,
       maxSessions: user.EXP_WITHIN_DAY,
-      warningDays: 0, // Default
+      warningDays: 0,
       email: user.EMAIL || '',
+      billingEmail: user.BILLING_EMAIL || '',
+      sendInvoice: user.SEND_INVOICE === 'Y',
+      sendCreditNote: user.SEND_CREDIT_NOTE === 'Y',
+      sendReceipt: user.SEND_RECEIPT === 'Y',
+      sendCreditReceipt: user.SEND_CREDIT_RECEIPT === 'Y',
+      debtorType: user.DEBTOR_TYPE || '',
+      titlePrefix: user.TITLE_PREFIX || '',
+      officeType: user.OFFICE_TYPE || '',
+      addressEn: user.ADDRESS_EN || '',
+      approvalSequence: user.APPROVAL_SEQUENCE != null ? String(user.APPROVAL_SEQUENCE) : '',
+      allowedScreens: user.ALLOWED_SCREENS ? (() => { try { return JSON.parse(user.ALLOWED_SCREENS) as string[]; } catch { return []; } })() : [],
+      dataAccessScope: user.DATA_ACCESS_SCOPE || '',
       avatar: null,
       avatarPreview: user.PATH_IMG,
       password: '',
@@ -112,6 +171,18 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
       maxSessions: 90,
       warningDays: 0,
       email: '',
+      billingEmail: '',
+      sendInvoice: false,
+      sendCreditNote: false,
+      sendReceipt: false,
+      sendCreditReceipt: false,
+      debtorType: '',
+      titlePrefix: '',
+      officeType: '',
+      addressEn: '',
+      approvalSequence: '',
+      allowedScreens: [],
+      dataAccessScope: '',
       avatar: null,
       avatarPreview: null,
       password: '',
@@ -160,6 +231,30 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
       isValid = false;
     }
 
+    // Customer & Documents – required fields
+    if (!this.formData.billingEmail.trim()) {
+      this.errors['billingEmail'] = 'Customer email for invoices is required';
+      isValid = false;
+    }
+    if (!this.formData.debtorType) {
+      this.errors['debtorType'] = 'Debtor type is required';
+      isValid = false;
+    }
+
+    // Approval & Access – required fields
+    if (!this.formData.approvalSequence) {
+      this.errors['approvalSequence'] = 'Approval sequence is required';
+      isValid = false;
+    }
+    if (!this.formData.dataAccessScope) {
+      this.errors['dataAccessScope'] = 'Data access scope is required';
+      isValid = false;
+    }
+    if (!this.formData.allowedScreens?.length) {
+      this.errors['allowedScreens'] = 'Select at least one allowed screen';
+      isValid = false;
+    }
+
     // Password validation (only for create mode or if password is entered in edit mode)
     if (this.mode === 'create' || this.formData.password) {
       if (!this.formData.password) {
@@ -179,6 +274,10 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
     // Email validation (optional but must be valid if provided)
     if (this.formData.email && !this.isValidEmail(this.formData.email)) {
       this.errors['email'] = 'Please enter a valid email address';
+      isValid = false;
+    }
+    if (this.formData.billingEmail && !this.isValidEmail(this.formData.billingEmail)) {
+      this.errors['billingEmail'] = 'Please enter a valid email address';
       isValid = false;
     }
 

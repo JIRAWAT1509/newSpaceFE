@@ -1,39 +1,36 @@
 <!-- finance-dashboard.component.html -->
 
 <div class="dashboard-container">
-  <!-- Stats Cards Grid -->
-  <div class="stats-grid">
-    @for (card of statCards(); track card.label) {
-      <div class="stat-card" [style.background]="card.bgGradient">
-        <div class="stat-card-icon">
-          <i class="pi" [ngClass]="card.icon"></i>
-        </div>
-        <div class="stat-card-body">
-          <div class="stat-label">{{ card.label }}</div>
-          <div class="stat-value">
-            <span>{{ card.value }}</span>
-            @if (card.unit) {
-              <span class="stat-unit">{{ card.unit }}</span>
-            }
+  <!-- Dashboard Overview (รูปแบบเดียวกับ facilities/utilities/master) -->
+  <div class="section-card">
+    <h2 class="section-title">Dashboard Overview</h2>
+    <div class="stats-grid">
+      @for (card of statCards(); track card.label) {
+        <article class="stat-card" [ngClass]="'stat-card--' + card.tone">
+          <div class="stat-card-bg"></div>
+          <div class="stat-card-icon">
+            <i class="pi" [ngClass]="card.icon"></i>
           </div>
-          @if (card.change !== undefined && card.change !== 0) {
-            <p
-              class="stat-change"
-              [ngClass]="{
-                'stat-change--up': card.change > 0,
-                'stat-change--down': card.change < 0
-              }"
-            >
-              <i class="pi" [ngClass]="getChangeIcon(card.change)"></i>
-              <span>{{ card.change > 0 ? '+' : '' }}{{ card.change }}%</span>
-              @if (card.changeLabel) {
-                <span class="stat-change-hint">{{ card.changeLabel }}</span>
+          <div class="stat-card-body">
+            <p class="stat-label">{{ card.label }}</p>
+            <p class="stat-value">
+              {{ card.value }}
+              @if (card.unit) {
+                <span class="stat-unit">{{ card.unit }}</span>
               }
             </p>
-          }
-        </div>
-      </div>
-    }
+            <p
+              class="stat-change"
+              [ngClass]="(card.change ?? 0) >= 0 ? 'stat-change--up' : 'stat-change--down'"
+            >
+              <i class="pi" [ngClass]="getChangeIcon(card.change ?? 0)"></i>
+              <span>{{ (card.change ?? 0) >= 0 ? '+' : '' }}{{ card.change ?? 0 }}%</span>
+              <span class="stat-change-hint">{{ card.changeLabel ?? 'vs last month' }}</span>
+            </p>
+          </div>
+        </article>
+      }
+    </div>
   </div>
 
   <!-- Debt/Receivables List -->

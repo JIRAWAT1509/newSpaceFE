@@ -58,9 +58,18 @@
   flex-wrap: nowrap;
 }
 
+/* สามคอลัมน์: ธนาคาร | สาขา | รหัสการนำส่งเงินเข้าบัญชีธนาคาร */
+.main-content.with-remittance .banks-section.half-width,
+.main-content.with-remittance .branches-section.half-width,
+.main-content.with-remittance .remittance-section {
+  flex: 0 0 calc(33.333% - 1rem);
+  min-width: 280px;
+}
+
 /* ==================== SECTION COMMON ==================== */
 .banks-section,
-.branches-section {
+.branches-section,
+.remittance-section {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
@@ -77,6 +86,10 @@
 .banks-section.half-width,
 .branches-section.half-width {
   width: 50%;
+  flex: 0 0 calc(50% - 0.75rem);
+}
+
+.remittance-section.half-width {
   flex: 0 0 calc(50% - 0.75rem);
 }
 
@@ -126,6 +139,33 @@
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+/* หน้าจอบันทึกข้อมูลสาขาธนาคาร (ในส่วนสาขา) */
+.branch-save-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #f3f4f6;
+}
+
+.branch-save-section .section-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.branch-form-inline {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.branch-form-inline .form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
 }
 
 /* ==================== SEARCH BOX ==================== */
@@ -272,6 +312,12 @@
   border-color: #10b981;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
+}
+
+.branch-card.selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  background: #eff6ff;
 }
 
 .branch-card-header {

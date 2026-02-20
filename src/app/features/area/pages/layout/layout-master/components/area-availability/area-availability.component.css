@@ -1,86 +1,89 @@
 .area-availability-container {
-  @apply p-6 bg-card rounded-lg shadow-sm border border-border;
+  @apply space-y-4;
 }
 
-.section-header {
-  @apply mb-6;
+/* รูปแบบเดียวกับ Dashboard Overview (facilities) */
+.section-card {
+  @apply rounded-xl border p-4 mb-4;
+  background: rgb(var(--card));
+  border-color: rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
 .section-title {
-  @apply text-2xl font-bold text-fg;
+  @apply text-xl font-bold mb-3;
+  color: rgb(var(--fg));
 }
 
-/* Status Cards Grid - 4 columns */
-.status-cards-grid {
-  @apply grid grid-cols-4 gap-4 mb-6;
+.stats-grid {
+  @apply grid gap-4;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+/* Status card = stat-card style (สีจาก status.color ใน template) */
 .status-card {
-  @apply relative flex items-center gap-4 p-4 rounded-xl;
-  @apply bg-card border-2 border-border;
+  @apply relative flex items-center gap-4 p-4 rounded-xl overflow-hidden;
   @apply cursor-pointer transition-all duration-200;
-  @apply hover:shadow-md hover:border-border;
+  min-height: 100px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+  color: white;
+}
+
+.status-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
 }
 
 .status-card.active {
-  @apply border-primary bg-primary/10 shadow-lg;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5), 0 8px 24px rgb(0 0 0 / 0.2);
 }
 
 .status-card.dimmed {
   @apply opacity-40;
 }
 
-/* Icon Circle */
-.icon-circle {
-  @apply w-14 h-14 rounded-xl flex items-center justify-center;
-  @apply flex-shrink-0;
-  @apply shadow-sm;
-  position: relative;
+.stat-card-icon {
+  @apply relative z-10 w-11 h-11 rounded-xl flex-shrink-0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
 }
 
-.icon-circle i {
-  @apply text-white text-2xl;
+.stat-card-icon i {
+  font-size: 1.25rem;
+  color: white;
   font-family: 'primeicons' !important;
-  font-size: 1.5rem;
-  line-height: 1;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  height: 100% !important;
-  transform: none !important;
-  aspect-ratio: 1 / 1 !important;
-  flex-shrink: 0 !important;
-}
-
-.icon-circle .status-icon-image {
-  @apply w-8 h-8 object-contain;
-  filter: brightness(0) invert(1);
+  line-height: 1 !important;
   display: block !important;
-  margin: auto !important;
-  aspect-ratio: 1 / 1 !important;
-  flex-shrink: 0 !important;
+  text-align: center !important;
+  transform: translate(0.03em, 0.06em);
 }
 
-/* Card Content */
-.card-content {
-  @apply flex-1 flex flex-col gap-1;
+.stat-card-icon .status-icon-image {
+  @apply w-6 h-6 object-contain;
+  filter: brightness(0) invert(1);
 }
 
-.card-header {
-  @apply flex items-baseline justify-between gap-2;
+.stat-card-body {
+  @apply relative z-10 flex flex-col justify-center min-w-0 flex-1;
 }
 
-.card-label-th {
-  @apply text-sm font-semibold text-fg;
+.stat-label {
+  @apply text-sm font-medium mb-0.5;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.card-count {
-  @apply text-2xl font-bold text-fg;
+.stat-value {
+  @apply font-bold leading-tight mb-0.5;
+  font-size: 1.35rem;
+  color: white;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
 }
 
-.card-label-en {
-  @apply text-xs text-muted uppercase tracking-wide;
+.stat-sublabel {
+  @apply text-xs font-normal uppercase tracking-wide;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* Selection Check */
@@ -111,40 +114,63 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Responsive Design */
+/* Responsive (ให้เท่ากับ Dashboard Overview - stats-overview) */
 @media (max-width: 1280px) {
-  .status-cards-grid {
-    @apply grid-cols-2 gap-3;
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    @apply gap-3;
   }
 
-  .icon-circle {
-    @apply w-12 h-12;
+  .stat-card-icon {
+    @apply w-10 h-10;
   }
 
-  .icon-circle i {
-    @apply text-xl;
-  }
-
-  .card-count {
-    @apply text-xl;
+  .stat-value {
+    font-size: 1.2rem;
   }
 }
 
 @media (max-width: 640px) {
-  .status-cards-grid {
-    @apply grid-cols-1;
+  .section-card {
+    @apply mb-3 p-3;
   }
 
-  .area-availability-container {
-    @apply p-4;
+  .section-title {
+    @apply text-lg mb-2;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    @apply gap-3;
+  }
+
+  .status-card {
+    @apply p-3 gap-3;
+  }
+
+  .stat-card-icon {
+    @apply w-10 h-10;
+  }
+
+  .stat-card-icon i {
+    font-size: 1.1rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
   }
 }
 
-/* Hover Effects */
-.status-card:not(.dimmed):hover {
-  @apply transform -translate-y-1;
-}
+@media (max-width: 480px) {
+  .status-card {
+    @apply p-2.5 gap-2.5;
+  }
 
-.status-card.active:hover {
-  @apply border-primary shadow-xl;
+  .stat-label {
+    @apply text-xs;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
 }

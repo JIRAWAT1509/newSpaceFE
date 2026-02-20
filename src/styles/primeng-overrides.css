@@ -348,6 +348,12 @@ textarea.p-inputtextarea:enabled:focus {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
 }
 
+/* Dropdown ที่ appendTo="body" ให้อยู่เหนือ dialog และเนื้อหาหน้า (รวมการ์ด 159 Total Features) */
+.p-select-overlay,
+.p-select-overlay .p-select-panel {
+  z-index: 99999 !important;
+}
+
 .p-select-option,
 .p-select-item,
 .p-dropdown-item {

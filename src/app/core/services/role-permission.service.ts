@@ -326,6 +326,52 @@ getPermissions(request: GetPermissionsRequest): Observable<GetPermissionsRespons
     return updatedPermissions;
   }
 
+  /**
+   * Merge permission flags from a source role into the current tree.
+   * Used for "Copy Permissions from Another Role": copies USE_FLAG, INS_FLAG, etc.
+   * from source flat list into the existing tree (by MENU_ID). Preserves current
+   * role's USER_GROUP and tree structure.
+   */
+  mergePermissionsFromSource(
+    currentTree: Permission[],
+    sourceFlat: Permission[],
+    targetUserGroup: string
+  ): Permission[] {
+    const sourceMap = new Map<string, Permission>();
+    sourceFlat.forEach((p) => sourceMap.set(p.MENU_ID, p));
+
+    const currentDate = new Date().toISOString();
+
+    const mergeNode = (node: Permission): Permission => {
+      const source = sourceMap.get(node.MENU_ID);
+      if (!source) {
+        // No source for this MENU_ID: keep node as-is, recurse children
+        return {
+          ...node,
+          children: node.children?.map(mergeNode) ?? [],
+        };
+      }
+
+      const mode = this.calculateAccessMode(source);
+      const merged = this.setPermissionAccess(
+        { ...node, USER_GROUP: targetUserGroup },
+        mode.isEnabled,
+        mode.isViewOnly
+      );
+      return {
+        ...merged,
+        USER_GROUP: targetUserGroup,
+        UPD_DATE: currentDate,
+        DataState: 2,
+        children: node.children?.map(mergeNode) ?? [],
+        isExpanded: node.isExpanded,
+        isVisible: node.isVisible,
+      };
+    };
+
+    return currentTree.map(mergeNode);
+  }
+
   // ==================== TREE OPERATIONS ====================
 
   /**

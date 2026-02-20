@@ -13,7 +13,6 @@ import { NavigationItem } from '../models/navigation.model';
  */
 
 export const NAVIGATION_CONTENT: NavigationItem[] = [
-
   // ============================================
   // SALES MODULE - RESTRUCTURED (5 Pages)
   // ============================================
@@ -22,27 +21,27 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       {
         name: 'sales_dashboard',
-        icon: 'pi-th-large',
+        icon: 'assets/icons/dashboard.svg',
         route: '/sales/dashboard',
       },
       {
         name: 'customer_management',
-        icon: 'pi-users',
+        icon: 'assets/icons/users.svg',
         route: '/sales/customer',
       },
       {
         name: 'budget_management',
-        icon: 'pi-wallet',
+        icon: 'assets/icons/wallet.svg',
         route: '/sales/budget',
       },
       {
         name: 'pipeline_management',
-        icon: 'pi-sitemap',
+        icon: 'assets/icons/sitemap.svg',
         route: '/sales/pipeline',
       },
       {
         name: 'activities_management',
-        icon: 'pi-calendar',
+        icon: 'assets/icons/calendar.svg',
         route: '/sales/activities',
       },
     ],
@@ -55,13 +54,6 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     primary_content: 'area',
     secondary_content: [
       {
-        name: 'master_data',
-        icon: 'pi-map',
-        route: '/area/layout/master',
-        hasDeeper: true,
-        deeperNote: 'Contains: Building, Floor, Zone, Layout, Price List, etc.',
-      },
-      /* {
         name: 'area_layout_management',
         icon: 'assets/icons/briefcase-outline.svg',
         sub: [
@@ -72,7 +64,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             deeperNote:
               'Contains: Building, Floor, Zone, Layout, Price List, etc.',
           },
-          /* {
+          {
             name: 'inquiry',
             route: '/area/layout/inquiry',
             hasDeeper: true,
@@ -83,10 +75,10 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             route: '/area/layout/reports',
             hasDeeper: true,
             deeperNote: 'Contains: Layout reports, Current area reports',
-          }, */
-      /*  ],
-      }, */
-      /* {
+          },
+        ],
+      },
+      {
         name: 'area_maintenance_closure',
         icon: 'assets/icons/clipboard-outline.svg',
         sub: [
@@ -112,7 +104,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           { name: 'daily_transactions', route: '/area/measurement/daily' },
           { name: 'reports', route: '/area/measurement/reports' },
         ],
-      }, */
+      },
     ],
   },
 
@@ -124,7 +116,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       {
         name: 'contract_management',
-        icon: 'pi-file-edit',
+        icon: 'assets/icons/business-outline.svg',
         route: '/contract/management',
         // sub: [
         //   {
@@ -135,7 +127,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
         //   }
         // ]
       },
-      /* {
+      {
         name: 'quotation_management',
         icon: 'assets/icons/briefcase-outline.svg',
         sub: [
@@ -192,7 +184,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             name: 'daily_transactions',
             route: '/contract/lease/daily',
             hasDeeper: true,
-            deeperNote: 'Contains: Lease, Copy, ภาคผนวก, etc.',
+            deeperNote: 'Contains: Lease, Copy, Addendum, etc.',
           },
           {
             name: 'processing',
@@ -255,7 +247,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
         name: 'fit_out_contract',
         icon: 'assets/icons/clipboard-outline.svg',
         sub: [{ name: 'daily_transactions', route: '/contract/fitout/daily' }],
-      }, */
+      },
     ],
   },
 
@@ -267,21 +259,11 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       // --- FINANCE SECTION ---
       {
-        name: 'dashboard',
-        icon: 'pi-chart-bar',
+        name: 'finance_master',
+        icon: 'assets/icons/business-outline.svg',
         route: '/finance/master',
       },
-      /* {
-        name: 'invoices',
-        icon: 'pi-money-bill',
-        route: '/collection/invoice/daily',
-      },
       {
-        name: 'finance_receipts',
-        icon: 'pi-receipt',
-        route: '/finance/receipt/daily',
-      }, */
-      /* {
         name: 'finance_receipts',
         icon: 'assets/icons/business-outline.svg',
         sub: [
@@ -299,8 +281,8 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             deeperNote: 'Contains: 20 different receipt reports',
           },
         ],
-      }, */
-      /* {
+      },
+      {
         name: 'finance_credit_note',
         icon: 'assets/icons/clipboard-outline.svg',
         sub: [
@@ -317,10 +299,10 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             deeperNote: 'Contains: Details, Print/Confirm',
           },
         ],
-      }, */
+      },
 
       // --- COLLECTION SECTION ---
-      /* {
+      {
         name: 'collection_sales_recording',
         icon: 'assets/icons/briefcase-outline.svg',
         sub: [
@@ -398,7 +380,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
               'Contains: Print, Outstanding summaries, Daily/Monthly reports, Bounced check tracking',
           },
         ],
-      }, */
+      },
     ],
   },
 
@@ -407,15 +389,9 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   // ============================================
   {
     primary_content: 'facilities',
-
     secondary_content: [
-      {
-        name: 'utilities',
-        icon: 'pi-bolt',
-        route: '/facilities/utilities/master',
-      },
       // --- UTILITIES SECTION ---
-      /* {
+      {
         name: 'utilities_meter_management',
         icon: 'assets/icons/briefcase-outline.svg',
         sub: [
@@ -473,7 +449,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           },
           { name: 'reports', route: '/facilities/workorder/reports' },
         ],
-      }, */
+      },
     ],
   },
 
@@ -525,7 +501,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       {
         name: 'report_all',
-        icon: 'pi-chart-line',
+        icon: 'assets/icons/clipboard-outline.svg',
         sub: [
           {
             name: 'view all',
@@ -557,11 +533,11 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           },
         ],
       },
-      /* {
+      {
         name: 'dashboard',
         icon: 'assets/icons/dashboard.svg',
         route: '/dashboard/overview',
-      }, */
+      },
     ],
   },
 
@@ -574,7 +550,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       // --- USER SETTING ---
       {
         name: 'user_accounts',
-        icon: 'pi-users',
+        icon: 'assets/icons/briefcase-outline.svg',
         sub: [
           {
             name: 'user_data_management',
@@ -596,7 +572,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       // --- COMPANY SETTING ---
       {
         name: 'company_info',
-        icon: 'pi-building',
+        icon: 'assets/icons/clipboard-outline.svg',
         sub: [
           {
             name: 'company_data',
@@ -621,7 +597,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       // --- SYSTEM SETTING ---
       {
         name: 'contract_data',
-        icon: 'pi-file-edit',
+        icon: 'assets/icons/business-outline.svg',
         // ✅ ให้คลิกที่ชั้นนี้ได้เลย
         route: '/setting/system/contract',
         sub: [
@@ -636,7 +612,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       },
       {
         name: 'finance_system_data',
-        icon: 'pi-wallet',
+        icon: 'assets/icons/clipboard-outline.svg',
 
         sub: [
           {
@@ -670,7 +646,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
 
       {
         name: 'interface_configuration',
-        icon: 'pi-sliders-h',
+        icon: 'assets/icons/business-outline.svg',
         sub: [
           {
             name: 'interface_settings',

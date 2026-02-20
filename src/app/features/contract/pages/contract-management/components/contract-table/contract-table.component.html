@@ -67,47 +67,49 @@
   <!-- Actions Section -->
   <div class="actions-section">
     <div class="actions-left">
-      <!-- Bulk Actions -->
-      <button
-        class="action-btn manage-btn"
-        [disabled]="selectedIds().length === 0"
-        (click)="showBulkActions.set(!showBulkActions())"
-      >
-        <i class="pi pi-cog"></i>
-        <span>จัดการ</span>
-      </button>
-
-      @if (showBulkActions() && selectedIds().length > 0) {
-        <div class="bulk-actions-menu">
-          <button class="menu-item" (click)="onBulkAction('extend')">
-            <i class="pi pi-calendar-plus"></i>
-            <span>Extend</span>
-          </button>
-          <button class="menu-item" (click)="onBulkAction('terminate')">
-            <i class="pi pi-ban"></i>
-            <span>Terminate</span>
-          </button>
-          <button class="menu-item" (click)="onBulkAction('discount')">
-            <i class="pi pi-percentage"></i>
-            <span>Discount</span>
-          </button>
-          <button class="menu-item" (click)="onBulkAction('renew')">
-            <i class="pi pi-refresh"></i>
-            <span>Renew</span>
-          </button>
-          <button class="menu-item" (click)="onBulkAction('edit')">
-            <i class="pi pi-pencil"></i>
-            <span>{{ getEditBulkActionLabel() }}</span>
-          </button>
-        </div>
-      }
-
       <span class="selected-count" *ngIf="selectedIds().length > 0">
         {{ selectedIds().length }} selected
       </span>
     </div>
 
     <div class="actions-right">
+      <!-- Bulk Actions (ย้ายมาอยู่กลุ่มเดียวกับปุ่มสร้าง) -->
+      <div class="manage-dropdown-wrapper">
+        <button
+          class="action-btn manage-btn"
+          [disabled]="selectedIds().length === 0"
+          (click)="showBulkActions.set(!showBulkActions())"
+        >
+          <i class="pi pi-cog"></i>
+          <span>จัดการ</span>
+        </button>
+
+        @if (showBulkActions() && selectedIds().length > 0) {
+          <div class="bulk-actions-menu">
+            <button class="menu-item" (click)="onBulkAction('extend')">
+              <i class="pi pi-calendar-plus"></i>
+              <span>Extend</span>
+            </button>
+            <button class="menu-item" (click)="onBulkAction('terminate')">
+              <i class="pi pi-ban"></i>
+              <span>Terminate</span>
+            </button>
+            <button class="menu-item" (click)="onBulkAction('discount')">
+              <i class="pi pi-percentage"></i>
+              <span>Discount</span>
+            </button>
+            <button class="menu-item" (click)="onBulkAction('renew')">
+              <i class="pi pi-refresh"></i>
+              <span>Renew</span>
+            </button>
+            <button class="menu-item" (click)="onBulkAction('edit')">
+              <i class="pi pi-pencil"></i>
+              <span>{{ getEditBulkActionLabel() }}</span>
+            </button>
+          </div>
+        }
+      </div>
+
       <button class="action-btn add-btn" (click)="openAddModal()">
         <i class="pi pi-plus"></i>
         <span>{{ getAddButtonLabel() }}</span>

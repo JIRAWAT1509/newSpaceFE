@@ -253,16 +253,12 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
 
   th: {
     // Primary navigation
-    sales: "ฝ่ายขาย",
     area: "พื้นที่",
     contract: "สัญญา",
     service: "บริการ",
-    collection_finance: "การจัดเก็บและการเงิน",
-    facilities: "สาธารณูปโภค",
     finance: "การเงิน",
     dashboard: "แดชบอร์ด",
     report_dashboard: "รายงาน",
-    setting: "ตั้งค่า",
 
     // Area - Secondary
     area_management: "การจัดการพื้นที่",
@@ -493,7 +489,7 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
     widget_layout: "เค้าโครงวิดเจ็ต",
     widget_settings: "ตั้งค่าวิดเจ็ต",
     custom_widgets: "วิดเจ็ตแบบกำหนดเอง",
-    widget_library: "ไลบรารีวิดเจ็ต",
+    widget_library: "คลังวิดเจ็ต",
 
     // Customization - Sub
     layout_options: "ตัวเลือกเค้าโครง",
@@ -505,16 +501,12 @@ export const NAVIGATION_TEXTS: { [lang: string]: NavigationTexts } = {
 
   zh: {
     // Primary navigation
-    sales: "销售",
     area: "区域",
     contract: "合同",
     service: "服务",
-    collection_finance: "收款与财务",
-    facilities: "设施",
     finance: "财务",
     dashboard: "仪表板",
     report_dashboard: "报告",
-    setting: "设置",
 
     // Area - Secondary
     area_management: "区域管理",

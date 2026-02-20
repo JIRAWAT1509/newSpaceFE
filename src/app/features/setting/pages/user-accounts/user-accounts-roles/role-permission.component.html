@@ -2,14 +2,16 @@
 
 <div class="role-permission-container">
 
-  <!-- Header Section -->
+  <!-- Header Section (รูปแบบเดียวกับ facilities/utilities/master) -->
   <div class="header-section">
     <div class="header-content">
+      <div class="header-icon">
+        <i class="pi pi-lock"></i>
+      </div>
       <div class="title-section">
         <h1 class="page-title">Role & Permission Management</h1>
         <p class="page-subtitle">Manage access permissions for user roles</p>
       </div>
-
       <div class="header-actions">
         <!-- Buttons moved to bottom of page -->
       </div>
@@ -55,7 +57,7 @@
         icon="pi pi-copy"
         severity="secondary"
         [outlined]="true"
-        [disabled]="!selectedRole || isLoading"
+        [disabled]="!hasPermissions || isLoading || roles.length < 2"
         (onClick)="openCopyModal()"
       ></p-button>
 
@@ -64,7 +66,7 @@
         icon="pi pi-bolt"
         severity="secondary"
         [outlined]="true"
-        [disabled]="!selectedRole || isLoading"
+        [disabled]="!hasPermissions || isLoading"
         (onClick)="openTemplateModal()"
       ></p-button>
 
@@ -88,46 +90,53 @@
     </div>
   </div>
 
-  <!-- Summary Statistics -->
-  <div *ngIf="hasPermissions && !isLoading" class="summary-section">
-    <div class="summary-card">
-      <div class="summary-icon">
-        <i class="pi pi-list"></i>
-      </div>
-      <div class="summary-content">
-        <div class="summary-value">{{ summary.totalFeatures }}</div>
-        <div class="summary-label">Total Features</div>
-      </div>
-    </div>
+  <!-- Dashboard Overview (รูปแบบเดียวกับ facilities/utilities/master) -->
+  <div *ngIf="hasPermissions && !isLoading" class="section-card">
+    <h2 class="section-title">Dashboard Overview</h2>
+    <div class="stats-grid">
+      <article class="stat-card stat-card--primary">
+        <div class="stat-card-bg"></div>
+        <div class="stat-card-icon">
+          <i class="pi pi-list"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">Total Features</p>
+          <p class="stat-value">{{ summary.totalFeatures }}</p>
+        </div>
+      </article>
 
-    <div class="summary-card">
-      <div class="summary-icon success">
-        <i class="pi pi-check-circle"></i>
-      </div>
-      <div class="summary-content">
-        <div class="summary-value">{{ summary.enabledFeatures }}</div>
-        <div class="summary-label">Enabled</div>
-      </div>
-    </div>
+      <article class="stat-card stat-card--success">
+        <div class="stat-card-bg"></div>
+        <div class="stat-card-icon">
+          <i class="pi pi-check-circle"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">Enabled</p>
+          <p class="stat-value">{{ summary.enabledFeatures }}</p>
+        </div>
+      </article>
 
-    <div class="summary-card">
-      <div class="summary-icon primary">
-        <i class="pi pi-unlock"></i>
-      </div>
-      <div class="summary-content">
-        <div class="summary-value">{{ summary.fullAccessFeatures }}</div>
-        <div class="summary-label">Full Access</div>
-      </div>
-    </div>
+      <article class="stat-card stat-card--info">
+        <div class="stat-card-bg"></div>
+        <div class="stat-card-icon">
+          <i class="pi pi-unlock"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">Full Access</p>
+          <p class="stat-value">{{ summary.fullAccessFeatures }}</p>
+        </div>
+      </article>
 
-    <div class="summary-card">
-      <div class="summary-icon info">
-        <i class="pi pi-eye"></i>
-      </div>
-      <div class="summary-content">
-        <div class="summary-value">{{ summary.viewOnlyFeatures }}</div>
-        <div class="summary-label">View Only</div>
-      </div>
+      <article class="stat-card stat-card--warning">
+        <div class="stat-card-bg"></div>
+        <div class="stat-card-icon">
+          <i class="pi pi-eye"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">View Only</p>
+          <p class="stat-value">{{ summary.viewOnlyFeatures }}</p>
+        </div>
+      </article>
     </div>
   </div>
 
@@ -287,132 +296,6 @@
 
 </div>
 
-<!-- Copy from Role Modal -->
-<p-dialog
-  [(visible)]="showCopyModal"
-  [modal]="true"
-  [closable]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: '500px', maxHeight: '85vh' }"
-  [contentStyle]="{ 'overflow-y': 'auto', 'flex': '1 1 auto', 'min-height': '0' }"
-  styleClass="role-permission-dialog"
-  contentStyleClass="role-permission-dialog-content"
-  header="Copy Permissions from Another Role"
->
-  <div class="modal-content-body">
-    <div class="warning-message">
-      <i class="pi pi-exclamation-triangle"></i>
-      <p>
-        This will copy all permissions from the selected role to
-        <strong *ngIf="selectedRole">{{ getRoleLabel(selectedRole) }}</strong>.
-        <strong>Your current permissions will be replaced.</strong>
-      </p>
-    </div>
-
-    <div class="modal-field">
-      <label class="modal-label">Select Source Role</label>
-      <p-select
-        [(ngModel)]="copyFromRole"
-        [options]="copyRoleOptions"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Choose a role to copy from..."
-        styleClass="w-full copy-role-select"
-        [appendTo]="null"
-        [panelStyleClass]="'copy-role-dropdown-panel'"
-      ></p-select>
-    </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <div class="dialog-footer-actions">
-      <p-button
-        label="ยกเลิก"
-        severity="secondary"
-        [outlined]="true"
-        (onClick)="cancelCopyModal()"
-      ></p-button>
-      <p-button
-        label="OK - Copy Permissions"
-        icon="pi pi-copy"
-        severity="primary"
-        [disabled]="!copyFromRole || copyFromRole === selectedRole"
-        (onClick)="copyFromOtherRole()"
-      ></p-button>
-    </div>
-  </ng-template>
-</p-dialog>
-
-<!-- Apply Template Modal -->
-<p-dialog
-  [(visible)]="showTemplateModal"
-  [modal]="true"
-  [closable]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: '600px', maxHeight: '85vh' }"
-  [contentStyle]="{ 'overflow-y': 'auto', 'flex': '1 1 auto', 'min-height': '0' }"
-  styleClass="role-permission-dialog"
-  contentStyleClass="role-permission-dialog-content"
-  header="Apply Permission Template"
->
-  <div class="modal-content-body">
-    <div class="warning-message">
-      <i class="pi pi-exclamation-triangle"></i>
-      <p>
-        <strong>Applying a template will replace current permissions.</strong>
-        Choose a pre-configured template to quickly set up permissions.
-      </p>
-    </div>
-
-    <div class="template-radio-list">
-      <div
-        *ngFor="let template of templates"
-        class="template-radio-item"
-        [class.selected]="selectedTemplate === template.id"
-        (click)="onTemplateSelect(template.id)"
-      >
-        <input
-          type="radio"
-          name="template"
-          [value]="template.id"
-          [checked]="selectedTemplate === template.id"
-          (change)="onTemplateSelect(template.id)"
-          class="template-radio-input"
-        />
-        <div class="template-radio-content">
-          <div class="template-radio-icon">
-            <i [class]="template.icon"></i>
-          </div>
-          <div class="template-radio-info">
-            <h4>{{ template.name }}</h4>
-            <p>{{ template.description }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <div class="dialog-footer-actions">
-      <p-button
-        label="ยกเลิก"
-        severity="secondary"
-        [outlined]="true"
-        (onClick)="cancelTemplateModal()"
-      ></p-button>
-      <p-button
-        label="OK - Apply Template"
-        icon="pi pi-check"
-        severity="primary"
-        [disabled]="!selectedTemplate || selectedTemplate === ''"
-        (onClick)="applyTemplate()"
-      ></p-button>
-    </div>
-  </ng-template>
-</p-dialog>
-
 <!-- Discard Changes Confirmation Modal -->
 <p-dialog
   [(visible)]="showDiscardModal"
@@ -448,4 +331,118 @@
       ></p-button>
     </div>
   </ng-template>
+</p-dialog>
+
+<!-- Copy from Role Modal -->
+<p-dialog
+  [(visible)]="showCopyModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '480px' }"
+  styleClass="role-permission-dialog"
+  contentStyleClass="role-permission-dialog-content"
+  header="Copy from Role"
+  (onHide)="cancelCopyModal()"
+>
+  <div class="modal-content-body" (wheel)="$event.stopPropagation()">
+    <p class="modal-description">
+      Copy all permission settings from another role to the currently selected role
+      <strong>{{ getRoleLabel(selectedRole) }}</strong>. You can then edit and save.
+    </p>
+    <div class="modal-field">
+      <label class="modal-label">Select source role</label>
+      <p-select
+        [(ngModel)]="copyFromRole"
+        [options]="copyRoleOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Choose a role to copy from..."
+        styleClass="w-full"
+        appendTo="body"
+        [overlayOptions]="copyRoleOverlayOptions"
+      ></p-select>
+    </div>
+
+    <div class="template-modal-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cancelCopyModal()"
+      ></p-button>
+      <p-button
+        label="Copy Permissions"
+        icon="pi pi-copy"
+        severity="primary"
+        [loading]="isLoading"
+        [disabled]="!copyFromRole"
+        (onClick)="copyFromOtherRole()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- Apply Template Modal -->
+<p-dialog
+  [(visible)]="showTemplateModal"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '520px' }"
+  styleClass="role-permission-dialog"
+  contentStyleClass="role-permission-dialog-content"
+  header="Apply Template"
+  (onHide)="cancelTemplateModal()"
+>
+  <div class="modal-content-body template-modal-body" (wheel)="$event.stopPropagation()">
+    <p class="modal-description">
+      Apply a preset template to the current role
+      <strong>{{ getRoleLabel(selectedRole) }}</strong>. This will overwrite current permission toggles. You can edit and save afterward.
+    </p>
+    <div class="template-grid">
+      <div
+        *ngFor="let template of templates"
+        class="template-card"
+        [class.selected]="selectedTemplate === template.id"
+        (click)="onTemplateSelect(template.id)"
+      >
+        <div class="template-icon">
+          <i [class]="template.icon || 'pi pi-file'"></i>
+        </div>
+        <div class="template-info">
+          <h4>{{ template.name }}</h4>
+          <p>{{ template.description }}</p>
+        </div>
+        <div class="template-radio">
+          <input
+            type="radio"
+            [name]="'template-' + template.id"
+            [value]="template.id"
+            [checked]="selectedTemplate === template.id"
+            (change)="onTemplateSelect(template.id)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- ปุ่มอยู่ใต้การ์ดเทมเพลต ให้เห็นเสมอ -->
+    <div class="template-modal-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cancelTemplateModal()"
+      ></p-button>
+      <p-button
+        label="Apply Template"
+        icon="pi pi-check"
+        severity="primary"
+        [disabled]="!selectedTemplate"
+        (onClick)="applyTemplate()"
+      ></p-button>
+    </div>
+  </div>
 </p-dialog>

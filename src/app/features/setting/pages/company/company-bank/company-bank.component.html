@@ -25,8 +25,8 @@
     </div>
   </div>
 
-  <!-- Main Content - Split Layout -->
-  <div class="main-content" [class.split-layout]="selectedBank">
+  <!-- Main Content - Split Layout (2 or 3 columns) -->
+  <div class="main-content" [class.split-layout]="selectedBank" [class.with-remittance]="selectedBranch">
 
     <!-- Banks Section -->
     <div class="banks-section" [class.half-width]="selectedBank">
@@ -141,7 +141,8 @@
         <div
           *ngFor="let branch of filteredBranches"
           class="branch-card"
-          (click)="viewBranchDetails(branch)"
+          [class.selected]="selectedBranch?.BRANCH_CODE === branch.BRANCH_CODE"
+          (click)="selectBranch(branch)"
         >
           <div class="branch-card-header">
             <div class="branch-icon">
@@ -189,6 +190,146 @@
       <div *ngIf="!isLoadingBranches && filteredBranches.length === 0" class="empty-state">
         <i class="pi pi-inbox empty-icon"></i>
         <p>No branches found for this bank</p>
+      </div>
+
+      <!-- หน้าจอบันทึกข้อมูลสาขาธนาคาร (แสดงเมื่อเลือกสาขา) -->
+      <div *ngIf="selectedBranch" class="branch-save-section">
+        <h3 class="section-title">
+          <i class="pi pi-save"></i>
+          บันทึกข้อมูลสาขาธนาคาร
+        </h3>
+        <div class="branch-form-inline">
+          <div class="form-field" [class.has-error]="branchErrors['BRANCH_CODE']">
+            <label class="form-label">รหัสสาขา</label>
+            <input
+              type="text"
+              pInputText
+              [ngModel]="branchForm.BRANCH_CODE"
+              disabled
+              class="form-input"
+            />
+          </div>
+          <div class="form-field" [class.has-error]="branchErrors['BRANCH_NAME_EN']">
+            <label class="form-label required">Branch Name (English)</label>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="branchForm.BRANCH_NAME_EN"
+              placeholder="ชื่อสาขา (อังกฤษ)"
+              class="form-input"
+            />
+            <div *ngIf="branchErrors['BRANCH_NAME_EN']" class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ branchErrors['BRANCH_NAME_EN'] }}</span>
+            </div>
+          </div>
+          <div class="form-field" [class.has-error]="branchErrors['BRANCH_NAME_TH']">
+            <label class="form-label required">Branch Name (Thai)</label>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="branchForm.BRANCH_NAME_TH"
+              placeholder="ชื่อสาขา (ไทย)"
+              class="form-input"
+            />
+            <div *ngIf="branchErrors['BRANCH_NAME_TH']" class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ branchErrors['BRANCH_NAME_TH'] }}</span>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Bank Code</label>
+            <input
+              type="text"
+              pInputText
+              [ngModel]="branchForm.BANK_CODE"
+              disabled
+              class="form-input"
+            />
+          </div>
+          <div class="form-actions">
+            <p-button
+              label="บันทึก"
+              icon="pi pi-check"
+              severity="primary"
+              (onClick)="saveBranchInline()"
+              [loading]="isSaving"
+            ></p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- รหัสการนำส่งเงินเข้าบัญชีธนาคาร (แสดงเมื่อเลือกสาขา) -->
+    <div *ngIf="selectedBranch" class="remittance-section half-width">
+      <div class="section-header">
+        <div class="selected-bank-info">
+          <h2 class="section-title">
+            <i class="pi pi-wallet"></i>
+            รหัสการนำส่งเงินเข้าบัญชีธนาคาร
+          </h2>
+          <span class="bank-badge">{{ selectedBranch.BRANCH_CODE }}</span>
+        </div>
+        <div class="branch-actions">
+          <p-button
+            label="ดูรายละเอียด"
+            icon="pi pi-eye"
+            [outlined]="true"
+            size="small"
+            (onClick)="viewBranchDetails(selectedBranch!)"
+          ></p-button>
+          <p-button
+            label="เพิ่ม"
+            icon="pi pi-plus"
+            severity="primary"
+            size="small"
+            (onClick)="openAddAccountModal()"
+          ></p-button>
+        </div>
+      </div>
+
+      <div *ngIf="isLoadingAccounts" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading...</p>
+      </div>
+
+      <div *ngIf="!isLoadingAccounts && accounts.length > 0" class="accounts-table">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>รหัสการนำส่งเงินเข้าบัญชี</th>
+              <th>เลขบัญชี</th>
+              <th>ประเภทบัญชี</th>
+              <th>บัญชีแยกประเภท (GL)</th>
+              <th>รายละเอียด</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let account of accounts"
+              class="clickable-row"
+              (click)="openEditAccountModal(account)"
+            >
+              <td>{{ account.PAID_FOR_CODE }}</td>
+              <td>{{ account.ACC_BANK }}</td>
+              <td>{{ account.ACC_TYPE }}</td>
+              <td>{{ account.ACC_GL }}</td>
+              <td>{{ account.NB_LONG_TEXT || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!isLoadingAccounts && accounts.length === 0" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>ยังไม่มีรหัสการนำส่งเงินเข้าบัญชี</p>
+        <p-button
+          label="เพิ่มรหัสการนำส่งเงิน"
+          icon="pi pi-plus"
+          severity="primary"
+          size="small"
+          (onClick)="openAddAccountModal()"
+        ></p-button>
       </div>
     </div>
 
