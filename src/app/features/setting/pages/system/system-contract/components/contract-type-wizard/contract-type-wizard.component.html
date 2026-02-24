@@ -8,10 +8,10 @@
   ></div>
 }
 
-<!-- Wizard Modal (เริ่มจากใต้ header เพื่อไม่ให้หัวข้อโดนบัง) -->
+<!-- Wizard Modal (ใช้ drawer-panel เพื่ออยู่เหนือ backdrop ไม่ให้สีจางบังฟอร์ม) -->
 @if (isOpen) {
   <div
-    class="fixed z-[60] bg-white rounded-lg shadow-2xl transition-all duration-300 ease-in-out
+    class="drawer-panel fixed z-[51] bg-white rounded-lg shadow-2xl transition-all duration-300 ease-in-out
            top-[100px] left-1/2 transform -translate-x-1/2
            w-[95%] max-w-[1200px] max-h-[calc(100vh-120px)] overflow-hidden"
   >
@@ -549,11 +549,14 @@
         </div>
       }
 
-      <!-- ==================== STEP 3: เงื่อนไขตามสัญญาเพิ่มเติม ==================== -->
+      <!-- ==================== STEP 3: เงื่อนไขตามสัญญาเพิ่มเติม / Additional Contract Conditions ==================== -->
       @if (currentStep === 3) {
         <div class="space-y-4">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">เงื่อนไขตามสัญญาเพิ่มเติม</h3>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">เงื่อนไขตามสัญญาเพิ่มเติม</h3>
+              <p class="text-sm text-gray-500 mt-0.5">Additional Contract Conditions</p>
+            </div>
             <p-button
               label="เพิ่มเงื่อนไข"
               icon="pi pi-plus"
@@ -568,6 +571,7 @@
             <div class="empty-state-small">
               <i class="pi pi-inbox text-3xl text-gray-400"></i>
               <p class="text-gray-500 mt-2">ยังไม่มีเงื่อนไข คลิก "เพิ่มเงื่อนไข" เพื่อเริ่มต้น</p>
+              <p class="text-gray-400 text-sm mt-1">No conditions yet. Click "Add Condition" to start.</p>
             </div>
           } @else {
             <div class="conditions-table-wrapper">
@@ -577,6 +581,8 @@
                     <th style="width: 60px;">ข้อที่</th>
                     <th>หัวข้อ</th>
                     <th>เนื้อหา</th>
+                    <th>Title (EN)</th>
+                    <th>Content (EN)</th>
                     <th style="width: 80px;">การดำเนินการ</th>
                   </tr>
                 </thead>
@@ -586,6 +592,8 @@
                       <td class="text-center">{{ condition.seq }}</td>
                       <td>{{ condition.title }}</td>
                       <td class="truncate max-w-xs">{{ condition.content }}</td>
+                      <td class="truncate max-w-xs">{{ condition.title_en || '-' }}</td>
+                      <td class="truncate max-w-xs">{{ condition.content_en || '-' }}</td>
                       <td class="text-center">
                         <p-button
                           icon="pi pi-pencil"
@@ -665,13 +673,15 @@
             </div>
           </div>
 
-          <!-- เงื่อนไขตามสัญญา -->
+          <!-- เงื่อนไขตามสัญญา / Contract Conditions -->
           <div class="summary-section">
-            <h4 class="summary-title">เงื่อนไขตามสัญญา</h4>
+            <h4 class="summary-title">เงื่อนไขตามสัญญา <span class="text-gray-500 font-normal text-sm">(Contract Conditions)</span></h4>
             @if (formData.conditions.length > 0) {
               <p class="text-sm text-gray-600">มีเงื่อนไขทั้งหมด {{ formData.conditions.length }} ข้อ</p>
+              <p class="text-sm text-gray-500">Total {{ formData.conditions.length }} condition(s).</p>
             } @else {
               <p class="text-sm text-gray-500">ไม่มีเงื่อนไข</p>
+              <p class="text-sm text-gray-400">No conditions.</p>
             }
           </div>
         </div>
@@ -725,49 +735,78 @@
   </div>
 }
 
-<!-- Condition Form Modal (ใช้ drawer-overlay ให้ z-index สูงกว่า header และหัวข้อไม่โดนบัง) -->
-@if (showConditionModal) {
-  <div class="drawer-overlay modal-overlay fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center" (click)="closeConditionModal()">
-    <div class="modal-container bg-white rounded-lg shadow-xl w-[90%] max-w-[600px] p-6" (click)="$event.stopPropagation()">
-      <h3 class="text-lg font-semibold text-gray-800 mb-4">{{ conditionEditMode ? 'แก้ไขเงื่อนไข' : 'เพิ่มเงื่อนไข' }}</h3>
+<!-- ฟอร์มเพิ่ม/แก้ไขเงื่อนไข: ใช้ p-dialog + appendTo="body" เพื่อให้เด้งอยู่ด้านหน้าฟอร์มเพิ่มประเภทสัญญาเสมอ -->
+<p-dialog
+  [(visible)]="showConditionModal"
+  [header]="conditionEditMode ? 'แก้ไขเงื่อนไข' : 'เพิ่มเงื่อนไข'"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '90%', maxWidth: '600px' }"
+  appendTo="body"
+  (onHide)="closeConditionModal()"
+  styleClass="condition-form-dialog"
+>
+  <div class="space-y-4">
+    <div class="form-field">
+      <label class="form-label required">หัวข้อ</label>
+      <input
+        type="text"
+        [(ngModel)]="conditionForm.title"
+        name="conditionTitle"
+        placeholder="กรอกหัวข้อ"
+        class="form-input"
+      />
+    </div>
 
-      <div class="space-y-4">
-        <div class="form-field">
-          <label class="form-label required">หัวข้อ</label>
-          <input
-            type="text"
-            [(ngModel)]="conditionForm.title"
-            name="conditionTitle"
-            placeholder="กรอกหัวข้อ"
-            class="form-input"
-          />
-        </div>
+    <div class="form-field">
+      <label class="form-label">หัวข้อ (EN) / Title</label>
+      <input
+        type="text"
+        [(ngModel)]="conditionForm.title_en"
+        name="conditionTitleEn"
+        placeholder="Enter title"
+        class="form-input"
+      />
+    </div>
 
-        <div class="form-field">
-          <label class="form-label required">เนื้อหา</label>
-          <textarea
-            [(ngModel)]="conditionForm.content"
-            name="conditionContent"
-            placeholder="กรอกเนื้อหา"
-            rows="4"
-            class="form-input"
-          ></textarea>
-        </div>
-      </div>
+    <div class="form-field">
+      <label class="form-label required">เนื้อหา</label>
+      <textarea
+        [(ngModel)]="conditionForm.content"
+        name="conditionContent"
+        placeholder="กรอกเนื้อหา"
+        rows="4"
+        class="form-input"
+      ></textarea>
+    </div>
 
-      <div class="flex justify-end gap-3 mt-6">
-        <p-button
-          label="ยกเลิก"
-          [outlined]="true"
-          severity="secondary"
-          (onClick)="closeConditionModal()"
-        ></p-button>
-        <p-button
-          label="บันทึก"
-          severity="primary"
-          (onClick)="saveCondition()"
-        ></p-button>
-      </div>
+    <div class="form-field">
+      <label class="form-label">เนื้อหา (EN) / Content</label>
+      <textarea
+        [(ngModel)]="conditionForm.content_en"
+        name="conditionContentEn"
+        placeholder="Enter content"
+        rows="4"
+        class="form-input"
+      ></textarea>
     </div>
   </div>
-}
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-3">
+      <p-button
+        label="ยกเลิก"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="closeConditionModal()"
+      ></p-button>
+      <p-button
+        label="บันทึก"
+        severity="primary"
+        (onClick)="saveCondition()"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-dialog>

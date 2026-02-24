@@ -294,7 +294,15 @@
       </div>
 
       <div *ngIf="!isLoadingAccounts && accounts.length > 0" class="accounts-table">
-        <table class="data-table">
+        <table class="data-table remittance-data-table">
+          <colgroup>
+            <col style="width: 12%" />
+            <col style="width: 14%" />
+            <col style="width: 16%" />
+            <col style="width: 16%" />
+            <col style="width: 28%" />
+            <col style="width: 90px" />
+          </colgroup>
           <thead>
             <tr>
               <th>รหัสการนำส่งเงินเข้าบัญชี</th>
@@ -302,19 +310,40 @@
               <th>ประเภทบัญชี</th>
               <th>บัญชีแยกประเภท (GL)</th>
               <th>รายละเอียด</th>
+              <th class="text-center">การดำเนินการ</th>
             </tr>
           </thead>
           <tbody>
             <tr
               *ngFor="let account of accounts"
               class="clickable-row"
-              (click)="openEditAccountModal(account)"
+              (click)="openViewAccountModal(account)"
             >
               <td>{{ account.PAID_FOR_CODE }}</td>
               <td>{{ account.ACC_BANK }}</td>
               <td>{{ account.ACC_TYPE }}</td>
               <td>{{ account.ACC_GL }}</td>
               <td>{{ account.NB_LONG_TEXT || '-' }}</td>
+              <td class="text-center" (click)="$event.stopPropagation()">
+                <p-button
+                  icon="pi pi-pencil"
+                  [text]="true"
+                  [rounded]="true"
+                  severity="info"
+                  size="small"
+                  pTooltip="แก้ไข"
+                  (onClick)="openEditAccountModal(account)"
+                ></p-button>
+                <p-button
+                  icon="pi pi-trash"
+                  [text]="true"
+                  [rounded]="true"
+                  severity="danger"
+                  size="small"
+                  pTooltip="ลบ"
+                  (onClick)="deleteAccount(account)"
+                ></p-button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -588,19 +617,40 @@
         <th>ประเภทบัญชี</th>
         <th>บัญชีแยกประเภท (GL)</th>
         <th>รายละเอียด</th>
+        <th class="text-center">การดำเนินการ</th>
       </tr>
     </thead>
     <tbody>
       <tr
         *ngFor="let account of accounts"
         class="clickable-row"
-        (click)="openEditAccountModal(account)"
+        (click)="openViewAccountModal(account)"
       >
         <td>{{ account.PAID_FOR_CODE }}</td>
         <td>{{ account.ACC_BANK }}</td>
         <td>{{ account.ACC_TYPE }}</td>
         <td>{{ account.ACC_GL }}</td>
         <td>{{ account.NB_LONG_TEXT || '-' }}</td>
+        <td class="text-center" (click)="$event.stopPropagation()">
+          <p-button
+            icon="pi pi-pencil"
+            [text]="true"
+            [rounded]="true"
+            severity="info"
+            size="small"
+            pTooltip="แก้ไข"
+            (onClick)="openEditAccountModal(account)"
+          ></p-button>
+          <p-button
+            icon="pi pi-trash"
+            [text]="true"
+            [rounded]="true"
+            severity="danger"
+            size="small"
+            pTooltip="ลบ"
+            (onClick)="deleteAccount(account)"
+          ></p-button>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -652,7 +702,7 @@
 </p-dialog>
 
 <!-- ============================================ -->
-<!-- MODAL 4: Account Add/Edit (รหัสการนำส่งเงินเข้าบัญชีธนาคาร) -->
+<!-- MODAL 4: Account Add/Edit/View (รหัสการนำส่งเงินเข้าบัญชีธนาคาร) -->
 <!-- ============================================ -->
 <p-dialog
   [(visible)]="showAccountModal"
@@ -661,13 +711,70 @@
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: '700px', maxWidth: '95vw' }"
-  [header]="isAccountEditMode ? 'แก้ไขรหัสการนำส่งเงินเข้าบัญชี' : 'เพิ่มรหัสการนำส่งเงินเข้าบัญชีธนาคาร'"
+  [header]="isAccountViewMode ? 'รายละเอียดรหัสการนำส่งเงินเข้าบัญชี' : (isAccountEditMode ? 'แก้ไขรหัสการนำส่งเงินเข้าบัญชี' : 'เพิ่มรหัสการนำส่งเงินเข้าบัญชีธนาคาร')"
 >
   <div class="modal-content">
     <h4 class="modal-section-title">
       <i class="pi pi-wallet"></i>
       รหัสการนำส่งเงินเข้าบัญชีธนาคาร
     </h4>
+
+    <!-- โหมดดูอย่างเดียว: แสดงเฉพาะข้อมูล ไม่มี input แก้ไข -->
+    <div *ngIf="isAccountViewMode" class="view-only-content">
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label">Bank Code</label>
+          <p class="view-value">{{ accountForm.BANK_CODE }}</p>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Branch Code</label>
+          <p class="view-value">{{ accountForm.BRANCH_CODE }}</p>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">เลขบัญชี</label>
+        <p class="view-value">{{ accountForm.ACC_BANK }}</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">ประเภทบัญชี</label>
+        <p class="view-value">{{ accountForm.ACC_TYPE }}</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">บัญชีแยกประเภท (GL)</label>
+        <p class="view-value">{{ accountForm.ACC_GL || '-' }}</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">รหัสการนำส่งเงินเข้าบัญชีธนาคาร</label>
+        <p class="view-value">{{ accountForm.PAID_FOR_CODE }}</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">รายละเอียด</label>
+        <p class="view-value">{{ accountForm.NB_LONG_TEXT || '-' }}</p>
+      </div>
+      <div class="bill-payment-section">
+        <h4 class="subsection-title">
+          <i class="pi pi-file-edit"></i>
+          Bill Payment Column Mapping
+        </h4>
+        <div class="form-row-three">
+          <div class="form-field">
+            <label class="form-label">Customer (Ref1)</label>
+            <p class="view-value">{{ accountForm.BILL_PAYMENT_REF1 || '-' }}</p>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Invoice No (Ref2)</label>
+            <p class="view-value">{{ accountForm.BILL_PAYMENT_REF2 || '-' }}</p>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Payment Amount</label>
+            <p class="view-value">{{ accountForm.BILL_PAYMENT_REF3 || '-' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- โหมดเพิ่ม/แก้ไข: ฟอร์มกรอกข้อมูล -->
+    <div *ngIf="!isAccountViewMode">
     <div class="form-row">
       <div class="form-field">
         <label class="form-label">Bank Code</label>
@@ -817,37 +924,57 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 
 <ng-template pTemplate="footer">
   <div class="modal-footer">
-    <div class="left-actions">
+    <!-- โหมดดูอย่างเดียว: ปิด + แก้ไข -->
+    <div *ngIf="isAccountViewMode" class="right-actions">
       <p-button
-        *ngIf="isAccountEditMode"
-        label="Delete"
-        icon="pi pi-trash"
-        severity="danger"
-        [outlined]="true"
-        (onClick)="deleteAccountFromModal()"
-      ></p-button>
-    </div>
-    <div class="right-actions">
-      <p-button
-        label="ยกเลิก"
+        label="ปิด"
         icon="pi pi-times"
         severity="secondary"
         [outlined]="true"
         (onClick)="closeAccountModal()"
-        [disabled]="isSaving"
       ></p-button>
       <p-button
-        [label]="isAccountEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างบัญชี'"
-        icon="pi pi-check"
+        label="แก้ไข"
+        icon="pi pi-pencil"
         severity="primary"
-        (onClick)="saveAccountModal()"
-        [loading]="isSaving"
+        (onClick)="switchAccountToEditMode()"
       ></p-button>
     </div>
+    <!-- โหมดเพิ่ม/แก้ไข: ยกเลิก บันทึก/สร้าง ลบ -->
+    <ng-container *ngIf="!isAccountViewMode">
+      <div class="left-actions">
+        <p-button
+          *ngIf="isAccountEditMode"
+          label="Delete"
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          (onClick)="deleteAccountFromModal()"
+        ></p-button>
+      </div>
+      <div class="right-actions">
+        <p-button
+          label="ยกเลิก"
+          icon="pi pi-times"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="closeAccountModal()"
+          [disabled]="isSaving"
+        ></p-button>
+        <p-button
+          [label]="isAccountEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างบัญชี'"
+          icon="pi pi-check"
+          severity="primary"
+          (onClick)="saveAccountModal()"
+          [loading]="isSaving"
+        ></p-button>
+      </div>
+    </ng-container>
   </div>
 </ng-template>
 </p-dialog>

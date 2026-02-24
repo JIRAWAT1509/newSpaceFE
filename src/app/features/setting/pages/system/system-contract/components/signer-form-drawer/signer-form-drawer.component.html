@@ -79,6 +79,7 @@
               placeholder="เลือกประเภทการลงนาม"
               [showClear]="true"
               appendTo="body"
+              [overlayOptions]="overlayOptions"
               styleClass="w-full"
               [class.input-error]="!!errors['REP_TYPE']"
             ></p-select>
@@ -99,6 +100,7 @@
               placeholder="เลือกสถานะ"
               [showClear]="false"
               appendTo="body"
+              [overlayOptions]="overlayOptions"
               styleClass="w-full"
               [class.input-error]="!!errors['STATUS']"
             ></p-select>

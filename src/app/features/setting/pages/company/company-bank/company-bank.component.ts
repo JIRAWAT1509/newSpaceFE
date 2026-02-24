@@ -115,6 +115,7 @@ export class CompanyBankComponent implements OnInit {
   showDetailsModal = false;
   isEditMode = false;
   isAccountEditMode = false;  // ✅ Added for account edit mode
+  isAccountViewMode = false;  // โหมดดูอย่างเดียว (กดแถว) — แก้ไขได้เฉพาะกดไอคอนแก้ไข
 
   // Forms
   bankForm: Bank = this.getEmptyBank();
@@ -581,20 +582,39 @@ openAddAccountModal() {
   }
 
   this.isAccountEditMode = false;
+  this.isAccountViewMode = false;
   this.accountForm = this.getEmptyAccount();
   this.accountForm.BANK_CODE = this.selectedBranch.BANK_CODE;
   this.accountForm.BRANCH_CODE = this.selectedBranch.BRANCH_CODE;
   this.accountErrors = {};
+  this.selectedAccount = null;
   this.showAccountModal = true;
 }
 
-// This method is already there, just make sure it exists
-openEditAccountModal(account: AccountInfo) {
-  this.isAccountEditMode = true;
-  this.accountForm = { ...account };
+/** เปิดโม달ดูรายละเอียดอย่างเดียว (ห้ามแก้ไข) — ใช้เมื่อคลิกแถว */
+openViewAccountModal(account: AccountInfo) {
   this.selectedAccount = account;
+  this.accountForm = { ...account };
+  this.isAccountViewMode = true;
+  this.isAccountEditMode = false;
   this.accountErrors = {};
   this.showAccountModal = true;
+}
+
+/** เปิดโม달แก้ไข — ใช้เฉพาะเมื่อกดไอคอนแก้ไข */
+openEditAccountModal(account: AccountInfo) {
+  this.selectedAccount = account;
+  this.accountForm = { ...account };
+  this.isAccountViewMode = false;
+  this.isAccountEditMode = true;
+  this.accountErrors = {};
+  this.showAccountModal = true;
+}
+
+/** จากโหมดดูอย่างเดียว ไปโหมดแก้ไข (ปุ่ม "แก้ไข" ในโม달) */
+switchAccountToEditMode() {
+  this.isAccountViewMode = false;
+  this.isAccountEditMode = true;
 }
 
 saveAccountModal() {
@@ -687,8 +707,10 @@ performDeleteAccount(account: AccountInfo) {
 
 closeAccountModal() {
   this.showAccountModal = false;
+  this.isAccountViewMode = false;
   this.accountForm = this.getEmptyAccount();
   this.accountErrors = {};
+  this.selectedAccount = null;
 }
 
 validateAccountForm(): boolean {

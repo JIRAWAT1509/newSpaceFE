@@ -1,10 +1,10 @@
 .area-availability-container {
-  @apply space-y-4;
+  @apply space-y-2 sm:space-y-4;
 }
 
 /* รูปแบบเดียวกับ Dashboard Overview (facilities) */
 .section-card {
-  @apply rounded-xl border p-4 mb-4;
+  @apply rounded-xl border mb-2 sm:mb-4 p-3 sm:p-4;
   background: rgb(var(--card));
   border-color: rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
@@ -22,9 +22,9 @@
 
 /* Status card = stat-card style (สีจาก status.color ใน template) */
 .status-card {
-  @apply relative flex items-center gap-4 p-4 rounded-xl overflow-hidden;
+  @apply relative flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl overflow-hidden;
   @apply cursor-pointer transition-all duration-200;
-  min-height: 100px;
+  min-height: 88px;
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
   color: white;
 }

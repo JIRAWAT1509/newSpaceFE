@@ -3,11 +3,14 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 
 interface Condition {
   seq: number;
   title: string;
   content: string;
+  title_en?: string;
+  content_en?: string;
 }
 
 interface ContractTypeForm {
@@ -47,7 +50,7 @@ interface ContractTypeForm {
 @Component({
   selector: 'app-contract-type-wizard',
   standalone: true,
-  imports: [CommonModule, FormsModule, Button],
+  imports: [CommonModule, FormsModule, Button, DialogModule],
   templateUrl: './contract-type-wizard.component.html',
   styleUrl: './contract-type-wizard.component.css'
 })
@@ -67,7 +70,7 @@ export class ContractTypeWizardComponent implements OnChanges {
   // Condition management
   showConditionModal: boolean = false;
   conditionEditMode: boolean = false;
-  conditionForm: Condition = { seq: 0, title: '', content: '' };
+  conditionForm: Condition = { seq: 0, title: '', content: '', title_en: '', content_en: '' };
   conditionEditIndex: number = -1;
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -218,7 +221,11 @@ export class ContractTypeWizardComponent implements OnChanges {
 
   editCondition(condition: Condition): void {
     this.conditionEditMode = true;
-    this.conditionForm = { ...condition };
+    this.conditionForm = {
+      ...condition,
+      title_en: condition.title_en ?? '',
+      content_en: condition.content_en ?? ''
+    };
     this.conditionEditIndex = this.formData.conditions.findIndex(c => c.seq === condition.seq);
     this.showConditionModal = true;
   }
@@ -247,7 +254,7 @@ export class ContractTypeWizardComponent implements OnChanges {
 
   closeConditionModal(): void {
     this.showConditionModal = false;
-    this.conditionForm = { seq: 0, title: '', content: '' };
+    this.conditionForm = { seq: 0, title: '', content: '', title_en: '', content_en: '' };
     this.conditionEditIndex = -1;
   }
 

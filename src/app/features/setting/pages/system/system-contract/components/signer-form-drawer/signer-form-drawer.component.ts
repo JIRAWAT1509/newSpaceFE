@@ -28,6 +28,9 @@ export class SignerFormDrawerComponent implements OnChanges {
   isSubmitting: boolean = false;
   errors: { [key: string]: string } = {};
 
+  /** ให้ overlay ของ dropdown โผล่เหนือ drawer (z-index) */
+  overlayOptions = { baseZIndex: 99999 };
+
   constructor(private cdr: ChangeDetectorRef) {}
 
   // Dropdown options
