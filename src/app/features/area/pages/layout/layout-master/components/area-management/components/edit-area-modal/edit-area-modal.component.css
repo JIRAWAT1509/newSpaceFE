@@ -7,6 +7,11 @@
   border-radius: 0.5rem 0.5rem 0 0;
 }
 
+/* ✅ ซ่อนปุ่ม close ของ PrimeNG เพราะเราทำเองแล้ว */
+:host ::ng-deep .edit-area-modal .p-dialog-header-icons {
+  display: none;
+}
+
 :host ::ng-deep .edit-area-modal .p-dialog-content {
   padding: 1rem 1.25rem;
 }
@@ -21,6 +26,7 @@
 .modal-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
 }
 
@@ -39,6 +45,26 @@
   background: rgba(255,255,255,0.25);
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
+}
+
+/* ✅ ปุ่ม close ที่ทำเอง */
+.btn-close-header {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-close-header:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Form */
@@ -63,7 +89,6 @@
   gap: 0.75rem;
 }
 
-/* ✅ ใช้ class ชื่ออื่น ไม่ชนกับ Tailwind */
 .form-col {
   flex: 1 1 0%;
   min-width: 0;

@@ -3,7 +3,7 @@
 <p-dialog
   [visible]="visible()"
   [modal]="true"
-  [closable]="true"
+  [closable]="false"
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: '480px' }"
@@ -19,6 +19,9 @@
           <span class="area-id-badge">{{ currentArea()!.roomNumber }}</span>
         }
       </h2>
+      <button type="button" class="btn-close-header" (click)="onCancel()">
+        <i class="pi pi-times"></i>
+      </button>
     </div>
   </ng-template>
 
