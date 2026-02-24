@@ -9,7 +9,6 @@ import { Button } from 'primeng/button';
 import { User, UserFormData, DropdownOption } from '@core/models/user.model';
 import { UserManagementService } from '@core/services/userManagement.service';
 import { FormInputComponent } from '@shared/components/formInput/form-input.component';
-import { FormTextareaComponent } from '@shared/components/formInput/form-textarea.component';
 import { FormToggleComponent } from '@shared/components/formInput/form-toggle.component';
 import { FormFileUploadComponent } from '@shared/components/formInput/form-file-upload.component';
 import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
@@ -24,7 +23,6 @@ import { WarningModalComponent } from '@shared/components/warning-modal/warning-
     MultiSelect,
     Button,
     FormInputComponent,
-    FormTextareaComponent,
     FormToggleComponent,
     FormFileUploadComponent,
     WarningModalComponent
@@ -42,22 +40,6 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
   formData: UserFormData = this.getEmptyFormData();
   roleOptions: DropdownOption[] = [];
   departmentOptions: DropdownOption[] = [];
-  titlePrefixOptions: DropdownOption[] = [
-    { label: 'Mr.', value: 'Mr.' },
-    { label: 'Mrs.', value: 'Mrs.' },
-    { label: 'Miss', value: 'Miss' },
-    { label: 'Ms.', value: 'Ms.' },
-    { label: 'Dr.', value: 'Dr.' },
-  ];
-  officeTypeOptions: DropdownOption[] = [
-    { label: 'Head office', value: 'head' },
-    { label: 'Branch', value: 'branch' },
-  ];
-  debtorTypeOptions: DropdownOption[] = [
-    { label: 'Individual', value: 'individual' },
-    { label: 'Company', value: 'company' },
-    { label: 'Government', value: 'government' },
-  ];
 
   /** ลำดับการอนุมัติ (1, 2, 3, ...) */
   approvalSequenceOptions: DropdownOption[] = [
@@ -138,15 +120,6 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
       maxSessions: user.EXP_WITHIN_DAY,
       warningDays: 0,
       email: user.EMAIL || '',
-      billingEmail: user.BILLING_EMAIL || '',
-      sendInvoice: user.SEND_INVOICE === 'Y',
-      sendCreditNote: user.SEND_CREDIT_NOTE === 'Y',
-      sendReceipt: user.SEND_RECEIPT === 'Y',
-      sendCreditReceipt: user.SEND_CREDIT_RECEIPT === 'Y',
-      debtorType: user.DEBTOR_TYPE || '',
-      titlePrefix: user.TITLE_PREFIX || '',
-      officeType: user.OFFICE_TYPE || '',
-      addressEn: user.ADDRESS_EN || '',
       approvalSequence: user.APPROVAL_SEQUENCE != null ? String(user.APPROVAL_SEQUENCE) : '',
       allowedScreens: user.ALLOWED_SCREENS ? (() => { try { return JSON.parse(user.ALLOWED_SCREENS) as string[]; } catch { return []; } })() : [],
       dataAccessScope: user.DATA_ACCESS_SCOPE || '',
@@ -171,15 +144,6 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
       maxSessions: 90,
       warningDays: 0,
       email: '',
-      billingEmail: '',
-      sendInvoice: false,
-      sendCreditNote: false,
-      sendReceipt: false,
-      sendCreditReceipt: false,
-      debtorType: '',
-      titlePrefix: '',
-      officeType: '',
-      addressEn: '',
       approvalSequence: '',
       allowedScreens: [],
       dataAccessScope: '',
@@ -231,16 +195,6 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
       isValid = false;
     }
 
-    // Customer & Documents – required fields
-    if (!this.formData.billingEmail.trim()) {
-      this.errors['billingEmail'] = 'Customer email for invoices is required';
-      isValid = false;
-    }
-    if (!this.formData.debtorType) {
-      this.errors['debtorType'] = 'Debtor type is required';
-      isValid = false;
-    }
-
     // Approval & Access – required fields
     if (!this.formData.approvalSequence) {
       this.errors['approvalSequence'] = 'Approval sequence is required';
@@ -250,7 +204,7 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
       this.errors['dataAccessScope'] = 'Data access scope is required';
       isValid = false;
     }
-    if (!this.formData.allowedScreens?.length) {
+    if (this.mode === 'edit' && !this.formData.allowedScreens?.length) {
       this.errors['allowedScreens'] = 'Select at least one allowed screen';
       isValid = false;
     }
@@ -274,10 +228,6 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
     // Email validation (optional but must be valid if provided)
     if (this.formData.email && !this.isValidEmail(this.formData.email)) {
       this.errors['email'] = 'Please enter a valid email address';
-      isValid = false;
-    }
-    if (this.formData.billingEmail && !this.isValidEmail(this.formData.billingEmail)) {
-      this.errors['billingEmail'] = 'Please enter a valid email address';
       isValid = false;
     }
 

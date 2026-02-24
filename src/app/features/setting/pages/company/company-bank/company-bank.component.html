@@ -59,11 +59,13 @@
           *ngFor="let bank of filteredBanks"
           class="bank-card"
           [class.selected]="selectedBank?.BANK_CODE === bank.BANK_CODE"
+          [pTooltip]="bank.BANK_NAME_EN + ' / ' + bank.BANK_NAME_TH"
+          tooltipPosition="top"
           (click)="selectBank(bank)"
         >
           <div class="bank-card-header">
-            <div class="bank-icon">
-              <i class="pi pi-building"></i>
+            <div class="bank-icon bank-logo" [ngClass]="getBankLogoClass(bank)">
+              <span>{{ getBankLogoText(bank) }}</span>
             </div>
             <div class="bank-code">{{ bank.BANK_CODE }}</div>
           </div>
@@ -194,10 +196,15 @@
 
       <!-- หน้าจอบันทึกข้อมูลสาขาธนาคาร (แสดงเมื่อเลือกสาขา) -->
       <div *ngIf="selectedBranch" class="branch-save-section">
-        <h3 class="section-title">
-          <i class="pi pi-save"></i>
-          บันทึกข้อมูลสาขาธนาคาร
-        </h3>
+        <div class="branch-save-header">
+          <h3 class="section-title">
+            <i class="pi pi-save"></i>
+            บันทึกข้อมูลสาขาธนาคาร
+          </h3>
+          <span class="branch-edit-indicator" [class.dirty]="hasBranchInlineChanges">
+            {{ hasBranchInlineChanges ? 'มีการแก้ไขที่ยังไม่บันทึก' : 'ข้อมูลล่าสุดถูกบันทึกแล้ว' }}
+          </span>
+        </div>
         <div class="branch-form-inline">
           <div class="form-field" [class.has-error]="branchErrors['BRANCH_CODE']">
             <label class="form-label">รหัสสาขา</label>
@@ -248,6 +255,14 @@
             />
           </div>
           <div class="form-actions">
+            <p-button
+              label="รีเซ็ต"
+              icon="pi pi-refresh"
+              severity="secondary"
+              [outlined]="true"
+              [disabled]="!hasBranchInlineChanges || isSaving"
+              (onClick)="resetBranchInlineForm()"
+            ></p-button>
             <p-button
               label="บันทึก"
               icon="pi pi-check"

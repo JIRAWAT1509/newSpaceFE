@@ -33,10 +33,23 @@ interface Customer {
   TAX_ID?: string;
   PHONE?: string;
   EMAIL?: string;
-  [key: string]: any;
+  DEBTOR_TYPE?: string;
+  TITLE_PREFIX?: string;
+  OFFICE_TYPE?: string;
+  ADDRESS_EN?: string;
+  USE_REGISTERED_ADDRESS_FOR_DELIVERY?: boolean;
+  SEND_INVOICE?: boolean;
+  INVOICE_EMAIL?: string;
+  SEND_CREDIT_INVOICE?: boolean;
+  CREDIT_INVOICE_EMAIL?: string;
+  SEND_RECEIPT?: boolean;
+  RECEIPT_EMAIL?: string;
+  SEND_CREDIT_RECEIPT?: boolean;
+  CREDIT_RECEIPT_EMAIL?: string;
 
-    selected?: boolean;          // ✅ ADD THIS
-  statusActive?: boolean;       // ✅ ADD THIS
+  selected?: boolean;
+  statusActive?: boolean;
+  [key: string]: any;
 
 }
 
@@ -108,6 +121,24 @@ export class CompanyCustomerComponent implements OnInit {
     { label: 'ไทย', value: 'TH' },
     { label: 'ต่างชาติ', value: 'FOREIGN' },
     { label: 'ต่างประเทศ', value: 'INTERNATIONAL' }
+  ];
+
+  debtorTypeOptions = [
+    { label: 'บุคคลธรรมดา', value: 'INDIVIDUAL' },
+    { label: 'นิติบุคคล', value: 'CORPORATE' },
+    { label: 'หน่วยงานรัฐ', value: 'GOVERNMENT' }
+  ];
+
+  titlePrefixOptions = [
+    { label: 'นาย', value: 'MR' },
+    { label: 'นาง', value: 'MRS' },
+    { label: 'นางสาว', value: 'MISS' },
+    { label: 'บริษัท', value: 'COMPANY' }
+  ];
+
+  officeTypeOptions = [
+    { label: 'สำนักงานใหญ่', value: 'HEAD_OFFICE' },
+    { label: 'สาขา', value: 'BRANCH' }
   ];
 
   statusOptions = [
@@ -410,6 +441,7 @@ validateStep1(): boolean {
 
 validateStep2(): boolean {
   let isValid = true;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   // Address is required
   if (!this.formData.ADDRESS || this.formData.ADDRESS.trim() === '') {
@@ -417,13 +449,81 @@ validateStep2(): boolean {
     isValid = false;
   }
 
-  // Email validation (if provided)
-  if (this.formData.EMAIL && this.formData.EMAIL.trim() !== '') {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.formData.EMAIL)) {
-      this.formErrors['EMAIL'] = 'Please enter a valid email address';
+  if (!this.formData.DEBTOR_TYPE) {
+    this.formErrors['DEBTOR_TYPE'] = 'Debtor type is required';
+    isValid = false;
+  }
+
+  if (!this.formData.TITLE_PREFIX) {
+    this.formErrors['TITLE_PREFIX'] = 'Title prefix is required';
+    isValid = false;
+  }
+
+  if (!this.formData.OFFICE_TYPE) {
+    this.formErrors['OFFICE_TYPE'] = 'Head office / Branch is required';
+    isValid = false;
+  }
+
+  if (!this.formData.USE_REGISTERED_ADDRESS_FOR_DELIVERY &&
+      (!this.formData.ADDRESS_EN || this.formData.ADDRESS_EN.trim() === '')) {
+    this.formErrors['ADDRESS_EN'] = 'Document delivery address is required';
+    isValid = false;
+  }
+
+  if (
+    !this.formData.SEND_INVOICE &&
+    !this.formData.SEND_CREDIT_INVOICE &&
+    !this.formData.SEND_RECEIPT &&
+    !this.formData.SEND_CREDIT_RECEIPT
+  ) {
+    this.formErrors['SEND_DOCUMENTS'] = 'Please select at least one document type';
+    isValid = false;
+  }
+
+  if (this.formData.SEND_INVOICE) {
+    if (!this.formData.INVOICE_EMAIL || this.formData.INVOICE_EMAIL.trim() === '') {
+      this.formErrors['INVOICE_EMAIL'] = 'Email for invoice is required';
+      isValid = false;
+    } else if (!emailRegex.test(this.formData.INVOICE_EMAIL)) {
+      this.formErrors['INVOICE_EMAIL'] = 'Please enter a valid email for invoice';
       isValid = false;
     }
+  }
+
+  if (this.formData.SEND_CREDIT_INVOICE) {
+    if (!this.formData.CREDIT_INVOICE_EMAIL || this.formData.CREDIT_INVOICE_EMAIL.trim() === '') {
+      this.formErrors['CREDIT_INVOICE_EMAIL'] = 'Email for credit note / invoice is required';
+      isValid = false;
+    } else if (!emailRegex.test(this.formData.CREDIT_INVOICE_EMAIL)) {
+      this.formErrors['CREDIT_INVOICE_EMAIL'] = 'Please enter a valid email for credit note / invoice';
+      isValid = false;
+    }
+  }
+
+  if (this.formData.SEND_RECEIPT) {
+    if (!this.formData.RECEIPT_EMAIL || this.formData.RECEIPT_EMAIL.trim() === '') {
+      this.formErrors['RECEIPT_EMAIL'] = 'Email for receipt is required';
+      isValid = false;
+    } else if (!emailRegex.test(this.formData.RECEIPT_EMAIL)) {
+      this.formErrors['RECEIPT_EMAIL'] = 'Please enter a valid email for receipt';
+      isValid = false;
+    }
+  }
+
+  if (this.formData.SEND_CREDIT_RECEIPT) {
+    if (!this.formData.CREDIT_RECEIPT_EMAIL || this.formData.CREDIT_RECEIPT_EMAIL.trim() === '') {
+      this.formErrors['CREDIT_RECEIPT_EMAIL'] = 'Email for credit note / receipt is required';
+      isValid = false;
+    } else if (!emailRegex.test(this.formData.CREDIT_RECEIPT_EMAIL)) {
+      this.formErrors['CREDIT_RECEIPT_EMAIL'] = 'Please enter a valid email for credit note / receipt';
+      isValid = false;
+    }
+  }
+
+  // General Email validation (if provided)
+  if (this.formData.EMAIL && this.formData.EMAIL.trim() !== '' && !emailRegex.test(this.formData.EMAIL)) {
+    this.formErrors['EMAIL'] = 'Please enter a valid email address';
+    isValid = false;
   }
 
   return isValid;
@@ -636,8 +736,21 @@ getEmptyCustomer(): Customer {
     TAX_ID: '',
     PHONE: '',
     EMAIL: '',
+    DEBTOR_TYPE: '',
+    TITLE_PREFIX: '',
+    OFFICE_TYPE: '',
+    ADDRESS_EN: '',
+    USE_REGISTERED_ADDRESS_FOR_DELIVERY: false,
+    SEND_INVOICE: false,
+    INVOICE_EMAIL: '',
+    SEND_CREDIT_INVOICE: false,
+    CREDIT_INVOICE_EMAIL: '',
+    SEND_RECEIPT: false,
+    RECEIPT_EMAIL: '',
+    SEND_CREDIT_RECEIPT: false,
+    CREDIT_RECEIPT_EMAIL: '',
     selected: false,
-    statusActive: true // ✅ ADD THIS
+    statusActive: true
   };
 }
 
@@ -652,11 +765,105 @@ getEmptyCustomer(): Customer {
         REC_STATUS: 'A',
         SHOP_NAME: `ร้านค้าที่ ${100 + i}`,
         ADDRESS: `${100 + i} ถนนวิภาวดีรังสิต แขวงจอมพล เขตจตุจักร กรุงเทพมหานคร 10900`,
+        ADDRESS_EN: i % 2 === 0
+          ? `${100 + i} ถนนวิภาวดีรังสิต แขวงจอมพล เขตจตุจักร กรุงเทพมหานคร 10900`
+          : `${100 + i} ถนนสุขุมวิท แขวงคลองเตยเหนือ เขตวัฒนา กรุงเทพมหานคร 10110`,
+        USE_REGISTERED_ADDRESS_FOR_DELIVERY: i % 2 === 0,
         CREATE_DATE: '/Date(1474942149000)/',
-        SAP_CUSTOMER_CODE: `${1000000 + i}`
+        SAP_CUSTOMER_CODE: `${1000000 + i}`,
+        DEBTOR_TYPE: i % 3 === 0 ? 'GOVERNMENT' : (i % 2 === 0 ? 'CORPORATE' : 'INDIVIDUAL'),
+        TITLE_PREFIX: i % 2 === 0 ? 'COMPANY' : 'MR',
+        OFFICE_TYPE: i % 2 === 0 ? 'HEAD_OFFICE' : 'BRANCH',
+        SEND_INVOICE: true,
+        INVOICE_EMAIL: `invoice${100 + i}@example.com`,
+        SEND_CREDIT_INVOICE: i % 2 === 0,
+        CREDIT_INVOICE_EMAIL: i % 2 === 0 ? `credit-invoice${100 + i}@example.com` : '',
+        SEND_RECEIPT: true,
+        RECEIPT_EMAIL: `receipt${100 + i}@example.com`,
+        SEND_CREDIT_RECEIPT: i % 3 === 0,
+        CREDIT_RECEIPT_EMAIL: i % 3 === 0 ? `credit-receipt${100 + i}@example.com` : ''
       });
     }
     return mock;
+  }
+
+  getDebtorTypeLabel(value?: string): string {
+    return this.getOptionLabel(this.debtorTypeOptions, value);
+  }
+
+  getTitlePrefixLabel(value?: string): string {
+    return this.getOptionLabel(this.titlePrefixOptions, value);
+  }
+
+  getOfficeTypeLabel(value?: string): string {
+    return this.getOptionLabel(this.officeTypeOptions, value);
+  }
+
+  getSelectedDocumentEmailSummary(customer?: Customer | null): string[] {
+    if (!customer) return [];
+
+    const docs: string[] = [];
+    if (customer.SEND_INVOICE) docs.push(`ใบแจ้งหนี้: ${customer.INVOICE_EMAIL || '-'}`);
+    if (customer.SEND_CREDIT_INVOICE) docs.push(`ใบลดหนี้ใบแจ้งหนี้: ${customer.CREDIT_INVOICE_EMAIL || '-'}`);
+    if (customer.SEND_RECEIPT) docs.push(`ใบเสร็จรับเงิน: ${customer.RECEIPT_EMAIL || '-'}`);
+    if (customer.SEND_CREDIT_RECEIPT) docs.push(`ใบลดหนี้ใบเสร็จ: ${customer.CREDIT_RECEIPT_EMAIL || '-'}`);
+    return docs;
+  }
+
+  private getOptionLabel(options: Array<{ label: string; value: string }>, value?: string): string {
+    if (!value) return '-';
+    return options.find(option => option.value === value)?.label || value;
+  }
+
+  onRegisteredAddressChange() {
+    if (this.formData.USE_REGISTERED_ADDRESS_FOR_DELIVERY) {
+      this.formData.ADDRESS_EN = this.formData.ADDRESS || '';
+    }
+  }
+
+  onUseRegisteredAddressForDeliveryChange() {
+    if (this.formData.USE_REGISTERED_ADDRESS_FOR_DELIVERY) {
+      this.formData.ADDRESS_EN = this.formData.ADDRESS || '';
+      delete this.formErrors['ADDRESS_EN'];
+    }
+  }
+
+  onDocumentToggle(docType: 'INVOICE' | 'CREDIT_INVOICE' | 'RECEIPT' | 'CREDIT_RECEIPT') {
+    switch (docType) {
+      case 'INVOICE':
+        if (!this.formData.SEND_INVOICE) {
+          this.formData.INVOICE_EMAIL = '';
+          delete this.formErrors['INVOICE_EMAIL'];
+        }
+        break;
+      case 'CREDIT_INVOICE':
+        if (!this.formData.SEND_CREDIT_INVOICE) {
+          this.formData.CREDIT_INVOICE_EMAIL = '';
+          delete this.formErrors['CREDIT_INVOICE_EMAIL'];
+        }
+        break;
+      case 'RECEIPT':
+        if (!this.formData.SEND_RECEIPT) {
+          this.formData.RECEIPT_EMAIL = '';
+          delete this.formErrors['RECEIPT_EMAIL'];
+        }
+        break;
+      case 'CREDIT_RECEIPT':
+        if (!this.formData.SEND_CREDIT_RECEIPT) {
+          this.formData.CREDIT_RECEIPT_EMAIL = '';
+          delete this.formErrors['CREDIT_RECEIPT_EMAIL'];
+        }
+        break;
+    }
+
+    if (
+      this.formData.SEND_INVOICE ||
+      this.formData.SEND_CREDIT_INVOICE ||
+      this.formData.SEND_RECEIPT ||
+      this.formData.SEND_CREDIT_RECEIPT
+    ) {
+      delete this.formErrors['SEND_DOCUMENTS'];
+    }
   }
 
   getStatusLabel(status: string): string {

@@ -73,24 +73,6 @@ export interface UserFormData {
   maxSessions: number;
   warningDays: number;
   email: string;
-  /** อีเมลลูกค้าสำหรับส่งใบแจ้งหนี้/ใบลดหนี้/ใบเสร็จ */
-  billingEmail: string;
-  /** ส่งใบแจ้งหนี้ */
-  sendInvoice: boolean;
-  /** ส่งใบลดหนี้ */
-  sendCreditNote: boolean;
-  /** ส่งใบเสร็จรับเงิน */
-  sendReceipt: boolean;
-  /** ส่งใบลดหนี้ใบเสร็จ */
-  sendCreditReceipt: boolean;
-  /** ประเภทลูกหนี้ */
-  debtorType: string;
-  /** คำนำหน้าชื่อ */
-  titlePrefix: string;
-  /** สำนักงานใหญ่/ย่อย */
-  officeType: string;
-  /** ที่อยู่ภาษาอังกฤษ */
-  addressEn: string;
   /** ลำดับการอนุมัติ (e.g. '1', '2', '3') */
   approvalSequence: string;
   /** หน้าจอที่อนุญาต (screen keys) */

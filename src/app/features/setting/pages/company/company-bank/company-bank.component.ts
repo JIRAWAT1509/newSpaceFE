@@ -147,6 +147,15 @@ billPaymentColumns = Array.from({ length: 26 }, (_, i) => ({
   value: String.fromCharCode(65 + i)
 }));
 
+private readonly bankLogoMap: Record<string, { text: string; cssClass: string }> = {
+  '001': { text: 'SCB', cssClass: 'logo-scb' },
+  '002': { text: 'BBL', cssClass: 'logo-bbl' },
+  '003': { text: 'KTB', cssClass: 'logo-ktb' },
+  '004': { text: 'KBK', cssClass: 'logo-kbk' },
+  '005': { text: 'BAY', cssClass: 'logo-bay' },
+  '006': { text: 'TTB', cssClass: 'logo-ttb' }
+};
+
   constructor(
     private confirmationService: ConfirmationService,
     private messageService: MessageService
@@ -270,6 +279,8 @@ loadAccountInfo(bankCode: string, branchCode: string) {
   selectBank(bank: Bank) {
     this.selectedBank = bank;
     this.selectedBranch = null;
+    this.branchForm = this.getEmptyBranch();
+    this.branchErrors = {};
     this.accounts = [];
     this.loadBranches(bank.BANK_CODE);
   }
@@ -294,6 +305,21 @@ loadAccountInfo(bankCode: string, branchCode: string) {
       this.showSuccess('บันทึกข้อมูลสาขาธนาคารเรียบร้อย');
     }
     this.isSaving = false;
+  }
+
+  resetBranchInlineForm() {
+    if (!this.selectedBranch) return;
+    this.branchForm = { ...this.selectedBranch };
+    this.branchErrors = {};
+    this.showSuccess('คืนค่าฟอร์มสาขาตามข้อมูลเดิมแล้ว');
+  }
+
+  get hasBranchInlineChanges(): boolean {
+    if (!this.selectedBranch) return false;
+    return (
+      this.branchForm.BRANCH_NAME_EN !== this.selectedBranch.BRANCH_NAME_EN ||
+      this.branchForm.BRANCH_NAME_TH !== this.selectedBranch.BRANCH_NAME_TH
+    );
   }
 
   openAddBankModal() {
@@ -806,6 +832,19 @@ getEmptyAccount(): AccountInfo {
       b.BRANCH_NAME_EN.toLowerCase().includes(query) ||
       b.BRANCH_NAME_TH.toLowerCase().includes(query)
     );
+  }
+
+  getBankLogoText(bank: Bank): string {
+    const mapped = this.bankLogoMap[bank.BANK_CODE];
+    if (mapped) return mapped.text;
+
+    const words = bank.BANK_NAME_EN.split(' ').filter(Boolean);
+    if (words.length === 0) return bank.BANK_CODE || 'BANK';
+    return words.slice(0, 3).map(word => word.charAt(0).toUpperCase()).join('');
+  }
+
+  getBankLogoClass(bank: Bank): string {
+    return this.bankLogoMap[bank.BANK_CODE]?.cssClass || 'logo-default';
   }
 
   // ✅ ADD: Load GL Accounts

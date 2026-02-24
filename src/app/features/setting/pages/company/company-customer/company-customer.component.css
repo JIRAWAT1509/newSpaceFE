@@ -466,6 +466,57 @@
   gap: 1.5rem;
 }
 
+.address-copy-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #1f2937;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.address-copy-toggle input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #2563eb;
+}
+
+.document-email-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.document-email-item {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.75rem 0.875rem;
+  background-color: #f9fafb;
+}
+
+.document-email-input {
+  margin-top: 0.625rem;
+}
+
+.checkbox-item-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.checkbox-item-inline input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #2563eb;
+}
+
+.document-email-input input {
+  width: 100%;
+}
+
 .info-text {
   color: #6b7280;
   font-size: 0.875rem;
@@ -778,6 +829,10 @@
     width: 40px;
     height: 40px;
     font-size: 1rem;
+  }
+
+  .document-email-grid {
+    grid-template-columns: 1fr;
   }
 }
 
