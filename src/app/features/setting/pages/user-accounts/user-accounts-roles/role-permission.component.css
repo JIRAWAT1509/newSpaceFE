@@ -1,6 +1,6 @@
 /* role-permission.component.css */
 
-/* ==================== CONTAINER (ระยะและพื้นหลังแบบ facilities/utilities) ==================== */
+/* ==================== CONTAINER (ระยะและพื้นหลังแบบ facilities/utilities/master) ==================== */
 .role-permission-container {
   max-width: 1600px;
   margin: 0 auto;
@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  background: rgb(var(--bg));
+  background: #ffffff !important;
 }
 
 /* ==================== HEADER SECTION (รูปแบบเดียวกับ facilities/utilities) ==================== */
@@ -17,7 +17,7 @@
   border-radius: 0.75rem;
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border: 1px solid rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
@@ -78,7 +78,7 @@
   gap: 0.75rem;
   margin-top: 0;
   padding: 1.5rem;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border-radius: 0.75rem;
   border: 1px solid rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
@@ -120,7 +120,7 @@
 
 /* ==================== CONTROL SECTION ==================== */
 .control-section {
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border-radius: 0.75rem;
   padding: 1.5rem;
   border: 1px solid rgb(var(--border));
@@ -156,7 +156,7 @@
   border: 1px solid rgb(var(--border));
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
@@ -184,12 +184,14 @@
   min-height: 100px;
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: #ffffff !important;
+  border: 1px solid rgb(var(--border));
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card-bg {
@@ -207,8 +209,6 @@
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(8px);
 }
 
 .stat-card-icon i {
@@ -235,7 +235,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   margin: 0 0 0.25rem 0;
-  color: rgba(255, 255, 255, 0.9);
+  color: #6b7280;
 }
 
 .stat-value {
@@ -243,29 +243,40 @@
   font-weight: 700;
   line-height: 1.25;
   margin: 0 0 0.25rem 0;
-  color: white;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+  color: #111827;
 }
 
-/* สีการ์ดเดียวกับ facilities/utilities (primary, success, info, warning) */
+/* การ์ดพื้นขาว + ไอคอนสี (แบบ facilities/utilities/master) */
 .stat-card--primary {
+  background: #ffffff !important;
+  border-color: rgb(var(--primary) / 0.3);
+}
+.stat-card--primary .stat-card-icon {
   background: rgb(var(--primary));
-  color: rgb(var(--primary-fg));
 }
 
 .stat-card--success {
+  background: #ffffff !important;
+  border-color: rgb(var(--success) / 0.3);
+}
+.stat-card--success .stat-card-icon {
   background: rgb(var(--success));
-  color: rgb(var(--success-fg));
 }
 
 .stat-card--info {
+  background: #ffffff !important;
+  border-color: rgb(20 184 166 / 0.3);
+}
+.stat-card--info .stat-card-icon {
   background: rgb(20 184 166);
-  color: white;
 }
 
 .stat-card--warning {
+  background: #ffffff !important;
+  border-color: rgb(var(--warning) / 0.3);
+}
+.stat-card--warning .stat-card-icon {
   background: rgb(var(--warning));
-  color: rgb(var(--warning-fg));
 }
 
 @media (max-width: 1280px) {
@@ -326,7 +337,7 @@
 
 /* ==================== SEARCH SECTION ==================== */
 .search-section {
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border-radius: 0.75rem;
   padding: 1.5rem;
   border: 1px solid rgb(var(--border));

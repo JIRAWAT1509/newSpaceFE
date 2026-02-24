@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --bg: 255 255 255;
+  --bg: 255 255 255; /* พื้นหลังทุกหน้าเป็นสีขาว */
   --fg: 15 23 42;
   --muted: 100 116 139;
   --border: 226 232 240;
@@ -35,12 +35,12 @@
 }
 
 [data-theme='dark'] {
-  --bg: 11 18 32;
+  --bg: 255 255 255; /* พื้นหลังทุกหน้าเป็นสีขาว */
   --fg: 226 232 240;
   --muted: 148 163 184;
   --border: 31 42 68;
-  --card: 17 28 47;
-  --input: 17 28 47;
+  --card: 255 255 255; /* การ์ดเป็นสีขาวเหมือนตัวอย่าง */
+  --input: 255 255 255;
   --primary: 59 130 246;
   --primary-fg: 226 232 240;
   --secondary: 56 189 248;
@@ -81,7 +81,12 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
   font-size: 14px;
   color: rgb(var(--fg));
-  background-color: rgb(var(--bg));
+  background-color: #ffffff;
+}
+
+/* พื้นที่เนื้อหาหลักทุกหน้าเป็นสีขาว */
+main {
+  background-color: #ffffff !important;
 }
 
 /* ==================== OVERLAY / DRAWER / MODAL: หัวข้อฟอร์มไม่ให้โดน header บัง (ทั้งระบบ) ==================== */

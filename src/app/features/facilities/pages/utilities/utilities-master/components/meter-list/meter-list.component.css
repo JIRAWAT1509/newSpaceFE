@@ -4,10 +4,10 @@
   @apply space-y-5;
 }
 
-/* ==================== DASHBOARD OVERVIEW (รูปแบบเดียวกับ stats-overview) ==================== */
+/* ==================== DASHBOARD OVERVIEW (พื้นขาว + การ์ด KPI ขาวกับไอคอนสี แบบ facilities/utilities/master) ==================== */
 .section-card {
   @apply rounded-xl border p-4 mb-4;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border-color: rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
@@ -26,20 +26,20 @@
   @apply relative flex items-center gap-4 p-4 rounded-xl overflow-hidden;
   @apply transition-all duration-200;
   min-height: 100px;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: #ffffff !important;
+  border: 1px solid rgb(var(--border));
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card-icon {
   @apply relative z-10 w-11 h-11 rounded-xl flex-shrink-0;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(8px);
 }
 
 .stat-card-icon i {
@@ -58,29 +58,38 @@
 
 .stat-label {
   @apply text-sm font-medium mb-0.5;
-  color: rgba(255, 255, 255, 0.9);
+  color: #6b7280;
 }
 
 .stat-value {
   @apply font-bold leading-tight mb-0;
   font-size: 1.35rem;
-  color: white;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+  color: #111827;
 }
 
+/* การ์ดพื้นขาว + ไอคอนสี */
 .stat-card--primary {
+  background: #ffffff !important;
+  border-color: rgb(var(--primary) / 0.3);
+}
+.stat-card--primary .stat-card-icon {
   background: rgb(var(--primary));
-  color: rgb(var(--primary-fg));
 }
 
 .stat-card--warning {
+  background: #ffffff !important;
+  border-color: rgb(var(--warning) / 0.3);
+}
+.stat-card--warning .stat-card-icon {
   background: rgb(var(--warning));
-  color: rgb(var(--warning-fg));
 }
 
 .stat-card--success {
+  background: #ffffff !important;
+  border-color: rgb(var(--success) / 0.3);
+}
+.stat-card--success .stat-card-icon {
   background: rgb(var(--success));
-  color: rgb(var(--success-fg));
 }
 
 /* Responsive */

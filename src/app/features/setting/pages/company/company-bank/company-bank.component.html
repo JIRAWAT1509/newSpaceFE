@@ -9,14 +9,16 @@
   <!-- Header -->
   <div class="header-section">
     <div class="header-content">
+      <div class="header-icon-wrap">
+        <i class="pi pi-credit-card"></i>
+      </div>
       <div class="title-section">
         <h1 class="page-title">Bank Management</h1>
-        <p class="page-subtitle">Manage banks, branches, and account information</p>
+        <p class="page-subtitle">จัดการธนาคาร สาขา และรหัสการนำส่งเงินเข้าบัญชี</p>
       </div>
-
       <div class="header-actions">
         <p-button
-          label="เพิ่ม"
+          label="เพิ่มธนาคาร"
           icon="pi pi-plus"
           severity="primary"
           (onClick)="openAddBankModal()"
@@ -28,12 +30,12 @@
   <!-- Main Content - Split Layout (2 or 3 columns) -->
   <div class="main-content" [class.split-layout]="selectedBank" [class.with-remittance]="selectedBranch">
 
-    <!-- Banks Section -->
+    <!-- Banks Section: รายการธนาคารแบบลิสต์ (ไม่เป็นการ์ด) -->
     <div class="banks-section" [class.half-width]="selectedBank">
       <div class="section-header">
         <h2 class="section-title">
           <i class="pi pi-building"></i>
-          Banks
+          รายการธนาคาร
         </h2>
         <div class="search-box">
           <i class="pi pi-search search-icon"></i>
@@ -41,7 +43,7 @@
             type="text"
             pInputText
             [(ngModel)]="bankSearchQuery"
-            placeholder="Search banks..."
+            placeholder="ค้นหาธนาคาร..."
             class="search-input"
           />
         </div>
@@ -50,36 +52,34 @@
       <!-- Loading -->
       <div *ngIf="isLoadingBanks" class="loading-state">
         <i class="pi pi-spin pi-spinner loading-icon"></i>
-        <p>Loading banks...</p>
+        <p>กำลังโหลด...</p>
       </div>
 
-      <!-- Banks Grid -->
-      <div *ngIf="!isLoadingBanks && filteredBanks.length > 0" class="banks-grid">
+      <!-- Bank List (รายการธรรมดา) -->
+      <div *ngIf="!isLoadingBanks && filteredBanks.length > 0" class="bank-list">
         <div
           *ngFor="let bank of filteredBanks"
-          class="bank-card"
+          class="bank-list-item"
           [class.selected]="selectedBank?.BANK_CODE === bank.BANK_CODE"
           [pTooltip]="bank.BANK_NAME_EN + ' / ' + bank.BANK_NAME_TH"
-          tooltipPosition="top"
+          tooltipPosition="right"
           (click)="selectBank(bank)"
         >
-          <div class="bank-card-header">
-            <div class="bank-icon bank-logo" [ngClass]="getBankLogoClass(bank)">
-              <span>{{ getBankLogoText(bank) }}</span>
-            </div>
-            <div class="bank-code">{{ bank.BANK_CODE }}</div>
+          <div class="bank-list-icon" [ngClass]="getBankLogoClass(bank)">
+            <span>{{ getBankLogoText(bank) }}</span>
           </div>
-          <div class="bank-card-body">
-            <h3 class="bank-name-en">{{ bank.BANK_NAME_EN }}</h3>
-            <p class="bank-name-th">{{ bank.BANK_NAME_TH }}</p>
+          <div class="bank-list-info">
+            <span class="bank-list-code">{{ bank.BANK_CODE }}</span>
+            <span class="bank-list-name">{{ bank.BANK_NAME_TH || bank.BANK_NAME_EN }}</span>
           </div>
-          <div class="bank-card-actions">
+          <div class="bank-list-actions">
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"
               [text]="true"
-              severity="info"
+              severity="secondary"
               size="small"
+              pTooltip="แก้ไข"
               (onClick)="openEditBankModal(bank); $event.stopPropagation()"
             ></p-button>
             <p-button
@@ -88,6 +88,7 @@
               [text]="true"
               severity="danger"
               size="small"
+              pTooltip="ลบ"
               (onClick)="deleteBank(bank); $event.stopPropagation()"
             ></p-button>
           </div>
@@ -97,7 +98,7 @@
       <!-- Empty State -->
       <div *ngIf="!isLoadingBanks && filteredBanks.length === 0" class="empty-state">
         <i class="pi pi-inbox empty-icon"></i>
-        <p>No banks found</p>
+        <p>ไม่พบธนาคาร</p>
       </div>
     </div>
 
@@ -107,7 +108,7 @@
         <div class="selected-bank-info">
           <h2 class="section-title">
             <i class="pi pi-map-marker"></i>
-            Branches
+            สาขา
           </h2>
           <span class="bank-badge">{{ selectedBank.BANK_CODE }}</span>
         </div>
@@ -118,11 +119,11 @@
               type="text"
               pInputText
               [(ngModel)]="branchSearchQuery"
-              placeholder="Search branches..."
+              placeholder="ค้นหาสาขา..."
               class="search-input"
             />
           </div>
-            <p-button
+          <p-button
             label="เพิ่ม"
             icon="pi pi-plus"
             severity="primary"
@@ -138,52 +139,25 @@
         <p>Loading branches...</p>
       </div>
 
-      <!-- Branches Grid -->
-      <div *ngIf="!isLoadingBranches && filteredBranches.length > 0" class="branches-grid">
+      <!-- Branches List (รายการสาขาแบบลิสต์) -->
+      <div *ngIf="!isLoadingBranches && filteredBranches.length > 0" class="branch-list">
         <div
           *ngFor="let branch of filteredBranches"
-          class="branch-card"
+          class="branch-list-item"
           [class.selected]="selectedBranch?.BRANCH_CODE === branch.BRANCH_CODE"
           (click)="selectBranch(branch)"
         >
-          <div class="branch-card-header">
-            <div class="branch-icon">
-              <i class="pi pi-map-marker"></i>
-            </div>
-            <div class="branch-code">{{ branch.BRANCH_CODE }}</div>
+          <div class="branch-list-icon">
+            <i class="pi pi-map-marker"></i>
           </div>
-          <div class="branch-card-body">
-            <h4 class="branch-name-en">{{ branch.BRANCH_NAME_EN }}</h4>
-            <p class="branch-name-th">{{ branch.BRANCH_NAME_TH }}</p>
+          <div class="branch-list-info">
+            <span class="branch-list-code">{{ branch.BRANCH_CODE }}</span>
+            <span class="branch-list-name">{{ branch.BRANCH_NAME_TH || branch.BRANCH_NAME_EN }}</span>
           </div>
-          <div class="branch-card-actions">
-            <p-button
-              icon="pi pi-pencil"
-              [rounded]="true"
-              [text]="true"
-              severity="info"
-              size="small"
-              pTooltip="แก้ไขสาขา"
-              (onClick)="openEditBranchModal(branch); $event.stopPropagation()"
-            ></p-button>
-            <p-button
-              icon="pi pi-eye"
-              [rounded]="true"
-              [text]="true"
-              severity="secondary"
-              size="small"
-              pTooltip="ดูรายละเอียดและบัญชี"
-              (onClick)="viewBranchDetails(branch); $event.stopPropagation()"
-            ></p-button>
-            <p-button
-              icon="pi pi-trash"
-              [rounded]="true"
-              [text]="true"
-              severity="danger"
-              size="small"
-              pTooltip="ลบสาขา"
-              (onClick)="deleteBranch(branch); $event.stopPropagation()"
-            ></p-button>
+          <div class="branch-list-actions">
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small" pTooltip="แก้ไข" (onClick)="openEditBranchModal(branch); $event.stopPropagation()"></p-button>
+            <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary" size="small" pTooltip="ดูรายละเอียด" (onClick)="viewBranchDetails(branch); $event.stopPropagation()"></p-button>
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" pTooltip="ลบ" (onClick)="deleteBranch(branch); $event.stopPropagation()"></p-button>
           </div>
         </div>
       </div>
@@ -321,8 +295,8 @@
           <thead>
             <tr>
               <th>รหัสการนำส่งเงินเข้าบัญชี</th>
-              <th>เลขบัญชี</th>
-              <th>ประเภทบัญชี</th>
+              <th class="col-account-no">เลขบัญชี</th>
+              <th class="col-account-type">ประเภทบัญชี</th>
               <th>บัญชีแยกประเภท (GL)</th>
               <th>รายละเอียด</th>
               <th class="text-center">การดำเนินการ</th>
@@ -335,29 +309,31 @@
               (click)="openViewAccountModal(account)"
             >
               <td>{{ account.PAID_FOR_CODE }}</td>
-              <td>{{ account.ACC_BANK }}</td>
-              <td>{{ account.ACC_TYPE }}</td>
+              <td class="col-account-no">{{ account.ACC_BANK }}</td>
+              <td class="col-account-type">{{ account.ACC_TYPE }}</td>
               <td>{{ account.ACC_GL }}</td>
               <td>{{ account.NB_LONG_TEXT || '-' }}</td>
-              <td class="text-center" (click)="$event.stopPropagation()">
-                <p-button
-                  icon="pi pi-pencil"
-                  [text]="true"
-                  [rounded]="true"
-                  severity="info"
-                  size="small"
-                  pTooltip="แก้ไข"
-                  (onClick)="openEditAccountModal(account)"
-                ></p-button>
-                <p-button
-                  icon="pi pi-trash"
-                  [text]="true"
-                  [rounded]="true"
-                  severity="danger"
-                  size="small"
-                  pTooltip="ลบ"
-                  (onClick)="deleteAccount(account)"
-                ></p-button>
+              <td class="text-center actions-cell" (click)="$event.stopPropagation()">
+                <div class="action-buttons">
+                  <p-button
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="info"
+                    size="small"
+                    pTooltip="แก้ไข"
+                    (onClick)="openEditAccountModal(account)"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    severity="danger"
+                    size="small"
+                    pTooltip="ลบ"
+                    (onClick)="deleteAccount(account)"
+                  ></p-button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -628,8 +604,8 @@
     <thead>
       <tr>
         <th>รหัสการนำส่งเงินเข้าบัญชี</th>
-        <th>เลขบัญชี</th>
-        <th>ประเภทบัญชี</th>
+        <th class="col-account-no">เลขบัญชี</th>
+        <th class="col-account-type">ประเภทบัญชี</th>
         <th>บัญชีแยกประเภท (GL)</th>
         <th>รายละเอียด</th>
         <th class="text-center">การดำเนินการ</th>
@@ -642,29 +618,31 @@
         (click)="openViewAccountModal(account)"
       >
         <td>{{ account.PAID_FOR_CODE }}</td>
-        <td>{{ account.ACC_BANK }}</td>
-        <td>{{ account.ACC_TYPE }}</td>
+        <td class="col-account-no">{{ account.ACC_BANK }}</td>
+        <td class="col-account-type">{{ account.ACC_TYPE }}</td>
         <td>{{ account.ACC_GL }}</td>
         <td>{{ account.NB_LONG_TEXT || '-' }}</td>
-        <td class="text-center" (click)="$event.stopPropagation()">
-          <p-button
-            icon="pi pi-pencil"
-            [text]="true"
-            [rounded]="true"
-            severity="info"
-            size="small"
-            pTooltip="แก้ไข"
-            (onClick)="openEditAccountModal(account)"
-          ></p-button>
-          <p-button
-            icon="pi pi-trash"
-            [text]="true"
-            [rounded]="true"
-            severity="danger"
-            size="small"
-            pTooltip="ลบ"
-            (onClick)="deleteAccount(account)"
-          ></p-button>
+        <td class="text-center actions-cell" (click)="$event.stopPropagation()">
+          <div class="action-buttons">
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              severity="info"
+              size="small"
+              pTooltip="แก้ไข"
+              (onClick)="openEditAccountModal(account)"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              size="small"
+              pTooltip="ลบ"
+              (onClick)="deleteAccount(account)"
+            ></p-button>
+          </div>
         </td>
       </tr>
     </tbody>

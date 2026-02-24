@@ -2,7 +2,7 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 1.5rem;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   min-height: 100vh;
 }
 
@@ -186,11 +186,34 @@
     width: 100%;
   }
 }
+/* หน้าจอบันทึกข้อมูล: บังคับพื้นหลังขาวและตัวอักษรเข้ม ไม่ให้ดำ (Defect fix) */
 .basic-form-wrapper {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 1.25rem;
-  background: #fff;
+  padding: 1.5rem;
+  background: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  color: #1f2937;
+}
+
+.basic-form-wrapper ::ng-deep .p-tabs,
+.basic-form-wrapper ::ng-deep .p-tablist,
+.basic-form-wrapper ::ng-deep .p-tabpanels,
+.basic-form-wrapper ::ng-deep .p-tabpanel {
+  background: #ffffff !important;
+  color: #1f2937;
+}
+
+.basic-form-wrapper ::ng-deep .p-tablist {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.basic-form-wrapper ::ng-deep input,
+.basic-form-wrapper ::ng-deep .p-inputtext,
+.basic-form-wrapper ::ng-deep .p-select {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  border-color: #d1d5db;
 }
 
 .basic-form-header {
@@ -205,13 +228,7 @@
   font-weight: 700;
   font-size: 1.05rem;
   margin: 0;
-}
-
-.basic-form-wrapper {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+  color: #1f2937;
 }
 
 .form-field {

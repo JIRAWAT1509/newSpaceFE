@@ -7,10 +7,9 @@
       @for (status of mainStatusDistribution(); track status.id) {
         <article
           [class]="getStatusCardClasses(status.id)"
-          [style.background]="status.color"
           (click)="toggleFilter(status.id)"
         >
-          <div class="stat-card-icon">
+          <div class="stat-card-icon" [style.background]="status.color">
             @if (getStatusIconType(status.id) === 'upload') {
               <img [src]="getStatusIcon(status.id)" alt="" class="status-icon-image" />
             } @else {

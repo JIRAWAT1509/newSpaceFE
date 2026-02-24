@@ -786,11 +786,11 @@ export const resolveTokens = (config: UiConfig): UiTokens => {
 };
 
 const setColorVars = (tokens: UiTokens): void => {
-  setColorVar('--bg', tokens.bg);
+  setColorVar('--bg', '#FFFFFF'); /* พื้นหลังทุกหน้าเป็นสีขาว */
+  setColorVar('--card', '#FFFFFF'); /* การ์ดเป็นสีขาวเหมือนตัวอย่าง */
   setColorVar('--fg', tokens.fg);
   setColorVar('--muted', tokens.muted);
   setColorVar('--border', tokens.border);
-  setColorVar('--card', tokens.card);
   setColorVar('--input', tokens.input);
   setColorVar('--primary', tokens.primary);
   setColorVar('--primary-fg', tokens.primaryFg);

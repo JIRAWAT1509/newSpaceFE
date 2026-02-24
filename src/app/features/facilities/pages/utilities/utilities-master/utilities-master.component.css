@@ -3,13 +3,14 @@
 /* ระยะเท่า Area Layout: p-6, ระหว่างบล็อก gap-6 */
 .utilities-container {
   @apply w-full min-h-screen p-6 flex flex-col gap-6;
+  background-color: #ffffff !important;
 }
 
 /* Page header (หัวข้อหน้าอยู่นอกการ์ด - รูปแบบเดียวกับหน้าอื่น) */
 .utilities-header {
   @apply rounded-xl;
   padding: 1rem 1.25rem;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border: 1px solid rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
@@ -34,7 +35,9 @@
 
 /* Tab Navigation - compact */
 .tab-navigation {
-  @apply flex gap-2 p-2 bg-card rounded-lg border border-border;
+  @apply flex gap-2 p-2 rounded-lg border;
+  background: #ffffff !important;
+  border-color: rgb(var(--border));
 }
 
 .tab-btn {
@@ -44,7 +47,7 @@
 }
 
 .tab-btn:hover {
-  @apply bg-bg;
+  background: rgb(var(--bg));
 }
 
 .tab-btn.active {

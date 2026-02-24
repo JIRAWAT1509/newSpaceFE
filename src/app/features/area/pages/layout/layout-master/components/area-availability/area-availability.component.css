@@ -2,10 +2,10 @@
   @apply space-y-2 sm:space-y-4;
 }
 
-/* รูปแบบเดียวกับ Dashboard Overview (facilities) */
+/* พื้นขาว + การ์ดขาวกับไอคอนสี (แบบ facilities/utilities/master) */
 .section-card {
   @apply rounded-xl border mb-2 sm:mb-4 p-3 sm:p-4;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border-color: rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
@@ -20,22 +20,24 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-/* Status card = stat-card style (สีจาก status.color ใน template) */
+/* การ์ดพื้นขาว + ไอคอนสี (สีจาก [style.background] บน .stat-card-icon) */
 .status-card {
   @apply relative flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl overflow-hidden;
   @apply cursor-pointer transition-all duration-200;
   min-height: 88px;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
-  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: #ffffff !important;
+  border: 1px solid rgb(var(--border));
+  color: #111827;
 }
 
 .status-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .status-card.active {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5), 0 8px 24px rgb(0 0 0 / 0.2);
+  box-shadow: 0 0 0 2px rgb(var(--primary) / 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .status-card.dimmed {
@@ -46,8 +48,6 @@
   @apply relative z-10 w-11 h-11 rounded-xl flex-shrink-0;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(8px);
 }
 
 .stat-card-icon i {
@@ -71,19 +71,18 @@
 
 .stat-label {
   @apply text-sm font-medium mb-0.5;
-  color: rgba(255, 255, 255, 0.9);
+  color: #6b7280;
 }
 
 .stat-value {
   @apply font-bold leading-tight mb-0.5;
   font-size: 1.35rem;
-  color: white;
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+  color: #111827;
 }
 
 .stat-sublabel {
   @apply text-xs font-normal uppercase tracking-wide;
-  color: rgba(255, 255, 255, 0.85);
+  color: #6b7280;
 }
 
 /* Selection Check */
@@ -101,7 +100,7 @@
 /* Percentage Bar */
 .percentage-bar {
   @apply flex h-10 rounded-lg overflow-hidden shadow-inner;
-  @apply bg-bg;
+  background: #f3f4f6;
 }
 
 .bar-segment {

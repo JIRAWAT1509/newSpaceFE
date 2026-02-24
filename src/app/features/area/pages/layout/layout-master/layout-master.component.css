@@ -1,17 +1,15 @@
 .layout-master-container {
   @apply min-h-screen flex flex-col;
-  background: rgb(var(--bg));
+  background: #ffffff !important;
   padding: 1.5rem;
   gap: 1rem;
   max-width: 100%;
   overflow-x: hidden;
 }
 
-/* Page header removed – no longer needed */
-
 .section {
   @apply rounded-xl border flex-shrink-0;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border-color: rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }

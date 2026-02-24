@@ -8,11 +8,13 @@
   max-width: 1680px;
   margin: 0 auto;
   padding: 0.35rem 1rem;
+  background: #ffffff;
+  min-height: 100vh;
 }
 
 .exec-hero {
   border-radius: 0.75rem;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border: 1px solid rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
   overflow: hidden;
@@ -257,7 +259,7 @@
   }
 }
 
-/* ==================== KPI ROW (redesigned) ==================== */
+/* ==================== KPI ROW (พื้นขาว + ไอคอนสี แบบ facilities/utilities/master) ==================== */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -271,52 +273,63 @@
   flex-direction: row;
   align-items: center;
   gap: 14px;
-  transition: box-shadow 250ms ease, transform 250ms ease;
+  transition: box-shadow 200ms ease, transform 200ms ease;
   min-width: 0;
   position: relative;
   overflow: hidden;
-  color: #fff;
-  border: none;
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  color: #111827;
 }
 
 .kpi-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.12;
-  background:
-    radial-gradient(circle at 90% 10%, rgba(255,255,255,0.5) 0%, transparent 45%),
-    radial-gradient(circle at 10% 90%, rgba(255,255,255,0.2) 0%, transparent 45%);
-  pointer-events: none;
+  display: none;
 }
 
 .kpi-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgb(0 0 0 / 0.22);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Card color variants */
+/* การ์ดพื้นขาว + ไอคอนสี */
 .kpi-card--indigo {
-  background: linear-gradient(135deg, #818cf8 0%, #6366f1 40%, #4f46e5 100%);
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+  background: #ffffff !important;
+  border-color: rgba(99, 102, 241, 0.35);
+}
+.kpi-card--indigo .kpi-icon {
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+  color: #fff;
 }
 
 .kpi-card--rose {
-  background: linear-gradient(135deg, #fb7185 0%, #f43f5e 40%, #e11d48 100%);
-  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.3);
+  background: #ffffff !important;
+  border-color: rgba(244, 63, 94, 0.35);
+}
+.kpi-card--rose .kpi-icon {
+  background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%);
+  color: #fff;
 }
 
 .kpi-card--cyan {
-  background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 40%, #0891b2 100%);
-  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+  background: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.35);
+}
+.kpi-card--cyan .kpi-icon {
+  background: linear-gradient(135deg, #22d3ee 0%, #0891b2 100%);
+  color: #fff;
 }
 
 .kpi-card--emerald {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 40%, #059669 100%);
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  background: #ffffff !important;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+.kpi-card--emerald .kpi-icon {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+  color: #fff;
 }
 
-/* Icon square — left side */
+/* Icon square — สีตาม card variant */
 .kpi-icon {
   width: 40px;
   height: 40px;
@@ -325,8 +338,6 @@
   place-items: center;
   font-size: 1.05rem;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(6px);
   color: #fff;
 }
 
@@ -339,20 +350,18 @@
   flex: 1;
 }
 
-/* Label on top */
 .kpi-label {
   font-size: 11px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.85);
+  color: #6b7280;
   line-height: 1.2;
   letter-spacing: 0.01em;
 }
 
-/* Big value */
 .kpi-value {
   font-size: 1.3rem;
   font-weight: 800;
-  color: #fff;
+  color: #111827;
   line-height: 1.1;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -361,18 +370,17 @@
 .kpi-value-unit {
   font-size: 0.8rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
+  color: #6b7280;
   letter-spacing: 0;
 }
 
-/* Change line at bottom */
 .kpi-change {
   display: flex;
   align-items: center;
   gap: 4px;
   font-size: 10.5px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: #059669;
   margin-top: 2px;
 }
 
@@ -382,7 +390,7 @@
 
 .kpi-change-hint {
   font-weight: 400;
-  opacity: 0.7;
+  color: #6b7280;
 }
 
 
@@ -658,7 +666,7 @@
 
 .exec-card {
   border-radius: 12px;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border: 1px solid rgb(var(--border));
   box-shadow: 0 1px 4px rgb(var(--shadow) / 0.06);
   padding: 10px 14px;
@@ -733,12 +741,12 @@
 
 .rev-filter-tab:hover {
   color: rgb(var(--fg));
-  background: rgb(var(--card));
+  background: #ffffff;
 }
 
 .rev-filter-tab-active {
   color: rgb(var(--primary));
-  background: rgb(var(--card));
+  background: #ffffff;
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.1);
 }
 
@@ -750,7 +758,7 @@
 .rev-filter-select {
   appearance: none;
   -webkit-appearance: none;
-  background: rgb(var(--card));
+  background: #ffffff;
   border: 1px solid rgb(var(--border));
   color: rgb(var(--fg));
   padding: 5px 28px 5px 10px;
@@ -1278,7 +1286,7 @@
 }
 
 .deep-v2-portfolio-card {
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border: 1px solid rgb(var(--border) / 0.5);
   border-radius: 10px;
   padding: 12px 10px;
@@ -1428,7 +1436,7 @@
   margin-top: 8px;
   padding: 8px 10px;
   border-radius: 12px;
-  background: rgb(var(--card));
+  background: #ffffff !important;
   border: 1px solid rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
   display: flex;
