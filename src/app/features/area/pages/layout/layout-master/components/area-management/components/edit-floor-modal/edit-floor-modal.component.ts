@@ -1,3 +1,5 @@
+/* edit-floor-modal.component.ts */
+
 import {
   Component,
   input,
@@ -25,6 +27,13 @@ interface DraftChanges {
   floorPlanImage?: string;
 }
 
+// ✅ แยก image ออกจาก draft เพื่อไม่ให้ช้าตอน drag
+interface DraftMeta {
+  floorId: string;
+  positions: { [areaId: string]: { x: number; y: number } };
+  activeStates: { [areaId: string]: boolean };
+}
+
 @Component({
   selector: 'app-edit-floor-modal',
   standalone: true,
@@ -44,6 +53,7 @@ export class EditFloorModalComponent {
   visible = signal<boolean>(false);
   currentFloor = input<Floor | null>(null);
   areas = input<Area[]>([]);
+  parentDraftImage = input<string | null>(null); // ✅ รับรูป draft จาก parent
 
   closed = output<void>();
   saved = output<DraftChanges>();
@@ -53,22 +63,30 @@ export class EditFloorModalComponent {
   showCloseWarning = false;
   showAddAreaWizard = signal<boolean>(false);
   hasDraftChanges = signal<boolean>(false);
+  localDraftImage = signal<string | null>(null); // ✅ รูปที่ upload ใหม่ใน modal
 
   markerListPanel = viewChild<MarkerListPanelComponent>('markerListPanel');
 
   private originalAreas: Area[] = [];
   private draftKey = '';
+  private imageKey = ''; // ✅ key แยกสำหรับ image
 
   activeAreas = computed(() => this.editableAreas().filter((a) => a.isActive));
   inactiveAreas = computed(() =>
     this.editableAreas().filter((a) => !a.isActive),
   );
 
+  // ✅ รูปที่จะแสดงใน modal: ถ้า upload ใหม่ใช้อันนั้น ถ้าไม่มีใช้จาก parent
+  effectiveDraftImage = computed<string | null>(
+    () => this.localDraftImage() ?? this.parentDraftImage(),
+  );
+
   hasChanges = computed(() => {
     const changes = this.getChanges();
     return (
       Object.keys(changes.positions).length > 0 ||
-      Object.keys(changes.activeStates).length > 0
+      Object.keys(changes.activeStates).length > 0 ||
+      !!changes.floorPlanImage
     );
   });
 
@@ -78,6 +96,7 @@ export class EditFloorModalComponent {
       const areas = this.areas();
       if (floor && areas.length > 0) {
         this.draftKey = `floor-edit-draft-${floor.id}`;
+        this.imageKey = `floor-edit-image-${floor.id}`; // ✅
         this.loadDraft();
       }
     });
@@ -88,6 +107,7 @@ export class EditFloorModalComponent {
     const floor = this.currentFloor();
     if (floor) {
       this.draftKey = `floor-edit-draft-${floor.id}`;
+      this.imageKey = `floor-edit-image-${floor.id}`; // ✅
       this.loadDraft();
     }
     this.visible.set(true);
@@ -95,9 +115,16 @@ export class EditFloorModalComponent {
 
   private loadDraft(): void {
     const draft = localStorage.getItem(this.draftKey);
+
+    // ✅ โหลด image แยก key ไม่ต้อง parse ทั้งก้อน
+    const savedImage = localStorage.getItem(this.imageKey);
+    if (savedImage) {
+      this.localDraftImage.set(savedImage);
+    }
+
     if (draft) {
       try {
-        const draftData: DraftChanges = JSON.parse(draft);
+        const draftData: DraftMeta = JSON.parse(draft);
         const areasWithDraft = this.areas().map((area) => ({
           ...area,
           position: draftData.positions[area.id] || area.position,
@@ -120,11 +147,13 @@ export class EditFloorModalComponent {
   private initializeEditableAreas(): void {
     this.editableAreas.set(JSON.parse(JSON.stringify(this.areas())));
     this.originalAreas = JSON.parse(JSON.stringify(this.areas()));
+    this.localDraftImage.set(null);
     this.hasDraftChanges.set(false);
   }
 
+  // ✅ saveDraft บันทึกเฉพาะ positions/activeStates (ไม่รวม image → ไม่ช้า)
   private saveDraft(): void {
-    const changes = this.getChanges();
+    const changes = this.getMeta();
     if (
       Object.keys(changes.positions).length > 0 ||
       Object.keys(changes.activeStates).length > 0
@@ -134,12 +163,26 @@ export class EditFloorModalComponent {
     }
   }
 
-  private clearDraft(): void {
-    localStorage.removeItem(this.draftKey);
-    this.hasDraftChanges.set(false);
+  // ✅ บันทึก image แยก (เรียกเฉพาะตอน upload ไม่ใช่ตอน drag)
+  private saveImageDraft(base64: string): void {
+    try {
+      localStorage.setItem(this.imageKey, base64);
+      this.hasDraftChanges.set(true);
+    } catch (e) {
+      // quota exceeded → เก็บใน memory อย่างเดียว
+      console.warn('localStorage quota exceeded, image stored in memory only');
+    }
   }
 
-  private getChanges(): DraftChanges {
+  private clearDraft(): void {
+    localStorage.removeItem(this.draftKey);
+    localStorage.removeItem(this.imageKey); // ✅ clear image key ด้วย
+    this.hasDraftChanges.set(false);
+    this.localDraftImage.set(null);
+  }
+
+  // ✅ getMeta: เฉพาะ positions/activeStates (เร็ว)
+  private getMeta(): DraftMeta {
     const floor = this.currentFloor();
     if (!floor) return { floorId: '', positions: {}, activeStates: {} };
 
@@ -148,14 +191,11 @@ export class EditFloorModalComponent {
 
     this.editableAreas().forEach((area) => {
       const original = this.originalAreas.find((a) => a.id === area.id);
-
-      // Area ใหม่ที่ไม่มีใน originalAreas → ถือว่ามีการเปลี่ยนแปลงเสมอ
       if (!original) {
         activeStates[area.id] = area.isActive;
         positions[area.id] = { x: area.position.x, y: area.position.y };
         return;
       }
-
       if (
         area.position.x !== original.position.x ||
         area.position.y !== original.position.y
@@ -170,21 +210,25 @@ export class EditFloorModalComponent {
     return { floorId: floor.id, positions, activeStates };
   }
 
+  private getChanges(): DraftChanges {
+    const meta = this.getMeta();
+    return {
+      ...meta,
+      floorPlanImage: this.localDraftImage() ?? undefined,
+    };
+  }
+
   private applyChangesToService(): void {
     this.editableAreas().forEach((editedArea) => {
       const original = this.originalAreas.find((a) => a.id === editedArea.id);
-
-      // Area ใหม่ที่ไม่มีใน originalAreas → update เลย
       if (!original) {
         this.areaDataService.updateArea({ ...editedArea });
         return;
       }
-
       const positionChanged =
         editedArea.position.x !== original.position.x ||
         editedArea.position.y !== original.position.y;
       const activeChanged = editedArea.isActive !== original.isActive;
-
       if (positionChanged || activeChanged) {
         this.areaDataService.updateArea({ ...editedArea });
       }
@@ -197,7 +241,7 @@ export class EditFloorModalComponent {
     if (index !== -1) {
       areas[index] = { ...areas[index], position: { ...event.position } };
       this.editableAreas.set([...areas]);
-      this.saveDraft();
+      this.saveDraft(); // ✅ เร็วขึ้นเพราะไม่รวม image
     }
   }
 
@@ -217,7 +261,6 @@ export class EditFloorModalComponent {
       this.selectedAreaId.set(areaId);
       return;
     }
-
     const index = areas.findIndex((a) => a.id === areaId);
     if (index !== -1) {
       areas[index] = {
@@ -302,9 +345,18 @@ export class EditFloorModalComponent {
   onMarkerDraggedOutside(areaId: string): void {
     this.onDragAreaToInactive(areaId);
   }
+
+  // ✅ บันทึก image แยก key ไม่กระทบ drag performance
   onUploadPlan(file: File): void {
-    console.log('Upload plan:', file.name);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      this.localDraftImage.set(base64);
+      this.saveImageDraft(base64); // ✅ แยก call
+    };
+    reader.readAsDataURL(file);
   }
+
   onAddAreaClicked(): void {
     this.showAddAreaWizard.set(true);
   }

@@ -40,6 +40,7 @@
         [floor]="currentFloor()"
         [activeAreas]="activeAreas()"
         [selectedAreaId]="selectedAreaId()"
+        [draftFloorPlanImage]="effectiveDraftImage()"
         (markerDragged)="onMarkerDragged($event)"
         (markerClicked)="onMarkerClicked($event)"
         (uploadPlan)="onUploadPlan($event)"
@@ -113,8 +114,17 @@
   </ng-template>
 </p-dialog>
 
-<app-add-area-wizard
-  [visible]="showAddAreaWizard()"
-  [floorId]="currentFloor()?.id || ''"
-  (closed)="onAddAreaWizardClose($event)"
+<app-editable-floor-plan
+  [floor]="currentFloor()"
+  [activeAreas]="activeAreas()"
+  [selectedAreaId]="selectedAreaId()"
+  [draftFloorPlanImage]="effectiveDraftImage()"
+  (markerDragged)="onMarkerDragged($event)"
+  (markerClicked)="onMarkerClicked($event)"
+  (uploadPlan)="onUploadPlan($event)"
+  (areaDroppedOnMap)="onAreaDroppedOnMap($event)"
+  (cursorOverMap)="onCursorOverMap($event)"
+  (markerDragStarted)="onMarkerDragStarted($event)"
+  (markerDragEnded)="onMarkerDragEnded()"
+  (markerDraggedOutside)="onMarkerDraggedOutside($event)"
 />

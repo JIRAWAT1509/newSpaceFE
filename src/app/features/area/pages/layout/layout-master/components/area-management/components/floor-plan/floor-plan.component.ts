@@ -65,8 +65,12 @@ export class FloorPlanComponent implements OnInit {
 
   selectedBuildingId = signal<string>('');
   selectedFloorId = signal<string>('');
+  draftFloorPlanImage = signal<string | null>(null);
 
   currentFloorImage = computed<string>(() => {
+    const draft = this.draftFloorPlanImage();
+    if (draft) return draft; // ✅ ถ้ามี draft ใช้เลย
+
     const floor = this.currentFloor();
     if (!floor) return '';
     const version = this.areaDataService.getLatestVersion(floor);
@@ -235,9 +239,9 @@ export class FloorPlanComponent implements OnInit {
   }
 
   onFloorChanged(floorId: string): void {
+    this.draftFloorPlanImage.set(null); // reset ก่อน
     const building = this.areaDataService.building();
     const floor = building.floors.find((f) => f.id === floorId);
-
     if (floor) {
       this.currentFloor.set(floor);
       this.selectedFloorId.set(floor.id);
@@ -310,10 +314,18 @@ export class FloorPlanComponent implements OnInit {
 
   onEditModalClose(): void {}
 
-  onEditModalSave(changes: any): void {
-    console.log('Saving changes:', changes);
-    this.loadFloorData(); // reload areas หลัง save
+  // แก้ onEditModalSave → ไม่ loadFloorData() ทั้งหมด reload เฉพาะ areas
+onEditModalSave(changes: any): void {
+  if (changes.floorPlanImage) {
+    this.draftFloorPlanImage.set(changes.floorPlanImage);
   }
+  // ✅ reload เฉพาะ areas ไม่ reset floor ทั้งหมด
+  const floor = this.currentFloor();
+  if (floor) {
+    const areas = this.areaDataService.getAreasForCurrentContext(floor);
+    this.areas.set(areas);
+  }
+}
 
   getFloors(): FloorWithAreas[] {
     return this.areaDataService.getFloors();

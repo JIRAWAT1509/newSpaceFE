@@ -10,7 +10,10 @@ import {
   ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AreaMarkerComponent, MarkerDragEvent } from '../area-marker/area-marker.component';
+import {
+  AreaMarkerComponent,
+  MarkerDragEvent,
+} from '../area-marker/area-marker.component';
 import { Area } from '@core/models/area.model';
 import { Floor } from '@core/models/floor.model';
 
@@ -22,35 +25,46 @@ import { Floor } from '@core/models/floor.model';
   styleUrl: './editable-floor-plan.component.css',
 })
 export class EditableFloorPlanComponent {
-  floor         = input<Floor | null>(null);
-  activeAreas   = input<Area[]>([]);          // ✅ เปลี่ยนจาก areas → activeAreas
+  floor = input<Floor | null>(null);
+  activeAreas = input<Area[]>([]);
   selectedAreaId = input<string | null>(null);
+  draftFloorPlanImage = input<string | null>(null); // ✅ เพิ่ม
 
-  markerDragged        = output<MarkerDragEvent>();
-  markerClicked        = output<string>();
-  uploadPlan           = output<File>();
-  areaDroppedOnMap     = output<{ areaId: string; position: { x: number; y: number } }>();
-  cursorOverMap        = output<boolean>();
-  markerDragStarted    = output<string>();
-  markerDragEnded      = output<void>();
+  markerDragged = output<MarkerDragEvent>();
+  markerClicked = output<string>();
+  uploadPlan = output<File>();
+  areaDroppedOnMap = output<{
+    areaId: string;
+    position: { x: number; y: number };
+  }>();
+  cursorOverMap = output<boolean>();
+  markerDragStarted = output<string>();
+  markerDragEnded = output<void>();
   markerDraggedOutside = output<string>();
 
-  floorImage         = viewChild<ElementRef>('floorImage');
-  fileInput          = viewChild<ElementRef>('fileInput');
+  floorImage = viewChild<ElementRef>('floorImage');
+  fileInput = viewChild<ElementRef>('fileInput');
   floorPlanContainer = viewChild<ElementRef>('floorPlanContainer');
 
-  zoomLevel   = signal<number>(1.0);
-  panOffset   = signal<{ x: number; y: number }>({ x: 0, y: 0 });
-  isDragOver  = signal<boolean>(false);
+  zoomLevel = signal<number>(1.0);
+  panOffset = signal<{ x: number; y: number }>({ x: 0, y: 0 });
+  isDragOver = signal<boolean>(false);
   ghostMarkerPosition = signal<{ x: number; y: number } | null>(null);
-  draggedAreaId       = signal<string | null>(null);
+  draggedAreaId = signal<string | null>(null);
 
-  // ✅ ลบ computed activeAreas ออก เพราะตอนนี้รับมาจาก input โดยตรง
+  // ✅ เช็ค draftFloorPlanImage ก่อน ถ้ามีให้ใช้เลย
   currentFloorImage = computed<string>(() => {
+    const draft = this.draftFloorPlanImage();
+    if (draft) return draft;
+
     const floorData = this.floor();
     if (!floorData?.floorPlanVersions?.length) return '';
-    const currentVersion = floorData.floorPlanVersions.find(v => v.validUntil === null);
-    return currentVersion?.planImage || floorData.floorPlanVersions[0].planImage;
+    const currentVersion = floorData.floorPlanVersions.find(
+      (v) => v.validUntil === null,
+    );
+    return (
+      currentVersion?.planImage || floorData.floorPlanVersions[0].planImage
+    );
   });
 
   private isPanning = false;
@@ -72,7 +86,10 @@ export class EditableFloorPlanComponent {
   }
 
   onMouseDown(event: MouseEvent): void {
-    if (event.button === 0 && !(event.target as HTMLElement).closest('.area-marker')) {
+    if (
+      event.button === 0 &&
+      !(event.target as HTMLElement).closest('.area-marker')
+    ) {
       this.isPanning = true;
       this.panStartX = event.clientX - this.panOffset().x;
       this.panStartY = event.clientY - this.panOffset().y;
@@ -84,7 +101,7 @@ export class EditableFloorPlanComponent {
     if (this.isPanning) {
       this.panOffset.set({
         x: event.clientX - this.panStartX,
-        y: event.clientY - this.panStartY
+        y: event.clientY - this.panStartY,
       });
       event.preventDefault();
     }
@@ -118,7 +135,12 @@ export class EditableFloorPlanComponent {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-      const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+      const validTypes = [
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'image/svg+xml',
+      ];
       if (!validTypes.includes(file.type)) {
         alert('Please upload a valid image file (PNG, JPG, or SVG)');
         return;
@@ -172,17 +194,21 @@ export class EditableFloorPlanComponent {
     }
   }
 
-  private calculateDropPosition(event: DragEvent): { x: number; y: number } | null {
+  private calculateDropPosition(
+    event: DragEvent,
+  ): { x: number; y: number } | null {
     const floorImageEl = this.floorImage();
     if (!floorImageEl) return null;
 
-    const imageRect = (floorImageEl.nativeElement as HTMLImageElement).getBoundingClientRect();
+    const imageRect = (
+      floorImageEl.nativeElement as HTMLImageElement
+    ).getBoundingClientRect();
     const mouseX = event.clientX - imageRect.left;
     const mouseY = event.clientY - imageRect.top;
 
     return {
       x: Math.max(5, Math.min(95, (mouseX / imageRect.width) * 100)),
-      y: Math.max(5, Math.min(95, (mouseY / imageRect.height) * 100))
+      y: Math.max(5, Math.min(95, (mouseY / imageRect.height) * 100)),
     };
   }
 
@@ -195,13 +221,15 @@ export class EditableFloorPlanComponent {
   getDraggedArea(): any {
     const areaId = this.draggedAreaId();
     if (!areaId) return null;
-    return this.activeAreas().find(a => a.id === areaId);  // ✅ ใช้ activeAreas() แทน areas()
+    return this.activeAreas().find((a) => a.id === areaId);
   }
 
   getStatusColor(status: string): string {
     const statusColors: Record<string, string> = {
-      vacant: '#80E08E', leased: '#FFD05F',
-      quotation: '#4CA3FF', unallocated: '#FF6384'
+      vacant: '#80E08E',
+      leased: '#FFD05F',
+      quotation: '#4CA3FF',
+      unallocated: '#FF6384',
     };
     return statusColors[status] || '#9CA3AF';
   }
