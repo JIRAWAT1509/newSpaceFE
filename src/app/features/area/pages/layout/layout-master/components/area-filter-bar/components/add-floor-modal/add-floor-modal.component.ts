@@ -1,8 +1,9 @@
-import { Component, output, signal, effect } from '@angular/core';
+import { Component, output, signal, effect, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { Floor, FloorPlanVersion } from '@core/models/floor.model';
+import { AreaDataService } from '@core/services/area/area-data.service';
 
 export interface AddFloorResult {
   floor: Floor;
@@ -28,30 +29,34 @@ export class AddFloorModalComponent {
   selectedFile = signal<File | null>(null);
   isSaving = signal<boolean>(false);
 
+  // ✅ inject service + computed
+  private areaDataService = inject(AreaDataService);
+  buildingDisplay = computed(() => {
+    const b = this.areaDataService.building();
+    return b ? `${b.code} - ${b.nameTh}` : '-';
+  });
+
   constructor(private fb: FormBuilder) {
     this.floorForm = this.fb.group({
       floorNumber: ['', [Validators.required]],
-      floorName: ['', Validators.required],
+      floorName:   ['', Validators.required],
       floorNameTh: [''],
       floorNameEn: ['']
     });
 
-    // Watch floor number changes and validate uniqueness
     effect(() => {
       const existing = this.existingFloorNumbers();
       const control = this.floorForm.get('floorNumber');
-
       if (control) {
         control.setValidators([Validators.required, this.floorExistsValidator(existing)]);
         control.updateValueAndValidity({ emitEvent: false });
       }
     });
 
-    // Auto-generate floor names when floor number changes
     this.floorForm.get('floorNumber')?.valueChanges.subscribe(value => {
       if (value && !this.floorForm.get('floorName')?.value) {
         this.floorForm.patchValue({
-          floorName: `Fl. ${value}`,
+          floorName:   `Fl. ${value}`,
           floorNameTh: `ชั้น ${value}`,
           floorNameEn: `Floor ${value}`
         }, { emitEvent: false });
@@ -71,9 +76,7 @@ export class AddFloorModalComponent {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
       if (!value) return null;
-
-      const exists = existingFloors.includes(Number(value));
-      return exists ? { floorExists: true } : null;
+      return existingFloors.includes(Number(value)) ? { floorExists: true } : null;
     };
   }
 
@@ -86,20 +89,9 @@ export class AddFloorModalComponent {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-
-      // Validate file size (10MB max)
-      if (file.size > 10 * 1024 * 1024) {
-        alert('File size must be less than 10MB');
-        return;
-      }
-
-      // Validate file type
+      if (file.size > 10 * 1024 * 1024) { alert('File size must be less than 10MB'); return; }
       const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-      if (!validTypes.includes(file.type)) {
-        alert('Only PNG and JPG images are allowed');
-        return;
-      }
-
+      if (!validTypes.includes(file.type)) { alert('Only PNG and JPG images are allowed'); return; }
       this.selectedFile.set(file);
     }
   }
@@ -115,38 +107,27 @@ export class AddFloorModalComponent {
   }
 
   async onSave(): Promise<void> {
-    if (this.floorForm.invalid) {
-      this.floorForm.markAllAsTouched();
-      return;
-    }
-
+    if (this.floorForm.invalid) { this.floorForm.markAllAsTouched(); return; }
     this.isSaving.set(true);
-
     try {
-      const formValue = this.floorForm.value;
+      const formValue  = this.floorForm.value;
       const floorNumber = Number(formValue.floorNumber);
+      const newFloorId  = `floor-${Date.now()}`;
 
-      // Generate new floor ID
-      const newFloorId = `floor-${floorNumber}`;
-
-      // Handle floor plan image if uploaded
       let planImageUrl = '';
       if (this.selectedFile()) {
-        // In real app, upload to server and get URL
-        // For now, create a local URL
         planImageUrl = URL.createObjectURL(this.selectedFile()!);
       }
 
-      // Create initial floor plan version
       const initialVersion: FloorPlanVersion = {
         id: `fpv-${newFloorId}-001`,
         floorId: newFloorId,
         versionNumber: 1,
         planImage: planImageUrl,
-        planImageWidth: 1920, // Default, would come from image
-        planImageHeight: 1080, // Default, would come from image
+        planImageWidth: 1920,
+        planImageHeight: 1080,
         validFrom: new Date(),
-        validUntil: null, // Current version
+        validUntil: null,
         renovationReason: 'Initial floor plan',
         renovationReasonTh: 'แผนพื้นเริ่มต้น',
         renovationReasonEn: 'Initial floor plan',
@@ -155,12 +136,11 @@ export class AddFloorModalComponent {
         updatedAt: new Date()
       };
 
-      // Create new floor
       const newFloor: Floor = {
         id: newFloorId,
         buildingId: this.buildingId(),
-        floorNumber: floorNumber,
-        floorName: formValue.floorName || `Fl. ${floorNumber}`,
+        floorNumber,
+        floorName:   formValue.floorName   || `Fl. ${floorNumber}`,
         floorNameTh: formValue.floorNameTh || `ชั้น ${floorNumber}`,
         floorNameEn: formValue.floorNameEn || `Floor ${floorNumber}`,
         floorPlanVersions: [initialVersion],
@@ -168,14 +148,8 @@ export class AddFloorModalComponent {
         updatedAt: new Date()
       };
 
-      // Emit the new floor
-      this.floorCreated.emit({
-        floor: newFloor,
-        shouldOpenEditModal: true
-      });
-
+      this.floorCreated.emit({ floor: newFloor, shouldOpenEditModal: true });
       this.visible.set(false);
-
     } catch (error) {
       console.error('Error creating floor:', error);
       alert('Failed to create floor. Please try again.');
@@ -185,8 +159,6 @@ export class AddFloorModalComponent {
   }
 
   onModalHide(): void {
-    if (!this.isSaving()) {
-      this.closed.emit();
-    }
+    if (!this.isSaving()) this.closed.emit();
   }
 }

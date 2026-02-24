@@ -1,0 +1,131 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '520px' }"
+  styleClass="add-building-modal"
+  (onHide)="onModalHide()"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="pi pi-building"></i>
+        Add New Building
+      </h2>
+    </div>
+  </ng-template>
+
+  <!-- Content -->
+  <div class="modal-content">
+    <form [formGroup]="buildingForm" class="building-form">
+
+      <!-- Code -->
+      <div class="form-group">
+        <label class="form-label required">Building Code</label>
+        <input
+          type="text"
+          formControlName="code"
+          class="form-input"
+          placeholder="e.g., ST03"
+          [class.error]="isFieldInvalid('code')"
+        />
+        @if (isFieldInvalid('code')) {
+          <span class="error-message">Building code is required</span>
+        }
+      </div>
+
+      <!-- Name -->
+      <div class="form-group">
+        <label class="form-label required">Building Name</label>
+        <input
+          type="text"
+          formControlName="name"
+          class="form-input"
+          placeholder="e.g., Imperial Tower 3"
+          [class.error]="isFieldInvalid('name')"
+        />
+        @if (isFieldInvalid('name')) {
+          <span class="error-message">Building name is required</span>
+        }
+      </div>
+
+      <!-- Name Thai -->
+      <div class="form-group">
+        <label class="form-label">Building Name (Thai)</label>
+        <input
+          type="text"
+          formControlName="nameTh"
+          class="form-input"
+          placeholder="e.g., อาคารอิมพีเรียล ทาวเวอร์ 3"
+        />
+      </div>
+
+      <!-- Name English -->
+      <div class="form-group">
+        <label class="form-label">Building Name (English)</label>
+        <input
+          type="text"
+          formControlName="nameEn"
+          class="form-input"
+          placeholder="e.g., Imperial Tower 3"
+        />
+      </div>
+
+      <!-- Address -->
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <input
+          type="text"
+          formControlName="address"
+          class="form-input"
+          placeholder="e.g., 123 Main St, Bangkok 10110"
+        />
+      </div>
+
+      <!-- Address Thai -->
+      <div class="form-group">
+        <label class="form-label">Address (Thai)</label>
+        <input
+          type="text"
+          formControlName="addressTh"
+          class="form-input"
+          placeholder="e.g., 123 ถ.หลัก กรุงเทพมหานคร 10110"
+        />
+      </div>
+
+      <!-- Address English -->
+      <div class="form-group">
+        <label class="form-label">Address (English)</label>
+        <input
+          type="text"
+          formControlName="addressEn"
+          class="form-input"
+          placeholder="e.g., 123 Main St, Bangkok 10110"
+        />
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="onCancel()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn-save"
+        (click)="onSave()"
+        [disabled]="!buildingForm.valid || isSaving()"
+      >
+        <i class="pi pi-check"></i>
+        {{ isSaving() ? 'Creating...' : 'Create Building' }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

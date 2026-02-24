@@ -14,3 +14,18 @@ export const MOCK_BUILDING: Building = {
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2025-11-21')
 };
+
+export const MOCK_BUILDING_2: Building = {
+  id: 'bld-002',
+  code: 'ST04',
+  name: 'อาคารอิมพีเรียล ทาวเวอร์ 4',
+  nameTh: 'อาคารอิมพีเรียล ทาวเวอร์ 4',
+  nameEn: 'Imperial Tower 4',
+  address: 'yyy, yyyyyyyy, กทม. 12345',
+  addressTh: 'yyy, yyyyyyyy, กรุงเทพมหานคร 12345',
+  addressEn: 'yyy, yyyyyyyy, Bangkok 12345',
+  createdAt: new Date('2024-03-01'),
+  updatedAt: new Date('2025-11-21')
+};
+
+export const MOCK_BUILDINGS: Building[] = [MOCK_BUILDING, MOCK_BUILDING_2];

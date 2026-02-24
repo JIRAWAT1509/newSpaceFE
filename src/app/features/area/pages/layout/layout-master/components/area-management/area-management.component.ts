@@ -1,3 +1,5 @@
+/* area-management.component.ts */
+
 import { Component, input, output, signal } from '@angular/core';
 import { FloorPlanComponent } from './components/floor-plan/floor-plan.component';
 import { AreaListComponent } from './components/area-list/area-list.component';

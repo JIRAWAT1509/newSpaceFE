@@ -1,5 +1,6 @@
+<!-- layout-master.component.html -->
+
 <div class="layout-master-container">
-  <!-- Section 1: Area Availability - หัวข้ออยู่ในการ์ดของ area-availability -->
   <div class="section section-availability">
     <app-area-availability
       [mode]="'per-building'"
@@ -7,15 +8,14 @@
     />
   </div>
 
-  <!-- Filter Bar - Between Section 1 and 2 -->
   <div class="section section-filter-bar">
     <app-area-filter-bar
       (filterChanged)="onTypeFilterChanged($event)"
       (createFloorClicked)="onCreateFloorClicked()"
+      (createBuilding)="onCreateBuildingClicked()"
     />
   </div>
 
-  <!-- Section 2: Area Management (Floor Plan + Area List) -->
   <div class="section section-area-management">
     <app-area-management
       [selectedStatusFilters]="selectedStatusFilters()"
@@ -25,13 +25,12 @@
     />
   </div>
 
-  <!-- Section 3: Floor/Area Data Display -->
   <div class="section section-data-display">
-<app-area-floor-data
-  [floorId]="currentFloorId()"
-  [selectedAreaId]="selectedAreaId()"
-  (backToGeneral)="onBackToGeneral()"
-/>
+    <app-area-floor-data
+      [floorId]="currentFloorId()"
+      [selectedAreaId]="selectedAreaId()"
+      (backToGeneral)="onBackToGeneral()"
+    />
   </div>
 </div>
 
@@ -40,4 +39,11 @@
   #addFloorModal
   (floorCreated)="onFloorCreated($event)"
   (closed)="onAddFloorModalClosed()"
+/>
+
+<!-- Add Building Modal -->
+<app-add-building-modal
+  #addBuildingModal
+  (buildingCreated)="onBuildingCreated($event)"
+  (closed)="onAddBuildingModalClosed()"
 />

@@ -23,13 +23,15 @@ interface DraftChanges {
     DialogModule,
     EditableFloorPlanComponent,
     MarkerListPanelComponent,
-    AddAreaWizardComponent
+    AddAreaWizardComponent,
   ],
   templateUrl: './edit-floor-modal.component.html',
-  styleUrl: './edit-floor-modal.component.css'
+  styleUrl: './edit-floor-modal.component.css',
 })
 export class EditFloorModalComponent {
-  visible = input.required<boolean>();
+  // ✅ visible เป็น internal signal — เปิดผ่าน open() method
+  visible = signal<boolean>(false);
+
   currentFloor = input<Floor | null>(null);
   areas = input<Area[]>([]);
 
@@ -40,31 +42,28 @@ export class EditFloorModalComponent {
   selectedAreaId = signal<string | null>(null);
   showCloseWarning = false;
   showAddAreaWizard = signal<boolean>(false);
+  hasDraftChanges = signal<boolean>(false);
 
   markerListPanel = viewChild<MarkerListPanelComponent>('markerListPanel');
 
   private originalAreas: Area[] = [];
   private draftKey = '';
 
-  activeAreas = computed(() =>
-    this.editableAreas().filter(a => a.isActive)
-  );
-
-  inactiveAreas = computed(() =>
-    this.editableAreas().filter(a => !a.isActive)
-  );
+  activeAreas = computed(() => this.editableAreas().filter((a) => a.isActive));
+  inactiveAreas = computed(() => this.editableAreas().filter((a) => !a.isActive));
 
   hasChanges = computed(() => {
-    return JSON.stringify(this.getChanges()) !== JSON.stringify({});
+    const changes = this.getChanges();
+    return (
+      Object.keys(changes.positions).length > 0 ||
+      Object.keys(changes.activeStates).length > 0
+    );
   });
-
-  hasDraftChanges = signal<boolean>(false);
 
   constructor() {
     effect(() => {
       const floor = this.currentFloor();
       const areas = this.areas();
-
       if (floor && areas.length > 0) {
         this.draftKey = `floor-edit-draft-${floor.id}`;
         this.loadDraft();
@@ -72,22 +71,30 @@ export class EditFloorModalComponent {
     });
   }
 
+  // ✅ เปิด modal จาก parent ผ่าน viewChild
+  open(): void {
+    this.initializeEditableAreas();
+    const floor = this.currentFloor();
+    if (floor) {
+      this.draftKey = `floor-edit-draft-${floor.id}`;
+      this.loadDraft();
+    }
+    this.visible.set(true);
+  }
+
   private loadDraft(): void {
     const draft = localStorage.getItem(this.draftKey);
     if (draft) {
       try {
         const draftData: DraftChanges = JSON.parse(draft);
-        const areasWithDraft = this.areas().map(area => {
-          const draftPosition = draftData.positions[area.id];
-          const draftActive = draftData.activeStates[area.id];
-
-          return {
-            ...area,
-            position: draftPosition || area.position,
-            isActive: draftActive !== undefined ? draftActive : area.isActive
-          };
-        });
-
+        const areasWithDraft = this.areas().map((area) => ({
+          ...area,
+          position: draftData.positions[area.id] || area.position,
+          isActive:
+            draftData.activeStates[area.id] !== undefined
+              ? draftData.activeStates[area.id]
+              : area.isActive,
+        }));
         this.editableAreas.set(areasWithDraft);
         this.originalAreas = JSON.parse(JSON.stringify(this.areas()));
         this.hasDraftChanges.set(true);
@@ -103,11 +110,15 @@ export class EditFloorModalComponent {
   private initializeEditableAreas(): void {
     this.editableAreas.set(JSON.parse(JSON.stringify(this.areas())));
     this.originalAreas = JSON.parse(JSON.stringify(this.areas()));
+    this.hasDraftChanges.set(false);
   }
 
   private saveDraft(): void {
     const changes = this.getChanges();
-    if (Object.keys(changes.positions).length > 0 || Object.keys(changes.activeStates).length > 0) {
+    if (
+      Object.keys(changes.positions).length > 0 ||
+      Object.keys(changes.activeStates).length > 0
+    ) {
       localStorage.setItem(this.draftKey, JSON.stringify(changes));
       this.hasDraftChanges.set(true);
     }
@@ -125,11 +136,14 @@ export class EditFloorModalComponent {
     const positions: { [key: string]: { x: number; y: number } } = {};
     const activeStates: { [key: string]: boolean } = {};
 
-    this.editableAreas().forEach(area => {
-      const original = this.originalAreas.find(a => a.id === area.id);
+    this.editableAreas().forEach((area) => {
+      const original = this.originalAreas.find((a) => a.id === area.id);
       if (!original) return;
 
-      if (area.position.x !== original.position.x || area.position.y !== original.position.y) {
+      if (
+        area.position.x !== original.position.x ||
+        area.position.y !== original.position.y
+      ) {
         positions[area.id] = { x: area.position.x, y: area.position.y };
       }
 
@@ -138,17 +152,12 @@ export class EditFloorModalComponent {
       }
     });
 
-    return {
-      floorId: floor.id,
-      positions,
-      activeStates
-    };
+    return { floorId: floor.id, positions, activeStates };
   }
 
   onMarkerDragged(event: MarkerDragEvent): void {
     const areas = this.editableAreas();
-    const index = areas.findIndex(a => a.id === event.areaId);
-
+    const index = areas.findIndex((a) => a.id === event.areaId);
     if (index !== -1) {
       areas[index].position = event.position;
       this.editableAreas.set([...areas]);
@@ -167,41 +176,31 @@ export class EditFloorModalComponent {
 
   onDragAreaToMap(areaId: string): void {
     const areas = this.editableAreas();
-    const area = areas.find(a => a.id === areaId);
-
+    const area = areas.find((a) => a.id === areaId);
     if (!area) return;
 
-    // Check if already active and has marker on map
     if (area.isActive) {
-      // Already on map - just select it
       this.selectedAreaId.set(areaId);
-      console.log('Area already on map, selected:', areaId);
       return;
     }
 
-    // Calculate status when activating
     const newStatus = this.calculateStatusOnActivation(area);
-
-    const index = areas.findIndex(a => a.id === areaId);
+    const index = areas.findIndex((a) => a.id === areaId);
     if (index !== -1) {
       areas[index].isActive = true;
       areas[index].status = newStatus;
       this.editableAreas.set([...areas]);
       this.saveDraft();
-      console.log(`Area ${area.roomNumber} activated with status: ${newStatus}`);
     }
   }
 
   onDragAreaToInactive(areaId: string): void {
     const areas = this.editableAreas();
-    const index = areas.findIndex(a => a.id === areaId);
-
+    const index = areas.findIndex((a) => a.id === areaId);
     if (index !== -1) {
       areas[index].isActive = false;
       this.editableAreas.set([...areas]);
       this.saveDraft();
-
-      // Deselect if this was selected
       if (this.selectedAreaId() === areaId) {
         this.selectedAreaId.set(null);
       }
@@ -209,76 +208,44 @@ export class EditFloorModalComponent {
   }
 
   private calculateStatusOnActivation(area: Area): AreaStatus {
-    // Has tenant with valid lease
     if (area.currentTenant) {
       const leaseEnd = new Date(area.currentTenant.leaseEnd);
-      const now = new Date();
-
-      // Check if lease is still valid
-      if (leaseEnd > now) {
-        return 'leased';
-      }
+      if (leaseEnd > new Date()) return 'leased';
     }
-
-    // Check if has quotation (you'd need to add this field to Area model)
-    // For now, default logic:
-
-    // If has monthlyRent set but no tenant, might be ready for rent
-    if (area.monthlyRent && area.monthlyRent > 0) {
-      return 'vacant';
-    }
-
-    // Not ready yet
+    if (area.monthlyRent && area.monthlyRent > 0) return 'vacant';
     return 'unallocated';
   }
 
   onAreaActivated(areaId: string): void {
-    // This is called when dragging from inactive panel to active panel
-    // Place at visual center (50%, 50%)
     const areas = this.editableAreas();
-    const area = areas.find(a => a.id === areaId);
-
+    const area = areas.find((a) => a.id === areaId);
     if (!area) return;
 
-    // Calculate status when activating
     const newStatus = this.calculateStatusOnActivation(area);
-
-    const index = areas.findIndex(a => a.id === areaId);
+    const index = areas.findIndex((a) => a.id === areaId);
     if (index !== -1) {
       areas[index].isActive = true;
       areas[index].status = newStatus;
-      areas[index].position = { x: 50, y: 50 }; // Center of view
+      areas[index].position = { x: 50, y: 50 };
       this.editableAreas.set([...areas]);
       this.selectedAreaId.set(areaId);
       this.saveDraft();
-      console.log(`Area ${area.roomNumber} activated at center with status: ${newStatus}`);
     }
   }
 
-  onAreaDroppedOnMap(event: { areaId: string; position: { x: number; y: number } }): void {
+  onAreaDroppedOnMap(event: {
+    areaId: string;
+    position: { x: number; y: number };
+  }): void {
     const areas = this.editableAreas();
-    const area = areas.find(a => a.id === event.areaId);
-
+    const area = areas.find((a) => a.id === event.areaId);
     if (!area) return;
 
-    // Check if already active
-    if (area.isActive) {
-      // Already on map - just update position and select
-      const index = areas.findIndex(a => a.id === event.areaId);
-      if (index !== -1) {
-        areas[index].position = event.position;
-        this.editableAreas.set([...areas]);
-        this.selectedAreaId.set(event.areaId);
-        this.saveDraft();
-        console.log(`Area ${area.roomNumber} position updated`);
-      }
-      return;
-    }
+    const newStatus = area.isActive
+      ? area.status
+      : this.calculateStatusOnActivation(area);
 
-    // Was inactive - activate it with calculated status
-    const newStatus = this.calculateStatusOnActivation(area);
-
-    const index = areas.findIndex(a => a.id === event.areaId);
+    const index = areas.findIndex((a) => a.id === event.areaId);
     if (index !== -1) {
       areas[index].isActive = true;
       areas[index].status = newStatus;
@@ -286,38 +253,26 @@ export class EditFloorModalComponent {
       this.editableAreas.set([...areas]);
       this.selectedAreaId.set(event.areaId);
       this.saveDraft();
-      console.log(`Area ${area.roomNumber} activated at dropped position with status: ${newStatus}`);
     }
   }
 
   onCursorOverMap(isOverMap: boolean): void {
-    const panel = this.markerListPanel();
-    if (panel) {
-      panel.setIsOverMap(isOverMap);
-    }
+    this.markerListPanel()?.setIsOverMap(isOverMap);
   }
 
   onMarkerDragStarted(areaId: string): void {
-    const panel = this.markerListPanel();
-    if (panel) {
-      panel.setDraggingFromMap(true);
-    }
+    this.markerListPanel()?.setDraggingFromMap(true);
   }
 
   onMarkerDragEnded(): void {
-    const panel = this.markerListPanel();
-    if (panel) {
-      panel.setDraggingFromMap(false);
-    }
+    this.markerListPanel()?.setDraggingFromMap(false);
   }
 
   onMarkerDraggedOutside(areaId: string): void {
-    // Marker was dragged outside map and released - deactivate it
     this.onDragAreaToInactive(areaId);
   }
 
   onUploadPlan(file: File): void {
-    // TODO: Implement floor plan upload
     console.log('Upload plan:', file.name);
   }
 
@@ -327,14 +282,11 @@ export class EditFloorModalComponent {
 
   onAddAreaWizardClose(newArea?: Area): void {
     this.showAddAreaWizard.set(false);
-
     if (newArea) {
       const areas = this.editableAreas();
       areas.push(newArea);
       this.editableAreas.set([...areas]);
       this.saveDraft();
-
-      console.log('Area added as draft:', newArea.roomNumber);
     }
   }
 
@@ -349,12 +301,13 @@ export class EditFloorModalComponent {
   confirmCancel(): void {
     this.showCloseWarning = false;
     this.clearDraft();
+    this.visible.set(false);
     this.closed.emit();
   }
 
   onClose(): void {
     this.saveDraft();
-    console.log('Draft saved');
+    this.visible.set(false);
     this.closed.emit();
   }
 
@@ -362,9 +315,7 @@ export class EditFloorModalComponent {
     const changes = this.getChanges();
     this.saved.emit(changes);
     this.clearDraft();
-
-    console.log('Changes saved successfully');
-
+    this.visible.set(false);
     this.closed.emit();
   }
 

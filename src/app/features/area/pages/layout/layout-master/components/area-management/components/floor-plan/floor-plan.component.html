@@ -138,7 +138,7 @@
 
 <!-- Edit Floor Modal -->
 <app-edit-floor-modal
-  [visible]="showEditModal()"
+  #editFloorModal
   [currentFloor]="currentFloor()"
   [areas]="areas()"
   (closed)="onEditModalClose()"

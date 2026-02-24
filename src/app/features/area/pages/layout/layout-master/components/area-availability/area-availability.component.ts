@@ -1,3 +1,5 @@
+/* C:\work\internship\newSpaceFE\src\app\features\area\pages\layout\layout-master\components\area-availability\area-availability.component.ts */
+
 import { Component, OnInit, output, signal, computed, input, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AreaDataService, StatusDistribution } from '@core/services/area/area-data.service';
@@ -69,7 +71,7 @@ export class AreaAvailabilityComponent implements OnInit, AfterViewInit, OnDestr
       statusIcons: areaConfig.statusIcons,
       statusIconTypes: areaConfig.statusIconTypes
     });
-    
+
     if (configHash !== this.lastConfigHash) {
       this.lastConfigHash = configHash;
       this.applyScopedColors();
@@ -83,7 +85,7 @@ export class AreaAvailabilityComponent implements OnInit, AfterViewInit, OnDestr
   private applyScopedColors(): void {
     const areaConfig = getAreaAvailabilityConfig();
     const container = this.elementRef.nativeElement.querySelector('.area-availability-container');
-    
+
     if (container && areaConfig.colors) {
       // Apply scoped colors to the container element
       applyModuleScopedColors(container, 'areaAvailability', areaConfig.colors);

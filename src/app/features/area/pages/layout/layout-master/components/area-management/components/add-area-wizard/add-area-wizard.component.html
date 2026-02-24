@@ -1,3 +1,5 @@
+<!-- add-area-wizard.component.html -->
+
 <p-dialog
   [visible]="visible()"
   [modal]="true"
@@ -7,7 +9,6 @@
   styleClass="add-area-wizard-modal"
   (onHide)="onModalHide()"
 >
-  <!-- Header -->
   <ng-template pTemplate="header">
     <div class="wizard-header">
       <h2 class="wizard-title">
@@ -29,17 +30,15 @@
     </div>
   </ng-template>
 
-  <!-- Content -->
   <div class="wizard-content">
+
     <!-- Step 1: Basic Info -->
     @if (currentStep() === 1) {
       <div class="wizard-step">
         <h3 class="step-title">Basic Information</h3>
 
         <div class="form-group">
-          <label class="form-label"
-            >Room Number <span class="required">*</span></label
-          >
+          <label class="form-label">Room Number <span class="required">*</span></label>
           <input
             type="text"
             class="form-input"
@@ -52,29 +51,23 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">
-            Area Type <span class="required">*</span>
-          </label>
-
-          <select
-            [(ngModel)]="formData.type"
-            style="
-              width: 100%;
-              padding: 10px 12px;
-              background-color: #ffffff;
-              color: #000000;
-              border: 1px solid #d1d5db;
-              border-radius: 6px;
-              font-size: 14px;
-              appearance: auto;
-              -webkit-appearance: auto;
-              -moz-appearance: auto;
-            "
-          >
-            <option value="" disabled selected>Select area type</option>
+          <label class="form-label">Area Type <span class="required">*</span></label>
+          <select [(ngModel)]="formData.type" class="form-select-native">
+            <option value="" disabled>Select area type</option>
             <option value="log">Log</option>
             <option value="kiosk">Kiosk</option>
             <option value="open-plan">Open Plan</option>
+          </select>
+        </div>
+
+        <!-- ✅ Subcategory -->
+        <div class="form-group">
+          <label class="form-label">Subcategory / ประเภทธุรกิจ</label>
+          <select [(ngModel)]="formData.subcategory" class="form-select-native">
+            <option value="">ไม่ระบุ</option>
+            @for (opt of subcategoryOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
           </select>
         </div>
       </div>
@@ -85,46 +78,77 @@
       <div class="wizard-step">
         <h3 class="step-title">Size & Rental Information</h3>
 
-        <div class="form-group">
-          <label class="form-label"
-            >Size (sqm) <span class="required">*</span></label
-          >
-          <input
-            type="number"
-            class="form-input"
-            [(ngModel)]="formData.size"
-            placeholder="e.g., 25.5"
-            min="1"
-            step="0.1"
-          />
-          @if (errors.size) {
-            <span class="error-message">{{ errors.size }}</span>
-          }
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label class="form-label">Size (ตร.ม.) <span class="required">*</span></label>
+            <input
+              type="number"
+              class="form-input"
+              [(ngModel)]="formData.size"
+              placeholder="e.g., 25.5"
+              min="1"
+              step="0.1"
+            />
+            @if (errors.size) {
+              <span class="error-message">{{ errors.size }}</span>
+            }
+          </div>
+
+          <div class="form-group flex-1">
+            <label class="form-label">Monthly Rent (฿)</label>
+            <input
+              type="number"
+              class="form-input"
+              [(ngModel)]="formData.monthlyRent"
+              placeholder="e.g., 15000"
+              min="0"
+            />
+          </div>
         </div>
 
+        <!-- ✅ คำนวณ rate ต่อ ตร.ม. -->
+        @if (ratePerSqm()) {
+          <div class="calculated-box">
+            <i class="pi pi-calculator"></i>
+            <div class="calc-detail">
+              <span class="calc-label">อัตราค่าเช่าต่อ ตร.ม.</span>
+              <span class="calc-value">฿{{ ratePerSqm() }} / ตร.ม. / เดือน</span>
+            </div>
+          </div>
+        }
+
+        <!-- ✅ Effective Date -->
         <div class="form-group">
-          <label class="form-label">Monthly Rent (฿)</label>
+          <label class="form-label">Effective Date / วันที่มีผลบังคับ <span class="required">*</span></label>
           <input
-            type="number"
+            type="date"
             class="form-input"
-            [(ngModel)]="formData.monthlyRent"
-            placeholder="e.g., 15000"
-            min="0"
+            [(ngModel)]="formData.effectiveDate"
           />
-          <span class="form-hint"
-            >Optional - Leave empty if not yet determined</span
-          >
+          @if (errors.effectiveDate) {
+            <span class="error-message">{{ errors.effectiveDate }}</span>
+          }
+          <span class="form-hint">วันที่เริ่มต้นใช้งานพื้นที่นี้</span>
+        </div>
+
+        <!-- ✅ Notes -->
+        <div class="form-group">
+          <label class="form-label">หมายเหตุ (Notes)</label>
+          <textarea
+            class="form-input form-textarea"
+            [(ngModel)]="formData.notes"
+            placeholder="บันทึกเพิ่มเติม เช่น เงื่อนไขพิเศษ, สภาพห้อง..."
+            rows="3"
+          ></textarea>
         </div>
       </div>
     }
 
-    <!-- Step 3: Room Pictures -->
+    <!-- Step 3: Pictures -->
     @if (currentStep() === 3) {
       <div class="wizard-step">
         <h3 class="step-title">Room Pictures (Optional)</h3>
-        <p class="step-description">
-          Upload 3-5 pictures of the room for reference
-        </p>
+        <p class="step-description">Upload 3-5 pictures of the room for reference</p>
 
         <div class="upload-area">
           <label class="upload-label">
@@ -133,14 +157,11 @@
               accept="image/*"
               multiple
               (change)="onPicturesSelected($event)"
-              #pictureInput
             />
             <div class="upload-placeholder">
               <i class="pi pi-cloud-upload"></i>
               <p>Click to upload pictures</p>
-              <span class="upload-hint"
-                >PNG, JPG up to 5MB each (3-5 pictures)</span
-              >
+              <span class="upload-hint">PNG, JPG up to 5MB each (max 5 pictures)</span>
             </div>
           </label>
 
@@ -149,11 +170,7 @@
               @for (picture of formData.pictures; track $index) {
                 <div class="picture-preview">
                   <img [src]="picture.preview" alt="Room picture" />
-                  <button
-                    type="button"
-                    class="remove-picture"
-                    (click)="removePicture($index)"
-                  >
+                  <button type="button" class="remove-picture" (click)="removePicture($index)">
                     <i class="pi pi-times"></i>
                   </button>
                 </div>
@@ -171,35 +188,49 @@
 
         <div class="summary-card">
           <div class="summary-row">
-            <span class="summary-label">Room Number:</span>
+            <span class="summary-label">Room Number</span>
             <span class="summary-value">{{ formData.roomNumber }}</span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">Type:</span>
+            <span class="summary-label">Type</span>
             <span class="summary-value">{{ getTypeLabel(formData.type) }}</span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">Size:</span>
-            <span class="summary-value">{{ formData.size }} sqm</span>
+            <span class="summary-label">Subcategory</span>
+            <span class="summary-value">{{ getSubcategoryLabel(formData.subcategory) }}</span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">Monthly Rent:</span>
+            <span class="summary-label">Size</span>
+            <span class="summary-value">{{ formData.size }} ตร.ม.</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Monthly Rent</span>
             <span class="summary-value">
-              {{
-                formData.monthlyRent
-                  ? "฿" + formData.monthlyRent.toLocaleString()
-                  : "Not set"
-              }}
+              {{ formData.monthlyRent ? '฿' + formData.monthlyRent.toLocaleString() : 'ไม่ระบุ' }}
             </span>
           </div>
+          @if (ratePerSqm()) {
+            <div class="summary-row">
+              <span class="summary-label">Rate / ตร.ม.</span>
+              <span class="summary-value">฿{{ ratePerSqm() }} / ตร.ม. / เดือน</span>
+            </div>
+          }
           <div class="summary-row">
-            <span class="summary-label">Pictures:</span>
-            <span class="summary-value"
-              >{{ formData.pictures.length }} uploaded</span
-            >
+            <span class="summary-label">Effective Date</span>
+            <span class="summary-value">{{ formData.effectiveDate }}</span>
+          </div>
+          @if (formData.notes) {
+            <div class="summary-row">
+              <span class="summary-label">หมายเหตุ</span>
+              <span class="summary-value">{{ formData.notes }}</span>
+            </div>
+          }
+          <div class="summary-row">
+            <span class="summary-label">Pictures</span>
+            <span class="summary-value">{{ formData.pictures.length }} รูป</span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">Initial Status:</span>
+            <span class="summary-label">Initial Status</span>
             <span class="summary-value">
               <span class="status-badge inactive">Inactive</span>
             </span>
@@ -209,15 +240,16 @@
         <div class="info-box">
           <i class="pi pi-info-circle"></i>
           <p>
-            The area will be created as <strong>inactive</strong> and added to
-            the inactive list. You can drag it to the map to activate it later.
+            พื้นที่จะถูกสร้างในสถานะ <strong>Inactive</strong>
+            และเพิ่มในรายการ Inactive List
+            สามารถลากไปวางบน Floor Plan เพื่อเปิดใช้งานได้ภายหลัง
           </p>
         </div>
       </div>
     }
+
   </div>
 
-  <!-- Footer -->
   <ng-template pTemplate="footer">
     <div class="wizard-footer">
       <button type="button" class="btn-cancel" (click)="onCancel()">
@@ -249,7 +281,7 @@
   </ng-template>
 </p-dialog>
 
-<!-- Close Warning -->
+<!-- Discard Warning -->
 <p-dialog
   [(visible)]="showCloseWarning"
   [modal]="true"
@@ -257,15 +289,9 @@
   [style]="{ width: '400px' }"
   header="Discard Changes?"
 >
-  <p class="warning-message">
-    Are you sure you want to cancel? All entered information will be lost.
-  </p>
+  <p class="warning-message">Are you sure? All entered information will be lost.</p>
   <ng-template pTemplate="footer">
-    <button
-      type="button"
-      class="btn-secondary"
-      (click)="showCloseWarning = false"
-    >
+    <button type="button" class="btn-secondary" (click)="showCloseWarning = false">
       Continue Editing
     </button>
     <button type="button" class="btn-danger" (click)="confirmCancel()">
