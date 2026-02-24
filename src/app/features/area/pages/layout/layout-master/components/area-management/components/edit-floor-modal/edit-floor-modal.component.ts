@@ -1,4 +1,15 @@
-import { Component, input, output, signal, computed, effect, viewChild } from '@angular/core';
+/* edit-floor-modal.component.ts */
+
+import {
+  Component,
+  input,
+  output,
+  signal,
+  computed,
+  effect,
+  viewChild,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { EditableFloorPlanComponent } from './../editable-floor-plan/editable-floor-plan.component';
@@ -7,6 +18,7 @@ import { AddAreaWizardComponent } from './../add-area-wizard/add-area-wizard.com
 import { Area, AreaStatus } from '@core/models/area.model';
 import { Floor } from '@core/models/floor.model';
 import { MarkerDragEvent } from '../area-marker/area-marker.component';
+import { AreaDataService } from '@core/services/area/area-data.service';
 
 interface DraftChanges {
   floorId: string;
@@ -29,9 +41,9 @@ interface DraftChanges {
   styleUrl: './edit-floor-modal.component.css',
 })
 export class EditFloorModalComponent {
-  // ✅ visible เป็น internal signal — เปิดผ่าน open() method
-  visible = signal<boolean>(false);
+  private areaDataService = inject(AreaDataService);
 
+  visible = signal<boolean>(false);
   currentFloor = input<Floor | null>(null);
   areas = input<Area[]>([]);
 
@@ -50,7 +62,9 @@ export class EditFloorModalComponent {
   private draftKey = '';
 
   activeAreas = computed(() => this.editableAreas().filter((a) => a.isActive));
-  inactiveAreas = computed(() => this.editableAreas().filter((a) => !a.isActive));
+  inactiveAreas = computed(() =>
+    this.editableAreas().filter((a) => !a.isActive),
+  );
 
   hasChanges = computed(() => {
     const changes = this.getChanges();
@@ -71,7 +85,6 @@ export class EditFloorModalComponent {
     });
   }
 
-  // ✅ เปิด modal จาก parent ผ่าน viewChild
   open(): void {
     this.initializeEditableAreas();
     const floor = this.currentFloor();
@@ -99,7 +112,6 @@ export class EditFloorModalComponent {
         this.originalAreas = JSON.parse(JSON.stringify(this.areas()));
         this.hasDraftChanges.set(true);
       } catch (e) {
-        console.error('Failed to load draft:', e);
         this.initializeEditableAreas();
       }
     } else {
@@ -146,7 +158,6 @@ export class EditFloorModalComponent {
       ) {
         positions[area.id] = { x: area.position.x, y: area.position.y };
       }
-
       if (area.isActive !== original.isActive) {
         activeStates[area.id] = area.isActive;
       }
@@ -155,19 +166,35 @@ export class EditFloorModalComponent {
     return { floorId: floor.id, positions, activeStates };
   }
 
+  // ✅ Apply changes ลง service โดยตรง
+  private applyChangesToService(): void {
+    this.editableAreas().forEach((editedArea) => {
+      const original = this.originalAreas.find((a) => a.id === editedArea.id);
+      if (!original) return;
+
+      const positionChanged =
+        editedArea.position.x !== original.position.x ||
+        editedArea.position.y !== original.position.y;
+      const activeChanged = editedArea.isActive !== original.isActive;
+
+      if (positionChanged || activeChanged) {
+        this.areaDataService.updateArea({ ...editedArea });
+      }
+    });
+  }
+
   onMarkerDragged(event: MarkerDragEvent): void {
     const areas = this.editableAreas();
     const index = areas.findIndex((a) => a.id === event.areaId);
     if (index !== -1) {
-      areas[index].position = event.position;
+      areas[index] = { ...areas[index], position: { ...event.position } };
       this.editableAreas.set([...areas]);
       this.saveDraft();
     }
   }
 
   onMarkerClicked(areaId: string): void {
-    const current = this.selectedAreaId();
-    this.selectedAreaId.set(current === areaId ? null : areaId);
+    this.selectedAreaId.set(this.selectedAreaId() === areaId ? null : areaId);
   }
 
   onAreaListClick(areaId: string): void {
@@ -178,17 +205,18 @@ export class EditFloorModalComponent {
     const areas = this.editableAreas();
     const area = areas.find((a) => a.id === areaId);
     if (!area) return;
-
     if (area.isActive) {
       this.selectedAreaId.set(areaId);
       return;
     }
 
-    const newStatus = this.calculateStatusOnActivation(area);
     const index = areas.findIndex((a) => a.id === areaId);
     if (index !== -1) {
-      areas[index].isActive = true;
-      areas[index].status = newStatus;
+      areas[index] = {
+        ...areas[index],
+        isActive: true,
+        status: this.calculateStatusOnActivation(area),
+      };
       this.editableAreas.set([...areas]);
       this.saveDraft();
     }
@@ -198,19 +226,16 @@ export class EditFloorModalComponent {
     const areas = this.editableAreas();
     const index = areas.findIndex((a) => a.id === areaId);
     if (index !== -1) {
-      areas[index].isActive = false;
+      areas[index] = { ...areas[index], isActive: false };
       this.editableAreas.set([...areas]);
       this.saveDraft();
-      if (this.selectedAreaId() === areaId) {
-        this.selectedAreaId.set(null);
-      }
+      if (this.selectedAreaId() === areaId) this.selectedAreaId.set(null);
     }
   }
 
   private calculateStatusOnActivation(area: Area): AreaStatus {
     if (area.currentTenant) {
-      const leaseEnd = new Date(area.currentTenant.leaseEnd);
-      if (leaseEnd > new Date()) return 'leased';
+      if (new Date(area.currentTenant.leaseEnd) > new Date()) return 'leased';
     }
     if (area.monthlyRent && area.monthlyRent > 0) return 'vacant';
     return 'unallocated';
@@ -220,13 +245,14 @@ export class EditFloorModalComponent {
     const areas = this.editableAreas();
     const area = areas.find((a) => a.id === areaId);
     if (!area) return;
-
-    const newStatus = this.calculateStatusOnActivation(area);
     const index = areas.findIndex((a) => a.id === areaId);
     if (index !== -1) {
-      areas[index].isActive = true;
-      areas[index].status = newStatus;
-      areas[index].position = { x: 50, y: 50 };
+      areas[index] = {
+        ...areas[index],
+        isActive: true,
+        status: this.calculateStatusOnActivation(area),
+        position: { x: 50, y: 50 },
+      };
       this.editableAreas.set([...areas]);
       this.selectedAreaId.set(areaId);
       this.saveDraft();
@@ -240,16 +266,16 @@ export class EditFloorModalComponent {
     const areas = this.editableAreas();
     const area = areas.find((a) => a.id === event.areaId);
     if (!area) return;
-
-    const newStatus = area.isActive
-      ? area.status
-      : this.calculateStatusOnActivation(area);
-
     const index = areas.findIndex((a) => a.id === event.areaId);
     if (index !== -1) {
-      areas[index].isActive = true;
-      areas[index].status = newStatus;
-      areas[index].position = event.position;
+      areas[index] = {
+        ...areas[index],
+        isActive: true,
+        status: area.isActive
+          ? area.status
+          : this.calculateStatusOnActivation(area),
+        position: { ...event.position },
+      };
       this.editableAreas.set([...areas]);
       this.selectedAreaId.set(event.areaId);
       this.saveDraft();
@@ -259,23 +285,18 @@ export class EditFloorModalComponent {
   onCursorOverMap(isOverMap: boolean): void {
     this.markerListPanel()?.setIsOverMap(isOverMap);
   }
-
   onMarkerDragStarted(areaId: string): void {
     this.markerListPanel()?.setDraggingFromMap(true);
   }
-
   onMarkerDragEnded(): void {
     this.markerListPanel()?.setDraggingFromMap(false);
   }
-
   onMarkerDraggedOutside(areaId: string): void {
     this.onDragAreaToInactive(areaId);
   }
-
   onUploadPlan(file: File): void {
     console.log('Upload plan:', file.name);
   }
-
   onAddAreaClicked(): void {
     this.showAddAreaWizard.set(true);
   }
@@ -283,9 +304,7 @@ export class EditFloorModalComponent {
   onAddAreaWizardClose(newArea?: Area): void {
     this.showAddAreaWizard.set(false);
     if (newArea) {
-      const areas = this.editableAreas();
-      areas.push(newArea);
-      this.editableAreas.set([...areas]);
+      this.editableAreas.set([...this.editableAreas(), newArea]);
       this.saveDraft();
     }
   }
@@ -312,6 +331,9 @@ export class EditFloorModalComponent {
   }
 
   onSave(): void {
+    // ✅ Apply ลง service จริงๆ
+    this.applyChangesToService();
+
     const changes = this.getChanges();
     this.saved.emit(changes);
     this.clearDraft();

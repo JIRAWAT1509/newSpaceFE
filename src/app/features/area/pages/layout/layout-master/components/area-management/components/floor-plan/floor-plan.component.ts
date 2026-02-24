@@ -1,6 +1,15 @@
 /* floor-plan.component.ts */
 
-import { Component, OnInit, input, output, signal, computed, effect, viewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  input,
+  output,
+  signal,
+  computed,
+  effect,
+  viewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
@@ -156,23 +165,40 @@ export class FloorPlanComponent implements OnInit {
     const area = this.areas().find((a) => a.id === areaId);
     if (!area) return;
 
-    this.zoomLevel.set(1.8);
+    const doZoom = () => {
+      const container = document.querySelector('.floor-plan-container');
+      const image = container?.querySelector(
+        '.floor-plan-image',
+      ) as HTMLImageElement | null;
+      if (!container || !image) return;
 
-    const container = document.querySelector('.floor-plan-container');
-    if (!container) return;
+      this.zoomLevel.set(1.8);
 
-    const containerRect = container.getBoundingClientRect();
-    const containerCenterX = containerRect.width / 2;
-    const containerCenterY = containerRect.height / 2;
+      const containerRect = container.getBoundingClientRect();
+      const containerCenterX = containerRect.width / 2;
+      const containerCenterY = containerRect.height / 2;
 
-    const imageSizeEstimate = 800;
-    const markerX = (area.position.x / 100) * imageSizeEstimate;
-    const markerY = (area.position.y / 100) * imageSizeEstimate;
+      const imageW = image.naturalWidth || image.offsetWidth;
+      const imageH = image.naturalHeight || image.offsetHeight;
 
-    this.panOffset.set({
-      x: containerCenterX - markerX,
-      y: containerCenterY - markerY,
-    });
+      const markerX = (area.position.x / 100) * imageW;
+      const markerY = (area.position.y / 100) * imageH;
+
+      this.panOffset.set({
+        x: containerCenterX - markerX,
+        y: containerCenterY - markerY,
+      });
+    };
+
+    const image = document.querySelector(
+      '.floor-plan-image',
+    ) as HTMLImageElement | null;
+    if (image && image.complete && image.naturalWidth > 0) {
+      doZoom();
+    } else if (image) {
+      // รอรูปโหลดเสร็จก่อน
+      image.onload = () => doZoom();
+    }
   }
 
   private getActionLabel(status: AreaStatus): string {
@@ -282,8 +308,7 @@ export class FloorPlanComponent implements OnInit {
     }
   }
 
-  onEditModalClose(): void {
-  }
+  onEditModalClose(): void {}
 
   onEditModalSave(changes: any): void {
     console.log('Saving changes:', changes);

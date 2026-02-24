@@ -1,3 +1,5 @@
+/* area-marker.component.css */
+
 .area-marker {
   @apply absolute;
   transform: translate(-50%, -100%);

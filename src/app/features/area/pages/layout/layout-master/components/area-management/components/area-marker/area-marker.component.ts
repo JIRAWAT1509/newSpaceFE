@@ -1,10 +1,20 @@
-import { Component, input, output, ElementRef, viewChild, effect, AfterViewInit, Input } from '@angular/core';
+/* area-marker.component.ts */
+
+import {
+  Component,
+  input,
+  output,
+  ElementRef,
+  viewChild,
+  effect,
+  Input,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Area } from '@core/models/area.model';
 
 export interface MarkerPosition {
-  x: number; // percentage 0-100
-  y: number; // percentage 0-100
+  x: number;
+  y: number;
 }
 
 export interface MarkerDragEvent {
@@ -17,7 +27,7 @@ export interface MarkerDragEvent {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './area-marker.component.html',
-  styleUrl: './area-marker.component.css'
+  styleUrl: './area-marker.component.css',
 })
 export class AreaMarkerComponent {
   area = input.required<Area>();
@@ -29,38 +39,21 @@ export class AreaMarkerComponent {
 
   markerDragged = output<MarkerDragEvent>();
   markerClicked = output<string>();
-  markerDragStart = output<string>(); // Native HTML5 drag start
-  markerDragEnd = output<void>(); // Native HTML5 drag end
-  markerDraggedOutside = output<string>(); // Emitted when dragged outside map and released
+  markerDragStart = output<string>();
+  markerDragEnd = output<void>();
+  markerDraggedOutside = output<string>();
 
   markerElement = viewChild<ElementRef>('markerElement');
 
   private isDragging = false;
-  private dragStartX = 0;
-  private dragStartY = 0;
-  private containerRect: DOMRect | null = null;
-  private clickStartPos = { x: 0, y: 0 }; // Track click position to detect drag vs click
-  private mousePosInContentDiv = { x: 0, y: 0 } // current mouse position of content div
-
-  constructor() {
-    effect(() => {
-      const area = this.area();
-      this.updateMarkerPosition();
-    });
-  }
+  private dragOffsetX = 0; // ✅ offset จาก center ของ marker ถึง cursor
+  private dragOffsetY = 0;
 
   getMarkerStyle(): any {
     const area = this.area();
     const hasWarning = area.currentTenant?.hasWarning || false;
     const statusColor = this.getStatusColor();
-
-    // Determine pulse color based on warning or status
-    let pulseColor = statusColor;
-    if (hasWarning) {
-      pulseColor = '#DC2626'; // Red for warnings
-    }
-
-    // Convert hex to RGB for CSS variables
+    let pulseColor = hasWarning ? '#DC2626' : statusColor;
     const rgb = this.hexToRgb(pulseColor);
 
     return {
@@ -70,28 +63,26 @@ export class AreaMarkerComponent {
       '--pulse-color-30': `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`,
       '--pulse-color-50': `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`,
       '--pulse-color-60': `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`,
-      '--pulse-color-70': `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)`
+      '--pulse-color-70': `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)`,
     };
   }
 
   private hexToRgb(hex: string): { r: number; g: number; b: number } {
-    // Remove # if present
     hex = hex.replace('#', '');
-
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-
-    return { r, g, b };
+    return {
+      r: parseInt(hex.substring(0, 2), 16),
+      g: parseInt(hex.substring(2, 4), 16),
+      b: parseInt(hex.substring(4, 6), 16),
+    };
   }
 
   getStatusColor(): string {
     const statusColors: { [key: string]: string } = {
-      'vacant': '#80E08E',
-      'leased': '#FFD05F',
-      'quotation': '#4CA3FF',
-      'unallocated': '#FF6384',
-      'inactive': '#9CA3AF'
+      vacant: '#80E08E',
+      leased: '#FFD05F',
+      quotation: '#4CA3FF',
+      unallocated: '#FF6384',
+      inactive: '#9CA3AF',
     };
     return statusColors[this.area().status] || '#9CA3AF';
   }
@@ -107,148 +98,126 @@ export class AreaMarkerComponent {
     }
   }
 
-
   onMouseDown(event: MouseEvent): void {
     if (!this.isDraggable()) return;
 
     event.preventDefault();
     event.stopPropagation();
 
-    this.isDragging = true;
-    this.clickStartPos = { x: event.clientX, y: event.clientY };
+    // ✅ คำนวณ offset จาก cursor ถึง anchor point ของ marker บน image
+    const floorImage = this.getFloorImage();
+    if (!floorImage) return;
 
-    const container = (event.target as HTMLElement).closest('.floor-plan-container');
-    if (container) {
-      this.containerRect = container.getBoundingClientRect();
-    }
+    const imageRect = floorImage.getBoundingClientRect();
+    const zoom = this.zoomLevel();
+
+    // ตำแหน่ง anchor (%) × ขนาด image จริง = pixel position บน image
+    const area = this.area();
+    const markerPxX = (area.position.x / 100) * imageRect.width;
+    const markerPxY = (area.position.y / 100) * imageRect.height;
+
+    // ตำแหน่ง cursor บน image (ยังไม่ zoom)
+    const cursorX = (event.clientX - imageRect.left) / zoom;
+    const cursorY = (event.clientY - imageRect.top) / zoom;
+
+    // ✅ offset = cursor - marker anchor → ใช้หักตอน drag
+    this.dragOffsetX = cursorX - markerPxX;
+    this.dragOffsetY = cursorY - markerPxY;
+
+    this.isDragging = false; // จะ set true เมื่อ move จริง
 
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
   }
 
   private onMouseMove = (event: MouseEvent): void => {
-    if (!this.isDragging || !this.containerRect) return;
-
     event.preventDefault();
+    this.isDragging = true;
 
-    // Get floor plan image element
-    const container = document.querySelector('.floor-plan-container');
-    const floorImage = container?.querySelector('.floor-plan-image') as HTMLImageElement;
-
+    const floorImage = this.getFloorImage();
     if (!floorImage) return;
 
     const imageRect = floorImage.getBoundingClientRect();
-    this.onMouseMoveInContentDiv(event);
+    const zoom = this.zoomLevel();
 
-    // Calculate raw mouse position relative to image
-    const zoomLevel = Number(this.zoomLevel().toFixed(1))
-    const rawMouseX = this.mousePosInContentDiv.x / zoomLevel; // event.clientX - imageRect.left;
-    const rawMouseY = this.mousePosInContentDiv.y / zoomLevel; //event.clientY - imageRect.top;
+    // cursor บน image space (unzoomed)
+    const cursorX = (event.clientX - imageRect.left) / zoom;
+    const cursorY = (event.clientY - imageRect.top) / zoom;
 
-    // Check if cursor is outside image bounds
-    const isOutsideImage =
-      rawMouseX < 0 ||
-      rawMouseX > imageRect.width ||
-      rawMouseY < 0 ||
-      rawMouseY > imageRect.height;
+    // ✅ หัก offset ออก ให้ marker ไม่กระโดด
+    const markerX = cursorX - this.dragOffsetX;
+    const markerY = cursorY - this.dragOffsetY;
 
-    if (isOutsideImage) {
-      // Don't update position while outside
-      return;
-    }
+    // Check bounds (image space)
+    const imageW = imageRect.width / zoom;
+    const imageH = imageRect.height / zoom;
+    const isOutside =
+      markerX < 0 || markerX > imageW || markerY < 0 || markerY > imageH;
 
-    // The marker has transform: translate(-50%, -100%)
-    // This means the marker's anchor point is at its bottom-center
-    // CSS positioning: marker's top-left corner is at (x%, y%)
-    // After transform: marker's bottom-center is at (x%, y%)
-
-    // To make cursor appear at the bottom-center of marker:
-    // We use raw mouse position directly as the position percentage
-    // The CSS transform will handle placing the marker correctly
+    if (isOutside) return;
 
     // Convert to percentage
-    let newX = (rawMouseX / imageRect.width) * 100
-    let newY = (rawMouseY / imageRect.height) * 100
-
-    // Clamp to valid range
-    newX = Math.max(5, Math.min(95, newX));
-    newY = Math.max(5, Math.min(95, newY));
+    const newX = Math.max(2, Math.min(98, (markerX / imageW) * 100));
+    const newY = Math.max(2, Math.min(98, (markerY / imageH) * 100));
 
     this.area().position.x = newX;
     this.area().position.y = newY;
-
-    this.updateMarkerPosition();
   };
 
   private onMouseUp = (event: MouseEvent): void => {
-    if (this.isDragging) {
-      event.preventDefault();
-      event.stopPropagation();
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseUp);
 
+    if (!this.isDragging) {
       this.isDragging = false;
-
-      // Check if released outside the map area
-      const container = document.querySelector('.floor-plan-container');
-      const floorImage = container?.querySelector('.floor-plan-image') as HTMLImageElement;
-
-      if (floorImage) {
-        const imageRect = floorImage.getBoundingClientRect();
-        const zoomLevel = Number(this.zoomLevel().toFixed(1))
-        const mouseX = this.mousePosInContentDiv.x / zoomLevel; // event.clientX - imageRect.left;
-        const mouseY = this.mousePosInContentDiv.y / zoomLevel; //event.clientY - imageRect.top;
-
-        const isOutsideImage =
-          mouseX < 0 ||
-          mouseX > imageRect.width ||
-          mouseY < 0 ||
-          mouseY > imageRect.height;
-
-        if (isOutsideImage) {
-          // Released outside map - deactivate
-          this.markerDraggedOutside.emit(this.area().id);
-          document.removeEventListener('mousemove', this.onMouseMove);
-          document.removeEventListener('mouseup', this.onMouseUp);
-          return;
-        }
-      }
-
-      // Released inside map - update position
-      this.markerDragged.emit({
-        areaId: this.area().id,
-        position: {
-          x: this.area().position.x,
-          y: this.area().position.y
-        }
-      });
-
-      document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('mouseup', this.onMouseUp);
+      return;
     }
+
+    const floorImage = this.getFloorImage();
+    if (floorImage) {
+      const imageRect = floorImage.getBoundingClientRect();
+      const zoom = this.zoomLevel();
+      const cursorX = (event.clientX - imageRect.left) / zoom;
+      const cursorY = (event.clientY - imageRect.top) / zoom;
+      const imageW = imageRect.width / zoom;
+      const imageH = imageRect.height / zoom;
+
+      const isOutside =
+        cursorX < 0 || cursorX > imageW || cursorY < 0 || cursorY > imageH;
+
+      if (isOutside) {
+        this.isDragging = false;
+        this.markerDraggedOutside.emit(this.area().id);
+        return;
+      }
+    }
+
+    this.markerDragged.emit({
+      areaId: this.area().id,
+      position: { x: this.area().position.x, y: this.area().position.y },
+    });
+
+    this.isDragging = false;
   };
 
-  private onMouseMoveInContentDiv = (event: MouseEvent): void => {
-    const rect = this.contentDiv?.getBoundingClientRect();
-    if (!rect) return;
-    this.mousePosInContentDiv.x = event.clientX - rect.left;
-    this.mousePosInContentDiv.y = event.clientY - rect.top;
+  private getFloorImage(): HTMLImageElement | null {
+    // ✅ หา image จาก contentDiv ที่ส่งมา หรือ query จาก DOM
+    if (this.contentDiv) {
+      return this.contentDiv.querySelector(
+        '.floor-plan-image',
+      ) as HTMLImageElement;
+    }
+    return document.querySelector('.floor-plan-image') as HTMLImageElement;
   }
 
-  private updateMarkerPosition(): void {
-    // Force Angular to detect changes
-  }
-
-  // Native HTML5 drag events (for dragging marker to panels)
   onDragStartNative(event: DragEvent): void {
     if (!this.isDraggable()) return;
-
     event.stopPropagation();
-
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
       event.dataTransfer.setData('areaId', this.area().id);
       event.dataTransfer.setData('source', 'marker');
     }
-
     this.markerDragStart.emit(this.area().id);
   }
 

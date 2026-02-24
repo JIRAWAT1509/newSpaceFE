@@ -1,10 +1,10 @@
-/* layout-master.component.css*/
 .layout-master-container {
-  @apply min-h-screen p-6 flex flex-col gap-6;
+  @apply p-4 flex flex-col gap-3;
   background: rgb(var(--bg));
+  /* ✅ ไม่ใช้ height: 100vh + overflow-y: auto อีกต่อไป */
+  /* ให้ parent (router/shell) จัดการ scroll แทน */
+  min-height: 100%;
 }
-
-/* Page header removed – no longer needed */
 
 .section {
   @apply rounded-xl border;
@@ -13,67 +13,32 @@
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
 
-/* Section 1: Area Availability - Full Width at Top */
-.section-availability {
-  @apply w-full;
-}
+.section-availability  { @apply w-full flex-shrink-0; }
+.section-filter-bar    { @apply w-full flex-shrink-0; }
 
-/* Filter Bar - Between Sections */
-.section-filter-bar {
-  @apply w-full;
-}
-
-/* Section 2: Area Management (Floor Plan + Area List) - Full Width */
 .section-area-management {
-  @apply w-full;
-  @apply min-h-[700px];
+  @apply w-full flex-shrink-0;
+  height: 85vh;
+  min-height: 300px;
 }
 
-/* Section 3: Floor/Area Data Display - Full Width */
+/* ✅ section ล่างต้องไม่มี max-height หรือ overflow hidden */
 .section-data-display {
-  @apply w-full;
-  @apply min-h-[400px];
+  @apply w-full flex-shrink-0;
+  /* ไม่กำหนด height — ให้ content กำหนดเอง */
 }
 
-/* Responsive Design */
 @media (max-width: 1280px) {
-  .section-area-management {
-    @apply min-h-[600px];
-  }
-
-  .section-data-display {
-    @apply min-h-[350px];
-  }
+  .section-area-management { height: 60vh; }
 }
 
 @media (max-width: 768px) {
-  .layout-master-container {
-    @apply p-4 gap-4;
-  }
-
-  .section-area-management {
-    @apply min-h-[500px];
-  }
-
-  .section-data-display {
-    @apply min-h-[300px];
-  }
+  .layout-master-container { @apply p-3 gap-2; }
+  .section-area-management { height: 70vh; min-height: 350px; }
 }
 
 @media (max-width: 480px) {
-  .layout-master-container {
-    @apply p-2 gap-2;
-  }
-
-  .section {
-    @apply rounded-lg;
-  }
-
-  .section-area-management {
-    @apply min-h-[350px];
-  }
-
-  .section-data-display {
-    @apply min-h-[200px];
-  }
+  .layout-master-container { @apply p-2 gap-2; }
+  .section { @apply rounded-lg; }
+  .section-area-management { height: 75vh; min-height: 280px; }
 }

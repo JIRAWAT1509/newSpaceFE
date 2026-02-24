@@ -31,7 +31,6 @@ export type ViewMode = 'normal' | 'pre-rent';
   providedIn: 'root'
 })
 export class AreaDataService {
-  // ✅ โหลด buildings ทั้งหมดตั้งแต่แรก
   private buildingsData = signal<BuildingWithFloors[]>(getAllBuildingsData());
   private currentBuildingId = signal<string>(getAllBuildingsData()[0].id);
   private currentMode = signal<ViewMode>('normal');
@@ -45,23 +44,47 @@ export class AreaDataService {
   readonly currentFloorId = this.selectedFloorId.asReadonly();
 
   // ✅ building ปัจจุบัน computed จาก currentBuildingId
-  readonly building = computed(() => {
-    return this.buildingsData().find(b => b.id === this.currentBuildingId())
-      ?? this.buildingsData()[0];
+  readonly building = computed(() =>
+    this.buildingsData().find(b => b.id === this.currentBuildingId())
+    ?? this.buildingsData()[0]
+  );
+
+  // ✅ floors ของ building ปัจจุบัน — reactive
+  readonly floors = computed(() => this.building()?.floors ?? []);
+
+  // ✅ floor ปัจจุบัน — reactive
+  readonly currentFloor = computed(() => {
+    const floorId = this.selectedFloorId();
+    if (!floorId) return null;
+    return this.floors().find(f => f.id === floorId) ?? null;
+  });
+
+  // ✅ status distribution ระดับ building — reactive
+  readonly buildingStatusDistribution = computed(() =>
+    this._calcBuildingStatusDistribution()
+  );
+
+  // ✅ status distribution ระดับ floor ปัจจุบัน — reactive
+  readonly currentFloorStatusDistribution = computed(() => {
+    const floor = this.currentFloor();
+    if (!floor) return [];
+    return this._calcFloorStatusDistribution(floor);
   });
 
   constructor() {
     console.log('AreaDataService initialized');
     console.log('All buildings:', this.buildingsData());
 
-    // Set initial floor to first floor of first building
     const building = this.building();
     if (building?.floors?.length > 0) {
       this.selectedFloorId.set(building.floors[0].id);
     }
   }
 
-  // ✅ เพิ่ม building ใหม่
+  // ============================================================
+  // Setters
+  // ============================================================
+
   addBuilding(building: Building): void {
     const newBuilding: BuildingWithFloors = { ...building, floors: [] };
     this.buildingsData.update(list => [...list, newBuilding]);
@@ -69,7 +92,6 @@ export class AreaDataService {
     this.selectedFloorId.set(null);
   }
 
-  // ✅ switch building + auto-switch to first floor
   setCurrentBuilding(buildingId: string): void {
     this.currentBuildingId.set(buildingId);
     const building = this.buildingsData().find(b => b.id === buildingId);
@@ -81,10 +103,12 @@ export class AreaDataService {
     this.selectedFloorId.set(floorId);
   }
 
-  getCurrentFloor(): FloorWithAreas | null {
-    const floorId = this.selectedFloorId();
-    if (!floorId) return null;
-    return this.getFloorById(floorId);
+  setMode(mode: ViewMode): void {
+    this.currentMode.set(mode);
+  }
+
+  setTargetDate(date: Date): void {
+    this.targetDate.set(date);
   }
 
   addFloor(floor: Floor): void {
@@ -98,22 +122,68 @@ export class AreaDataService {
     );
   }
 
-  setMode(mode: ViewMode): void {
-    this.currentMode.set(mode);
+  updateArea(updatedArea: Area): void {
+    this.buildingsData.update(buildings =>
+      buildings.map(building =>
+        building.id === this.currentBuildingId()
+          ? {
+              ...building,
+              floors: building.floors.map(floor =>
+                floor.id === updatedArea.floorId
+                  ? {
+                      ...floor,
+                      areas: floor.areas.map(area =>
+                        area.id === updatedArea.id ? updatedArea : area
+                      )
+                    }
+                  : floor
+              )
+            }
+          : building
+      )
+    );
   }
 
-  setTargetDate(date: Date): void {
-    this.targetDate.set(date);
+  // ============================================================
+  // Non-reactive helpers (ยังเก็บไว้ backward compat)
+  // ============================================================
+
+  /** @deprecated ใช้ computed `floors` แทน */
+  getFloors(): FloorWithAreas[] {
+    return this.floors();
   }
+
+  /** @deprecated ใช้ computed `currentFloor` แทน */
+  getFloorById(floorId: string): FloorWithAreas | null {
+    return this.floors().find(f => f.id === floorId) ?? null;
+  }
+
+  /** @deprecated ใช้ computed `currentFloor` แทน */
+  getCurrentFloor(): FloorWithAreas | null {
+    return this.currentFloor();
+  }
+
+  /** @deprecated ใช้ computed `currentFloorStatusDistribution` แทน */
+  getStatusDistribution(floor: FloorWithAreas): StatusDistribution[] {
+    return this._calcFloorStatusDistribution(floor);
+  }
+
+  /** @deprecated ใช้ computed `buildingStatusDistribution` แทน */
+  getBuildingStatusDistribution(): StatusDistribution[] {
+    return this._calcBuildingStatusDistribution();
+  }
+
+  // ============================================================
+  // Floor Plan Version
+  // ============================================================
 
   getVersionForDate(floor: Floor, date: Date): FloorPlanVersion | null {
     const targetTime = date.getTime();
-    const version = floor.floorPlanVersions.find(v => {
+    return floor.floorPlanVersions.find(v => {
       const validFromTime = v.validFrom.getTime();
       const validUntilTime = v.validUntil ? v.validUntil.getTime() : Infinity;
       return targetTime >= validFromTime && targetTime <= validUntilTime;
-    });
-    return version || null;
+    }) || null;
   }
 
   getLatestVersion(floor: Floor): FloorPlanVersion | null {
@@ -124,7 +194,7 @@ export class AreaDataService {
   }
 
   getAreasForVersion(floor: FloorWithAreas, versionId: string): Area[] {
-    if (!floor.areas || floor.areas.length === 0) return [];
+    if (!floor.areas?.length) return [];
     return floor.areas.filter(area =>
       area.floorPlanVersionId === versionId && !area.isDeleted
     );
@@ -140,9 +210,12 @@ export class AreaDataService {
     return this.getAreasForVersion(floor, version.id);
   }
 
+  // ============================================================
+  // Warnings / Inactive
+  // ============================================================
+
   private calculateDaysUntil(targetDate: Date, referenceDate: Date): number {
-    const timeDiff = targetDate.getTime() - referenceDate.getTime();
-    return Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    return Math.floor((targetDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24));
   }
 
   private hasContractWarning(area: Area, referenceDate: Date): boolean {
@@ -164,9 +237,8 @@ export class AreaDataService {
   private isCurrentlyInactive(area: Area, referenceDate: Date): boolean {
     if (!area.inactivePeriod) return false;
     const refTime = referenceDate.getTime();
-    const startTime = area.inactivePeriod.startDate.getTime();
-    const endTime = area.inactivePeriod.endDate.getTime();
-    return refTime >= startTime && refTime <= endTime;
+    return refTime >= area.inactivePeriod.startDate.getTime()
+      && refTime <= area.inactivePeriod.endDate.getTime();
   }
 
   updateInactiveStatus(areas: Area[], referenceDate: Date): void {
@@ -174,24 +246,19 @@ export class AreaDataService {
       if (area.inactivePeriod) {
         const isCurrentlyActive = this.isCurrentlyInactive(area, referenceDate);
         area.inactivePeriod.isCurrentlyActive = isCurrentlyActive;
-        if (isCurrentlyActive) {
-          area.isActive = false;
-        }
+        if (isCurrentlyActive) area.isActive = false;
       }
     });
   }
 
-  getStatusDistribution(floor: FloorWithAreas): StatusDistribution[] {
-    const referenceDate = this.targetDate();
-    const areas = this.getAreasForCurrentContext(floor);
-    this.updateContractWarnings(areas, referenceDate);
-    this.updateInactiveStatus(areas, referenceDate);
-    return this.calculateStatusDistribution(areas, referenceDate);
-  }
+  // ============================================================
+  // Private calculation (ทั้งคู่อ่าน signal ผ่าน this.xxx()
+  // จึง reactive เมื่อถูกเรียกจาก computed())
+  // ============================================================
 
-  getBuildingStatusDistribution(): StatusDistribution[] {
-    const building = this.building();
-    const referenceDate = this.targetDate();
+  private _calcBuildingStatusDistribution(): StatusDistribution[] {
+    const building = this.building();        // reactive dependency
+    const referenceDate = this.targetDate(); // reactive dependency
     const allAreas: Area[] = [];
     building.floors.forEach(floor => {
       const areas = this.getAreasForCurrentContext(floor);
@@ -202,20 +269,24 @@ export class AreaDataService {
     return this.calculateStatusDistribution(allAreas, referenceDate);
   }
 
+  private _calcFloorStatusDistribution(floor: FloorWithAreas): StatusDistribution[] {
+    const referenceDate = this.targetDate(); // reactive dependency
+    const areas = this.getAreasForCurrentContext(floor);
+    this.updateContractWarnings(areas, referenceDate);
+    this.updateInactiveStatus(areas, referenceDate);
+    return this.calculateStatusDistribution(areas, referenceDate);
+  }
+
   private calculateStatusDistribution(areas: Area[], referenceDate: Date): StatusDistribution[] {
     const statusCounts = new Map<AreaStatus, { count: number; warningCount: number }>();
     const allStatuses: AreaStatus[] = ['vacant', 'leased', 'quotation', 'unallocated'];
-    allStatuses.forEach(status => {
-      statusCounts.set(status, { count: 0, warningCount: 0 });
-    });
+    allStatuses.forEach(status => statusCounts.set(status, { count: 0, warningCount: 0 }));
 
     areas.forEach(area => {
       if (!area.isActive) return;
       const current = statusCounts.get(area.status) || { count: 0, warningCount: 0 };
       current.count++;
-      if (this.hasContractWarning(area, referenceDate)) {
-        current.warningCount++;
-      }
+      if (this.hasContractWarning(area, referenceDate)) current.warningCount++;
       statusCounts.set(area.status, current);
     });
 
@@ -302,36 +373,4 @@ export class AreaDataService {
       }
     ];
   }
-
-updateArea(updatedArea: Area): void {
-  this.buildingsData.update(buildings =>
-    buildings.map(building =>
-      building.id === this.currentBuildingId()
-        ? {
-            ...building,
-            floors: building.floors.map(floor =>
-              floor.id === updatedArea.floorId
-                ? {
-                    ...floor,
-                    areas: floor.areas.map(area =>
-                      area.id === updatedArea.id ? updatedArea : area
-                    )
-                  }
-                : floor
-            )
-          }
-        : building
-    )
-  );
 }
-
-  getFloors(): FloorWithAreas[] {
-    return this.building()?.floors ?? [];
-  }
-
-  getFloorById(floorId: string): FloorWithAreas | null {
-    return this.getFloors().find(f => f.id === floorId) ?? null;
-  }
-}
-
-
