@@ -35,7 +35,7 @@ export class AreaListComponent {
   selectedSort = signal<'roomNumber' | 'status' | 'tenant'>('roomNumber');
   expandedAreaId = signal<string | null>(null);
   currentPage = signal<number>(1);
-  itemsPerPage = 6;
+  itemsPerPage = 10;
   showPageDropdown = false;
 
   sortOptions: SortOption[] = [

@@ -1,5 +1,3 @@
-/* edit-floor-modal.component.ts */
-
 import {
   Component,
   input,
@@ -150,7 +148,13 @@ export class EditFloorModalComponent {
 
     this.editableAreas().forEach((area) => {
       const original = this.originalAreas.find((a) => a.id === area.id);
-      if (!original) return;
+
+      // Area ใหม่ที่ไม่มีใน originalAreas → ถือว่ามีการเปลี่ยนแปลงเสมอ
+      if (!original) {
+        activeStates[area.id] = area.isActive;
+        positions[area.id] = { x: area.position.x, y: area.position.y };
+        return;
+      }
 
       if (
         area.position.x !== original.position.x ||
@@ -166,11 +170,15 @@ export class EditFloorModalComponent {
     return { floorId: floor.id, positions, activeStates };
   }
 
-  // ✅ Apply changes ลง service โดยตรง
   private applyChangesToService(): void {
     this.editableAreas().forEach((editedArea) => {
       const original = this.originalAreas.find((a) => a.id === editedArea.id);
-      if (!original) return;
+
+      // Area ใหม่ที่ไม่มีใน originalAreas → update เลย
+      if (!original) {
+        this.areaDataService.updateArea({ ...editedArea });
+        return;
+      }
 
       const positionChanged =
         editedArea.position.x !== original.position.x ||
@@ -331,9 +339,7 @@ export class EditFloorModalComponent {
   }
 
   onSave(): void {
-    // ✅ Apply ลง service จริงๆ
     this.applyChangesToService();
-
     const changes = this.getChanges();
     this.saved.emit(changes);
     this.clearDraft();
