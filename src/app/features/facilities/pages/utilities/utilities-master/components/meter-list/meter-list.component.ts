@@ -11,21 +11,21 @@ import { ConfirmationModalComponent } from '@shared/components/confirmation-moda
 /** Extended meter with building info + computed fields for the table */
 interface MeterTableRow {
   id: string;
-  meterName: string;       // ชื่อ meter
+  meterName: string;       // meter name
   meterNumber: string;
-  groupName: string;       // กลุ่ม meter
-  meterType: MeterType;    // ประเภท meter
+  groupName: string;       // meter group
+  meterType: MeterType;    // meter type
   meterTypeLabel: string;
   meterTypeColor: string;
   meterTypeIcon: string;
-  building: string;        // อาคาร
-  room: string;            // ห้อง
-  status: 'complete' | 'pending' | 'new'; // สถานะ
-  lastRecordedDate: string;  // วันที่จดบันทึก meter ล่าสุด
-  currentReading: number;    // ค่ามิเตอร์ปัจจุบัน
+  building: string;        // building
+  room: string;            // room
+  status: 'complete' | 'pending' | 'new'; // status
+  lastRecordedDate: string;  // last recorded date
+  currentReading: number;    // current reading
   previousReading: number;
   averageConsumption: number; // average consumption
-  currentCost: number;       // ค่าใช้จ่ายปัจจุบัน
+  currentCost: number;       // current cost
   unit: string;
   expectedMin: number;
   expectedMax: number;

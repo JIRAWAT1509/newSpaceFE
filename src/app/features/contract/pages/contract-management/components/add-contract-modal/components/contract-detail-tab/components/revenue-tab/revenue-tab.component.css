@@ -5,7 +5,7 @@
   transition: margin-right 0.25s ease;
 }
 
-/* เมื่อเปิด drawer เนื้อหาหลักไม่ล้ำไปใต้ drawer หัวข้อตารางไม่โดนบัง */
+/* Main content does not go under drawer; table header not covered */
 .revenue-wrapper.drawer-open {
   margin-right: 520px;
 }
@@ -90,7 +90,7 @@
   @apply rounded font-medium text-sm transition-colors;
 }
 
-/* ปุ่มลบใช้จาก global styles.css */
+/* Delete button from global */
 
 .btn-secondary {
   @apply px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700;

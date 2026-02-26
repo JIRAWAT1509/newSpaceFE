@@ -32,7 +32,7 @@
 
   <form [formGroup]="form()">
 
-    <!-- Section A: ข้อมูลอ้างอิงเอกสาร -->
+    <!-- Section A: Document reference -->
     <div class="form-section header-section" id="section-header">
       <h4 class="section-title">A. ข้อมูลอ้างอิงเอกสาร</h4>
       <div class="form-grid-2">
@@ -73,7 +73,7 @@
           }
         </div>
 
-        <!-- Row 2: ระบบเจน AUTO ให้ แก้ไขไม่ได้ (แสดงเป็นสีเทาจางให้ผู้ใช้ไม่ต้องสนใจ) -->
+        <!-- Row 2: Auto-generated, read-only (dimmed) -->
         <div class="form-group auto-field-group">
           <label>เลขที่ใบเสนอราคา (น.หลัก)</label>
           <input
@@ -161,7 +161,7 @@
       </div>
     </div>
 
-    <!-- Section B: ข้อมูลสินค้า/บริการ (ต้นทาง) -->
+    <!-- Section B: Products/Services (source) -->
     <div class="form-section subsection" id="section-products">
       <h4 class="section-title">B. ข้อมูลสินค้า/บริการ (ต้นทาง)</h4>
 
@@ -257,7 +257,7 @@
       </div>
     </div>
 
-    <!-- Section C: ข้อมูลพื้นที่ (จากใบเสนอราคา) -->
+    <!-- Section C: Area (from quotation) -->
     <div class="form-section subsection" id="section-area">
       <h4 class="section-title">C. ข้อมูลพื้นที่ (จากใบเสนอราคา)</h4>
 
@@ -347,7 +347,7 @@
       </div>
     </div>
 
-    <!-- Section D: ข้อมูลผู้ติดต่อ -->
+    <!-- Section D: Contact -->
     <div class="form-section subsection" id="section-contact">
       <h4 class="section-title">D. ข้อมูลผู้ติดต่อ</h4>
 
@@ -417,4 +417,4 @@
   </div>
 }
 
-<!-- Decline Info Modal ถูกย้ายไปอยู่ที่ contract-table เพื่อเด้งตอนกดยกเลิกสัญญาแทน -->
+<!-- Decline Info Modal is shown from contract-table when cancelling -->

@@ -171,7 +171,7 @@
   @apply flex items-center justify-center gap-2;
 }
 
-/* ปุ่มแก้ไข/ลบใช้จาก global styles.css */
+/* Edit/delete buttons from global */
 .action-btn {
   @apply flex items-center justify-center border-none cursor-pointer transition-all duration-150;
 }

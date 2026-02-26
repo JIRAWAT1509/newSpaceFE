@@ -534,7 +534,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         labels: this.revenueLabels,
         datasets: [
-          // Bars: Budget (ซ้าย)
+          // Bars: Budget (left)
           {
             type: 'bar',
             label: 'Budget',
@@ -546,7 +546,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             order: 3,
             yAxisID: 'y',
           } as any,
-          // Bars: Actual (ขวา, null months render no bar)
+          // Bars: Actual (right; null months = no bar)
           {
             type: 'bar',
             label: 'Actual',

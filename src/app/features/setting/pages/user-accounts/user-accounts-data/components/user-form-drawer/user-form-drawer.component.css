@@ -1,18 +1,18 @@
 /* user-form-drawer.component.css */
 
-/* Drawer layout: header + scrollable body + footer (ไม่ให้เนื้อหาหรือปุ่มโดนบัง) */
+/* Drawer layout: header + scrollable body + footer */
 .drawer-panel {
   overflow: hidden;
 }
 
 .drawer-body {
   -webkit-overflow-scrolling: touch;
-  /* ขยับเนื้อหาลง ให้หัวข้อ Basic Information ไม่ชิด header */
+  /* Offset content so header not flush */
   padding-top: 2rem;
   padding-bottom: 0.5rem;
 }
 
-/* หัวฟอร์ม บนสุดของเนื้อหา */
+/* Form heading at top of content */
 .form-heading-title {
   font-size: 1.125rem;
   font-weight: 700;
@@ -92,7 +92,7 @@
   box-shadow: 0 0 0 2px #ef4444 !important;
 }
 
-/* Branch Access Control - แถวเดียวต่อสาขา + ปุ่มขนาดเล็กลง */
+/* Branch Access Control - one row per branch */
 .branch-row-single {
   display: flex;
   flex-wrap: wrap;
@@ -149,7 +149,7 @@
   accent-color: #3b82f6;
 }
 
-/* Branch Access Control - ปุ่มลบ (ถังขยะ) และปุ่มเพิ่มสาขา - ขนาดเล็กลง */
+/* Branch delete and add buttons - smaller */
 .btn-branch-action {
   display: inline-flex;
   align-items: center;
@@ -171,7 +171,7 @@
   transform: scale(0.97);
 }
 
-/* ปุ่มลบแถว - ไอคอนถังขยะ ขนาดเล็กลง */
+/* Row delete button - trash icon smaller */
 .btn-branch-remove {
   width: 1.75rem;
   height: 1.75rem;
@@ -189,7 +189,7 @@
   font-size: 0.8125rem;
 }
 
-/* ปุ่มเพิ่มสาขา - ขนาดเล็กลง */
+/* Add branch button - smaller */
 .btn-branch-add {
   padding: 0.25rem 0.5rem;
   height: 1.75rem;

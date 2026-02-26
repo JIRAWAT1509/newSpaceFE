@@ -207,14 +207,14 @@ export class GeneralDetailTabComponent implements OnInit {
           { label: 'เครื่องใช้ไฟฟ้า', value: 'CAT002' },
         ];
       case 'areaBuilding': {
-        // ✅ ดึง buildings list ทั้งหมด ไม่ใช่แค่ building เดียว
+        // Fetch all buildings
         return this.areaDataService.buildings().map((b) => ({
           label: `${b.nameTh} (${b.code})`,
           value: b.id,
         }));
       }
       case 'areaFloor': {
-        // ดึงชั้นตาม building จาก AreaDataService
+        // Floors from AreaDataService by building
         const floors = this.areaDataService.getFloors();
         return floors.map((floor) => ({
           label:
@@ -225,7 +225,7 @@ export class GeneralDetailTabComponent implements OnInit {
         }));
       }
       case 'areaUnitNumber': {
-        // ดึงห้องจาก AreaDataService ตามชั้นที่เลือก
+        // Areas from AreaDataService for selected floor
         const floorId = this.selectedFloorId();
         if (!floorId) return [];
         const floor = this.areaDataService.getFloorById(floorId);
@@ -249,7 +249,7 @@ export class GeneralDetailTabComponent implements OnInit {
     }
   }
 
-  /** แปลง area type เป็นชื่อไทย */
+  /** Map area type for display */
   private mapAreaType(type: string): string {
     const types: Record<string, string> = {
       'open-plan': 'Open Plan',
@@ -259,7 +259,7 @@ export class GeneralDetailTabComponent implements OnInit {
     return types[type] || type;
   }
 
-  /** แปลง area status เป็นชื่อไทย */
+  /** Map area status for display */
   private mapAreaStatus(status: string): string {
     const statuses: Record<string, string> = {
       leased: 'เช่าอยู่',
@@ -303,7 +303,7 @@ export class GeneralDetailTabComponent implements OnInit {
     const control = this.form().get(field);
 
     if (field === 'areaUnitNumber') {
-      // เมื่อเลือกห้อง → auto-fill ข้อมูลจาก AreaDataService
+      // On unit selected: auto-fill from AreaDataService
       const floorId = this.selectedFloorId();
       const floor = floorId ? this.areaDataService.getFloorById(floorId) : null;
       const areas = floor
@@ -315,21 +315,21 @@ export class GeneralDetailTabComponent implements OnInit {
         control.setValue(selectedArea.roomNumber);
         control.markAsTouched();
 
-        // Auto-fill พื้นที่รวม
+        // Auto-fill total area
         const areaTotalControl = this.form().get('areaTotal');
         if (areaTotalControl) {
           areaTotalControl.setValue(selectedArea.size);
           areaTotalControl.markAsTouched();
         }
 
-        // Auto-fill ประเภทพื้นที่
+        // Auto-fill area type
         const areaTypeControl = this.form().get('areaType');
         if (areaTypeControl) {
           areaTypeControl.setValue(this.mapAreaType(selectedArea.type));
           areaTypeControl.markAsTouched();
         }
 
-        // Auto-fill ค่าเช่า/เดือน (จาก monthlyRent หรือ currentTenant.monthlyRent)
+        // Auto-fill monthly rent
         const rentControl = this.form().get('areaMonthlyRent');
         if (rentControl) {
           const rent =
@@ -341,7 +341,7 @@ export class GeneralDetailTabComponent implements OnInit {
         }
       }
     } else if (field === 'areaBuilding') {
-      // เมื่อเลือก building → set label, track ID, and clear dependent fields
+      // On building selected: set label, track ID, clear dependents
       this.selectedBuildingId.set(item.value);
       if (control) {
         control.setValue(item.label);
@@ -360,7 +360,7 @@ export class GeneralDetailTabComponent implements OnInit {
       if (typeControl) typeControl.setValue('');
       if (rentControl) rentControl.setValue('');
     } else if (field === 'areaFloor') {
-      // เมื่อเลือก floor → set label, track ID, and clear unit
+      // On floor selected: set label, track ID, clear unit
       this.selectedFloorId.set(item.value);
       if (control) {
         control.setValue(item.label);
@@ -413,7 +413,7 @@ export class GeneralDetailTabComponent implements OnInit {
     this.showDeclineModal.set(false);
   }
 
-  /** อนุญาตเฉพาะตัวเลขในช่องเบอร์โทร */
+  /** Allow digits only in phone field */
   onPhoneInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/[^0-9]/g, '');

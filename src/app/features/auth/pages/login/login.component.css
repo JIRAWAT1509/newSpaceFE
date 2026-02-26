@@ -1,4 +1,5 @@
-/* ========== Login — Modern glass card + mesh background ========== */
+/* ========== Login ========== */
+
 .auth-page {
   min-height: 100vh;
   min-height: 100dvh;
@@ -19,23 +20,23 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 120% 80% at 20% 20%, rgba(22, 119, 255, 0.4) 0%, transparent 50%),
-    radial-gradient(ellipse 100% 100% at 80% 60%, rgba(56, 189, 248, 0.35) 0%, transparent 50%),
-    linear-gradient(180deg, #0f172a 0%, #1e293b 40%, #0f172a 100%);
+    radial-gradient(ellipse 120% 80% at 20% 20%, rgba(59, 130, 246, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 100% at 80% 60%, rgba(56, 189, 248, 0.2) 0%, transparent 50%),
+    linear-gradient(180deg, #f8fafc 0%, #e0e7ff 35%, #f1f5f9 70%, #f8fafc 100%);
 }
 
 .auth-bg-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.4;
+  opacity: 0.35;
   animation: auth-orb 20s ease-in-out infinite;
 }
 
 .auth-bg-orb-1 {
   width: 400px;
   height: 400px;
-  background: rgb(var(--primary));
+  background: rgba(59, 130, 246, 0.5);
   top: -100px;
   right: 10%;
 }
@@ -43,7 +44,7 @@
 .auth-bg-orb-2 {
   width: 320px;
   height: 320px;
-  background: rgb(var(--secondary));
+  background: rgba(99, 102, 241, 0.4);
   bottom: 10%;
   left: -80px;
   animation-delay: -7s;
@@ -52,24 +53,23 @@
 .auth-bg-orb-3 {
   width: 240px;
   height: 240px;
-  background: rgba(56, 189, 248, 0.6);
+  background: rgba(56, 189, 248, 0.4);
   bottom: 30%;
   right: 20%;
   animation-delay: -14s;
 }
 
 @keyframes auth-orb {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-  50% { transform: translate(20px, -20px) scale(1.1); opacity: 0.5; }
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.35; }
+  50% { transform: translate(20px, -20px) scale(1.1); opacity: 0.45; }
 }
 
-.auth-bg-grid {
+.auth-bg-dots {
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
+  background-image: radial-gradient(circle at center, rgba(30, 58, 138, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.9;
 }
 
 .auth-container {
@@ -90,12 +90,12 @@
   min-height: 540px;
   border-radius: 24px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(24px);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.2),
-    0 25px 50px -12px rgba(0, 0, 0, 0.4),
-    0 0 80px -20px rgba(22, 119, 255, 0.3);
+    0 0 0 1px rgba(255, 255, 255, 0.8),
+    0 25px 50px -12px rgba(30, 58, 138, 0.12),
+    0 0 60px -15px rgba(59, 130, 246, 0.15);
   animation: auth-card-in 0.6s ease-out;
 }
 
@@ -117,7 +117,6 @@
   }
 }
 
-/* ----- Brand panel ----- */
 .auth-card-brand {
   display: none;
   background: linear-gradient(165deg, rgb(var(--primary)) 0%, #1d4ed8 50%, rgb(var(--secondary)) 100%);
@@ -149,14 +148,6 @@
   z-index: 1;
 }
 
-.auth-brand-line {
-  width: 40px;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 2px;
-  margin-bottom: 1.5rem;
-}
-
 .auth-card-brand .auth-brand-logo {
   display: block;
   font-size: 48px !important;
@@ -178,7 +169,6 @@
   line-height: 1.4;
 }
 
-/* ----- Form panel ----- */
 .auth-card-form {
   padding: 2.5rem 2rem;
   display: flex;

@@ -186,7 +186,7 @@
     width: 100%;
   }
 }
-/* หน้าจอบันทึกข้อมูล: บังคับพื้นหลังขาวและตัวอักษรเข้ม ไม่ให้ดำ (Defect fix) */
+/* Form save view: force white bg and dark text (defect fix) */
 .basic-form-wrapper {
   border: 1px solid #e5e7eb;
   border-radius: 12px;

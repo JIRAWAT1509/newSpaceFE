@@ -13,7 +13,7 @@
     </button>
   </div>
 
-  <!-- Sub-Tab Content: ใช้ [hidden] แทน @if เพื่อให้ฟอร์มอยู่ใน DOM เสมอ (ใช้เก็บค่าตอนกดถัดไป) -->
+  <!-- Sub-tabs: [hidden] so form stays in DOM when switching -->
   <div class="sub-tab-content">
     <div [hidden]="activeSubTabIndex() !== 0">
       <app-contract-info-tab #contractInfoTab />

@@ -2,7 +2,7 @@
   @apply space-y-2 sm:space-y-4;
 }
 
-/* พื้นขาว + การ์ดขาวกับไอคอนสี (แบบ facilities/utilities/master) */
+/* Stats cards: white bg + colored icon */
 .section-card {
   @apply rounded-xl border mb-2 sm:mb-4 p-3 sm:p-4;
   background: #ffffff !important;
@@ -23,7 +23,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-/* การ์ดพื้นขาว + ไอคอนสี (สีจาก [style.background] บน .stat-card-icon) */
+/* Stat card icon from [style.background] */
 .status-card {
   @apply relative flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl overflow-hidden;
   @apply cursor-pointer transition-all duration-200;
@@ -116,7 +116,7 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Responsive (ให้เท่ากับ Dashboard Overview - stats-overview) */
+/* Responsive: match Dashboard Overview */
 @media (max-width: 1280px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

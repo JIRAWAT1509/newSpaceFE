@@ -203,7 +203,7 @@
   transition: all 0.15s ease;
 }
 
-/* .btn-edit ใช้จาก global styles.css */
+/* .btn-edit from global styles */
 
 .btn-save {
   background: #10b98118;
@@ -334,7 +334,7 @@
   @apply flex items-center justify-center gap-2;
 }
 
-/* ปุ่มแก้ไข/ลบใช้จาก global styles.css */
+/* Edit/delete buttons from global */
 .action-btn {
   @apply flex items-center justify-center border-none cursor-pointer transition-all duration-150;
 }

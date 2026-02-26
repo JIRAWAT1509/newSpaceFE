@@ -1,4 +1,4 @@
-/* centralized-approval.component.css - ข้อมูลสัญญารออนุมัติ */
+/* centralized-approval.component.css */
 .approval-page {
   min-height: 100vh;
   padding: 1.5rem;
@@ -29,7 +29,7 @@
   color: rgb(var(--muted));
 }
 
-/* ==================== การ์ดเลือกช่วงวันที่ (เฉพาะหน้านี้) ==================== */
+/* Date range card */
 .daterange-card {
   display: flex;
   align-items: center;
@@ -97,7 +97,7 @@
   gap: 1rem;
 }
 
-/* ทุกฟิลเตอร์อยู่บรรทัดเดียวกัน */
+/* Filters on one row */
 .filters-row-single {
   display: flex;
   flex-wrap: wrap;
@@ -118,7 +118,7 @@
   padding-bottom: 0.5rem;
 }
 
-/* พื้นที่สูงเท่า label ของคอลัมน์อื่น เพื่อให้ checkbox อยู่แนวเดียวกับช่องเลือก */
+/* Checkbox row height align */
 .filters-row-single .filter-item.checkbox-wrap::before {
   content: '';
   display: block;
@@ -147,7 +147,7 @@
   margin-bottom: 0;
 }
 
-/* ปุ่มค้นหาอยู่แนวเดียวกับช่องเลือก */
+/* Search button align */
 .filters-row-single .filter-search-wrap::before {
   content: '';
   display: block;
@@ -279,7 +279,7 @@
   gap: 0.75rem;
 }
 
-/* แท็บเมื่ออยู่ด้านใน table card */
+/* Tabs inside table card */
 .tabs-row-inside {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid rgb(var(--border));
@@ -292,7 +292,7 @@
   border-color: rgb(var(--border));
 }
 
-/* ฟิลเตอร์อยู่ในตำแหน่งกลางการ์ด (จัดวางใหม่ให้สมดุล) */
+/* Filters centered in card */
 .filters-in-card {
   padding: 1rem 1.25rem;
   border-bottom: 1px solid rgb(var(--border));
@@ -396,7 +396,7 @@
   box-shadow: 0 1px 2px rgb(var(--shadow) / 0.05);
 }
 
-/* แท็บเมื่ออยู่แถวเดียวกับค้นหาเลขสัญญา */
+/* Tabs row with contract search */
 .tabs-wrap-in-toolbar {
   flex-shrink: 0;
   padding: 0.125rem;
@@ -575,7 +575,7 @@
   min-height: 200px;
 }
 
-/* พื้นที่ว่างเมื่อไม่มีข้อมูล - กล่องอยู่กึ่งกลางจอ */
+/* Empty state centered */
 .table-empty-state {
   flex: 1;
   min-height: 320px;
@@ -677,7 +677,7 @@
   text-align: center;
 }
 
-/* คอลัมน์ผู้อนุมัติ 1/2/3 แต่ละคอลัมน์มีปุ่มแอคชันของตัวเอง */
+/* Approver columns 1/2/3 */
 .th-approver {
   min-width: 140px;
   white-space: nowrap;
@@ -691,7 +691,7 @@
   padding: 0.5rem 0.75rem;
 }
 
-/* พื้นหลังแต่ละเซลล์ผู้อนุมัติ: อนุมัติแล้ว = เขียว, รออนุมัติ = เหลือง (เฉพาะคอลัมน์ผู้อนุมัติ) */
+/* Cell bg: approved=green, pending=yellow */
 .cell-approver-done {
   background: #dcfce7 !important;
 }
@@ -752,7 +752,7 @@
   font-size: 0.75rem;
 }
 
-/* เลิกใช้แล้ว (เก็บไว้เผื่อ reference) */
+/* Deprecated (kept for reference) */
 .th-actions {
   width: 1%;
   white-space: nowrap;
@@ -839,7 +839,7 @@
   pointer-events: none;
 }
 
-/* ป๊อปอัพเหตุผลส่งกลับ/ไม่อนุมัติ */
+/* Decline reason popup */
 ::ng-deep .approval-reason-dialog.p-dialog .p-dialog-header {
   padding: 1rem 1.25rem;
   font-weight: 600;
@@ -1020,7 +1020,7 @@
   text-align: center;
 }
 
-/* ==================== Drawer (รายละเอียด + อนุมัติ ในหน้าเดียว) ==================== */
+/* ==================== Drawer ==================== */
 .drawer-overlay {
   position: fixed;
   top: 0;

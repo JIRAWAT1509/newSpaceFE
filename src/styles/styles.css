@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --bg: 255 255 255; /* พื้นหลังทุกหน้าเป็นสีขาว */
+  --bg: 255 255 255;
   --fg: 15 23 42;
   --muted: 100 116 139;
   --border: 226 232 240;
@@ -35,11 +35,11 @@
 }
 
 [data-theme='dark'] {
-  --bg: 255 255 255; /* พื้นหลังทุกหน้าเป็นสีขาว */
+  --bg: 255 255 255;
   --fg: 226 232 240;
   --muted: 148 163 184;
   --border: 31 42 68;
-  --card: 255 255 255; /* การ์ดเป็นสีขาวเหมือนตัวอย่าง */
+  --card: 255 255 255;
   --input: 255 255 255;
   --primary: 59 130 246;
   --primary-fg: 226 232 240;
@@ -84,12 +84,12 @@ body {
   background-color: #ffffff;
 }
 
-/* ==================== หัวข้อใหญ่กว่าเนื้อหา (ทุกหน้า) ==================== */
+/* ==================== Typography ==================== */
 html {
   font-size: 14px;
 }
 
-/* เนื้อหา / body – 14px */
+/* Body text 14px */
 body, p, span, div, td, th, li, label, input, select, textarea, button, a,
 .p-datatable .p-datatable-thead th,
 .p-datatable .p-datatable-tbody td,
@@ -104,7 +104,7 @@ body, p, span, div, td, th, li, label, input, select, textarea, button, a,
   font-size: 14px !important;
 }
 
-/* หัวข้อระดับหน้า / กลุ่ม – ใหญ่กว่าเนื้อหา */
+/* Page/section headings */
 h1 {
   font-size: 22px !important;
   line-height: 1.3;
@@ -154,7 +154,7 @@ h4, h5, h6 {
   font-weight: 600;
 }
 
-/* ครอบคลุมทุก element ที่อาจตั้ง font-size ใน component (ทั้งระบบ) */
+/* Component font-size scope */
 body,
 body *,
 main,
@@ -166,13 +166,13 @@ main *,
   font-size: inherit;
 }
 
-/* พื้นที่เนื้อหาหลักทุกหน้าเป็นสีขาว */
+/* Main content area background */
 main {
   background-color: #ffffff !important;
 }
 
-/* ==================== RESPONSIVE – รองรับทุกหน้าจอ (โมบาย แท็บเล็ต เดสก์ท็อป) ==================== */
-/* Breakpoints ใช้ร่วมกับ Tailwind: xs 375, sm 640, md 768, lg 1024, xl 1280, 2xl 1536 */
+/* ==================== RESPONSIVE ==================== */
+/* Breakpoints (Tailwind) */
 
 :root {
   --bp-mobile: 639px;
@@ -195,7 +195,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Safe area สำหรับสมาร์ทโฟนมี notch / home indicator */
+/* Safe area for notch / home indicator */
 @supports (padding: env(safe-area-inset-top)) {
   body {
     padding-left: env(safe-area-inset-left);
@@ -203,7 +203,7 @@ body {
   }
 }
 
-/* คอนเทนเนอร์เนื้อหาทุกหน้า – โมบายแคบ แท็บ/เดสก์กว้าง */
+/* Content container width */
 .content-container {
   margin-left: auto;
   margin-right: auto;
@@ -224,7 +224,7 @@ body {
   }
 }
 
-/* ปุ่ม/ลิงก์ที่กดบนมือถือ – ขนาดสัมผัสไม่เล็กเกินไป */
+/* Touch target size on mobile */
 @media (max-width: 639px) {
   button:not(.icon-only),
   .p-button:not([class*="p-button-icon-only"]),
@@ -234,7 +234,7 @@ body {
   }
 }
 
-/* ตารางบนมือถือ – ให้เลื่อนแนวนอนได้ ไม่บีบเลย์เอาต์ */
+/* Table horizontal scroll on mobile */
 .table-scroll-mobile,
 .table-container {
   overflow-x: auto;
@@ -251,7 +251,7 @@ body {
   }
 }
 
-/* การ์ด/ฟอร์มทุกหน้า – โมบายเต็มความกว้าง */
+/* Cards/forms full width on mobile */
 @media (max-width: 639px) {
   .p-card,
   .p-panel,
@@ -264,7 +264,7 @@ body {
   }
 }
 
-/* Drawer/Modal บนมือถือ – เต็มจอหรือเกือบเต็ม */
+/* Drawer/Modal full screen on mobile */
 @media (max-width: 639px) {
   .drawer-panel {
     width: 100% !important;
@@ -278,7 +278,7 @@ body {
   }
 }
 
-/* Utility: บนมือถือเรียงแนวตั้ง บนแท็บ/เดสก์เรียงแนวนอน */
+/* Utility: stack on mobile, row on desktop */
 .responsive-stack-mobile {
   display: flex;
   flex-direction: column;
@@ -291,17 +291,17 @@ body {
   }
 }
 
-/* ==================== OVERLAY / DRAWER / MODAL: หัวข้อฟอร์มไม่ให้โดน header บัง (ทั้งระบบ) ==================== */
-/* App header ใช้ z-index 200 สูง ~96px; overlay ต้องอยู่เหนือและเนื้อหาอยู่ใต้ header */
+/* ==================== OVERLAY / DRAWER / MODAL ==================== */
+/* Header z-index and overlay */
 .drawer-overlay,
 .drawer-backdrop {
   z-index: 9998 !important;
 }
-/* Panel ต้องอยู่เหนือ overlay เสมอ เพื่อให้คลิกและพิมพ์ในฟอร์มได้ */
+/* Panel above overlay */
 .drawer-panel {
   z-index: 9999 !important;
 }
-/* Modal overlay (กล่องกลางจอ): ให้หัวข้ออยู่ใต้ header เสมอ */
+/* Modal overlay: content below header */
 .modal-overlay {
   z-index: 9998 !important;
   padding-top: 100px !important;
@@ -316,7 +316,7 @@ body {
   max-height: calc(100vh - 120px) !important;
   margin: 0 auto !important;
 }
-/* Drawer panel (ด้านข้าง): เริ่มจากใต้ header (100px) เพื่อไม่ให้หัวข้อโดนบัง */
+/* Drawer panel: start below header */
 @media (min-width: 768px) {
   .drawer-container,
   .drawer-panel {
@@ -326,7 +326,7 @@ body {
     max-height: calc(100vh - 100px) !important;
   }
 }
-/* โมบาย: drawer เต็มความกว้างจากด้านล่าง */
+/* Mobile: drawer full width from bottom */
 @media (max-width: 639px) {
   .modal-overlay {
     padding-top: 0.5rem !important;
@@ -348,14 +348,14 @@ html[data-icon-style='outline'] .pi {
   font-weight: 400;
 }
 
-/* ==================== STANDARD ACTION ICON BUTTONS (ทั้งระบบ: ขนาดและสีเดียวกัน) ==================== */
+/* ==================== STANDARD ACTION ICON BUTTONS ==================== */
 /*
- * ปุ่มแก้ไข (ดินสอ): 34x34px, สีเทาเข้ม #374151, พื้นหลังโปร่ง, ไอคอน 1rem
- * ปุ่มลบ (ถัง): 34x34px, พื้นหลังแดง #E8847C, ไอคอนขาว, ไอคอน 1rem
- * ใช้ !important เพื่อให้ชนะ component styles ทุกจุด
+ * Edit button: 34x34px, #374151, transparent bg, 1rem icon
+ * Delete button: 34x34px, #E8847C bg, white icon
+ * !important to override component styles
  */
 
-/* ---- ปุ่มแก้ไข (ทุก class ที่ใช้ในระบบ) ---- */
+/* Edit button (all usages) */
 .sp-edit-btn,
 .action-btn-edit,
 .action-btn.edit,
@@ -428,7 +428,7 @@ html[data-icon-style='outline'] .pi {
   font-size: 1rem !important;
 }
 
-/* ---- ปุ่มลบ (ทุก class ที่ใช้ในระบบ) ---- */
+/* Delete button (all usages) */
 .sp-delete-btn,
 .action-btn-delete,
 .action-btn.delete,
@@ -503,7 +503,7 @@ html[data-icon-style='outline'] .pi {
   font-size: 1rem !important;
 }
 
-/* ---- คู่ปุ่มแก้ไข+ลบ (ช่องว่างเท่ากัน) ---- */
+/* Edit + Delete button pair spacing */
 .sp-action-icons {
   display: inline-flex;
   align-items: center;

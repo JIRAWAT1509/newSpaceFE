@@ -54,7 +54,7 @@
   text-align: right;
 }
 
-/* Scrollable container – โมบายเลื่อนแนวนอนได้ */
+/* Scrollable container - horizontal on mobile */
 .table-container {
   overflow-y: auto;
   overflow-x: auto;

@@ -1,7 +1,7 @@
 /* add-contract-modal.component.css */
 
 /* ==================== Modal Backdrop ==================== */
-/* อยู่เหนือ header (z-index 9998) และเริ่มใต้ header (padding-top 100px) */
+/* Above header, start below header */
 .modal-backdrop {
   @apply fixed inset-0 bg-black bg-opacity-50 flex justify-center p-4;
   padding-top: 100px !important;

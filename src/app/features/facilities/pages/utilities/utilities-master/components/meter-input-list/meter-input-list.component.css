@@ -4,7 +4,7 @@
   @apply space-y-8;
 }
 
-/* ==================== DASHBOARD OVERVIEW (พื้นขาว + การ์ด KPI ขาวกับไอคอนสี แบบ facilities/utilities/master) ==================== */
+/* ==================== DASHBOARD OVERVIEW ==================== */
 .section-card {
   @apply rounded-xl border p-4 mb-4;
   background: #ffffff !important;
@@ -67,7 +67,7 @@
   color: #111827;
 }
 
-/* การ์ดพื้นขาว + ไอคอนสี */
+
 .stat-card--primary {
   background: #ffffff !important;
   border-color: rgb(var(--primary) / 0.3);
@@ -159,7 +159,7 @@
   min-width: 0;
 }
 
-/* ให้ title ทั้งสองฝั่งอยู่ระดับเดียวกัน และ controls อยู่ระดับเดียวกัน */
+/* Align titles and controls on both sides */
 .filter-group-col .filter-title,
 .filter-type-col .filter-title {
   height: 20px;

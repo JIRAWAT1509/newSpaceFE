@@ -26,7 +26,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   meter = input.required<Meter>();
   isExpanded = input<boolean>(false); // Controlled by parent
   isCompleted = input<boolean>(false); // For meter list view
-  /** เมื่อ true แสดงเป็นแถวเดียว มีช่องกรอกและปุ่มบันทึกให้กรอกได้เลยโดยไม่ต้องขยาย */
+  /** When true: single row with input + save, no expand */
   inlineMode = input<boolean>(false);
 
   // Outputs
@@ -44,7 +44,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   isWarning = signal<boolean>(false);
   warningMessage = signal<string>('');
   isEditing = signal<boolean>(false);
-  /** สำหรับโหมด inline ของ completed meters - คลิกแก้ไขเพื่อเปิดฟอร์ม */
+  /** Inline edit mode for completed meters - click edit to open form */
   isInlineEditing = signal<boolean>(false);
 
   // Confirmation modal state (for out-of-range readings)
@@ -235,7 +235,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     }
 
     if (this.isOutOfRange()) {
-      // อนุญาตให้บันทึกได้ แต่แสดงคำเตือน
+      // Allow save but show warning
       this.hasError.set(false);
       this.errorMessage.set('');
       this.isWarning.set(true);
@@ -260,7 +260,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     const reading = this.currentReading();
     if (!reading) return;
 
-    // ถ้าเกิน expected range → แสดง confirm popup
+    // If outside expected range → show confirm popup
     if (this.isOutOfRange()) {
       this.showRangeConfirmation('normal', event);
       return;
@@ -269,7 +269,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     this.doSave();
   }
 
-  /** บันทึกจริง (หลังผ่าน validation/confirmation แล้ว) */
+  /** Persist save after validation/confirmation */
   private doSave(): void {
     const reading = this.currentReading();
     if (!reading) return;
@@ -297,7 +297,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
   onInputChange(): void {
     this.hasError.set(false);
     this.errorMessage.set('');
-    // รีเซ็ตคำเตือนเมื่อแก้ไขค่า
+    // Reset warning when value changes
     this.isWarning.set(false);
     this.warningMessage.set('');
   }
@@ -324,7 +324,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     const reading = this.currentReading();
     if (!reading) return;
 
-    // ถ้าเกิน expected range → แสดง confirm popup
+    // If outside expected range → show confirm popup
     if (this.isOutOfRange()) {
       this.showRangeConfirmation('edit', event);
       return;
@@ -333,7 +333,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     this.doSaveEdit();
   }
 
-  /** บันทึกแก้ไขจริง */
+  /** Persist edit save */
   private doSaveEdit(): void {
     const reading = this.currentReading();
     if (!reading) return;
@@ -349,15 +349,15 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
 
   // ==================== INLINE EDIT MODE (for completed meters) ====================
 
-  /** เปิดโหมดแก้ไขในการ์ด inline */
+  /** Open edit mode on inline card */
   onInlineEdit(event: Event): void {
     event.stopPropagation();
     this.isInlineEditing.set(true);
-    // ตั้งค่าเริ่มต้นเป็นค่าปัจจุบัน
+    // Init with current value
     this.currentReading.set(this.meter().currentReading);
   }
 
-  /** ยกเลิกแก้ไขในโหมด inline */
+  /** Cancel inline edit */
   onCancelInlineEdit(event: Event): void {
     event.stopPropagation();
     this.isInlineEditing.set(false);
@@ -368,7 +368,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     this.warningMessage.set('');
   }
 
-  /** บันทึกการแก้ไขในโหมด inline */
+  /** Save inline edit */
   onSaveInlineEdit(event: Event): void {
     event.stopPropagation();
 
@@ -379,7 +379,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     const reading = this.currentReading();
     if (!reading) return;
 
-    // ถ้าเกิน expected range → แสดง confirm popup
+    // If outside expected range → show confirm popup
     if (this.isOutOfRange()) {
       this.showRangeConfirmation('inline', event);
       return;
@@ -388,7 +388,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     this.doSaveInlineEdit();
   }
 
-  /** บันทึก inline จริง */
+  /** Persist inline save */
   private doSaveInlineEdit(): void {
     const reading = this.currentReading();
     if (!reading) return;
@@ -415,7 +415,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
 
   // ==================== CONFIRMATION MODAL ====================
 
-  /** แสดง popup ยืนยันเมื่อค่าเกิน expected range */
+  /** Show confirm popup when value outside expected range */
   private showRangeConfirmation(mode: 'normal' | 'edit' | 'inline', event: Event): void {
     const reading = this.currentReading()!;
     const info = this.getExpectedRangeInfo();
@@ -432,7 +432,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     this.showConfirmModal.set(true);
   }
 
-  /** ยืนยันบันทึก (กดตกลงใน popup) */
+  /** Confirm save (accept in popup) */
   onConfirmSave(): void {
     this.showConfirmModal.set(false);
     const mode = this.pendingSaveMode();
@@ -446,7 +446,7 @@ export class MeterInputCardComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** ยกเลิก (กดยกเลิกใน popup) */
+  /** Cancel (reject in popup) */
   onCancelConfirm(): void {
     this.showConfirmModal.set(false);
   }

@@ -81,7 +81,7 @@
   cursor: not-allowed;
 }
 
-/* ✅ Container — flex-1 + min-height: 0 สำคัญมาก */
+
 .floor-plan-container {
   flex: 1;
   position: relative;
@@ -151,7 +151,7 @@
   z-index: 20;
 }
 
-/* ✅ hidden-file-input — ซ่อนแบบ accessible */
+
 .hidden-file-input {
   position: absolute;
   width: 1px;

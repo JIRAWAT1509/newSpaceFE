@@ -79,7 +79,7 @@
   @apply text-sm;
 }
 
-/* Responsive - จอแคบ / laptop resolution ต่ำ */
+/* Responsive - narrow / low-res */
 @media (max-width: 1366px) {
   .filter-bar-container {
     @apply p-3;

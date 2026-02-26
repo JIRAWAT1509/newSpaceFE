@@ -72,7 +72,7 @@
   @apply mb-1.5;
 }
 
-/* ✅ Area Item — compact เหมือน marker-list-panel */
+
 .area-item {
   @apply flex items-center gap-2 px-3 py-2 rounded-lg;
   @apply bg-white border border-gray-200;
@@ -99,7 +99,7 @@
   @apply rounded-b-none border-b-0;
 }
 
-/* ✅ Status dot — เล็กลงเหมือน marker */
+
 .status-dot {
   @apply w-3 h-3 rounded-full flex-shrink-0;
 }
@@ -112,12 +112,12 @@
   gap: 1px;
 }
 
-/* ✅ Room number — sm เหมือน marker */
+
 .room-number {
   @apply text-sm font-semibold text-gray-800 truncate;
 }
 
-/* ✅ Tenant info — xs เหมือน area-type ใน marker */
+
 .tenant-info {
   @apply text-xs text-gray-400;
 }
@@ -165,7 +165,7 @@
   @apply flex gap-1.5 pt-2 border-t border-gray-100;
 }
 
-/* ✅ Buttons — compact เหมือน marker */
+
 .btn-view-details,
 .btn-edit-area {
   flex: 1;

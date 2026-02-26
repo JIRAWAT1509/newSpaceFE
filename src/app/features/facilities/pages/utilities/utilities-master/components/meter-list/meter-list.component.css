@@ -4,7 +4,7 @@
   @apply space-y-5;
 }
 
-/* ==================== DASHBOARD OVERVIEW (พื้นขาว + การ์ด KPI ขาวกับไอคอนสี แบบ facilities/utilities/master) ==================== */
+/* ==================== DASHBOARD OVERVIEW ==================== */
 .section-card {
   @apply rounded-xl border p-4 mb-4;
   background: #ffffff !important;
@@ -67,7 +67,7 @@
   color: #111827;
 }
 
-/* การ์ดพื้นขาว + ไอคอนสี */
+
 .stat-card--primary {
   background: #ffffff !important;
   border-color: rgb(var(--primary) / 0.3);
@@ -214,11 +214,11 @@
 
 .table-wrapper {
   @apply overflow-x-auto;
-  /* ให้ตารางย่อตามความกว้างหน้าจอ ไม่บังคับสกอร์ลแนวนอน */
+  /* Table fit width, no forced horizontal scroll */
   max-width: 100%;
 }
 
-/* ==================== TABLE (fit หน้าเดียว ไม่สกอร์ลแนวนอน) ==================== */
+/* ==================== TABLE ==================== */
 .meter-table {
   @apply w-full;
   border-collapse: collapse;
@@ -226,7 +226,7 @@
   min-width: 0;
 }
 
-/* ความกว้างคอลัมน์รวม 100% ให้เห็นครบในหน้าเดียว */
+/* Column widths 100% */
 .meter-table .col-name { width: 11%; }
 .meter-table .col-group { width: 15%; }
 .meter-table .col-type { width: 10%; }
@@ -280,7 +280,7 @@
   @apply font-semibold text-gray-900;
 }
 
-/* Group Tag - ขึ้นบรรทัดใหม่ได้ ไม่ล้น */
+/* Group Tag - wrap, no overflow */
 .group-tag {
   @apply text-gray-600 block;
   font-size: 0.8rem;
@@ -414,7 +414,7 @@
   text-align: center !important;
 }
 
-/* .btn-edit-row ใช้จาก global styles.css */
+/* .btn-edit-row from global styles */
 .btn-edit-row {
   @apply flex items-center justify-center border-none cursor-pointer transition-all duration-150;
 }

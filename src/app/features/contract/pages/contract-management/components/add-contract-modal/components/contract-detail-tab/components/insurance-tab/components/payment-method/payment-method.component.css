@@ -32,14 +32,14 @@
   @apply px-2 py-1 border-b border-gray-200;
 }
 
-/* ปุ่ม + เพิ่ม ขนาดเท่ากับ .btn-add */
+/* Add button same size as .btn-add */
 .btn-add-sm {
   @apply flex items-center gap-2 px-4 py-2;
   @apply bg-blue-600 hover:bg-blue-700 text-white;
   @apply rounded font-medium text-sm transition-colors;
 }
 
-/* ปุ่มลบใช้จาก global styles.css */
+/* Delete button from global */
 
 .w-16 {
   width: 4rem;

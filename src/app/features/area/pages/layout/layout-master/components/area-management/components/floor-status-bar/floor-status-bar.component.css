@@ -17,7 +17,7 @@
 }
 
 .segment-text {
-  /* ปรับตัวอักษรให้ดูโปร่งและสะอาดตา */
+  
   @apply text-[10px] font-bold text-white uppercase tracking-widest;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }

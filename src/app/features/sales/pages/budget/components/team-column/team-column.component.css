@@ -63,7 +63,7 @@
   flex-shrink: 0;
 }
 
-/* ปุ่มแก้ไข/ลบใช้จาก global styles.css (ขนาดและสีเดียวกันทั้งระบบ) */
+/* Edit/delete buttons from global */
 .team-action-btn {
   display: flex;
   align-items: center;

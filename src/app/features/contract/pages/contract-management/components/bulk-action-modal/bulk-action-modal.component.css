@@ -1,5 +1,5 @@
 /* bulk-action-modal.component.css */
-/* ฟอร์มในฟันเฟืองจัดการ: อยู่เหนือ header (z-index สูง) และเริ่มใต้ header (padding-top) */
+/* Form in bulk menu: above header */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -63,7 +63,7 @@
   font-size: 1.25rem;
 }
 
-/* ใช้โทนฟ้าน้ำเงินให้สอดคล้องกับระบบ */
+/* Blue theme for consistency */
 .header-icon.terminate,
 .header-icon.discount,
 .header-icon.renew,
@@ -286,7 +286,7 @@
   cursor: not-allowed;
 }
 
-/* ปุ่มยืนยันทั้งหมดใช้ธีมฟ้าน้ำเงินเดียวกัน */
+/* Confirm all button - blue theme */
 .btn-primary.terminate,
 .btn-primary.discount,
 .btn-primary.renew,

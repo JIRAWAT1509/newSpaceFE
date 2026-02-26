@@ -1,7 +1,7 @@
 <!-- meter-list.component.html - TABLE VERSION -->
 
 <div class="meter-list-container">
-  <!-- Dashboard Overview (รูปแบบเดียวกับ facilities stats-overview) -->
+  <!-- Dashboard Overview -->
   <div class="section-card">
     <h2 class="section-title">Dashboard Overview</h2>
     <div class="stats-grid">
@@ -125,19 +125,19 @@
         <tbody>
           @for (row of filteredMeters(); track row.id) {
             <tr [class.editing-row]="row.isEditing">
-              <!-- 1. ชื่อ Meter -->
+              <!-- 1. Meter name -->
               <td>
                 <div class="meter-name-cell">
                   <span class="meter-number">{{ row.meterNumber }}</span>
                 </div>
               </td>
 
-              <!-- 2. กลุ่ม Meter -->
+              <!-- 2. Meter group -->
               <td>
                 <span class="group-tag">{{ row.groupName }}</span>
               </td>
 
-              <!-- 3. ประเภท Meter -->
+              <!-- 3. Meter type -->
               <td>
                 <div class="type-badge" [style.background-color]="row.meterTypeColor + '20'" [style.color]="row.meterTypeColor">
                   <i class="pi" [ngClass]="row.meterTypeIcon"></i>
@@ -145,25 +145,25 @@
                 </div>
               </td>
 
-              <!-- 4. อาคาร -->
+              <!-- 4. Building -->
               <td>{{ row.building }}</td>
 
-              <!-- 5. ห้อง -->
+              <!-- 5. Room -->
               <td>
                 <span class="room-badge">{{ row.room }}</span>
               </td>
 
-              <!-- 6. สถานะ -->
+              <!-- 6. Status -->
               <td>
                 <span class="status-badge" [ngClass]="getStatusClass(row.status)">
                   {{ getStatusLabel(row.status) }}
                 </span>
               </td>
 
-              <!-- 7. วันที่บันทึกล่าสุด -->
+              <!-- 7. Last recorded date -->
               <td>{{ formatDate(row.lastRecordedDate) }}</td>
 
-              <!-- 8. ค่ามิเตอร์ปัจจุบัน (editable) -->
+              <!-- 8. Current reading (editable) -->
               <td>
                 @if (row.isEditing) {
                   <div class="inline-edit">
@@ -197,7 +197,7 @@
                 <span class="consumption-unit">{{ row.unit }}</span>
               </td>
 
-              <!-- 10. ค่าใช้จ่าย -->
+              <!-- 10. Cost -->
               <td>
                 <span class="cost-value">฿{{ formatCost(row.currentCost) }}</span>
               </td>

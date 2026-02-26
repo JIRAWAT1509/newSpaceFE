@@ -1,12 +1,12 @@
 /* finance-master.component.css */
 
-/* ระยะเท่า Area Layout: p-6, ระหว่างบล็อก gap-6 (แบบ facilities/utilities/master) */
+/* Layout: p-6, gap-6 */
 .finance-container {
   @apply w-full min-h-screen p-6 flex flex-col gap-6;
   background-color: #ffffff !important;
 }
 
-/* Page header รูปแบบเดียวกับ Area Layout */
+/* Page header (match Area Layout) */
 .finance-header {
   @apply rounded-xl;
   padding: 1rem 1.25rem;
@@ -103,7 +103,7 @@
   @apply text-muted;
 }
 
-/* Responsive - Mobile (เท่า Area Layout) */
+/* Responsive - Mobile */
 @media (max-width: 768px) {
   .finance-container {
     @apply p-4 gap-4;

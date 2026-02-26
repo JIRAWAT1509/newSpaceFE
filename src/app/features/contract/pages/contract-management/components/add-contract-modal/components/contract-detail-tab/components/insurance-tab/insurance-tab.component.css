@@ -162,14 +162,14 @@
   @apply rounded font-medium text-sm transition-colors;
 }
 
-/* ปุ่ม + เพิ่ม ขนาดเท่ากับ .btn-add */
+/* Add button same size as .btn-add */
 .btn-add-sm {
   @apply flex items-center gap-2 px-4 py-2;
   @apply bg-blue-600 hover:bg-blue-700 text-white;
   @apply rounded font-medium text-sm transition-colors;
 }
 
-/* ปุ่มลบใช้จาก global styles.css (ขนาดและสีเดียวกันทั้งระบบ) */
+/* Delete button from global */
 
 .btn-secondary {
   @apply px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700;

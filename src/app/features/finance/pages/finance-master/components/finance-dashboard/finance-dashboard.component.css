@@ -8,7 +8,7 @@
   margin-top: 1.5rem;
 }
 
-/* Dashboard Overview - รูปแบบเดียวกับ facilities/utilities/master */
+/* Dashboard Overview - same style as facilities/utilities/master */
 .section-card {
   @apply rounded-xl border p-4 mb-4;
   background: #ffffff !important;
@@ -112,7 +112,7 @@
   @apply font-normal;
 }
 
-/* การ์ดพื้นขาว + ไอคอนสี (แบบ facilities/utilities/master) */
+
 .stat-card--primary {
   background: #ffffff !important;
   border-color: rgb(var(--primary) / 0.3);
@@ -323,7 +323,7 @@
   @apply text-gray-500;
 }
 
-/* เพิ่มท้ายไฟล์ */
+/* End of file */
 
 /* Sortable Table Headers */
 .debt-table th {

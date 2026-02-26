@@ -1,6 +1,6 @@
 /* revenue-form-drawer.component.css */
 
-/* ไม่ให้ drawer ทับ header (Defect fix: หน้าจอบันทึกข้อมูลเหลือมกับ header) */
+/* Drawer below header (defect fix) */
 @media (min-width: 768px) {
   .drawer-panel--revenue {
     top: 100px !important;
@@ -9,7 +9,7 @@
   }
 }
 
-/* Drawer แบบ flex: หัว-ท้ายคงที่ ส่วนกลางเลื่อนได้ ไม่ตัดปุ่มล่าง */
+/* Drawer flex: fixed header/footer, scrollable middle */
 .drawer-panel--revenue {
   display: flex;
   flex-direction: column;

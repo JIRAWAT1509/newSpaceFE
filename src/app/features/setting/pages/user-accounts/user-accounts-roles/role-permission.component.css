@@ -1,6 +1,6 @@
 /* role-permission.component.css */
 
-/* ==================== CONTAINER (ระยะและพื้นหลังแบบ facilities/utilities/master) ==================== */
+/* ==================== CONTAINER ==================== */
 .role-permission-container {
   max-width: 1600px;
   margin: 0 auto;
@@ -12,7 +12,7 @@
   background: #ffffff !important;
 }
 
-/* ==================== HEADER SECTION (รูปแบบเดียวกับ facilities/utilities) ==================== */
+/* ==================== HEADER SECTION ==================== */
 .header-section {
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
@@ -118,7 +118,7 @@
   margin-bottom: 1rem;
 }
 
-/* ==================== ROLE MANAGEMENT (ปุ่ม Add New Role, Assign Permission + ตาราง ตาม wireframe) ==================== */
+/* ==================== ROLE MANAGEMENT ==================== */
 .role-management-section {
   background: #ffffff !important;
   border-radius: 0.75rem;
@@ -239,7 +239,7 @@
   scroll-margin-top: 1rem;
 }
 
-/* ==================== แผงกำหนดสิทธิ์ ย่อ/ขยาย ได้ ==================== */
+/* ==================== Permission panel (collapsible) ==================== */
 .permission-panel-collapsible {
   background: #ffffff !important;
   border-radius: 0.75rem;
@@ -297,7 +297,7 @@
   margin-bottom: 0;
 }
 
-/* ==================== PERMISSION SECTION ตามสเก็ตช์ (Permission + Copy from standard role + แท็บ) ==================== */
+/* ==================== PERMISSION SECTION ==================== */
 .permission-assign-section {
   background: #ffffff !important;
   border-radius: 0.75rem;
@@ -349,7 +349,7 @@
   margin: 1rem 0 1.5rem 0;
 }
 
-/* ==================== ASSIGN PERMISSION MODAL (ป้ายประกาศตามสเก็ต) ==================== */
+/* ==================== ASSIGN PERMISSION MODAL ==================== */
 .assign-permission-dialog .p-dialog-content {
   overflow-y: auto;
   max-height: calc(90vh - 120px);
@@ -408,7 +408,7 @@
   margin-bottom: 0.75rem;
 }
 
-/* ปุ่ม Apply ชิดขวาตามหลัก UX */
+/* Apply button right-aligned */
 .permission-copy-row.assign-permission-copy-row .permission-copy-apply-wrap {
   margin-left: auto;
 }
@@ -480,7 +480,7 @@
   flex-wrap: wrap;
 }
 
-/* ==================== DASHBOARD OVERVIEW (รูปแบบเดียวกับ facilities/utilities/master) ==================== */
+/* ==================== DASHBOARD OVERVIEW ==================== */
 .section-card {
   border-radius: 0.75rem;
   border: 1px solid rgb(var(--border));
@@ -576,7 +576,7 @@
   color: #111827;
 }
 
-/* การ์ดพื้นขาว + ไอคอนสี (แบบ facilities/utilities/master) */
+
 .stat-card--primary {
   background: #ffffff !important;
   border-color: rgb(var(--primary) / 0.3);
@@ -998,7 +998,7 @@
   color: #f59e0b;
 }
 
-/* Apply Template modal: ปุ่มอยู่ใต้การ์ดเทมเพลตในเนื้อหา โผล่เสมอ */
+/* Apply Template modal: buttons below card */
 .template-modal-body .template-grid {
   max-height: none;
 }
@@ -1235,7 +1235,7 @@
 
 /* ==================== DIALOG/MODAL FIXES ==================== */
 
-/* บังคับ dialog โมดัล Copy/Apply Template ให้สูงไม่เกินจอ และปุ่ม footer โผล่เสมอ */
+/* Copy/Apply dialog: max height, footer visible */
 ::ng-deep .role-permission-dialog.p-dialog {
   max-height: 85vh !important;
   height: auto !important;
@@ -1255,7 +1255,7 @@
   visibility: visible !important;
 }
 
-/* Dialog wrapper - flex เพื่อให้ footer (ปุ่ม) อยู่ล่างเสมอ ไม่ถูกตัด */
+/* Dialog wrapper: flex so footer stays at bottom */
 ::ng-deep .p-dialog {
   border-radius: 12px !important;
   overflow: hidden !important;

@@ -174,7 +174,7 @@
 }
 
 /* ==================== ACTION BUTTONS ==================== */
-/* ขนาดและสีใช้จาก global styles.css (ปุ่มแก้ไข/ลบทั้งระบบเดียวกัน) */
+/* Edit/delete buttons from global styles */
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -249,7 +249,7 @@
     padding: 0.625rem 0.75rem;
   }
 
-  /* ปุ่มแก้ไข/ลบใช้ขนาดจาก global */
+  /* Edit/delete button size from global */
 }
 
 @media (max-width: 640px) {

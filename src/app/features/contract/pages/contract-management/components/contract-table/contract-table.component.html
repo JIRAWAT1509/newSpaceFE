@@ -73,7 +73,7 @@
     </div>
 
     <div class="actions-right">
-      <!-- Bulk Actions (ย้ายมาอยู่กลุ่มเดียวกับปุ่มสร้าง) -->
+      <!-- Bulk Actions -->
       <div class="manage-dropdown-wrapper">
         <button
           class="action-btn manage-btn"
@@ -229,7 +229,7 @@
 
               @if (activeRowMenu() === item.CONTRACT_ID) {
                 <div class="row-actions-menu">
-                  <!-- แก้ไข: เฉพาะสัญญาที่ยังไม่ถูกโอนหรือยกเลิก -->
+                  <!-- Edit: only contracts not transferred or cancelled -->
                   @if (!isContractLocked(item)) {
                     <button class="menu-item" (click)="onRowAction('edit', item)">
                       <i class="pi pi-pencil"></i>
@@ -241,7 +241,7 @@
                     <span>{{ getCopyContractLabel() }}</span>
                   </button>
 
-                  <!-- ใบเสนอราคา -->
+                  <!-- Quotation -->
                   @if (contractType() === 'quotation') {
                     @if (!isContractLocked(item)) {
                       <button class="menu-item" (click)="onRowAction('transfer-to-booking', item)">
@@ -261,7 +261,7 @@
                     }
                   }
 
-                  <!-- สัญญาจอง -->
+                  <!-- Booking -->
                   @if (contractType() === 'booking') {
                     <button class="menu-item" (click)="onRowAction('copy-booking-to-quotation', item)">
                       <i class="pi pi-copy"></i>
@@ -285,7 +285,7 @@
                     }
                   }
 
-                  <!-- สัญญาเช่า -->
+                  <!-- Lease -->
                   @if (contractType() === 'lease') {
                     <button class="menu-item" (click)="onRowAction('copy-to-booking', item)">
                       <i class="pi pi-copy"></i>

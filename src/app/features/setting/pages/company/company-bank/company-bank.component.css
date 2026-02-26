@@ -76,7 +76,7 @@
   min-width: 0;
 }
 
-/* สามคอลัมน์: ธนาคาร (ลิสต์แคบ) | สาขา | รหัสการนำส่งเงิน */
+/* Three columns: banks | branches | remittance */
 .main-content.with-remittance .banks-section.half-width {
   flex: 0 0 320px;
   min-width: 280px;
@@ -206,7 +206,7 @@
   flex-wrap: wrap;
 }
 
-/* หน้าจอบันทึกข้อมูลสาขาธนาคาร (ในส่วนสาขา) */
+/* Branch save form section */
 .branch-save-section {
   margin-top: 1.5rem;
   padding: 1.25rem 1.5rem;
@@ -391,14 +391,14 @@
   opacity: 0.85;
 }
 
-/* ซ่อนจุด/ข้อความหลงจากปุ่ม PrimeNG (icon-only) */
+/* Hide PrimeNG icon-only button labels */
 .bank-list-actions ::ng-deep .p-button .p-button-label,
 .branch-list-actions ::ng-deep .p-button .p-button-label,
 .action-buttons ::ng-deep .p-button .p-button-label {
   display: none !important;
 }
 
-/* ปุ่มในคอลัมน์การดำเนินการ: แสดงเฉพาะไอคอน ไม่ให้มีจุดสามจุดหรือข้อความหลง */
+/* Actions column: icon only */
 .action-buttons ::ng-deep .p-button > *:not(.p-button-icon) {
   display: none !important;
 }
@@ -907,7 +907,7 @@
   font-weight: 500;
 }
 
-/* โหมดดูอย่างเดียวในโม달บัญชี */
+/* View-only mode in account modal */
 .view-only-content .form-field {
   margin-bottom: 0.75rem;
 }
@@ -938,7 +938,7 @@
   margin: 0;
 }
 
-/* Data Table — รหัสการนำส่งเงินเข้าบัญชี */
+/* Remittance accounts table */
 .accounts-table {
   overflow-x: auto;
   border-radius: 14px;
@@ -975,7 +975,7 @@
   white-space: nowrap;
 }
 
-/* ตารางรหัสการนำส่ง — เพิ่มระยะระหว่างคอลัมน์ ไม่ให้ติดกัน */
+/* Table cell spacing */
 .remittance-data-table th,
 .remittance-data-table td {
   padding-left: 1.25rem;
@@ -1014,7 +1014,7 @@
   word-break: break-word;
 }
 
-/* คอลัมน์เลขบัญชี — อยู่บรรทัดเดียว ไม่ตัดเป็น ... */
+/* Account number column */
 .data-table .col-account-no {
   white-space: nowrap;
   min-width: 8rem;
@@ -1023,7 +1023,7 @@
   padding-right: 1.5rem;
 }
 
-/* คอลัมน์ประเภทบัญชี — อยู่บรรทัดเดียว มีระยะห่างจากเลขบัญชี */
+/* Account type column */
 .data-table .col-account-type {
   white-space: nowrap;
   min-width: 7.5rem;
@@ -1032,7 +1032,7 @@
   padding-left: 1.5rem;
 }
 
-/* คอลัมน์รายละเอียดให้ขึ้นบรรทัดใหม่ได้ ถ้าข้อความยาว */
+/* Details column wrap */
 .data-table.remittance-data-table td:nth-child(5) {
   word-break: break-word;
   white-space: normal;
@@ -1051,7 +1051,7 @@
   text-decoration: underline;
 }
 
-/* คอลัมน์การดำเนินการ — แสดงข้อความเต็ม (ไม่ตัดเป็น ...) */
+/* Actions column full width */
 .remittance-data-table th.actions-col-header,
 .remittance-data-table td.actions-cell {
   min-width: 120px;
@@ -1065,7 +1065,7 @@
   text-align: center;
 }
 
-/* ปุ่มแก้ไข/ลบ อยู่บรรทัดเดียวกัน */
+/* Edit/delete buttons row */
 .data-table .actions-cell {
   white-space: nowrap;
   vertical-align: middle;

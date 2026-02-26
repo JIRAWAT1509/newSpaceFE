@@ -14,7 +14,7 @@
   background: linear-gradient(to bottom, rgb(var(--primary)), rgb(var(--secondary)));
 }
 
-/* Mobile: sidebar as overlay ใต้ header */
+/* Mobile: sidebar as overlay below header */
 @media (max-width: 767px) {
   .sidebar-wrapper.sidebar-mobile-overlay {
     position: fixed;
@@ -49,13 +49,13 @@
   to { opacity: 1; }
 }
 
-/* Main content: โมบายมี bottom nav + safe area */
+/* Main content: mobile has bottom nav + safe area */
 .main-with-bottom-nav {
   padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
   min-height: 0;
 }
 
-/* โมบาย: เนื้อหาหลักมี padding แคบ แท็บ/เดสก์กว้างขึ้น */
+/* Mobile: content padding; desktop wider */
 @media (max-width: 639px) {
   .app-layout main .container {
     padding-left: 0.75rem;

@@ -132,7 +132,7 @@
 }
 
 :host ::ng-deep .status-segment {
-  @apply text-sm; /* ลดขนาดตัวอักษร */
+  @apply text-sm;
 }
 
 
@@ -142,9 +142,9 @@
 }
 
 .edit-button {
-  @apply flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg shadow-md; /* ลด padding */
+  @apply flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg shadow-md;
   @apply hover:bg-blue-700 transition-colors duration-200;
-  @apply font-medium text-sm; /* ลดขนาดตัวอักษร */
+  @apply font-medium text-sm;
 }
 
 .edit-button i {
@@ -182,7 +182,7 @@
   }
 
   .bottom-center-controls {
-    @apply max-w-[350px] bottom-3; /* ลดขนาดและเว้นระยะ */
+    @apply max-w-[350px] bottom-3;
   }
 
   .bottom-right-controls {
@@ -190,7 +190,7 @@
   }
 
   .edit-button {
-    @apply px-3 py-2 text-xs; /* ลดขนาดเพิ่มเติม */
+    @apply px-3 py-2 text-xs;
   }
 }
 
@@ -200,12 +200,12 @@
   }
 
   .bottom-center-controls {
-    @apply max-w-[200px] left-20 transform-none; /* ย้ายไปซ้าย ไม่ center */
+    @apply max-w-[200px] left-20 transform-none;
     @apply bottom-3;
   }
 
   :host ::ng-deep .status-segment {
-    @apply text-xs; /* ลดตัวอักษรมากขึ้นในมือถือ */
+    @apply text-xs;
     min-height: 32px;
   }
 
