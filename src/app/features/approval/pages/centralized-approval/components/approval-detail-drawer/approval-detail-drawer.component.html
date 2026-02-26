@@ -1,0 +1,96 @@
+<!-- approval-detail-drawer.component.html - รายละเอียด + อนุมัติ/ส่งกลับ ในหน้าเดียว -->
+@if (row && contract) {
+  <div class="drawer-inner">
+    <div class="drawer-header">
+      <div class="header-content">
+        <h2 class="drawer-title">รายละเอียดสัญญา</h2>
+        <p class="drawer-subtitle">{{ contract.CONTRACT_NUMBER }}</p>
+      </div>
+      <button type="button" class="btn-close" (click)="onClose()" aria-label="ปิด">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="detail-section">
+        <h3 class="section-title"><i class="pi pi-file-edit"></i> ข้อมูลสัญญา</h3>
+        <dl class="detail-grid">
+          <dt>ประเภทสัญญา</dt>
+          <dd>{{ getContractTypeLabel(contract.CONTRACT_TYPE) }}</dd>
+
+          <dt>เลขที่สัญญา</dt>
+          <dd>{{ contract.CONTRACT_NUMBER }}</dd>
+
+          <dt>ระยะเวลาสัญญา</dt>
+          <dd>{{ getDurationDisplay(contract) }}</dd>
+
+          <dt>ชื่อลูกค้า</dt>
+          <dd>
+            <span class="customer-id">{{ contract.CUSTOMER_ID }}</span>
+            {{ contract.TENANT_NAME_TH || contract.COMPANY_NAME || '-' }}
+          </dd>
+
+          <dt>ชื่อกิจการ</dt>
+          <dd>{{ contract.BUSINESS_NAME || '-' }}</dd>
+
+          <dt>ผู้ทำรายการ / ผู้แก้ไข</dt>
+          <dd>{{ getCreatorDisplay(contract) }}</dd>
+
+          <dt>ผู้อนุมัติลำดับที่ 1</dt>
+          <dd class="approver-cell" [class.approved]="row.approvalStatus === 'approved'">{{ row.approver1Display }}</dd>
+
+          <dt>ผู้อนุมัติลำดับที่ 2</dt>
+          <dd class="approver-cell" [class.approved]="row.approvalStatus === 'approved'">{{ row.approver2Display }}</dd>
+
+          <dt>ผู้อนุมัติลำดับที่ 3</dt>
+          <dd class="approver-cell">{{ row.approver3Display }}</dd>
+
+          <dt>วันที่บันทึก</dt>
+          <dd>{{ formatDate(contract.RECORD_DATE) }}</dd>
+
+          <dt>วันที่อนุมัติ</dt>
+          <dd>{{ formatDate(contract.APPROVAL_DATE) }}</dd>
+        </dl>
+      </div>
+
+      @if (row.approvalStatus === 'waiting') {
+        <div class="detail-section">
+          <h3 class="section-title"><i class="pi pi-comment"></i> เหตุผลที่ส่งกลับ/ไม่อนุมัติ</h3>
+          <textarea
+            class="reason-textarea"
+            [(ngModel)]="rejectReason"
+            placeholder="กรอกเหตุผล (เมื่อต้องการส่งกลับหรือไม่อนุมัติ)..."
+            rows="4"
+          ></textarea>
+        </div>
+      }
+    </div>
+
+    <div class="drawer-footer">
+      <button type="button" class="btn-footer btn-secondary" (click)="onClose()">
+        ปิด
+      </button>
+      @if (row.approvalStatus === 'waiting') {
+        @if (canAct) {
+          <button
+            type="button"
+            class="btn-footer btn-danger"
+            [disabled]="!rejectReason.trim()"
+            (click)="onReject()"
+          >
+            <i class="pi pi-times"></i>
+            ส่งกลับ / ไม่อนุมัติ
+          </button>
+          <button type="button" class="btn-footer btn-primary" (click)="onApprove()">
+            <i class="pi pi-check"></i>
+            อนุมัติ
+          </button>
+        }
+      } @else {
+        <button type="button" class="btn-footer btn-primary" (click)="onClose()">
+          ตกลง
+        </button>
+      }
+    </div>
+  </div>
+}

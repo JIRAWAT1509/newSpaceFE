@@ -1,12 +1,17 @@
 // user-management.service.ts - Mock service for user account management (CRUD operations)
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { User, UserResponse, UserFormData, DropdownOption } from '@core/models/user.model';
+import { CompanyService } from '@core/services/company.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserManagementService {
+
+  constructor(private companyService: CompanyService) {}
+
   private mockUsers: User[] = [
     {
       MyFile: null,
@@ -102,8 +107,6 @@ export class UserManagementService {
       IsSelected: false
     }
   ];
-
-  constructor() {}
 
   // Get all users with filters
   getUsers(filters?: {
@@ -225,5 +228,18 @@ export class UserManagementService {
       { label: 'Accounting', value: 'บัญชี' }
     ];
     return of(departments).pipe(delay(100));
+  }
+
+  // Get branch options for Branch Access Control dropdown - ดึงจาก Company (สาขา)
+  getBranchOptions(): Observable<DropdownOption[]> {
+    return this.companyService.getBranches().pipe(
+      map(branches => [
+        { label: '-- เลือกสาขา --', value: '' },
+        ...branches.map(b => ({
+          label: b.STORE_NAME_T && b.STORE_NAME_T !== '-' ? `${b.STORE_NAME_T} (${b.STORE_CODE})` : `${b.SHORT_NAME} (${b.STORE_CODE})`,
+          value: b.STORE_CODE
+        }))
+      ])
+    );
   }
 }

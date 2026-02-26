@@ -169,16 +169,18 @@
 
 /* ==================== Selector Modal ==================== */
 .selector-modal-backdrop {
-  @apply fixed inset-0 bg-black bg-opacity-50 z-[60];
-  @apply flex justify-center p-4;
-  padding-top: 96px;
+  @apply fixed inset-0 bg-black bg-opacity-50 flex justify-center p-4;
+  padding-top: 100px !important;
   align-items: flex-start;
   box-sizing: border-box;
+  z-index: 9998 !important;
+  overflow-y: auto;
+  padding-bottom: 2rem;
 }
 
 .selector-modal-content {
   @apply bg-white rounded-lg w-full max-w-md shadow-2xl flex flex-col;
-  max-height: calc(100vh - 96px - 1rem);
+  max-height: calc(100vh - 100px - 1rem);
   min-height: 200px;
 }
 

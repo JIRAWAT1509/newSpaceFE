@@ -1,0 +1,302 @@
+<!-- centralized-approval.component.html - ข้อมูลสัญญารออนุมัติ ทุกอย่างจบในหน้าเดียว -->
+<div class="approval-page">
+  <header class="page-header">
+    <h1 class="page-title">ข้อมูลสัญญารออนุมัติ</h1>
+  </header>
+
+  <!-- Table -->
+  <div class="table-card">
+    <!-- ฟิลเตอร์ทั้งหมดบรรทัดเดียว -->
+    <section class="filters-in-card">
+      <div class="filters-single-line">
+        <div class="filter-cell filter-cell-date">
+          <span class="filter-group-label">ช่วงวันที่</span>
+          <div class="daterange-inline">
+            <p-datepicker
+              [(ngModel)]="dateRangeFrom"
+              (ngModelChange)="onDateRangeFromChange($event)"
+              [showIcon]="true"
+              dateFormat="dd/mm/yy"
+              placeholder="ตั้งแต่"
+              inputId="approval-date-from"
+              styleClass="approval-datepicker"
+            />
+            <span class="daterange-to">ถึง</span>
+            <p-datepicker
+              [(ngModel)]="dateRangeTo"
+              (ngModelChange)="onDateRangeToChange($event)"
+              [showIcon]="true"
+              dateFormat="dd/mm/yy"
+              placeholder="ถึง"
+              inputId="approval-date-to"
+              styleClass="approval-datepicker"
+            />
+          </div>
+        </div>
+        <div class="filter-cell">
+          <label class="filter-label">สาขา</label>
+          <select
+            class="filter-select"
+            [ngModel]="selectedBranch()"
+            (ngModelChange)="selectedBranch.set($event)"
+          >
+            @for (b of branches(); track b.id) {
+              <option [value]="b.id">{{ b.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-cell filter-doc-type">
+          <label class="filter-label">ประเภทเอกสาร</label>
+          <p-multiSelect
+            [options]="docTypeOptions"
+            [ngModel]="selectedDocTypeIds()"
+            (ngModelChange)="selectedDocTypeIds.set($event)"
+            optionLabel="label"
+            optionValue="id"
+            placeholder="เลือกประเภทเอกสาร"
+            [showClear]="true"
+            styleClass="approval-doc-type-select"
+            display="chip"
+          />
+        </div>
+        <div class="filter-cell checkbox-wrap">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [ngModel]="showMyDocumentsOnly()"
+              (ngModelChange)="showMyDocumentsOnly.set($event)"
+            />
+            <span>แสดงเอกสารของตนเอง</span>
+          </label>
+        </div>
+        <div class="filter-cell filter-search-wrap">
+          <button type="button" class="btn-search" (click)="onSearch()">
+            <i class="pi pi-search"></i>
+            <span>ค้นหา</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="table-toolbar">
+      <div class="table-toolbar-left">
+        <div class="table-search">
+          <i class="pi pi-search"></i>
+          <input
+            type="text"
+            class="table-search-input"
+            placeholder="ค้นหาเลขสัญญา, ลูกค้า, ชื่อกิจการ..."
+            [ngModel]="searchKeyword()"
+            (ngModelChange)="searchKeyword.set($event)"
+          />
+        </div>
+        <div class="tabs-wrap tabs-wrap-in-toolbar">
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="activeTab() === 'waiting'"
+            (click)="setTab('waiting')"
+          >
+            <span class="tab-dot waiting"></span>
+            Waiting Approve ({{ filteredWaitingCount() }})
+          </button>
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="activeTab() === 'approved'"
+            (click)="setTab('approved')"
+          >
+            <span class="tab-dot approved"></span>
+            Approved ({{ filteredApprovedCount() }})
+          </button>
+        </div>
+      </div>
+      <div class="table-toolbar-right">
+        @if (activeTab() === 'waiting' && approvableRowsCount() > 0) {
+          <button
+            type="button"
+            class="btn-approve-all"
+            (click)="onApproveAll()"
+            title="อนุมัติทุกรายการที่คุณมีสิทธิ์ ({{ approvableRowsCount() }} รายการ)"
+          >
+            <i class="pi pi-check-circle"></i>
+            <span>Approve all ({{ approvableRowsCount() }})</span>
+          </button>
+        }
+        <span class="table-count">{{ filteredRows().length }} รายการ</span>
+      </div>
+    </div>
+
+    @if (filteredRows().length === 0) {
+      <div class="table-empty-state">
+        <div class="empty-state-context">
+          <i class="pi pi-inbox"></i>
+          <span class="empty-state-message">{{ activeTab() === 'waiting' ? 'ไม่มีสัญญารออนุมัติตามเงื่อนไขที่เลือก' : 'ไม่มีสัญญาที่อนุมัติแล้วตามเงื่อนไขที่เลือก' }}</span>
+          <span class="empty-cell-hint">ลองเปลี่ยนช่วงวันที่ สาขา หรือประเภทเอกสาร</span>
+        </div>
+      </div>
+    } @else {
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ประเภทสัญญา</th>
+            <th>เลขที่สัญญา</th>
+            <th>ระยะเวลาสัญญา</th>
+            <th>ชื่อลูกค้า</th>
+            <th>ชื่อกิจการ</th>
+            <th class="th-approver">ผู้อนุมัติ 1</th>
+            <th class="th-approver">ผู้อนุมัติ 2</th>
+            <th class="th-approver">ผู้อนุมัติ 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of filteredRows(); track row.contract.CONTRACT_ID) {
+            <tr class="row-clickable" (click)="viewDetail(row)"
+                [class.row-waiting]="row.approvalStatus === 'waiting'"
+                [class.row-approved]="row.approvalStatus === 'approved'">
+              <td>{{ getContractTypeLabel(row.contract.CONTRACT_TYPE) }}</td>
+              <td><strong>{{ row.contract.CONTRACT_NUMBER }}</strong></td>
+              <td>{{ getDurationDisplay(row.contract) }}</td>
+              <td>
+                <span class="customer-id">{{ row.contract.CUSTOMER_ID }}</span>
+                {{ row.contract.TENANT_NAME_TH || row.contract.COMPANY_NAME }}
+              </td>
+              <td>{{ row.contract.BUSINESS_NAME || '-' }}</td>
+              <!-- คอลัมน์ผู้อนุมัติ: พื้นหลังเซลล์ อนุมัติแล้ว=เขียว รออนุมัติ=เหลือง -->
+              <td class="cell-approver" (click)="$event.stopPropagation()" [class]="getApproverCellClass(row, 1)">
+                <div class="approver-cell-content">
+                  <span class="approver-display">{{ row.approver1Display }}</span>
+                  <span class="approver-status-badge" [class]="'status-' + getApproverColumnStatus(row, 1)">
+                    {{ getApproverStatusLabel(row, 1) }}
+                  </span>
+                  @if (activeTab() === 'waiting' && canActOnColumn(row, 1)) {
+                    <div class="action-btns action-btns-inline">
+                      <button type="button" class="btn-action btn-approve" title="อนุมัติ" (click)="onApproveFromTable(row)">
+                        <i class="pi pi-check"></i><span>Approve</span>
+                      </button>
+                      <button type="button" class="btn-action btn-reject" title="ไม่อนุมัติ" (click)="openReasonDialog(row, 'reject')">
+                        <i class="pi pi-times"></i><span>Reject</span>
+                      </button>
+                      <button type="button" class="btn-action btn-return" title="ส่งกลับ" (click)="openReasonDialog(row, 'return')">
+                        <i class="pi pi-replay"></i><span>Return</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </td>
+              <!-- คอลัมน์ผู้อนุมัติ 2 -->
+              <td class="cell-approver" (click)="$event.stopPropagation()" [class]="getApproverCellClass(row, 2)">
+                <div class="approver-cell-content">
+                  <span class="approver-display">{{ row.approver2Display }}</span>
+                  <span class="approver-status-badge" [class]="'status-' + getApproverColumnStatus(row, 2)">
+                    {{ getApproverStatusLabel(row, 2) }}
+                  </span>
+                  @if (activeTab() === 'waiting' && canActOnColumn(row, 2)) {
+                    <div class="action-btns action-btns-inline">
+                      <button type="button" class="btn-action btn-approve" title="อนุมัติ" (click)="onApproveFromTable(row)">
+                        <i class="pi pi-check"></i><span>Approve</span>
+                      </button>
+                      <button type="button" class="btn-action btn-reject" title="ไม่อนุมัติ" (click)="openReasonDialog(row, 'reject')">
+                        <i class="pi pi-times"></i><span>Reject</span>
+                      </button>
+                      <button type="button" class="btn-action btn-return" title="ส่งกลับ" (click)="openReasonDialog(row, 'return')">
+                        <i class="pi pi-replay"></i><span>Return</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </td>
+              <!-- คอลัมน์ผู้อนุมัติ 3 -->
+              <td class="cell-approver" (click)="$event.stopPropagation()" [class]="getApproverCellClass(row, 3)">
+                <div class="approver-cell-content">
+                  <span class="approver-display">{{ row.approver3Display }}</span>
+                  <span class="approver-status-badge" [class]="'status-' + getApproverColumnStatus(row, 3)">
+                    {{ getApproverStatusLabel(row, 3) }}
+                  </span>
+                  @if (activeTab() === 'waiting' && canActOnColumn(row, 3)) {
+                    <div class="action-btns action-btns-inline">
+                      <button type="button" class="btn-action btn-approve" title="อนุมัติ" (click)="onApproveFromTable(row)">
+                        <i class="pi pi-check"></i><span>Approve</span>
+                      </button>
+                      <button type="button" class="btn-action btn-reject" title="ไม่อนุมัติ" (click)="openReasonDialog(row, 'reject')">
+                        <i class="pi pi-times"></i><span>Reject</span>
+                      </button>
+                      <button type="button" class="btn-action btn-return" title="ส่งกลับ" (click)="openReasonDialog(row, 'return')">
+                        <i class="pi pi-replay"></i><span>Return</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+</div>
+
+<!-- Drawer รายละเอียด + อนุมัติ/ส่งกลับ (จบในหน้าเดียว ไม่เด้งไปหน้าอื่น) -->
+@if (drawerOpen()) {
+  <div class="drawer-overlay" (click)="closeDrawer()" role="button" tabindex="0" aria-label="ปิด"></div>
+  <div class="drawer-panel" [class.open]="drawerOpen()">
+    <app-approval-detail-drawer
+      [row]="selectedRow()"
+      [isOpen]="drawerOpen()"
+      (close)="closeDrawer()"
+      (approve)="onApprove($event)"
+      (reject)="onReject($event)"
+    />
+  </div>
+}
+
+<!-- ป้ายประกาศยืนยันอนุมัติทั้งหมด (แบบเดียวกับระบบ) -->
+<app-confirmation-modal
+  [isOpen]="showApproveAllConfirm()"
+  type="success"
+  title="ยืนยันการอนุมัติ"
+  [message]="'อนุมัติทั้ง ' + approveAllPendingCount() + ' รายการที่คุณมีสิทธิ์ ใช่หรือไม่?'"
+  confirmText="อนุมัติทั้งหมด"
+  cancelText="ยกเลิก"
+  confirmIcon="pi-check"
+  (confirm)="confirmApproveAll()"
+  (cancel)="closeApproveAllConfirm()"
+/>
+
+<!-- ป๊อปอัพกรอกเหตุผลส่งกลับ/ไม่อนุมัติ -->
+<p-dialog
+  [(visible)]="showReasonDialog"
+  [header]="reasonDialogTitle"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeReasonDialog()"
+  styleClass="approval-reason-dialog"
+  [style]="{ width: '420px' }"
+>
+  <div class="reason-dialog-body">
+    <label class="reason-label">เหตุผลที่ส่งกลับ/ไม่อนุมัติสัญญา</label>
+    <textarea
+      [(ngModel)]="reasonDialogText"
+      class="reason-textarea"
+      placeholder="กรอกเหตุผล..."
+      rows="4"
+    ></textarea>
+  </div>
+  <ng-template pTemplate="footer">
+    <button type="button" class="btn-dialog-cancel" (click)="closeReasonDialog()">
+      ยกเลิก
+    </button>
+    <button
+      type="button"
+      class="btn-dialog-confirm"
+      [disabled]="!reasonDialogText.trim()"
+      (click)="confirmReasonDialog()"
+    >
+      ยืนยัน
+    </button>
+  </ng-template>
+</p-dialog>

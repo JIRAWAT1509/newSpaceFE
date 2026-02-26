@@ -4,19 +4,19 @@
 .role-permission-container {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 1rem 1.25rem;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   background: #ffffff !important;
 }
 
 /* ==================== HEADER SECTION (รูปแบบเดียวกับ facilities/utilities) ==================== */
 .header-section {
   border-radius: 0.75rem;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
   background: #ffffff !important;
   border: 1px solid rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
@@ -30,14 +30,14 @@
 }
 
 .header-icon {
-  width: 3rem;
-  height: 3rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   flex-shrink: 0;
   background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
   box-shadow: 0 2px 8px rgb(var(--shadow) / 0.2);
@@ -53,14 +53,14 @@
 }
 
 .page-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: rgb(var(--fg));
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.125rem 0;
 }
 
 .page-subtitle {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: rgb(var(--muted));
   margin: 0;
 }
@@ -116,6 +116,336 @@
 /* ==================== MESSAGES ==================== */
 .message-container {
   margin-bottom: 1rem;
+}
+
+/* ==================== ROLE MANAGEMENT (ปุ่ม Add New Role, Assign Permission + ตาราง ตาม wireframe) ==================== */
+.role-management-section {
+  background: #ffffff !important;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
+  margin-bottom: 0.5rem;
+}
+
+.role-management-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.role-table-card {
+  border: 1px solid rgb(var(--border));
+  border-radius: 0.5rem;
+  overflow: hidden;
+  min-height: 80px;
+  position: relative;
+}
+
+.role-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.role-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgb(var(--muted));
+  background: rgb(var(--muted) / 0.08);
+  border-bottom: 1px solid rgb(var(--border));
+}
+
+.role-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgb(var(--border));
+  font-size: 0.8125rem;
+}
+
+.role-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.role-row:hover {
+  background: rgb(var(--primary) / 0.06);
+}
+
+.role-row.selected {
+  background: rgb(var(--primary) / 0.12);
+}
+
+.role-row-inactive {
+  opacity: 0.65;
+}
+
+.role-row-inactive .role-name-cell {
+  color: rgb(var(--muted));
+}
+
+.role-table-loading,
+.role-table-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  color: rgb(var(--muted));
+  font-size: 0.8125rem;
+}
+
+.role-table-loading i {
+  font-size: 1.125rem;
+}
+
+.col-members {
+  width: 5rem;
+  text-align: center;
+}
+
+.col-active {
+  width: 4.5rem;
+  text-align: center;
+}
+
+.active-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.active-cell input {
+  margin: 0;
+}
+
+.active-label {
+  font-size: 0.8125rem;
+}
+
+.col-actions {
+  width: 7rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.col-actions p-button {
+  margin-left: 0.125rem;
+}
+
+.permission-section-anchor {
+  scroll-margin-top: 1rem;
+}
+
+/* ==================== แผงกำหนดสิทธิ์ ย่อ/ขยาย ได้ ==================== */
+.permission-panel-collapsible {
+  background: #ffffff !important;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
+  overflow: hidden;
+}
+
+.permission-panel-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: rgb(var(--bg) / 0.4);
+  color: rgb(var(--fg));
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.permission-panel-header:hover {
+  background: rgb(var(--primary) / 0.08);
+}
+
+.permission-panel-header .pi {
+  font-size: 1rem;
+  color: rgb(var(--muted));
+  transition: transform 0.2s;
+}
+
+.permission-panel-title {
+  flex: 1;
+}
+
+.permission-panel-header-role {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgb(var(--muted));
+}
+
+.permission-panel-body {
+  border-top: 1px solid rgb(var(--border));
+  padding-top: 0;
+}
+
+.permission-panel-body .control-section {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid rgb(var(--border));
+  box-shadow: none;
+  margin-bottom: 0;
+}
+
+/* ==================== PERMISSION SECTION ตามสเก็ตช์ (Permission + Copy from standard role + แท็บ) ==================== */
+.permission-assign-section {
+  background: #ffffff !important;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
+  margin-bottom: 1.5rem;
+}
+
+.permission-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgb(var(--fg));
+  margin: 0 0 1rem 0;
+}
+
+.permission-copy-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.permission-copy-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  margin: 0;
+}
+
+.permission-copy-label input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+
+.permission-copy-select {
+  min-width: 220px;
+}
+
+.permission-divider {
+  height: 1px;
+  background: rgb(var(--border));
+  margin: 1rem 0 1.5rem 0;
+}
+
+/* ==================== ASSIGN PERMISSION MODAL (ป้ายประกาศตามสเก็ต) ==================== */
+.assign-permission-dialog .p-dialog-content {
+  overflow-y: auto;
+  max-height: calc(90vh - 120px);
+}
+
+.assign-permission-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 200px;
+}
+
+.assign-permission-field {
+  margin-bottom: 1rem;
+}
+
+.assign-permission-field .modal-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(var(--fg));
+  margin-bottom: 0.35rem;
+}
+
+.required-asterisk {
+  color: #dc2626;
+  margin-left: 0.125rem;
+}
+
+.assign-permission-role-name {
+  font-size: 1rem;
+  color: rgb(var(--fg));
+  font-weight: 500;
+}
+
+.assign-permission-role-name-input {
+  width: 100%;
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgb(var(--border));
+  border-radius: 0.375rem;
+}
+
+.assign-permission-role-name-input::placeholder {
+  color: rgb(var(--muted));
+}
+
+.assign-permission-heading {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: rgb(var(--fg));
+  margin: 0 0 0.75rem 0;
+}
+
+.assign-permission-copy-row {
+  margin-bottom: 0.75rem;
+}
+
+/* ปุ่ม Apply ชิดขวาตามหลัก UX */
+.permission-copy-row.assign-permission-copy-row .permission-copy-apply-wrap {
+  margin-left: auto;
+}
+
+.assign-permission-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  color: rgb(var(--muted));
+}
+
+.assign-permission-tabs-wrap {
+  flex: 1;
+  min-height: 280px;
+  margin-bottom: 1rem;
+}
+
+.assign-permission-tabs .tab-headers {
+  margin-bottom: 0.5rem;
+}
+
+.assign-permission-tab-content {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid rgb(var(--border));
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.assign-permission-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(var(--border));
+  margin-top: 0.5rem;
 }
 
 /* ==================== CONTROL SECTION ==================== */

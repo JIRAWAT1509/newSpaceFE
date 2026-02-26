@@ -24,6 +24,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   headerHeight = signal<number>(96);
   isMobile = signal<boolean>(false);
+  isAuthRoute = signal<boolean>(false);
 
   private mediaQuery: MediaQueryList | null = null;
   private mediaListener?: () => void;
@@ -65,11 +66,18 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd)
     ).subscribe(() => {
+      this.checkAuthRoute();
       if (this.isMobile()) {
         this.navigationService.setSidebarExpanded(false);
       }
     });
+    this.checkAuthRoute();
     setTimeout(() => this.updateHeaderHeight(), 0);
+  }
+
+  private checkAuthRoute(): void {
+    const url = this.router.url;
+    this.isAuthRoute.set(url.startsWith('/login') || url.startsWith('/forgot-password') || url.startsWith('/reset-password'));
   }
 
   ngOnDestroy(): void {

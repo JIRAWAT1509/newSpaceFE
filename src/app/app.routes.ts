@@ -3,6 +3,22 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   // ============================================
+  // AUTH – Login, Forgot Password, Reset Password (เต็มจอ ไม่มี header/sidebar)
+  // ============================================
+  {
+    path: 'login',
+    loadComponent: () => import('./features/auth/pages/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('./features/auth/pages/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./features/auth/pages/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+  },
+
+  // ============================================
   // DEFAULT / HOME REDIRECT
   // ============================================
   {
@@ -53,6 +69,14 @@ export const routes: Routes = [
   {
     path: 'contract',
     loadChildren: () => import('./features/contract/contract.routes').then(m => m.CONTRACT_ROUTES)
+  },
+
+  // ============================================
+  // CENTRALIZED APPROVAL (Task icon in header)
+  // ============================================
+  {
+    path: 'approval',
+    loadChildren: () => import('./features/approval/approval.routes').then(m => m.APPROVAL_ROUTES)
   },
 
   // ============================================

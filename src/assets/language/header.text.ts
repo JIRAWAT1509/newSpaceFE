@@ -8,6 +8,10 @@ export interface HeaderTexts {
   viewProfile: string;
   settings: string;
   logout: string;
+  dateRangeFrom: string;
+  dateRangeTo: string;
+  datePlaceholderFrom: string;
+  datePlaceholderTo: string;
 }
 
 // This structure allows easy addition of more languages in the future
@@ -21,7 +25,11 @@ export const HEADER_TEXTS: { [key: string]: HeaderTexts } = {
     profileLabel: 'User Profile',
     viewProfile: 'View Profile',
     settings: 'Settings',
-    logout: 'Logout'
+    logout: 'Logout',
+    dateRangeFrom: 'Select Date range from',
+    dateRangeTo: 'to',
+    datePlaceholderFrom: 'From',
+    datePlaceholderTo: 'To'
   },
   th: {
     logoText: 'S P A C E',
@@ -32,7 +40,11 @@ export const HEADER_TEXTS: { [key: string]: HeaderTexts } = {
     profileLabel: 'โปรไฟล์ผู้ใช้',
     viewProfile: 'ดูโปรไฟล์',
     settings: 'ตั้งค่า',
-    logout: 'ออกจากระบบ'
+    logout: 'ออกจากระบบ',
+    dateRangeFrom: 'เลือกช่วงวันที่ตั้งแต่',
+    dateRangeTo: 'ถึง',
+    datePlaceholderFrom: 'ตั้งแต่',
+    datePlaceholderTo: 'ถึง'
   },
   zh: {
     logoText: 'S P A C E',
@@ -43,6 +55,10 @@ export const HEADER_TEXTS: { [key: string]: HeaderTexts } = {
     profileLabel: '用户资料',
     viewProfile: '查看资料',
     settings: '设置',
-    logout: '登出'
+    logout: '登出',
+    dateRangeFrom: '选择日期范围 从',
+    dateRangeTo: '到',
+    datePlaceholderFrom: '从',
+    datePlaceholderTo: '到'
   }
 };

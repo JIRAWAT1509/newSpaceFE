@@ -33,6 +33,9 @@
 
 
 
+@if (isAuthRoute()) {
+  <router-outlet />
+} @else {
 <app-header
   #headerRef
   [style.--sidebar-width]="isMobile() ? '0' : (isSidebarExpanded() ? '16rem' : '5rem')"
@@ -78,3 +81,4 @@
     </main>
   </div>
 </div>
+}

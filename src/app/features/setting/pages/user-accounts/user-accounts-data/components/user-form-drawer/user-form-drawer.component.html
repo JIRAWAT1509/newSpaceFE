@@ -171,6 +171,62 @@
         </div>
       </div>
 
+      <!-- Branch Access Control (default all access) - ตามบรีฟ: กด [+] เพิ่มสาขาได้ -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-1 pb-2 border-b border-gray-200">
+          Branch Access Control
+        </h3>
+        <p class="text-sm text-gray-500 mb-4">ค่าเริ่มต้นเข้าถึงทุกสาขา (default all access) ถ้าต้องการจำกัดสิทธิ์ให้เลือกสาขาด้านล่าง</p>
+
+        <div class="space-y-2">
+          <ng-container *ngFor="let item of formData.branchAccess; let i = index">
+            <div class="branch-row-single">
+              <span class="branch-row-num">{{ i + 1 }}.</span>
+              <span class="branch-row-label">Branch</span>
+              <div class="branch-row-select">
+                <p-select
+                  [(ngModel)]="item.branchId"
+                  [ngModelOptions]="{standalone: true}"
+                  [options]="branchOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="เลือกสาขา"
+                  [showClear]="true"
+                  styleClass="w-full"
+                ></p-select>
+              </div>
+              <label class="branch-row-chk">
+                <input type="checkbox" [(ngModel)]="item.read" [ngModelOptions]="{standalone: true}" class="branch-checkbox" />
+                <span>ดูข้อมูล</span>
+              </label>
+              <label class="branch-row-chk">
+                <input type="checkbox" [(ngModel)]="item.write" [ngModelOptions]="{standalone: true}" class="branch-checkbox" />
+                <span>แก้ไขได้</span>
+              </label>
+              <button
+                *ngIf="formData.branchAccess.length > 1"
+                type="button"
+                (click)="removeBranchAccessRow(i)"
+                class="btn-branch-action btn-branch-remove"
+                title="ลบแถว"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+              <button
+                type="button"
+                (click)="addBranchAccessRow()"
+                class="btn-branch-action btn-branch-add"
+                title="เพิ่มสาขา"
+              >
+                <i class="pi pi-plus"></i>
+                <span class="btn-branch-add-text">เพิ่มสาขา</span>
+              </button>
+            </div>
+          </ng-container>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">กด [+] เพื่อเพิ่มสาขาเพิ่มเติม</p>
+      </div>
+
       <!-- Approval & Access (ลำดับการอนุมัติ, หน้าจอ, ขอบเขตข้อมูล) -->
       <div class="mb-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">

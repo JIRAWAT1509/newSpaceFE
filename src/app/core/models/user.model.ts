@@ -79,6 +79,8 @@ export interface UserFormData {
   allowedScreens: string[];
   /** ขอบเขตการเข้าถึงข้อมูล */
   dataAccessScope: string;
+  /** รายการสาขาที่กำหนดสิทธิ์ (default all access = ว่างไว้ได้) */
+  branchAccess: BranchAccessItem[];
   avatar: File | null;
   avatarPreview: string | null;
   password: string;
@@ -90,4 +92,13 @@ export interface UserFormData {
 export interface DropdownOption {
   label: string;
   value: string;
+}
+
+/** รายการสาขาที่ผู้ใช้มีสิทธิ์เข้าถึง (Branch Access Control) */
+export interface BranchAccessItem {
+  branchId: string;
+  /** สิทธิ์อ่าน (checkbox ที่ 1) */
+  read: boolean;
+  /** สิทธิ์เขียน/แก้ไข (checkbox ที่ 2) */
+  write: boolean;
 }

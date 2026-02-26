@@ -1,16 +1,18 @@
 /* bulk-action-modal.component.css */
-
+/* ฟอร์มในฟันเฟืองจัดการ: อยู่เหนือ header (z-index สูง) และเริ่มใต้ header (padding-top) */
 .modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  padding-top: 72px;
+  padding-top: 100px;
   align-items: flex-start;
   box-sizing: border-box;
-  z-index: 50;
+  z-index: 9998;
   animation: fadeIn 0.2s ease-out;
+  overflow-y: auto;
+  padding-bottom: 2rem;
 }
 
 @keyframes fadeIn {
@@ -23,7 +25,7 @@
   border-radius: 12px;
   width: 100%;
   max-width: 520px;
-  max-height: calc(100vh - 72px - 1rem);
+  max-height: calc(100vh - 100px - 1rem);
   overflow: hidden;
   display: flex;
   flex-direction: column;

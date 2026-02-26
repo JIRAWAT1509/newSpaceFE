@@ -54,16 +54,33 @@
   text-align: right;
 }
 
-/* Scrollable container */
+/* Scrollable container – โมบายเลื่อนแนวนอนได้ */
 .table-container {
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid rgb(var(--border));
   border-radius: 0.375rem;
+  max-width: 100%;
+}
+
+@media (max-width: 639px) {
+  .table-container {
+    overflow-x: auto;
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+    border-radius: 0.5rem;
+  }
+  .table-container .dashboard-table,
+  .table-container .p-datatable-table,
+  .table-container table {
+    min-width: 480px;
+  }
 }
 
 .table-container::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 .table-container::-webkit-scrollbar-track {

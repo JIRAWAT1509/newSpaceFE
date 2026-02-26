@@ -547,29 +547,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   {
     primary_content: 'setting',
     secondary_content: [
-      // --- USER SETTING ---
-      {
-        name: 'user_accounts',
-        icon: 'assets/icons/briefcase-outline.svg',
-        sub: [
-          {
-            name: 'user_data_management',
-            route: '/setting/user-accounts/data',
-            hasDeeper: true,
-            deeperNote:
-              'Contains: User setup, User groups, Display preferences',
-          },
-          {
-            name: 'roles_permissions',
-            route: '/setting/user-accounts/roles',
-            hasDeeper: true,
-            deeperNote:
-              'Contains: Permissions, Email recipients, Positions, Access scope, Approval period',
-          },
-        ],
-      },
-
-      // --- COMPANY SETTING ---
+      // --- COMPANY SETTING (อันดับแรก) ---
       {
         name: 'company_info',
         icon: 'assets/icons/clipboard-outline.svg',
@@ -590,6 +568,28 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           {
             name: 'customer_info',
             route: '/setting/company/customer',
+          },
+        ],
+      },
+
+      // --- USER SETTING ---
+      {
+        name: 'user_accounts',
+        icon: 'assets/icons/briefcase-outline.svg',
+        sub: [
+          {
+            name: 'user_data_management',
+            route: '/setting/user-accounts/data',
+            hasDeeper: true,
+            deeperNote:
+              'Contains: User setup, User groups, Display preferences',
+          },
+          {
+            name: 'roles_permissions',
+            route: '/setting/user-accounts/roles',
+            hasDeeper: true,
+            deeperNote:
+              'Contains: Permissions, Email recipients, Positions, Access scope, Approval period',
           },
         ],
       },

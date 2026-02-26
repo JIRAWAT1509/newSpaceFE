@@ -40,6 +40,7 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
   formData: UserFormData = this.getEmptyFormData();
   roleOptions: DropdownOption[] = [];
   departmentOptions: DropdownOption[] = [];
+  branchOptions: DropdownOption[] = [];
 
   /** ลำดับการอนุมัติ (1, 2, 3, ...) */
   approvalSequenceOptions: DropdownOption[] = [
@@ -105,6 +106,12 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
         this.departmentOptions = departments;
       }
     });
+
+    this.userManagementService.getBranchOptions().subscribe({
+      next: (branches) => {
+        this.branchOptions = branches;
+      }
+    });
   }
 
   populateFormFromUser(user: User): void {
@@ -123,6 +130,7 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
       approvalSequence: user.APPROVAL_SEQUENCE != null ? String(user.APPROVAL_SEQUENCE) : '',
       allowedScreens: user.ALLOWED_SCREENS ? (() => { try { return JSON.parse(user.ALLOWED_SCREENS) as string[]; } catch { return []; } })() : [],
       dataAccessScope: user.DATA_ACCESS_SCOPE || '',
+      branchAccess: (user as any).BRANCH_ACCESS ? (() => { try { const a = JSON.parse((user as any).BRANCH_ACCESS); return Array.isArray(a) && a.length > 0 ? a : [{ branchId: '', read: false, write: false }]; } catch { return [{ branchId: '', read: false, write: false }]; } })() : [{ branchId: '', read: false, write: false }],
       avatar: null,
       avatarPreview: user.PATH_IMG,
       password: '',
@@ -147,6 +155,7 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
       approvalSequence: '',
       allowedScreens: [],
       dataAccessScope: '',
+      branchAccess: [{ branchId: '', read: false, write: false }],
       avatar: null,
       avatarPreview: null,
       password: '',
@@ -285,5 +294,18 @@ export class UserFormDrawerComponent implements OnInit, OnChanges {
 
   closeWarning(): void {
     this.showWarning = false;
+  }
+
+  /** เพิ่มแถว Branch Access (กด [+] ได้ตามบรีฟ) */
+  addBranchAccessRow(): void {
+    this.formData.branchAccess = [...(this.formData.branchAccess || []), { branchId: '', read: false, write: false }];
+  }
+
+  /** ลบแถว Branch Access */
+  removeBranchAccessRow(index: number): void {
+    const list = [...(this.formData.branchAccess || [])];
+    if (list.length <= 1) return;
+    list.splice(index, 1);
+    this.formData.branchAccess = list;
   }
 }

@@ -717,3 +717,35 @@ body {
   background: rgb(var(--card)) !important;
   color: rgb(var(--fg)) !important;
 }
+
+/* ==================== RESPONSIVE โมบาย – PrimeNG ==================== */
+@media (max-width: 639px) {
+  .p-dialog-mask {
+    padding: 0.5rem !important;
+    padding-top: 3rem !important;
+    align-items: flex-start !important;
+  }
+  .p-dialog-mask .p-dialog {
+    width: calc(100vw - 1rem) !important;
+    max-width: none !important;
+    max-height: calc(100dvh - 4rem) !important;
+    margin: 0 auto !important;
+    border-radius: 1rem !important;
+  }
+  .p-dialog .p-dialog-header,
+  .p-dialog .p-dialog-footer {
+    padding: 0.75rem 1rem !important;
+  }
+  .p-dialog .p-dialog-content {
+    padding: 1rem !important;
+  }
+  /* ตาราง PrimeNG ให้เลื่อนแนวนอนบนมือถือ */
+  .p-datatable-wrapper,
+  .p-datatable .p-datatable-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .p-datatable .p-datatable-table {
+    min-width: 480px;
+  }
+}

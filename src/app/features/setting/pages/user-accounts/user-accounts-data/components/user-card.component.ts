@@ -1,12 +1,14 @@
 // user-card.component.ts - Individual user card in grid
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Button } from 'primeng/button';
+import { Tooltip } from 'primeng/tooltip';
 import { User } from '@core/models/user.model';
 
 @Component({
   selector: 'app-user-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Button, Tooltip],
   template: `
     <div
       class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-4 relative border border-gray-200"
@@ -92,13 +94,15 @@ import { User } from '@core/models/user.model';
           <i class="pi pi-pencil text-sm"></i>
           Edit
         </button>
-        <button
-          (click)="onDelete()"
-          class="px-3 py-2 text-red-500 hover:bg-red-50 text-sm font-medium rounded-lg transition-colors flex items-center justify-center border border-red-200"
-          title="Delete"
-        >
-          <i class="pi pi-trash text-sm"></i>
-        </button>
+        <p-button
+          icon="pi pi-trash"
+          [rounded]="true"
+          [text]="true"
+          severity="danger"
+          size="small"
+          pTooltip="ลบ"
+          (onClick)="onDelete()"
+        ></p-button>
       </div>
     </div>
   `

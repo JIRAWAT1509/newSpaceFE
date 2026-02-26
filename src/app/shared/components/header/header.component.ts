@@ -2,7 +2,7 @@
 
 import { Component, HostListener, OnInit, OnDestroy, effect, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
   trigger,
@@ -24,6 +24,9 @@ import { NAVIGATION_TEXTS } from '@assets/language/navigation.text';
 import { NavigationService } from '@core/services/navigation.service';
 import { HeaderService } from '@core/services/header.service';
 import { getLabelOverride } from '@core/services/ui-settings';
+import { ApprovalNotificationService } from '@core/services/approval-notification.service';
+import { Subscription } from 'rxjs';
+import { AuthService } from '@core/services/auth.service';
 
 export interface SearchResultItem {
   title: string;
@@ -168,6 +171,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   // Search
   searchQuery: string = '';
 
+  /** จำนวนเอกสารรออนุมัติ (สำหรับแสดง badge ที่ MY TASK) */
+  pendingApprovalCount = 0;
+
+  private routerSubscription?: Subscription;
+
   // Texts for multi-language support
   texts: HeaderTexts;
 
@@ -177,7 +185,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     private navigationService: NavigationService,
     private headerService: HeaderService,
-    private router: Router // NEW: Inject Router for navigation
+    private router: Router,
+    public approvalNotification: ApprovalNotificationService,
+    private auth: AuthService
   ) {
     this.currentLanguage = this.languageService.getCurrentLanguage();
     this.texts = HEADER_TEXTS[this.currentLanguage.code];
@@ -190,6 +200,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     effect(() => {
       this.isScrolled = this.headerService.isScrolled();
     });
+
+    effect(() => {
+      this.pendingApprovalCount = this.approvalNotification.count();
+    });
   }
 
   ngOnInit(): void {
@@ -201,6 +215,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     // Load language data
     this.availableLanguages = this.languageService.getAvailableLanguages();
+
+    // โหลดจำนวนรออนุมัติให้ badge MY TASK แสดงทุกหน้า
+    this.approvalNotification.refreshPendingCount();
+    this.setupRouterSubscription();
+  }
+
+  private setupRouterSubscription(): void {
+    this.routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.approvalNotification.refreshPendingCount();
+      }
+    });
   }
 
   getUserInitials(name: string): string {
@@ -290,7 +316,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cleanup if needed
+    this.routerSubscription?.unsubscribe();
   }
 
   toggleLanguageDropdown(): void {
@@ -358,8 +384,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    // Implement logout logic
-    console.log('Logout clicked');
+    this.auth.logout();
+    this.router.navigate(['/login']);
   }
 
   // Close dropdowns when clicking outside

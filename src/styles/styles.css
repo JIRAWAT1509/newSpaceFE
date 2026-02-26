@@ -84,9 +84,171 @@ body {
   background-color: #ffffff;
 }
 
+/* ==================== ขนาดฟอนต์ทั้งระบบเท่ากัน (ทุกหน้า หัวข้อและเนื้อหา) ==================== */
+html {
+  font-size: 14px;
+}
+h1, h2, h3, h4, h5, h6,
+.form-heading-title,
+.page-title,
+.section-title,
+.card-title,
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-title,
+.p-panel .p-panel-title,
+.p-card .p-card-title {
+  font-size: 14px !important;
+  line-height: 1.5;
+}
+/* ครอบคลุมทุก element ที่อาจตั้ง font-size ใน component (ทั้งระบบ) */
+body,
+body *,
+main,
+main *,
+.p-dialog *,
+.p-drawer *,
+.drawer-panel *,
+.content-container * {
+  font-size: inherit;
+}
+/* คืนค่าขนาดให้ชัดเจนที่ตัวข้อความหลัก (ทั้งระบบ) */
+body, p, span, div, td, th, li, label, input, select, textarea, button, a,
+.p-datatable .p-datatable-thead th,
+.p-datatable .p-datatable-tbody td,
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-footer,
+.p-card .p-card-content,
+.p-panel .p-panel-content,
+.p-tabview .p-tabview-panels,
+.p-select .p-select-label,
+.p-inputtext,
+.p-dropdown .p-dropdown-label {
+  font-size: 14px !important;
+}
+
 /* พื้นที่เนื้อหาหลักทุกหน้าเป็นสีขาว */
 main {
   background-color: #ffffff !important;
+}
+
+/* ==================== RESPONSIVE – รองรับทุกหน้าจอ (โมบาย แท็บเล็ต เดสก์ท็อป) ==================== */
+/* Breakpoints ใช้ร่วมกับ Tailwind: xs 375, sm 640, md 768, lg 1024, xl 1280, 2xl 1536 */
+
+:root {
+  --bp-mobile: 639px;
+  --bp-tablet: 1023px;
+  --bp-desktop: 1024px;
+  --content-padding-mobile: 0.75rem;
+  --content-padding-tablet: 1rem;
+  --content-padding-desktop: 1.5rem;
+  --touch-min: 44px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Safe area สำหรับสมาร์ทโฟนมี notch / home indicator */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* คอนเทนเนอร์เนื้อหาทุกหน้า – โมบายแคบ แท็บ/เดสก์กว้าง */
+.content-container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: var(--content-max);
+  padding-left: var(--content-padding-mobile);
+  padding-right: var(--content-padding-mobile);
+}
+@media (min-width: 640px) {
+  .content-container {
+    padding-left: var(--content-padding-tablet);
+    padding-right: var(--content-padding-tablet);
+  }
+}
+@media (min-width: 1024px) {
+  .content-container {
+    padding-left: var(--content-padding-desktop);
+    padding-right: var(--content-padding-desktop);
+  }
+}
+
+/* ปุ่ม/ลิงก์ที่กดบนมือถือ – ขนาดสัมผัสไม่เล็กเกินไป */
+@media (max-width: 639px) {
+  button:not(.icon-only),
+  .p-button:not([class*="p-button-icon-only"]),
+  a[role="button"] {
+    min-height: var(--touch-min);
+    min-width: var(--touch-min);
+  }
+}
+
+/* ตารางบนมือถือ – ให้เลื่อนแนวนอนได้ ไม่บีบเลย์เอาต์ */
+.table-scroll-mobile,
+.table-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+@media (max-width: 639px) {
+  .table-scroll-mobile .p-datatable-table,
+  .table-scroll-mobile table,
+  .table-container .p-datatable-table,
+  .table-container table {
+    min-width: 480px;
+  }
+}
+
+/* การ์ด/ฟอร์มทุกหน้า – โมบายเต็มความกว้าง */
+@media (max-width: 639px) {
+  .p-card,
+  .p-panel,
+  .p-dialog .p-dialog-content {
+    border-radius: 0.75rem;
+  }
+  .p-dialog {
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+/* Drawer/Modal บนมือถือ – เต็มจอหรือเกือบเต็ม */
+@media (max-width: 639px) {
+  .drawer-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 1rem 1rem 0 0 !important;
+  }
+  .drawer-body,
+  .p-dialog .p-dialog-content {
+    padding-left: var(--content-padding-mobile);
+    padding-right: var(--content-padding-mobile);
+  }
+}
+
+/* Utility: บนมือถือเรียงแนวตั้ง บนแท็บ/เดสก์เรียงแนวนอน */
+.responsive-stack-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+@media (min-width: 640px) {
+  .responsive-stack-mobile {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 }
 
 /* ==================== OVERLAY / DRAWER / MODAL: หัวข้อฟอร์มไม่ให้โดน header บัง (ทั้งระบบ) ==================== */
@@ -124,12 +286,18 @@ main {
     max-height: calc(100vh - 100px) !important;
   }
 }
-
-.content-container {
-  margin: 0 auto;
-  max-width: var(--content-max);
-  padding-left: var(--content-padding);
-  padding-right: var(--content-padding);
+/* โมบาย: drawer เต็มความกว้างจากด้านล่าง */
+@media (max-width: 639px) {
+  .modal-overlay {
+    padding-top: 0.5rem !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+    padding-bottom: 1rem !important;
+  }
+  .modal-overlay .modal-container,
+  .modal-overlay .edit-modal-container {
+    max-height: calc(100dvh - 2rem) !important;
+  }
 }
 
 html[data-icon-style='solid'] .pi {

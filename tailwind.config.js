@@ -2,9 +2,34 @@
 module.exports = {
   content: [
     "./src/**/*.{html,ts}",
-  ], 
+  ],
   theme: {
+    /* Breakpoints: โมบาย (<640), แท็บเล็ต (640-1023), เดสก์ท็อป (1024+) */
+    screens: {
+      'xs': '375px',   /* สมาร์ทโฟนเล็ก */
+      'sm': '640px',   /* สมาร์ทโฟนใหญ่ / แท็บเล็ตแนวตั้ง */
+      'md': '768px',   /* แท็บเล็ต */
+      'lg': '1024px',  /* เล็ปท็อป / เดสก์ท็อปเล็ก */
+      'xl': '1280px',
+      '2xl': '1536px',
+    },
     extend: {
+      /* ขนาดฟอนต์ทั้งระบบเท่ากัน: ทุกหน้า หัวข้อและเนื้อหาใช้ขนาดเดียวกัน */
+      fontSize: {
+        'xs': ['14px', { lineHeight: '1.5' }],
+        'sm': ['14px', { lineHeight: '1.5' }],
+        'base': ['14px', { lineHeight: '1.5' }],
+        'lg': ['14px', { lineHeight: '1.5' }],
+        'xl': ['14px', { lineHeight: '1.5' }],
+        '2xl': ['14px', { lineHeight: '1.5' }],
+        '3xl': ['14px', { lineHeight: '1.5' }],
+        '4xl': ['14px', { lineHeight: '1.5' }],
+        '5xl': ['14px', { lineHeight: '1.5' }],
+        '6xl': ['14px', { lineHeight: '1.5' }],
+        '7xl': ['14px', { lineHeight: '1.5' }],
+        '8xl': ['14px', { lineHeight: '1.5' }],
+        '9xl': ['14px', { lineHeight: '1.5' }],
+      },
       colors: {
         bg: "rgb(var(--bg) / <alpha-value>)",
         fg: "rgb(var(--fg) / <alpha-value>)",

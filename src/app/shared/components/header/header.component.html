@@ -18,7 +18,7 @@
         </button>
         <h1
           (click)="onLogoClick()"
-          class="text-primary-foreground text-xl md:text-2xl font-bold tracking-tight md:tracking-wide drop-shadow-md cursor-pointer hover:opacity-90 active:opacity-95 transition-opacity duration-200 whitespace-nowrap truncate"
+          class="header-logo text-primary-foreground font-bold tracking-tight md:tracking-wide drop-shadow-md cursor-pointer hover:opacity-90 active:opacity-95 transition-opacity duration-200 whitespace-nowrap truncate"
           title="Go to Home"
         >
           {{ texts.logoText }}
@@ -98,10 +98,25 @@
             </div>
           </div>
 
+          <!-- Task / MY TASK - Centralized approval (noti จำนวนรออนุมัติ) -->
+          <a
+            routerLink="/approval"
+            class="header-task-btn"
+            [title]="pendingApprovalCount > 0 ? 'MY TASK - มีเอกสารรออนุมัติ ' + pendingApprovalCount + ' รายการ' : 'MY TASK - ข้อมูลสัญญารออนุมัติ'"
+            aria-label="MY TASK"
+          >
+            <i class="pi pi-inbox" aria-hidden="true"></i>
+            @if (pendingApprovalCount > 0) {
+              <span class="header-task-badge" [attr.aria-label]="pendingApprovalCount + ' รายการรออนุมัติ'">
+                {{ pendingApprovalCount > 99 ? '99+' : pendingApprovalCount }}
+              </span>
+            }
+          </a>
+
           <!-- Language Selector -->
           <div class="relative language-dropdown">
             <button (click)="toggleLanguageDropdown()"
-              class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-card text-fg font-semibold text-xs md:text-sm flex items-center justify-center hover:bg-bg active:scale-95 transition-all duration-200 shadow-md flex-shrink-0 touch-manipulation">
+              class="header-icon-circle rounded-full bg-card text-fg font-semibold flex items-center justify-center hover:bg-bg active:scale-95 transition-all duration-200 shadow-md flex-shrink-0 touch-manipulation">
               {{ currentLanguage.abbreviation }}
             </button>
 
@@ -122,10 +137,10 @@
           <!-- User Profile -->
           <div class="relative profile-dropdown">
             <button (click)="toggleProfileDropdown()"
-              class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-card flex items-center justify-center hover:bg-bg active:scale-95 transition-all duration-200 shadow-md overflow-hidden flex-shrink-0 touch-manipulation ring-2 ring-transparent focus:ring-primary/30">
+              class="header-icon-circle rounded-full bg-card flex items-center justify-center hover:bg-bg active:scale-95 transition-all duration-200 shadow-md overflow-hidden flex-shrink-0 touch-manipulation ring-2 ring-transparent focus:ring-primary/30">
               <img *ngIf="hasProfilePicture && profilePictureUrl" [src]="profilePictureUrl" [alt]="username"
                 class="w-full h-full object-cover" />
-              <svg *ngIf="!hasProfilePicture" class="w-4 h-4 md:w-5 md:h-5 text-muted" fill="none"
+              <svg *ngIf="!hasProfilePicture" class="header-profile-icon text-muted" fill="none"
                 stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

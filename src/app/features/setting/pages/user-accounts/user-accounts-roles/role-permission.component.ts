@@ -1,14 +1,16 @@
 // role-permission.component.ts - Main component for role and permission management
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
-import { Tabs } from 'primeng/tabs';
 import { Dialog } from 'primeng/dialog';
 import { Message } from 'primeng/message';
 import { Tooltip } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { Checkbox } from 'primeng/checkbox';
 import { Subject, takeUntil, debounceTime } from 'rxjs';
 
 import {
@@ -17,11 +19,12 @@ import {
   MenuTab,
   PermissionTemplate,
   PermissionSummary,
-  BulkActionType,
   MENU_TABS
 } from '@core/models/permission.model';
 import { RolePermissionService } from '@core/services/role-permission.service';
+import { RoleService } from '@core/services/role.service';
 import { PermissionTreeRowComponent } from './components/permission-tree-row/permission-tree-row.component';
+import { RoleDrawerComponent } from './components/role-drawer/role-drawer.component';
 
 @Component({
   selector: 'app-role-permission',
@@ -32,57 +35,75 @@ import { PermissionTreeRowComponent } from './components/permission-tree-row/per
     Select,
     Button,
     InputText,
-    // Tabs,
     Dialog,
     Message,
-    // Tooltip,
-    PermissionTreeRowComponent
+    Tooltip,
+    ConfirmDialogModule,
+    Checkbox,
+    PermissionTreeRowComponent,
+    RoleDrawerComponent,
   ],
   templateUrl: './role-permission.component.html',
-  styleUrl: './role-permission.component.css'
+  styleUrl: './role-permission.component.css',
+  providers: [ConfirmationService],
 })
 export class RolePermissionComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
 
+  @ViewChild('permissionSection') permissionSectionRef?: ElementRef<HTMLElement>;
+
   // ==================== DATA ====================
 
-  // Roles
   roles: Role[] = [];
   selectedRole: string = '';
+  /** ค่าใน dropdown (sync กับ selectedRole; ใช้ revert ตอนยกเลิก discard) */
+  selectedRoleDropdown: string = '';
 
-  // Permissions (tree structure)
   permissionTree: Permission[] = [];
-  originalPermissions: Permission[] = []; // For cancel/reset
+  originalPermissions: Permission[] = [];
 
-  // Tabs
   tabs: MenuTab[] = [];
   activeTabIndex: number = 0;
 
-  // Templates
   templates: PermissionTemplate[] = [];
 
   // ==================== UI STATE ====================
 
   isLoading: boolean = false;
+  isLoadingRoles: boolean = false;
   isSaving: boolean = false;
   hasChanges: boolean = false;
 
-  // Search & Filter
   searchQuery: string = '';
   filteredTree: Permission[] = [];
 
-  // Modals
   showCopyModal: boolean = false;
   showTemplateModal: boolean = false;
   showDiscardModal: boolean = false;
   copyFromRole: string = '';
   selectedTemplate: string = '';
+  /** role ที่จะสลับไปเมื่อกด Discard (จาก dropdown หรือคลิกแถว) */
+  pendingRoleSelection: string = '';
 
-  /** ให้ dropdown ในโมดัล Copy from Role โผล่เหนือ dialog และการ์ดด้านหลัง */
+  /** ตามสเก็ตช์ Assign Permission: Copy from standard role (inline ในส่วน Permission) */
+  useCopyFromStandardRole = false;
+  copyFromRoleInline: string = '';
+  isCopyingPermissions = false;
+
+  showRoleDrawer = false;
+  roleDrawerMode: 'create' | 'edit' = 'create';
+  roleDrawerRole: Role | null = null;
+
+  /** โมดัล Assign Permission ตามสเก็ต (Role name + Permission + Copy from standard role + แท็บ + Save) */
+  showAssignPermissionModal = false;
+  /** ชื่อ role ที่แก้ได้ในโมดัล Assign Permission */
+  assignPermissionRoleName = '';
+  /** เลือกเทมเพลตในโมดัล Assign Permission (ใช้ร่วมกับ Apply Template) */
+  templateChoiceInAssignModal = '';
+
   copyRoleOverlayOptions = { baseZIndex: 99999 };
 
-  // Statistics
   summary: PermissionSummary = {
     totalMenus: 0,
     totalFeatures: 0,
@@ -92,28 +113,22 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
     fullAccessFeatures: 0
   };
 
-  // Messages
   successMessage: string = '';
   errorMessage: string = '';
 
-  // ==================== CONSTRUCTOR ====================
+  /** แผงกำหนดสิทธิ์ (Select Role + Permission) ย่อ/ขยาย ได้ — เริ่มต้นย่อไว้ */
+  permissionPanelExpanded = false;
 
   constructor(
     private rolePermissionService: RolePermissionService,
+    private roleService: RoleService,
+    private confirmationService: ConfirmationService,
     private cdr: ChangeDetectorRef
   ) {
-    // Setup search debounce
     this.searchSubject
-      .pipe(
-        debounceTime(300),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(query => {
-        this.applySearchFilter(query);
-      });
+      .pipe(debounceTime(300), takeUntil(this.destroy$))
+      .subscribe(query => this.applySearchFilter(query));
   }
-
-  // ==================== LIFECYCLE ====================
 
   ngOnInit(): void {
     this.loadRoles();
@@ -125,32 +140,27 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ==================== LOAD DATA ====================
-
   /**
-   * Load all available roles
+   * โหลดรายการ role จาก RoleService (ตาราง + dropdown)
    */
   loadRoles(): void {
-    this.isLoading = true;
-
-    this.rolePermissionService.getRoles()
+    this.isLoadingRoles = true;
+    this.roleService.getRoles()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          this.roles = response.data;
-
-          // Auto-select first role if available
+        next: (data) => {
+          this.roles = data;
           if (this.roles.length > 0 && !this.selectedRole) {
             this.selectedRole = this.roles[0].USER_GROUP;
+            this.selectedRoleDropdown = this.selectedRole;
             this.loadPermissions();
-          } else {
-            this.isLoading = false;
           }
+          this.isLoadingRoles = false;
         },
-        error: (error) => {
-          console.error('Error loading roles:', error);
-          this.showError('Failed to load roles');
-          this.isLoading = false;
+        error: (err) => {
+          console.error('Error loading roles:', err);
+          this.showError('โหลดรายการ role ไม่สำเร็จ');
+          this.isLoadingRoles = false;
         }
       });
   }
@@ -208,6 +218,7 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
 
           this.hasChanges = false;
           this.isLoading = false;
+          this.selectedRoleDropdown = this.selectedRole;
         },
         error: (error) => {
           console.error('Error loading permissions:', error);
@@ -239,37 +250,191 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   // ==================== ROLE SELECTION ====================
 
   /**
-   * Handle role selection change
+   * เมื่อเปลี่ยน role จาก dropdown (p-select ส่ง value มา)
    */
-  onRoleChange(): void {
+  onRoleChange(ev: { value?: string } | string): void {
+    const newValue = (typeof ev === 'object' && ev && ev.value !== undefined ? ev.value : (typeof ev === 'string' ? ev : this.selectedRoleDropdown)) ?? this.selectedRoleDropdown;
     if (this.hasChanges) {
+      this.pendingRoleSelection = newValue;
       this.showDiscardModal = true;
     } else {
+      this.selectedRole = newValue;
+      this.selectedRoleDropdown = newValue;
       this.loadPermissions();
     }
   }
 
-  /**
-   * Confirm discard changes and load new role
-   */
   confirmDiscardChanges(): void {
     this.showDiscardModal = false;
     this.hasChanges = false;
+    if (this.pendingRoleSelection) {
+      this.selectedRole = this.pendingRoleSelection;
+      this.selectedRoleDropdown = this.selectedRole;
+      this.pendingRoleSelection = '';
+    }
     this.loadPermissions();
   }
 
-  /**
-   * Cancel discard and revert role selection
-   */
   cancelDiscardChanges(): void {
-    // Revert to previous role selection
-    const previousRole = this.roles.find(r =>
-      JSON.stringify(this.originalPermissions).includes(r.USER_GROUP)
-    );
-    if (previousRole) {
-      this.selectedRole = previousRole.USER_GROUP;
-    }
+    this.selectedRoleDropdown = this.selectedRole;
+    this.pendingRoleSelection = '';
     this.showDiscardModal = false;
+  }
+
+  closeRoleDrawer(): void {
+    this.showRoleDrawer = false;
+    this.roleDrawerRole = null;
+  }
+
+  onRoleDrawerSaved(role: Role): void {
+    const idx = this.roles.findIndex((r) => r.USER_GROUP === role.USER_GROUP);
+    if (idx >= 0) {
+      this.roles[idx] = { ...this.roles[idx], ...role };
+    } else {
+      this.roles = [...this.roles, role];
+    }
+    this.showSuccess(this.roleDrawerMode === 'create' ? 'สร้าง role แล้ว' : 'อัปเดต role แล้ว');
+    this.closeRoleDrawer();
+    // หลังสร้าง role ใหม่ ให้เลือก role นั้นและโหลดสิทธิ (พร้อมกด Assign Permission ได้ทันที)
+    if (this.roleDrawerMode === 'create') {
+      this.selectedRole = role.USER_GROUP;
+      this.selectedRoleDropdown = role.USER_GROUP;
+      this.loadPermissions();
+    }
+  }
+
+  /** เลือก role จากแถวในตาราง แล้วโหลด permission */
+  selectRoleRow(r: Role): void {
+    if (this.hasChanges) {
+      this.pendingRoleSelection = r.USER_GROUP;
+      this.showDiscardModal = true;
+      return;
+    }
+    this.selectedRole = r.USER_GROUP;
+    this.selectedRoleDropdown = r.USER_GROUP;
+    this.permissionPanelExpanded = true;
+    this.loadPermissions();
+  }
+
+  /** scroll ไปส่วน Permission (เมื่อกด Assign Permission) */
+  scrollToPermissionSection(): void {
+    if (this.permissionSectionRef?.nativeElement) {
+      this.permissionSectionRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  /** สลับย่อ/ขยาย แผงกำหนดสิทธิ์ (Select Role + Permission) */
+  togglePermissionPanel(): void {
+    this.permissionPanelExpanded = !this.permissionPanelExpanded;
+  }
+
+  /** เปิดป้ายประกาศ Assign Permission ตามสเก็ต */
+  openAssignPermissionModal(): void {
+    if (!this.selectedRole || this.isRoleInactive(this.selectedRole)) return;
+    // โหลดสิทธิเฉพาะเมื่อยังไม่มีข้อมูล และไม่ได้กำลังโหลดอยู่ (ไม่ reload ทับการแก้ไขที่ยังไม่บันทึก)
+    if (!this.hasPermissions && !this.isLoading) {
+      this.loadPermissions();
+    }
+    this.assignPermissionRoleName = this.getRoleLabel(this.selectedRole);
+    this.templateChoiceInAssignModal = '';
+    this.showAssignPermissionModal = true;
+  }
+
+  closeAssignPermissionModal(): void {
+    this.showAssignPermissionModal = false;
+  }
+
+  /** บันทึกสิทธิในโมดัล Assign Permission แล้วปิด (รวมอัปเดตชื่อ role ถ้าแก้) */
+  savePermissionsAndCloseAssignModal(): void {
+    const nameTrimmed = this.assignPermissionRoleName?.trim() ?? '';
+    if (!nameTrimmed) {
+      this.showError('กรุณากรอกชื่อ role');
+      return;
+    }
+    const currentName = this.getRoleLabel(this.selectedRole);
+    const nameChanged = nameTrimmed !== currentName;
+
+    if (nameChanged) {
+      this.roleService.updateRole(this.selectedRole, { name: nameTrimmed })
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (updatedRole) => {
+            const idx = this.roles.findIndex(r => r.USER_GROUP === this.selectedRole);
+            if (idx >= 0) {
+              this.roles[idx] = { ...this.roles[idx], ...updatedRole };
+            }
+            this.savePermissions('บันทึกสิทธิและชื่อ role เรียบร้อยแล้ว', () => this.closeAssignPermissionModal());
+          },
+          error: () => {
+            this.showError('อัปเดตชื่อ role ไม่สำเร็จ');
+          },
+        });
+    } else {
+      this.savePermissions('บันทึกสิทธิเรียบร้อยแล้ว', () => this.closeAssignPermissionModal());
+    }
+  }
+
+  openAddRoleDrawer(): void {
+    this.roleDrawerMode = 'create';
+    this.roleDrawerRole = null;
+    this.showRoleDrawer = true;
+  }
+
+  openEditRoleDrawer(r: Role): void {
+    this.roleDrawerMode = 'edit';
+    this.roleDrawerRole = { ...r };
+    this.showRoleDrawer = true;
+  }
+
+  /** เช็คว่า role นี้ inactive หรือไม่ (ใช้ disable Assign Permission) */
+  isRoleInactive(role: Role | string | null): boolean {
+    if (!role) return true;
+    const r = typeof role === 'string' ? this.roles.find(x => x.USER_GROUP === role) : role;
+    return r ? r.ACTIVE === 'N' : true;
+  }
+
+  /** สลับ Active จาก checkbox ในตาราง (optimistic) */
+  onRoleActiveToggle(r: Role, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const prev = r.ACTIVE;
+    r.ACTIVE = checked ? 'Y' : 'N';
+    this.roleService.toggleRoleActive(r.USER_GROUP, checked)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        error: () => {
+          r.ACTIVE = prev;
+          this.showError('เปลี่ยนสถานะ Active ไม่สำเร็จ');
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  confirmDeleteRole(r: Role): void {
+    this.confirmationService.confirm({
+      message: `ต้องการลบ role "${r.GROUP_NAME}" ใช่หรือไม่?`,
+      header: 'ยืนยันการลบ',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.deleteRole(r),
+    });
+  }
+
+  deleteRole(r: Role): void {
+    this.roleService.deleteRole(r.USER_GROUP)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.roles = this.roles.filter(x => x.USER_GROUP !== r.USER_GROUP);
+          if (this.selectedRole === r.USER_GROUP) {
+            this.selectedRole = this.roles[0]?.USER_GROUP ?? '';
+            this.selectedRoleDropdown = this.selectedRole;
+            this.loadPermissions();
+          }
+          this.showSuccess('ลบ role แล้ว');
+          this.cdr.markForCheck();
+        },
+        error: () => this.showError('ลบ role ไม่สำเร็จ'),
+      });
   }
 
   // ==================== PERMISSION CHANGES ====================
@@ -500,37 +665,54 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Apply selected template (only called when user clicks Apply Template button)
+   * Apply template to permission tree (ไม่บันทึก ไม่ปิดโมดัล — ใช้ใน Assign Permission modal)
+   * @returns true ถ้า apply สำเร็จ
    */
-  applyTemplate(): void {
-    if (!this.selectedTemplate) return;
+  applyTemplateToTree(templateId: string): boolean {
+    if (!templateId) return false;
+    const template = this.templates.find(t => t.id === templateId);
+    if (!template) return false;
 
-    const template = this.templates.find(t => t.id === this.selectedTemplate);
-    if (!template) return;
-
-    // Flatten tree to apply template
     const flatPermissions = this.rolePermissionService.flattenTree(this.permissionTree);
-
-    // Apply template
     const updatedPermissions = this.rolePermissionService.applyTemplate(
       flatPermissions,
       template
     );
-
-    // Rebuild tree
     this.permissionTree = this.rolePermissionService.buildTree(updatedPermissions);
     this.permissionTree = this.rolePermissionService.updateIndeterminateStates(
       this.permissionTree
     );
     this.filteredTree = [...this.permissionTree];
     this.buildTabs();
-
     this.hasChanges = true;
     this.updateSummary();
-    const templateName = template.name;
+    return true;
+  }
+
+  /**
+   * Apply selected template (only called when user clicks Apply Template button on main page)
+   */
+  applyTemplate(): void {
+    if (!this.selectedTemplate) return;
+    if (!this.applyTemplateToTree(this.selectedTemplate)) return;
+    const template = this.templates.find(t => t.id === this.selectedTemplate);
+    const templateName = template?.name ?? '';
     this.showTemplateModal = false;
     this.selectedTemplate = '';
     this.savePermissions(`Template "${templateName}" applied and saved.`);
+  }
+
+  /**
+   * Apply template ภายในโมดัล Assign Permission (ไม่ปิดโมดัล ไม่บันทึก — ให้กด Save ด้านล่าง)
+   */
+  applyTemplateInAssignModal(): void {
+    if (!this.templateChoiceInAssignModal) {
+      this.showError('กรุณาเลือกเทมเพลต');
+      return;
+    }
+    if (this.applyTemplateToTree(this.templateChoiceInAssignModal)) {
+      this.showSuccess('ใช้เทมเพลตแล้ว — กด Save ด้านล่างเพื่อบันทึก');
+    }
   }
 
   // ==================== COPY FROM ROLE ====================
@@ -549,6 +731,49 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   cancelCopyModal(): void {
     this.showCopyModal = false;
     this.copyFromRole = '';
+  }
+
+  /** Apply Copy from standard role (inline ในส่วน Permission ตามสเก็ตช์) */
+  applyCopyFromStandardRoleInline(): void {
+    if (!this.copyFromRoleInline || this.copyFromRoleInline === this.selectedRole) {
+      this.showError('กรุณาเลือก role ต้นทางที่แตกต่างจาก role ปัจจุบัน');
+      return;
+    }
+    this.isCopyingPermissions = true;
+    this.clearMessages();
+    this.rolePermissionService
+      .getPermissions({ USER_GROUP: this.copyFromRoleInline })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          const sourceWithMode = response.data.map((p) => {
+            const mode = this.rolePermissionService.calculateAccessMode(p);
+            return { ...p, isEnabled: mode.isEnabled, isViewOnly: mode.isViewOnly };
+          });
+          this.permissionTree = this.rolePermissionService.mergePermissionsFromSource(
+            this.permissionTree,
+            sourceWithMode,
+            this.selectedRole
+          );
+          this.permissionTree = this.rolePermissionService.updateIndeterminateStates(this.permissionTree);
+          if (this.searchQuery) {
+            this.applySearchFilter(this.searchQuery);
+          } else {
+            this.filteredTree = [...this.permissionTree];
+          }
+          this.buildTabs();
+          this.updateSummary();
+          this.hasChanges = true;
+          this.isCopyingPermissions = false;
+          const label = this.roles.find((r) => r.USER_GROUP === this.copyFromRoleInline)?.GROUP_NAME ?? this.copyFromRoleInline;
+          this.showSuccess(`คัดลอกสิทธิจาก role "${label}" แล้ว — กด "บันทึกการเปลี่ยนแปลง" เพื่อบันทึก`);
+        },
+        error: (err) => {
+          console.error('Error copying permissions:', err);
+          this.showError('โหลดสิทธิจาก role ต้นทางไม่สำเร็จ');
+          this.isCopyingPermissions = false;
+        },
+      });
   }
 
   /**
@@ -612,8 +837,9 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   /**
    * Save permissions to backend.
    * @param optionalSuccessMessage If provided, shown on success instead of default message.
+   * @param onSuccess Optional callback after save success (e.g. close Assign Permission modal).
    */
-  savePermissions(optionalSuccessMessage?: string): void {
+  savePermissions(optionalSuccessMessage?: string, onSuccess?: () => void): void {
     if (!this.selectedRole) {
       this.showError('Please select a role');
       return;
@@ -643,6 +869,7 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
           this.originalPermissions = JSON.parse(JSON.stringify(this.permissionTree));
           this.isSaving = false;
           this.showSuccess(optionalSuccessMessage ?? 'Permissions saved successfully');
+          onSuccess?.();
         },
         error: (error) => {
           console.error('Error saving permissions:', error);
@@ -743,15 +970,5 @@ export class RolePermissionComponent implements OnInit, OnDestroy {
   getRoleLabel(value: string): string {
     const role = this.roles.find(r => r.USER_GROUP === value);
     return role ? role.GROUP_NAME : value;
-  }
-
-  /**
-   * Open Add Role modal
-   */
-  openAddRoleModal(): void {
-    // TODO: Implement Add Role functionality
-    // For now, just show a message
-    this.showSuccess('Add Role feature coming soon');
-    // You can add a modal here similar to copy/template modals
   }
 }

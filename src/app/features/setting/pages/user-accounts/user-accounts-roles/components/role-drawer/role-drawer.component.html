@@ -1,0 +1,39 @@
+<!-- role-drawer: ป้ายประกาศกลางหน้าจอ (p-dialog) แบบ Copy from Role -->
+<p-dialog
+  [visible]="isOpen"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '450px' }"
+  styleClass="role-permission-dialog"
+  contentStyleClass="role-permission-dialog-content"
+  [header]="mode === 'create' ? 'Add New Role' : 'Edit Role'"
+  (onHide)="onClose()"
+>
+  <div class="modal-content-body" (wheel)="$event.stopPropagation()">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="modal-field">
+        <label class="modal-label">Role name <span class="text-red-500">*</span></label>
+        <input type="text" pInputText formControlName="name" class="w-full modal-input" placeholder="เช่น Sale Manager" />
+        <span *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="text-red-600 text-sm">กรุณากรอกชื่อ role</span>
+      </div>
+
+      <div class="modal-field flex items-center gap-3">
+        <label class="modal-label mb-0">Enable</label>
+        <label class="toggle-switch">
+          <input type="checkbox" formControlName="isActive" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <p *ngIf="errorMessage" class="text-red-600 text-sm mt-2">{{ errorMessage }}</p>
+
+      <!-- ปุ่ม Save / Cancel ไว้ในเนื้อหาให้เห็นชัด -->
+      <div class="template-modal-actions role-drawer-actions">
+        <p-button label="Cancel" severity="secondary" [outlined]="true" (onClick)="onClose()"></p-button>
+        <p-button label="Save" icon="pi pi-check" severity="primary" [loading]="isSubmitting" [disabled]="form.invalid" (onClick)="onSubmit()"></p-button>
+      </div>
+    </form>
+  </div>
+</p-dialog>
