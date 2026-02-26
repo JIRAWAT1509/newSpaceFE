@@ -1,3 +1,5 @@
+<!-- add-floor-modal.component.html -->
+
 <p-dialog
   [(visible)]="visible"
   [modal]="true"
@@ -20,6 +22,20 @@
 
   <!-- Content -->
   <div class="modal-content">
+    <!-- เพิ่มใน form ก่อน Floor Number -->
+    <div class="form-group">
+      <label class="form-label">Building</label>
+      <input
+        type="text"
+        class="form-input"
+        [value]="buildingDisplay()"
+        readonly
+        style="background-color: #f9fafb; cursor: not-allowed"
+      />
+      <span class="form-hint text-xs text-gray-400"
+        >Building ที่เลือกอยู่ในปัจจุบัน</span
+      >
+    </div>
     <form [formGroup]="floorForm" class="floor-form">
       <!-- Floor Number -->
       <div class="form-group">
@@ -31,12 +47,12 @@
           placeholder="e.g., 55"
           [class.error]="isFieldInvalid('floorNumber')"
         />
-        @if (isFieldInvalid('floorNumber')) {
+        @if (isFieldInvalid("floorNumber")) {
           <span class="error-message">
-            @if (floorForm.get('floorNumber')?.hasError('required')) {
+            @if (floorForm.get("floorNumber")?.hasError("required")) {
               Floor number is required
             }
-            @if (floorForm.get('floorNumber')?.hasError('floorExists')) {
+            @if (floorForm.get("floorNumber")?.hasError("floorExists")) {
               This floor number already exists
             }
           </span>
@@ -53,7 +69,7 @@
           placeholder="e.g., Fl. 55"
           [class.error]="isFieldInvalid('floorName')"
         />
-        @if (isFieldInvalid('floorName')) {
+        @if (isFieldInvalid("floorName")) {
           <span class="error-message">Floor name is required</span>
         }
       </div>
@@ -118,11 +134,7 @@
   <!-- Footer -->
   <ng-template pTemplate="footer">
     <div class="modal-footer">
-      <button
-        type="button"
-        class="btn-cancel"
-        (click)="onCancel()"
-      >
+      <button type="button" class="btn-cancel" (click)="onCancel()">
         <i class="pi pi-times"></i>
         Cancel
       </button>
@@ -134,7 +146,7 @@
         [disabled]="!floorForm.valid || isSaving()"
       >
         <i class="pi pi-check"></i>
-        {{ isSaving() ? 'Creating...' : 'Create Floor' }}
+        {{ isSaving() ? "Creating..." : "Create Floor" }}
       </button>
     </div>
   </ng-template>

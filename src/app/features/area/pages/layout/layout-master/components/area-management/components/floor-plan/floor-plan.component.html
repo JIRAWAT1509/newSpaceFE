@@ -136,11 +136,11 @@
   </div>
 </div>
 
-<!-- Edit Floor Modal -->
 <app-edit-floor-modal
-  [visible]="showEditModal()"
+  #editFloorModal
   [currentFloor]="currentFloor()"
   [areas]="areas()"
+  [parentDraftImage]="draftFloorPlanImage()"
   (closed)="onEditModalClose()"
   (saved)="onEditModalSave($event)"
 />

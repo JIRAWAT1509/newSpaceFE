@@ -84,34 +84,12 @@ body {
   background-color: #ffffff;
 }
 
-/* ==================== ขนาดฟอนต์ทั้งระบบเท่ากัน (ทุกหน้า หัวข้อและเนื้อหา) ==================== */
+/* ==================== หัวข้อใหญ่กว่าเนื้อหา (ทุกหน้า) ==================== */
 html {
   font-size: 14px;
 }
-h1, h2, h3, h4, h5, h6,
-.form-heading-title,
-.page-title,
-.section-title,
-.card-title,
-.p-dialog .p-dialog-header,
-.p-dialog .p-dialog-title,
-.p-panel .p-panel-title,
-.p-card .p-card-title {
-  font-size: 14px !important;
-  line-height: 1.5;
-}
-/* ครอบคลุมทุก element ที่อาจตั้ง font-size ใน component (ทั้งระบบ) */
-body,
-body *,
-main,
-main *,
-.p-dialog *,
-.p-drawer *,
-.drawer-panel *,
-.content-container * {
-  font-size: inherit;
-}
-/* คืนค่าขนาดให้ชัดเจนที่ตัวข้อความหลัก (ทั้งระบบ) */
+
+/* เนื้อหา / body – 14px */
 body, p, span, div, td, th, li, label, input, select, textarea, button, a,
 .p-datatable .p-datatable-thead th,
 .p-datatable .p-datatable-tbody td,
@@ -124,6 +102,68 @@ body, p, span, div, td, th, li, label, input, select, textarea, button, a,
 .p-inputtext,
 .p-dropdown .p-dropdown-label {
   font-size: 14px !important;
+}
+
+/* หัวข้อระดับหน้า / กลุ่ม – ใหญ่กว่าเนื้อหา */
+h1 {
+  font-size: 22px !important;
+  line-height: 1.3;
+  font-weight: 700;
+}
+h2 {
+  font-size: 18px !important;
+  line-height: 1.35;
+  font-weight: 700;
+}
+h3 {
+  font-size: 16px !important;
+  line-height: 1.4;
+  font-weight: 600;
+}
+h4, h5, h6 {
+  font-size: 15px !important;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.page-title,
+.form-heading-title {
+  font-size: 18px !important;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.section-title {
+  font-size: 16px !important;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.card-title {
+  font-size: 15px !important;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-title,
+.p-panel .p-panel-title,
+.p-card .p-card-title {
+  font-size: 16px !important;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+/* ครอบคลุมทุก element ที่อาจตั้ง font-size ใน component (ทั้งระบบ) */
+body,
+body *,
+main,
+main *,
+.p-dialog *,
+.p-drawer *,
+.drawer-panel *,
+.content-container * {
+  font-size: inherit;
 }
 
 /* พื้นที่เนื้อหาหลักทุกหน้าเป็นสีขาว */

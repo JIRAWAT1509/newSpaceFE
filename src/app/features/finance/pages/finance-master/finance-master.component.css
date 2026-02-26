@@ -26,7 +26,10 @@
 }
 
 .header-title {
-  @apply text-2xl font-bold text-fg;
+  font-size: 1.5rem !important;
+  font-weight: 700;
+  line-height: 1.3;
+  color: rgb(var(--fg));
 }
 
 .header-subtitle {

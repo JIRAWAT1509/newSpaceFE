@@ -209,19 +209,19 @@
         <div class="detail-section">
           <h3 class="section-title">Contact Information</h3>
           <div class="detail-item">
-            <span class="detail-label">Address (ตามบัตรประชาชน):</span>
+            <span class="detail-label">ที่อยู่ตามทะเบียน:</span>
             <span class="detail-value">{{
               selectedCustomerDetails.ADDRESS
             }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">ที่อยู่สำหรับจัดส่งเอกสาร:</span>
+            <span class="detail-label">ที่อยู่จัดส่งเอกสาร:</span>
             <span class="detail-value">{{
               selectedCustomerDetails.ADDRESS_EN || "-"
             }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">ใช้ที่อยู่ตามบัตรประชาชนสำหรับจัดส่ง:</span>
+            <span class="detail-label">ใช้ที่อยู่ตามทะเบียนเป็นที่อยู่จัดส่ง:</span>
             <span class="detail-value">{{
               selectedCustomerDetails.USE_REGISTERED_ADDRESS_FOR_DELIVERY ? "ใช่" : "ไม่ใช่"
             }}</span>
@@ -533,13 +533,13 @@
 
         <div class="form-grid">
           <div class="form-field full-width" [class.has-error]="formErrors['ADDRESS']">
-            <label class="form-label required">Address (ที่อยู่ตามบัตรประชาชน)</label>
+            <label class="form-label required">ที่อยู่ตามทะเบียน</label>
             <textarea
               pInputTextarea
               [(ngModel)]="formData.ADDRESS"
               (ngModelChange)="onRegisteredAddressChange()"
               [rows]="3"
-              placeholder="กรอกที่อยู่ตามบัตรประชาชน"
+              placeholder="กรอกที่อยู่ตามทะเบียนบ้าน/บัตรประชาชน"
             ></textarea>
             <div *ngIf="formErrors['ADDRESS']" class="error-message">
               <i class="pi pi-exclamation-circle"></i>
@@ -548,13 +548,13 @@
           </div>
 
           <div class="form-field full-width" [class.has-error]="formErrors['ADDRESS_EN']">
-            <label class="form-label required">ที่อยู่สำหรับจัดส่งเอกสาร</label>
+            <label class="form-label required">ที่อยู่จัดส่งเอกสาร</label>
             <textarea
               pInputTextarea
               [(ngModel)]="formData.ADDRESS_EN"
               [disabled]="!!formData.USE_REGISTERED_ADDRESS_FOR_DELIVERY"
               [rows]="3"
-              placeholder="กรอกที่อยู่สำหรับจัดส่งเอกสาร"
+              placeholder="กรอกที่อยู่จัดส่งเอกสาร"
             ></textarea>
             <div *ngIf="formErrors['ADDRESS_EN']" class="error-message">
               <i class="pi pi-exclamation-circle"></i>
@@ -569,7 +569,7 @@
                 [(ngModel)]="formData.USE_REGISTERED_ADDRESS_FOR_DELIVERY"
                 (change)="onUseRegisteredAddressForDeliveryChange()"
               />
-              <span>ใช้ข้อมูลจาก Address (ที่อยู่ตามบัตรประชาชน)</span>
+              <span>ใช้ที่อยู่ตามทะเบียนเป็นที่อยู่จัดส่ง</span>
             </label>
           </div>
 
@@ -913,12 +913,12 @@
               </div>
 
               <div class="summary-item">
-                <span class="summary-label">ที่อยู่สำหรับจัดส่งเอกสาร:</span>
+                <span class="summary-label">ที่อยู่จัดส่งเอกสาร:</span>
                 <span class="summary-value">{{ formData.ADDRESS_EN || "-" }}</span>
               </div>
 
               <div class="summary-item">
-                <span class="summary-label">ใช้ที่อยู่ตามบัตรประชาชนสำหรับจัดส่ง:</span>
+                <span class="summary-label">ใช้ที่อยู่ตามทะเบียนเป็นที่อยู่จัดส่ง:</span>
                 <span class="summary-value">{{ formData.USE_REGISTERED_ADDRESS_FOR_DELIVERY ? "ใช่" : "ไม่ใช่" }}</span>
               </div>
 

@@ -14,7 +14,7 @@ export interface FilterChangeEvent {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './area-filter-bar.component.html',
-  styleUrl: './area-filter-bar.component.css'
+  styleUrl: './area-filter-bar.component.css',
 })
 export class AreaFilterBarComponent {
   selectedTypes = signal<ActionType[]>([]);
@@ -61,10 +61,15 @@ export class AreaFilterBarComponent {
     this.createFloorClicked.emit();
   }
 
+  createBuilding = output<void>();
+
+  onCreateBuilding(): void {
+    this.createBuilding.emit();
+  }
   private emitFilterChange(): void {
     this.filterChanged.emit({
       selectedTypes: this.selectedTypes(),
-      searchQuery: this.searchQuery
+      searchQuery: this.searchQuery,
     });
   }
 }

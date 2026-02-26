@@ -3,7 +3,7 @@
 import { Area } from '../models/area.model';
 
 /**
- * Mock Areas for Floor 55
+ * Mock Areas for Floor 55 (Building 1)
  * 16 total areas: 10 active (on map), 6 inactive (hidden)
  * All use the current version (fpv-003) from floor-versions.mock.ts
  */
@@ -332,5 +332,124 @@ export const MOCK_AREAS: Area[] = [
     },
     createdAt: new Date('2023-11-15'),
     updatedAt: new Date('2024-11-01')
+  }
+];
+
+// ============ Building 2 - Floor 1 Areas ============
+export const MOCK_AREAS_BLD2_FL1: Area[] = [
+  {
+    id: 'area-bld2-001',
+    floorId: 'floor-bld2-01',
+    roomNumber: 'T4-1-001',
+    type: 'open-plan',
+    status: 'vacant',
+    position: { x: 25, y: 35 },
+    floorPlanVersionId: 'fpv-bld2-001',
+    size: 60.0,
+    monthlyRent: 45000,
+    isActive: true,
+    isDeleted: false,
+    createdAt: new Date('2024-03-01'),
+    updatedAt: new Date('2025-01-01')
+  },
+  {
+    id: 'area-bld2-002',
+    floorId: 'floor-bld2-01',
+    roomNumber: 'T4-1-002',
+    type: 'kiosk',
+    status: 'leased',
+    position: { x: 50, y: 50 },
+    floorPlanVersionId: 'fpv-bld2-001',
+    size: 15.0,
+    monthlyRent: 18000,
+    isActive: true,
+    isDeleted: false,
+    currentTenant: {
+      name: 'Sweet Bakery',
+      nameTh: 'สวีท เบเกอรี่',
+      nameEn: 'Sweet Bakery',
+      contactPhone: '081-999-0000',
+      leaseStart: new Date('2024-04-01'),
+      leaseEnd: new Date('2026-03-31'),
+      monthlyRent: 18000,
+      hasWarning: false,
+      daysUntilExpiry: 480
+    },
+    createdAt: new Date('2024-03-01'),
+    updatedAt: new Date('2025-01-01')
+  },
+  {
+    id: 'area-bld2-003',
+    floorId: 'floor-bld2-01',
+    roomNumber: 'T4-1-003',
+    type: 'log',
+    status: 'quotation',
+    position: { x: 70, y: 40 },
+    floorPlanVersionId: 'fpv-bld2-001',
+    size: 30.0,
+    monthlyRent: 25000,
+    isActive: true,
+    isDeleted: false,
+    createdAt: new Date('2024-03-01'),
+    updatedAt: new Date('2025-01-01')
+  },
+  {
+    id: 'area-bld2-004',
+    floorId: 'floor-bld2-01',
+    roomNumber: 'T4-1-004',
+    type: 'open-plan',
+    status: 'unallocated',
+    position: { x: 30, y: 65 },
+    floorPlanVersionId: 'fpv-bld2-001',
+    size: 55.0,
+    isActive: true,
+    isDeleted: false,
+    createdAt: new Date('2024-03-01'),
+    updatedAt: new Date('2025-01-01')
+  }
+];
+
+// ============ Building 2 - Floor 2 Areas ============
+export const MOCK_AREAS_BLD2_FL2: Area[] = [
+  {
+    id: 'area-bld2-fl2-001',
+    floorId: 'floor-bld2-02',
+    roomNumber: 'T4-2-001',
+    type: 'open-plan',
+    status: 'leased',
+    position: { x: 30, y: 30 },
+    floorPlanVersionId: 'fpv-bld2-002',
+    size: 70.0,
+    monthlyRent: 52000,
+    isActive: true,
+    isDeleted: false,
+    currentTenant: {
+      name: 'Mega Retail Co.',
+      nameTh: 'เมกะ รีเทล',
+      nameEn: 'Mega Retail Co.',
+      contactPhone: '02-888-7777',
+      leaseStart: new Date('2024-05-01'),
+      leaseEnd: new Date('2027-04-30'),
+      monthlyRent: 52000,
+      hasWarning: false,
+      daysUntilExpiry: 820
+    },
+    createdAt: new Date('2024-03-01'),
+    updatedAt: new Date('2025-01-01')
+  },
+  {
+    id: 'area-bld2-fl2-002',
+    floorId: 'floor-bld2-02',
+    roomNumber: 'T4-2-002',
+    type: 'kiosk',
+    status: 'vacant',
+    position: { x: 60, y: 55 },
+    floorPlanVersionId: 'fpv-bld2-002',
+    size: 14.0,
+    monthlyRent: 16000,
+    isActive: true,
+    isDeleted: false,
+    createdAt: new Date('2024-03-01'),
+    updatedAt: new Date('2025-01-01')
   }
 ];
