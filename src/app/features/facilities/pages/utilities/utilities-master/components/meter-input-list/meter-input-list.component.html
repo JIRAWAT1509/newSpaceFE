@@ -1,51 +1,37 @@
 <!-- meter-input-list.component.html - FINAL CORRECTED -->
 
 <div class="input-list-container">
-  <!-- Header Stats - Clean Modern Cards -->
-  <div class="header-stats">
-    <!-- Total Meters Card -->
-    <div class="stat-card stat-card--blue">
-      <div class="stat-card-content">
-        <div class="stat-icon-wrapper">
-          <div class="stat-icon">
-            <i class="pi pi-th-large"></i>
-          </div>
+  <!-- Dashboard Overview -->
+  <div class="section-card">
+    <h2 class="section-title">Dashboard Overview</h2>
+    <div class="stats-grid">
+      <article class="stat-card stat-card--primary">
+        <div class="stat-card-icon">
+          <i class="pi pi-th-large"></i>
         </div>
-        <div class="stat-info">
-          <div class="stat-value">{{ totalMeters() }}</div>
-          <div class="stat-label">Total Meters</div>
+        <div class="stat-card-body">
+          <p class="stat-label">Total Meters</p>
+          <p class="stat-value">{{ totalMeters() }}</p>
         </div>
-      </div>
-    </div>
-
-    <!-- Pending Readings Card -->
-    <div class="stat-card stat-card--amber">
-      <div class="stat-card-content">
-        <div class="stat-icon-wrapper">
-          <div class="stat-icon">
-            <i class="pi pi-clock"></i>
-          </div>
+      </article>
+      <article class="stat-card stat-card--warning">
+        <div class="stat-card-icon">
+          <i class="pi pi-clock"></i>
         </div>
-        <div class="stat-info">
-          <div class="stat-value">{{ pendingMeters() }}</div>
-          <div class="stat-label">Pending Readings</div>
+        <div class="stat-card-body">
+          <p class="stat-label">Pending Readings</p>
+          <p class="stat-value">{{ pendingMeters() }}</p>
         </div>
-      </div>
-    </div>
-
-    <!-- Saved This Session Card -->
-    <div class="stat-card stat-card--emerald">
-      <div class="stat-card-content">
-        <div class="stat-icon-wrapper">
-          <div class="stat-icon">
-            <i class="pi pi-check-circle"></i>
-          </div>
+      </article>
+      <article class="stat-card stat-card--success">
+        <div class="stat-card-icon">
+          <i class="pi pi-check-circle"></i>
         </div>
-        <div class="stat-info">
-          <div class="stat-value">{{ savedCount() }}</div>
-          <div class="stat-label">Saved This Session</div>
+        <div class="stat-card-body">
+          <p class="stat-label">Saved This Session</p>
+          <p class="stat-value">{{ savedCount() }}</p>
         </div>
-      </div>
+      </article>
     </div>
   </div>
 
@@ -90,7 +76,7 @@
     </div>
   </div>
 
-  <!-- Meters List: กรอกได้เลยโดยไม่ต้องขยาย -->
+  <!-- Meters list: inline edit -->
   <div class="meters-section">
     <div class="section-header">
       <h3 class="section-title">

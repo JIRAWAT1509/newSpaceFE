@@ -51,6 +51,8 @@ export interface Role {
   DESCRIPTION?: string;       // Role description
   OU_CODE?: string;           // Organization unit
   ACTIVE: 'Y' | 'N';          // Is role active?
+  /** Number of users in this role (from API if available) */
+  memberCount?: number;
   CREATED_BY?: string;        // Created by user
   CREATED_DATE?: string;      // Creation date
   UPD_BY?: string;            // Last updated by

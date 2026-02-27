@@ -44,6 +44,12 @@ export interface Contract {
   CONTRACT_DATE: string;                  // สัญญาลงวันที่
   RECORD_DATE?: string;                   // วันที่บันทึก
   APPROVAL_DATE?: string;                 // วันที่อนุมัติ
+  /** วันที่ผู้อนุมัติ 1 อนุมัติ (ถ้ามี) */
+  APPROVER_1_AT?: string | null;
+  /** วันที่ผู้อนุมัติ 2 อนุมัติ (ถ้ามี) */
+  APPROVER_2_AT?: string | null;
+  /** วันที่ผู้อนุมัติ 3 อนุมัติ (ถ้ามี) */
+  APPROVER_3_AT?: string | null;
   INTENTION_LETTER?: string;              // ใบแสดงเจตนา
   TRANSFER_TO_BOOKING?: string;           // การโอนไปสัญญาจอง
   TRANSFER_TO_LEASE?: string;             // การโอนไปสัญญาเช่า

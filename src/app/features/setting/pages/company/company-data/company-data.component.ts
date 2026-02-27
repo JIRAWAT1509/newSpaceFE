@@ -134,7 +134,6 @@ export class CompanyDataComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadOrgCodes();
     this.loadCompanies();
     this.loadLegalEntities();
     this.loadBranches();

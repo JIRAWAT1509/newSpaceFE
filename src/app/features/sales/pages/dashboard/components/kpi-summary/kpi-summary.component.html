@@ -1,4 +1,4 @@
-<!-- kpi-summary.component.html -->
+<!-- kpi-summary.component.html - UPDATED -->
 
 <div class="kpi-summary-container">
 
@@ -12,14 +12,20 @@
           <p class="subtitle">ตัวชี้วัดผลการดำเนินงานหลัก</p>
         </div>
       </div>
-      <button
-        class="btn-refresh"
-        (click)="refresh()"
-        [disabled]="isLoading()"
-        title="Refresh data"
-      >
-        <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
-      </button>
+      <div class="header-actions">
+        <button class="btn-view-all">
+          <span>View Reports</span>
+          <i class="pi pi-arrow-right"></i>
+        </button>
+        <button
+          class="btn-refresh"
+          (click)="refresh()"
+          [disabled]="isLoading()"
+          title="Refresh data"
+        >
+          <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
+        </button>
+      </div>
     </div>
   </div>
 

@@ -1,4 +1,4 @@
-<!-- customer-table.component.html -->
+<!-- customer-table.component.html - WITH CREATE QUOTATION BUTTON -->
 
 <div class="table-wrapper">
   <table class="customer-table">
@@ -151,6 +151,13 @@
 
           <!-- Actions -->
           <td class="actions-cell">
+            <button
+              class="action-btn create-quotation"
+              (click)="onCreateQuotation(customer, $event)"
+              title="Create Quotation"
+            >
+              <i class="pi pi-file-edit"></i>
+            </button>
             <button
               class="action-btn edit"
               (click)="onEdit(customer.id, $event)"

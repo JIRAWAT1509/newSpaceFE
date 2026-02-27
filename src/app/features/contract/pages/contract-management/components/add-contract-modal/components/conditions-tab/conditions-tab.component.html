@@ -1,6 +1,6 @@
 <!-- conditions-tab.component.html -->
 
-<div class="conditions-wrapper">
+<div class="conditions-wrapper" [class.drawer-open]="showConditionDrawer()">
 
   <!-- Progress Indicator -->
   <div class="progress-indicator">
@@ -32,7 +32,7 @@
 
   <form [formGroup]="form()!">
 
-    <!-- Section 1: ระยะเวลา & การต่อสัญญา -->
+    <!-- Section 1: Contract duration & renewal -->
     <div class="form-section" id="section-duration">
       <h4 class="section-title">1. ระยะเวลา & การต่อสัญญา</h4>
       <div class="form-grid-2">
@@ -101,7 +101,7 @@
       </div>
     </div>
 
-    <!-- Section 2: เงื่อนไขทางการเงิน -->
+    <!-- Section 2: Financial terms -->
     <div class="form-section" id="section-financial">
       <h4 class="section-title">2. เงื่อนไขทางการเงิน</h4>
       <div class="form-grid-2">
@@ -194,7 +194,7 @@
       </div>
     </div>
 
-    <!-- Section 3: เงื่อนไขพิเศษ -->
+    <!-- Section 3: Special conditions -->
     <div class="form-section" id="section-special">
       <h4 class="section-title">3. เงื่อนไขพิเศษ</h4>
       <div class="form-grid-2">
@@ -236,7 +236,7 @@
       </div>
     </div>
 
-    <!-- Section 4: บันทึกแนบท้ายสัญญา -->
+    <!-- Section 4: Contract attachments -->
     <div class="form-section" id="section-addendum">
       <h4 class="section-title">4. บันทึกแนบท้ายสัญญา</h4>
       <div class="form-grid-2">
@@ -264,7 +264,7 @@
       </div>
     </div>
 
-    <!-- Section 5: เงื่อนไขเพิ่มเติม -->
+    <!-- Section 5: Additional terms -->
     <div class="form-section" id="section-additional">
       <div class="section-header">
         <h4>5. เงื่อนไขเพิ่มเติม</h4>
@@ -279,8 +279,10 @@
           <thead>
             <tr>
               <th style="width: 80px;">ข้อที่</th>
-              <th style="width: 250px;">หัวข้อ</th>
+              <th style="width: 200px;">หัวข้อ</th>
               <th>เนื้อหา</th>
+              <th style="width: 200px;">หัวข้อ (EN)</th>
+              <th>เนื้อหา (EN)</th>
               <th style="width: 100px;"></th>
             </tr>
           </thead>
@@ -291,6 +293,10 @@
                 <td>{{ condition.title }}</td>
                 <td>
                   <div class="content-preview">{{ condition.content }}</div>
+                </td>
+                <td>{{ condition.titleEn || '-' }}</td>
+                <td>
+                  <div class="content-preview">{{ condition.contentEn || '-' }}</div>
                 </td>
                 <td>
                   <div class="action-buttons">
@@ -305,7 +311,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="4" class="text-center py-4 text-gray-500">No records to display.</td>
+                <td colspan="6" class="text-center py-4 text-gray-500">No records to display.</td>
               </tr>
             }
           </tbody>
@@ -357,6 +363,26 @@
               formControlName="content"
               rows="10"
               class="w-full"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label>หัวข้อ (ภาษาอังกฤษ)</label>
+            <input
+              type="text"
+              pInputText
+              formControlName="titleEn"
+              class="w-full"
+              placeholder="Title (English, optional)"
+            />
+          </div>
+          <div class="form-group">
+            <label>เนื้อหา (ภาษาอังกฤษ)</label>
+            <textarea
+              pInputTextarea
+              formControlName="contentEn"
+              rows="6"
+              class="w-full"
+              placeholder="Content (English, optional)"
             ></textarea>
           </div>
         </form>

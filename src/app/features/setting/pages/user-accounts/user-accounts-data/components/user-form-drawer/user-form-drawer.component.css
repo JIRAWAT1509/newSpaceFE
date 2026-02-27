@@ -1,6 +1,33 @@
 /* user-form-drawer.component.css */
 
+/* Drawer layout: header + scrollable body + footer */
+.drawer-panel {
+  overflow: hidden;
+}
+
+.drawer-body {
+  -webkit-overflow-scrolling: touch;
+  /* Offset content so header not flush */
+  padding-top: 2rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Form heading at top of content */
+.form-heading-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0.5rem 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.drawer-body form {
+  padding-bottom: 0.5rem;
+}
+
 /* Custom scrollbar for form content */
+.drawer-body::-webkit-scrollbar,
 .overflow-y-auto::-webkit-scrollbar {
   width: 8px;
 }
@@ -63,4 +90,131 @@
 
 ::ng-deep .p-select.border-red-500:focus {
   box-shadow: 0 0 0 2px #ef4444 !important;
+}
+
+/* Branch Access Control - one row per branch */
+.branch-row-single {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background: rgba(249, 250, 251, 0.6);
+}
+
+.branch-row-num {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+  min-width: 1.25rem;
+}
+
+.branch-row-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.branch-row-select {
+  min-width: 140px;
+  flex: 1;
+  max-width: 200px;
+}
+
+.branch-row-select ::ng-deep .p-select {
+  min-height: 1.75rem;
+}
+
+.branch-row-select ::ng-deep .p-select .p-select-label {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.branch-row-chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.branch-checkbox {
+  width: 0.875rem;
+  height: 0.875rem;
+  accent-color: #3b82f6;
+}
+
+/* Branch delete and add buttons - smaller */
+.btn-branch-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.btn-branch-action:focus {
+  outline: none;
+}
+
+.btn-branch-action:active {
+  transform: scale(0.97);
+}
+
+/* Row delete button - trash icon smaller */
+.btn-branch-remove {
+  width: 1.75rem;
+  height: 1.75rem;
+  min-width: 1.75rem;
+  color: #b91c1c;
+  background: transparent;
+}
+
+.btn-branch-remove:hover {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.btn-branch-remove i {
+  font-size: 0.8125rem;
+}
+
+/* Add branch button - smaller */
+.btn-branch-add {
+  padding: 0.25rem 0.5rem;
+  height: 1.75rem;
+  color: white;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.35);
+}
+
+.btn-branch-add:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.4);
+}
+
+.btn-branch-add i {
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.btn-branch-add-text {
+  white-space: nowrap;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .btn-branch-add-text {
+    display: none;
+  }
 }

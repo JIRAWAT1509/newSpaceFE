@@ -11,7 +11,7 @@
 }
 
 /* Row Content */
-.tree-row-content {
+.tree-row-content {   
   display: grid;
   grid-template-columns: 1fr 150px 150px;
   gap: 1rem;

@@ -1,4 +1,4 @@
-<!-- customer-insights.component.html -->
+<!-- customer-insights.component.html - FULL IMPLEMENTATION WITH NAVIGATION -->
 
 <div class="customer-insights-container">
 
@@ -12,14 +12,20 @@
           <p class="subtitle">ข้อมูลเชิงลึกเกี่ยวกับลูกค้า</p>
         </div>
       </div>
-      <button
-        class="btn-refresh"
-        (click)="refresh()"
-        [disabled]="isLoading()"
-        title="Refresh data"
-      >
-        <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
-      </button>
+      <div class="header-actions">
+        <button class="btn-view-all" (click)="navigateToCustomers()">
+          <span>View Customers</span>
+          <i class="pi pi-arrow-right"></i>
+        </button>
+        <button
+          class="btn-refresh"
+          (click)="refresh()"
+          [disabled]="isLoading()"
+          title="Refresh data"
+        >
+          <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -35,7 +41,7 @@
     </div>
   }
 
-  <!-- Main Content -->
+  <!-- Main Content (WITHOUT AT-RISK) -->
   @if (insights()) {
     <div class="insights-grid">
 
@@ -61,13 +67,6 @@
         [customers]="insights()!.topCustomers"
         [isLoading]="isLoading()"
       ></app-top-customers-table>
-
-      <!-- At-Risk Customers Alert -->
-      <app-at-risk-customers-alert
-        [customers]="insights()!.atRiskCustomers"
-        [isLoading]="isLoading()"
-      ></app-at-risk-customers-alert>
-
     </div>
   }
 

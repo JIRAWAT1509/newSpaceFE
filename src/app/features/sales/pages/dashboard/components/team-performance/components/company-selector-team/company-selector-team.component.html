@@ -1,0 +1,43 @@
+<!-- company-selector-team.component.html -->
+
+<div class="company-selector">
+  <label class="selector-label">
+    <i class="pi pi-building"></i>
+    <span>Select Company / Companies</span>
+  </label>
+
+  <div class="companies-grid">
+    <!-- All Companies Option -->
+    <div
+      class="company-chip"
+      [class.selected]="isAllSelected()"
+      (click)="onToggleAll()"
+    >
+      <div class="chip-checkbox">
+        <i class="pi" [class.pi-check-square]="isAllSelected()" [class.pi-square]="!isAllSelected()"></i>
+      </div>
+      <div class="chip-content">
+        <span class="chip-name">All Companies</span>
+        <span class="chip-name-th">ทุกบริษัท</span>
+      </div>
+    </div>
+
+    <!-- Individual Companies -->
+    @for (company of companies; track company.id) {
+      <div
+        class="company-chip"
+        [class.selected]="isSelected(company.id)"
+        [class.disabled]="isAllSelected()"
+        (click)="onToggleCompany(company.id)"
+      >
+        <div class="chip-checkbox">
+          <i class="pi" [class.pi-check-square]="isSelected(company.id)" [class.pi-square]="!isSelected(company.id)"></i>
+        </div>
+        <div class="chip-content">
+          <span class="chip-name">{{ company.name }}</span>
+          <span class="chip-name-th">{{ company.nameTh }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</div>

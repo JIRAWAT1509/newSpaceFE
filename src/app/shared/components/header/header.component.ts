@@ -1,8 +1,17 @@
 // header.component.ts - UPDATED with logo navigation
 
-import { Component, HostListener, OnInit, OnDestroy, effect, input } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnInit,
+  OnDestroy,
+  effect,
+  input,
+  computed,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
   trigger,
@@ -24,6 +33,13 @@ import { NAVIGATION_TEXTS } from '@assets/language/navigation.text';
 import { NavigationService } from '@core/services/navigation.service';
 import { HeaderService } from '@core/services/header.service';
 import { getLabelOverride } from '@core/services/ui-settings';
+
+import { TranslatorService } from '@/app/core/services/settings/translator.service';
+import { TranslateParser, TranslatePipe } from '@ngx-translate/core';
+
+import { ApprovalNotificationService } from '@core/services/approval-notification.service';
+import { Subscription } from 'rxjs';
+import { AuthService } from '@core/services/auth.service';
 
 export interface SearchResultItem {
   title: string;
@@ -78,11 +94,10 @@ const SEARCHABLE_ITEMS: SearchResultItem[] = [
   { title: 'Finance Tax Data', category: 'Setting > Finance', route: '/setting/system/finance/tax', icon: 'pi-percentage', keywords: ['tax', 'ภาษี', 'vat', 'wht'] },
   { title: 'Interface Configuration', category: 'Setting > System', route: '/setting/system/interface', icon: 'pi-link', keywords: ['interface', 'configuration', 'api', 'ftp', 'rpa'] },
 ];
-
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, TranslatePipe],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
   animations: [
@@ -95,7 +110,7 @@ const SEARCHABLE_ITEMS: SearchResultItem[] = [
       transition(':leave', [
         animate(
           '300ms ease-in',
-          style({ height: '0', opacity: 100, overflow: 'hidden' })
+          style({ height: '0', opacity: 100, overflow: 'hidden' }),
         ),
       ]),
     ]),
@@ -105,47 +120,50 @@ const SEARCHABLE_ITEMS: SearchResultItem[] = [
         style({ transform: 'translateY(-50px)', opacity: 100 }),
         animate(
           '300ms ease-out',
-          style({ transform: 'translateY(0)', opacity: 100 })
+          style({ transform: 'translateY(0)', opacity: 100 }),
         ),
       ]),
       transition(':leave', [
         animate(
           '300ms ease-in',
-          style({ transform: 'translateY(-50px)', opacity: 100 })
+          style({ transform: 'translateY(-50px)', opacity: 100 }),
         ),
       ]),
     ]),
-     trigger('slideDownSmallFaded', [
+    trigger('slideDownSmallFaded', [
       transition(':enter', [
         style({ transform: 'translateY(-20px)', opacity: 0 }),
         animate(
           '300ms ease-out',
-          style({ transform: 'translateY(0)', opacity: 1 })
+          style({ transform: 'translateY(0)', opacity: 1 }),
         ),
       ]),
       transition(':leave', [
         animate(
           '300ms ease-in',
-          style({ transform: 'translateY(-20px)', opacity: 0 })
+          style({ transform: 'translateY(-20px)', opacity: 0 }),
         ),
       ]),
     ]),
   ],
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  private translatorService = inject(TranslatorService);
+  langAbbreviation = computed(() => this.translatorService.abbreviation);
+
   isMobile = input<boolean>(false);
 
   // Navigation data
   navigationItems: NavigationItem[] = NAVIGATION_CONTENT.filter(
-    (item) => item.primary_content !== 'setting'
+    (item) => item.primary_content !== 'setting',
   );
   activeMenuItem: string = '';
   navIconMap: Record<string, string> = {
     sales: 'pi pi-chart-line',
     area: 'pi pi-map',
     contract: 'pi pi-file-edit',
-    collection_finance: 'pi pi-wallet',
-    facilities: 'pi pi-cog',
+    Collection: 'pi pi-wallet',
+    Facilities: 'pi pi-cog',
     report_dashboard: 'pi pi-chart-bar',
     setting: 'pi pi-sliders-h',
   };
@@ -168,6 +186,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   // Search
   searchQuery: string = '';
 
+    /** จำนวนเอกสารรออนุมัติ (สำหรับแสดง badge ที่ MY TASK) */
+  pendingApprovalCount = 0;
+
+  private routerSubscription?: Subscription;
+
   // Texts for multi-language support
   texts: HeaderTexts;
 
@@ -177,7 +200,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     private navigationService: NavigationService,
     private headerService: HeaderService,
-    private router: Router // NEW: Inject Router for navigation
+    private router: Router,
+    public approvalNotification: ApprovalNotificationService,
+    private auth: AuthService
   ) {
     this.currentLanguage = this.languageService.getCurrentLanguage();
     this.texts = HEADER_TEXTS[this.currentLanguage.code];
@@ -190,6 +215,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     effect(() => {
       this.isScrolled = this.headerService.isScrolled();
     });
+
+    effect(() => {
+      this.pendingApprovalCount = this.approvalNotification.count();
+    });
   }
 
   ngOnInit(): void {
@@ -201,6 +230,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     // Load language data
     this.availableLanguages = this.languageService.getAvailableLanguages();
+
+        // โหลดจำนวนรออนุมัติให้ badge MY TASK แสดงทุกหน้า
+    this.approvalNotification.refreshPendingCount();
+    this.setupRouterSubscription();
+  }
+
+    private setupRouterSubscription(): void {
+    this.routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.approvalNotification.refreshPendingCount();
+      }
+    });
   }
 
   getUserInitials(name: string): string {
@@ -266,24 +307,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   private findBestMatch(query: string): SearchResultItem | null {
-    const terms = query.split(/\s+/).filter(t => t.length > 0);
+    const terms = query.split(/\s+/).filter((t) => t.length > 0);
 
-    const scored = SEARCHABLE_ITEMS
-      .map(item => {
-        let score = 0;
-        const titleLower = item.title.toLowerCase();
-        const categoryLower = item.category.toLowerCase();
-        const keywordsJoined = item.keywords.join(' ').toLowerCase();
+    const scored = SEARCHABLE_ITEMS.map((item) => {
+      let score = 0;
+      const titleLower = item.title.toLowerCase();
+      const categoryLower = item.category.toLowerCase();
+      const keywordsJoined = item.keywords.join(' ').toLowerCase();
 
-        for (const term of terms) {
-          if (titleLower.includes(term)) score += 10;
-          if (titleLower.startsWith(term)) score += 5;
-          if (categoryLower.includes(term)) score += 3;
-          if (keywordsJoined.includes(term)) score += 5;
-        }
-        return { item, score };
-      })
-      .filter(r => r.score > 0)
+      for (const term of terms) {
+        if (titleLower.includes(term)) score += 10;
+        if (titleLower.startsWith(term)) score += 5;
+        if (categoryLower.includes(term)) score += 3;
+        if (keywordsJoined.includes(term)) score += 5;
+      }
+      return { item, score };
+    })
+      .filter((r) => r.score > 0)
       .sort((a, b) => b.score - a.score);
 
     return scored.length > 0 ? scored[0].item : null;
@@ -312,6 +352,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.currentLanguage = language;
     this.texts = HEADER_TEXTS[language.code];
     this.isLanguageDropdownOpen = false;
+    this.translatorService.setLanguage(language.code, true);
   }
 
   translateNav(key: string): string {
@@ -332,7 +373,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private getPrimaryRoute(key: string): string | null {
     const navItem = this.navigationItems.find(
-      (item) => item.primary_content === key
+      (item) => item.primary_content === key,
     );
     if (!navItem) {
       return null;
@@ -358,8 +399,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    // Implement logout logic
-    console.log('Logout clicked');
+    this.auth.logout();
+    this.router.navigate(['/login']);
   }
 
   // Close dropdowns when clicking outside
@@ -375,3 +416,4 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 }
+

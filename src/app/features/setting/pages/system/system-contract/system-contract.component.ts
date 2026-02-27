@@ -816,7 +816,7 @@ selectedSigner: any = null;
 
 openEditDrawer(item: any): void {
   this.drawerMode = 'edit';
-  this.selectedItem = item;
+  this.selectedItem = item ? { ...item } : null;
   this.businessDrawerOpen = true;
 }
 
@@ -1028,7 +1028,7 @@ onContractTypeWizardSave(event: any): void {
 
 openEditSignerDrawer(signer: any): void {
   this.drawerMode = 'edit';
-  this.selectedSigner = signer;
+  this.selectedSigner = signer ? { ...signer } : null;
   this.signerDrawerOpen = true;
 }
 
@@ -1080,7 +1080,7 @@ openAddCostCenterDrawer(): void {
 
   openEditCostCenterDrawer(item: any): void {
   this.drawerMode = 'edit';
-  this.selectedCostCenter = item;
+  this.selectedCostCenter = item ? { ...item } : null;
   this.costCenterDrawerOpen = true;
 }
 

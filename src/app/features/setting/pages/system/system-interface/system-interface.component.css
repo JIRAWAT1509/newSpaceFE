@@ -294,7 +294,7 @@
 }
 
 /* ============================================
-   Global Theme Panel — อยู่หน้าเดียว ไม่ต้องสกอร์ล
+   Global Theme Panel — single view, no scroll
    ============================================ */
 .global-theme-panel.settings-panel {
   gap: 0.75rem;
@@ -342,7 +342,7 @@
   margin: 0.2rem 0 0 0;
 }
 
-/* โหมดธีม + รูปแบบไอคอน — กะทัดรัด */
+/* Theme mode + icon style — compact */
 .theme-mode-selector--compact {
   display: flex;
   gap: 0.5rem;
@@ -423,7 +423,7 @@
   color: rgb(var(--primary));
 }
 
-/* ชุดสีหลัก + ชุดสีสถานะ — กริดกะทัดรัด */
+/* Primary + status colors — compact grid */
 .preset-grid--compact {
   gap: 0.5rem;
 }
@@ -508,7 +508,7 @@
   font-size: 0.5rem;
 }
 
-/* ตัวอย่างสีสถานะ — แถวเดียว */
+/* Status color examples — single row */
 .status-colors-preview--compact {
   margin-top: 0.75rem;
   padding-top: 0.5rem;
@@ -566,7 +566,7 @@
   opacity: 0.8;
 }
 
-/* Responsive: ธีมและสีหลัก — จอเล็กให้เป็นคอลัมน์เดียว */
+/* Responsive: theme/colors single column on small */
 @media (max-width: 1024px) {
   .global-theme-row--toggles,
   .global-theme-row--presets {
@@ -1000,7 +1000,7 @@
   gap: 1.5rem;
 }
 
-/* Area Availability: 2 คอลัมน์ + กะทัดรัด ให้อยู่หน้าเดียว */
+/* Area Availability: 2 columns, compact, single view */
 .area-availability-panel.settings-panel,
 .facilities-utilities-panel.settings-panel {
   gap: 0.75rem;
@@ -1563,7 +1563,7 @@
   transform: none;
 }
 
-/* เอา outline/ขีดวงตอนโฟกัสออกจากปุ่มบันทึก */
+/* Remove focus outline from save button */
 .btn-primary:focus,
 .btn-primary:focus-visible {
   outline: none;

@@ -8,16 +8,16 @@ import { TeamMemberPerformance } from '@core/models/dashboard.types';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './team-leaderboard.component.html',
-  styleUrl: './team-leaderboard.component.css'
+  styleUrl: './team-leaderboard.component.css',
 })
 export class TeamLeaderboardComponent {
-
   @Input() members: TeamMemberPerformance[] = [];
   @Input() isLoading: boolean = false;
   @Output() memberSelect = new EventEmitter<string>();
 
   sortColumn: string = 'rank';
   sortDirection: 'asc' | 'desc' = 'asc';
+
 
   sortBy(column: string): void {
     if (this.sortColumn === column) {
@@ -39,7 +39,9 @@ export class TeamLeaderboardComponent {
 
   getSortIcon(column: string): string {
     if (this.sortColumn !== column) return 'pi pi-sort-alt';
-    return this.sortDirection === 'asc' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down';
+    return this.sortDirection === 'asc'
+      ? 'pi pi-sort-amount-up'
+      : 'pi pi-sort-amount-down';
   }
 
   onMemberClick(memberId: string): void {
@@ -53,6 +55,15 @@ export class TeamLeaderboardComponent {
       return `฿${(value / 1000).toFixed(0)}K`;
     }
     return `฿${Math.round(value).toLocaleString()}`;
+  }
+
+  formatAttainment(value: number): string {
+    // Handle NaN, Infinity, and invalid numbers
+    if (!isFinite(value) || isNaN(value)) {
+      return '0';
+    }
+    // Round to whole number for cleaner display
+    return Math.round(value).toString();
   }
 
   getAttainmentClass(attainment: number): string {

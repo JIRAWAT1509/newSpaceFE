@@ -1,0 +1,141 @@
+<!-- award-podium.component.html -->
+
+<div class="podium-container">
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-skeleton"></div>
+    </div>
+  }
+
+  @if (!isLoading && topThree.length > 0) {
+    <div class="podium-stage">
+
+      <!-- Second Place (Left) -->
+      @if (secondPlace) {
+        <div class="podium-column second" (click)="onPodiumClick(secondPlace.id)">
+          <div class="podium-top">
+            <!-- Profile Picture (Conditional) -->
+            @if (showProfileCircle) {
+              <div class="profile-circle silver">
+                @if (getProfileImage(secondPlace)) {
+                  <span class="profile-emoji">{{ getProfileImage(secondPlace) }}</span>
+                } @else {
+                  <span class="profile-initials">{{ getInitials(secondPlace.name) }}</span>
+                }
+              </div>
+            }
+
+            <!-- Medal Badge -->
+            <div class="medal-badge silver">
+              <span class="medal-icon">🥈</span>
+              <span class="rank-number">2</span>
+            </div>
+          </div>
+
+          <!-- Podium Base -->
+          <div class="podium-base silver">
+            <div class="member-name">{{ secondPlace.name }}</div>
+            <div class="member-stats">
+              <div class="stat-item">
+                <span class="stat-value">{{ formatCurrency(secondPlace.ytdSales) }}</span>
+                <span class="stat-label">YTD Sales</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">{{ formatAttainment(secondPlace.attainment) }}%</span>
+                <span class="stat-label">Attainment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- First Place (Center/Tallest) -->
+      @if (firstPlace) {
+        <div class="podium-column first" (click)="onPodiumClick(firstPlace.id)">
+          <div class="podium-top">
+            <!-- Profile Picture (Conditional) -->
+            @if (showProfileCircle) {
+              <div class="profile-circle gold">
+                @if (getProfileImage(firstPlace)) {
+                  <span class="profile-emoji">{{ getProfileImage(firstPlace) }}</span>
+                } @else {
+                  <span class="profile-initials">{{ getInitials(firstPlace.name) }}</span>
+                }
+              </div>
+            }
+
+            <!-- Medal Badge -->
+            <div class="medal-badge gold">
+              <span class="medal-icon">🥇</span>
+              <span class="rank-number">1</span>
+            </div>
+          </div>
+
+          <!-- Podium Base -->
+          <div class="podium-base gold">
+            <div class="member-name">{{ firstPlace.name }}</div>
+            <div class="member-stats">
+              <div class="stat-item">
+                <span class="stat-value">{{ formatCurrency(firstPlace.ytdSales) }}</span>
+                <span class="stat-label">YTD Sales</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">{{ formatAttainment(firstPlace.attainment) }}%</span>
+                <span class="stat-label">Attainment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Third Place (Right) -->
+      @if (thirdPlace) {
+        <div class="podium-column third" (click)="onPodiumClick(thirdPlace.id)">
+          <div class="podium-top">
+            <!-- Profile Picture (Conditional) -->
+            @if (showProfileCircle) {
+              <div class="profile-circle bronze">
+                @if (getProfileImage(thirdPlace)) {
+                  <span class="profile-emoji">{{ getProfileImage(thirdPlace) }}</span>
+                } @else {
+                  <span class="profile-initials">{{ getInitials(thirdPlace.name) }}</span>
+                }
+              </div>
+            }
+
+            <!-- Medal Badge -->
+            <div class="medal-badge bronze">
+              <span class="medal-icon">🥉</span>
+              <span class="rank-number">3</span>
+            </div>
+          </div>
+
+          <!-- Podium Base -->
+          <div class="podium-base bronze">
+            <div class="member-name">{{ thirdPlace.name }}</div>
+            <div class="member-stats">
+              <div class="stat-item">
+                <span class="stat-value">{{ formatCurrency(thirdPlace.ytdSales) }}</span>
+                <span class="stat-label">YTD Sales</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">{{ formatAttainment(thirdPlace.attainment) }}%</span>
+                <span class="stat-label">Attainment</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+    </div>
+  }
+
+  @if (!isLoading && topThree.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-trophy"></i>
+      <p>No performance data available</p>
+    </div>
+  }
+
+</div>

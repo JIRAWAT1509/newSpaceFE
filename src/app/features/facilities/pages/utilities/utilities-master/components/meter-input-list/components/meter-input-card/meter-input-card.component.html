@@ -1,11 +1,11 @@
 <!-- meter-input-card.component.html - FINAL CORRECTED -->
 
-<!-- INLINE MODE: การ์ดสี่เหลี่ยมจัตุรัส -->
+<!-- INLINE MODE: square card -->
 @if (inlineMode()) {
-  <!-- ==================== COMPLETED METERS: Read-only หรือ Edit Mode ==================== -->
+  <!-- ==================== COMPLETED METERS: Read-only or Edit Mode ==================== -->
   @if (isCompleted()) {
     <div class="meter-card inline-square completed-card" (click)="$event.stopPropagation()">
-      <!-- หัวการ์ด: ไอคอน + Room / Tenant | ไอคอนแก้ไขขวาบน -->
+      <!-- Card header: icon + Room/Tenant | edit icon top-right -->
       <div class="square-header">
         <div class="square-header-left">
           <div class="compact-icon" [style.background-color]="getMeterColor()">
@@ -23,7 +23,7 @@
         }
       </div>
 
-      <!-- สถิติ: Last Reading, Current Month, Consumption, Avg Monthly -->
+      <!-- Stats: Last Reading, Current Month, Consumption, Avg Monthly -->
       <div class="square-stats">
         <div class="square-stat">
           <span class="square-stat-label">Last Reading</span>
@@ -43,7 +43,7 @@
         </div>
       </div>
 
-      <!-- โหมดแก้ไข: แสดงฟอร์มเมื่อคลิกไอคอนแก้ไข -->
+      <!-- Edit mode: form when edit icon clicked -->
       @if (isInlineEditing()) {
         <div class="square-input-section">
           <label class="square-input-label">
@@ -125,9 +125,9 @@
       }
     </div>
   } @else {
-    <!-- ==================== ALL METERS: กรอกได้เลยโดยไม่ต้องขยาย ==================== -->
+    <!-- ALL METERS: inline edit -->
     <div class="meter-card inline-square" (click)="$event.stopPropagation()">
-      <!-- หัวการ์ด: ไอคอน + Room / Tenant | กล้องขวาบน -->
+      <!-- Card header: icon + Room/Tenant | camera top-right -->
       <div class="square-header">
         <div class="square-header-left">
           <div class="compact-icon" [style.background-color]="getMeterColor()">
@@ -145,7 +145,7 @@
         }
       </div>
 
-      <!-- สถิติ: Last Reading, Current Month, Consumption, Avg Monthly -->
+      <!-- Stats: Last Reading, Current Month, Consumption, Avg Monthly -->
       <div class="square-stats">
         <div class="square-stat">
           <span class="square-stat-label">Last Reading</span>
@@ -165,7 +165,7 @@
         </div>
       </div>
 
-      <!-- ช่องกรอก + บันทึก -->
+      <!-- Input + Save -->
       <div class="square-input-section">
         <label class="square-input-label">
           Current Reading ({{ meter().unit }})
@@ -226,7 +226,7 @@
         }
       </div>
 
-      <!-- แสดงรูปที่แนบแล้ว (ถ้ามี) -->
+      <!-- Attached photos (if any) -->
       @if (attachedPhotos().length > 0) {
         <div class="square-photo-row">
           <div class="square-photos-preview">
@@ -466,7 +466,7 @@
   </div>
 }
 
-<!-- Confirmation Modal: ค่าเกิน expected range -->
+<!-- Confirmation: value outside expected range -->
 <app-confirmation-modal
   [isOpen]="showConfirmModal()"
   type="warning"

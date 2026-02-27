@@ -28,6 +28,15 @@ export class RepPerformanceCardComponent {
     return `฿${Math.round(value).toLocaleString()}`;
   }
 
+  formatAttainment(value: number): string {
+    // Handle NaN, Infinity, and invalid numbers
+    if (!isFinite(value) || isNaN(value)) {
+      return '0';
+    }
+    // Round to whole number for cleaner display
+    return Math.round(value).toString();
+  }
+
   getAttainmentClass(): string {
     const attainment = this.member.attainment;
     if (attainment >= 100) return 'excellent';

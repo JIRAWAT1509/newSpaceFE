@@ -22,58 +22,53 @@
   }
 
   @if (!isLoading && customers.length > 0) {
-    <div class="customers-list">
-      @for (customer of customers.slice(0, 5); track customer.id) {
-        <div class="risk-card" [ngClass]="getRiskClass(customer.churnRisk)">
-          <div class="card-header">
-            <div class="customer-info">
-              <i [class]="getRiskIcon(customer.churnRisk)"></i>
-              <div>
-                <div class="customer-name">{{ customer.name }}</div>
-                @if (customer.companyName) {
-                  <div class="company-name">{{ customer.companyName }}</div>
-                }
-              </div>
+    <div class="cards-scroll-container">
+      @for (customer of customers; track customer.id) {
+        <div class="risk-card-compact" [ngClass]="getRiskClass(customer.churnRisk)">
+
+          <!-- Risk Badge Header -->
+          <div class="card-risk-header">
+            <i [class]="getRiskIcon(customer.churnRisk)"></i>
+            <span class="risk-label">{{ customer.churnRisk === 'high' ? 'HIGH RISK' : 'MEDIUM RISK' }}</span>
+          </div>
+
+          <!-- Customer Name -->
+          <div class="customer-name">{{ customer.name }}</div>
+          @if (customer.companyName) {
+            <div class="company-name">{{ customer.companyName }}</div>
+          }
+
+          <!-- Key Metrics -->
+          <div class="metrics-compact">
+            <div class="metric-row">
+              <span class="metric-label">ARR at risk:</span>
+              <span class="metric-value">{{ formatCurrency(customer.arr) }}</span>
             </div>
-            <div class="risk-badge" [ngClass]="getRiskClass(customer.churnRisk)">
-              {{ customer.churnRisk }} risk
+            <div class="metric-row">
+              <span class="metric-label">Last contact:</span>
+              <span class="metric-value">{{ customer.daysSinceContact }}d ago</span>
             </div>
           </div>
 
-          <div class="card-body">
-            <div class="risk-details">
-              <div class="detail-row">
-                <span class="detail-label">ARR at risk:</span>
-                <span class="detail-value">{{ formatCurrency(customer.arr) }}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Reason:</span>
-                <span class="detail-value">{{ customer.reason }}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Last contact:</span>
-                <span class="detail-value">{{ customer.daysSinceContact }} days ago</span>
-              </div>
-              @if (customer.overduePayments > 0) {
-                <div class="detail-row warning">
-                  <span class="detail-label">⚠️ Overdue payments:</span>
-                  <span class="detail-value">{{ customer.overduePayments }}</span>
-                </div>
-              }
-            </div>
-
-            <div class="action-section">
-              <i class="pi pi-lightbulb"></i>
-              <span class="action-text">{{ customer.recommendedAction }}</span>
-            </div>
+          <!-- Reason -->
+          <div class="reason-compact">
+            <i class="pi pi-info-circle"></i>
+            <span>{{ customer.reason }}</span>
           </div>
-        </div>
-      }
 
-      @if (customers.length > 5) {
-        <div class="view-more">
-          <i class="pi pi-angle-down"></i>
-          <span>+{{ customers.length - 5 }} more at-risk customers</span>
+          @if (customer.overduePayments > 0) {
+            <div class="overdue-alert">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ customer.overduePayments }} overdue payment(s)</span>
+            </div>
+          }
+
+          <!-- Action -->
+          <div class="action-compact">
+            <i class="pi pi-lightbulb"></i>
+            <span>{{ customer.recommendedAction }}</span>
+          </div>
+
         </div>
       }
     </div>

@@ -1,4 +1,4 @@
-// customer-table.component.ts
+// customer-table.component.ts - WITH CREATE QUOTATION
 import { Component, input, output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -7,6 +7,7 @@ import {
   STATUS_LABELS,
   CHURN_RISK_LABELS
 } from '@core/models/customer.model';
+import { CustomerQuotationService } from '@core/services/customer-quotation.service';
 
 type SortColumn = 'name' | 'class' | 'segment' | 'owner' | 'arr' | 'csat' | 'churnRisk' | 'nextAction';
 type SortDirection = 'asc' | 'desc' | null;
@@ -25,11 +26,13 @@ export class CustomerTableComponent {
   // Outputs
   editCustomer = output<string>();
   deleteCustomer = output<string>();
-  viewCustomer = output<string>(); // New output for viewing customer details
+  viewCustomer = output<string>();
 
   // Sorting state
   sortColumn = signal<SortColumn | null>(null);
   sortDirection = signal<SortDirection>(null);
+
+  constructor(private quotationService: CustomerQuotationService) {}
 
   // Sorted customers
   sortedCustomers = computed(() => {
@@ -92,7 +95,6 @@ export class CustomerTableComponent {
   // Toggle sort
   toggleSort(column: SortColumn): void {
     if (this.sortColumn() === column) {
-      // Cycle through: asc -> desc -> null
       const current = this.sortDirection();
       if (current === 'asc') {
         this.sortDirection.set('desc');
@@ -155,6 +157,24 @@ export class CustomerTableComponent {
   }
 
   // Actions
+  onCreateQuotation(customer: Customer, event: Event): void {
+    event.stopPropagation();
+
+    // Prepare customer data for quotation
+    const quotationData = {
+      customerId: customer.id,
+      customerName: this.getDisplayName(customer),
+      companyName: customer.companyName,
+      owner: customer.owner,
+      segment: customer.segment,
+      class: customer.class,
+      arr: customer.arr
+    };
+
+    // Navigate to contract management with pre-filled data
+    this.quotationService.createQuotationFromCustomer(quotationData);
+  }
+
   onEdit(customerId: string, event: Event): void {
     event.stopPropagation();
     this.editCustomer.emit(customerId);
@@ -166,7 +186,6 @@ export class CustomerTableComponent {
   }
 
   onRowClick(customerId: string): void {
-    // Emit view customer event to show detail modal
     this.viewCustomer.emit(customerId);
   }
 }

@@ -1,15 +1,18 @@
-/* marker-list-panel.component.ts */
-
 import {
   Component,
   input,
   output,
   signal,
+  computed,
   viewChild,
   ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Area, AreaStatus, AreaType } from '@core/models/area.model';
+
+export interface FilterChangeEvent {
+  selectedStatuses: AreaStatus[];
+}
 
 @Component({
   selector: 'app-marker-list-panel',
@@ -38,9 +41,48 @@ export class MarkerListPanelComponent {
   isDraggingFromMap = signal<boolean>(false);
   isActiveZoneHovered = signal<boolean>(false);
   isInactiveZoneHovered = signal<boolean>(false);
-  isOverMap = signal<boolean>(false); // Track if cursor is over map
+  isOverMap = signal<boolean>(false);
   draggedAreaId: string | null = null;
   dragSource: 'active' | 'inactive' | null = null;
+
+  // ✅ ใช้ signal เดียว ควบคุมว่า section ไหนเปิดอยู่ ('active' | 'inactive' | null)
+  private openSection = signal<'active' | 'inactive'>('active');
+
+  isActiveSectionCollapsed = computed(() => this.openSection() !== 'active');
+  isInactiveSectionCollapsed = computed(
+    () => this.openSection() !== 'inactive',
+  );
+
+  private readonly ITEM_HEIGHT = 56;
+  private readonly MAX_VISIBLE = 6;
+  private readonly LIST_PADDING = 16;
+
+  activeListMaxHeight = computed(() => {
+    const count = this.activeAreas().length;
+    const visible = Math.min(count, this.MAX_VISIBLE);
+    return visible > 0
+      ? `${visible * this.ITEM_HEIGHT + this.LIST_PADDING}px`
+      : '80px';
+  });
+
+  inactiveListMaxHeight = computed(() => {
+    const count = this.inactiveAreas().length;
+    const visible = Math.min(count, this.MAX_VISIBLE);
+    return visible > 0
+      ? `${visible * this.ITEM_HEIGHT + this.LIST_PADDING}px`
+      : '80px';
+  });
+
+  // ✅ toggle แต่ละ section — ถ้า section นั้นเปิดอยู่แล้ว ให้คง state เดิม (accordion style)
+  toggleActiveSection(): void {
+    this.openSection.set('active');
+    this.expandedAreaId.set(null);
+  }
+
+  toggleInactiveSection(): void {
+    this.openSection.set('inactive');
+    this.expandedAreaId.set(null);
+  }
 
   onActiveAreaClick(areaId: string): void {
     const current = this.expandedAreaId();
@@ -49,7 +91,6 @@ export class MarkerListPanelComponent {
   }
 
   onAreaClick(areaId: string): void {
-    // Alias for onActiveAreaClick (for backward compatibility)
     this.onActiveAreaClick(areaId);
   }
 
@@ -57,22 +98,7 @@ export class MarkerListPanelComponent {
     const current = this.expandedAreaId();
     this.expandedAreaId.set(current === areaId ? null : areaId);
   }
-  // เพิ่ม signals
-  private activeSectionCollapsed = signal(false);
-  private inactiveSectionCollapsed = signal(false);
 
-  // เพิ่ม getters
-  isActiveSectionCollapsed = this.activeSectionCollapsed.asReadonly();
-  isInactiveSectionCollapsed = this.inactiveSectionCollapsed.asReadonly();
-
-  // เพิ่ม methods
-  toggleActiveSection(): void {
-    this.activeSectionCollapsed.update((value) => !value);
-  }
-
-  toggleInactiveSection(): void {
-    this.inactiveSectionCollapsed.update((value) => !value);
-  }
   onDragStart(
     event: DragEvent,
     areaId: string,
@@ -86,11 +112,9 @@ export class MarkerListPanelComponent {
       event.dataTransfer.setData('areaId', areaId);
       event.dataTransfer.setData('source', source);
 
-      // Create ghost image for dragging
       const dragImage = this.createDragGhost(areaId, source);
       event.dataTransfer.setDragImage(dragImage, 20, 20);
 
-      // Remove ghost after a short delay
       setTimeout(() => {
         document.body.removeChild(dragImage);
       }, 0);
@@ -114,7 +138,6 @@ export class MarkerListPanelComponent {
       return div;
     }
 
-    // Create list-style ghost (default)
     const ghost = document.createElement('div');
     ghost.id = 'drag-ghost-preview';
     ghost.style.position = 'absolute';
@@ -156,12 +179,9 @@ export class MarkerListPanelComponent {
     this.dragEnded.emit();
   }
 
-  // Drop zone handlers for active list
   onActiveZoneDragOver(event: DragEvent): void {
     event.preventDefault();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'move';
-    }
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
     this.isActiveZoneHovered.set(true);
   }
 
@@ -172,25 +192,15 @@ export class MarkerListPanelComponent {
   onActiveZoneDrop(event: DragEvent): void {
     event.preventDefault();
     this.isActiveZoneHovered.set(false);
-
     const areaId = event.dataTransfer?.getData('areaId');
     const source = event.dataTransfer?.getData('source');
-
     if (!areaId) return;
-
-    // If from inactive → activate and add to center of map
-    if (source === 'inactive') {
-      this.areaActivated.emit(areaId);
-    }
-    // If already active → do nothing (already in active list)
+    if (source === 'inactive') this.areaActivated.emit(areaId);
   }
 
-  // Drop zone handlers for inactive list
   onInactiveZoneDragOver(event: DragEvent): void {
     event.preventDefault();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'move';
-    }
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
     this.isInactiveZoneHovered.set(true);
   }
 
@@ -201,17 +211,11 @@ export class MarkerListPanelComponent {
   onInactiveZoneDrop(event: DragEvent): void {
     event.preventDefault();
     this.isInactiveZoneHovered.set(false);
-
     const areaId = event.dataTransfer?.getData('areaId');
     const source = event.dataTransfer?.getData('source');
-
     if (!areaId) return;
-
-    // If from active list OR from marker → deactivate
-    if (source === 'active' || source === 'marker') {
+    if (source === 'active' || source === 'marker')
       this.dragToInactive.emit(areaId);
-    }
-    // If already inactive → do nothing
   }
 
   onMoveToInactive(event: Event, areaId: string): void {
@@ -228,7 +232,6 @@ export class MarkerListPanelComponent {
 
   onSeeMore(event: Event, areaId: string): void {
     event.stopPropagation();
-    // TODO: Navigate to company data page
     console.log('See more for area:', areaId);
   }
 
@@ -236,12 +239,10 @@ export class MarkerListPanelComponent {
     this.addAreaClicked.emit();
   }
 
-  // Called from parent when marker is being dragged
   setDraggingFromMap(isDragging: boolean): void {
     this.isDraggingFromMap.set(isDragging);
   }
 
-  // Called from parent to track if cursor is over map
   setIsOverMap(isOver: boolean): void {
     this.isOverMap.set(isOver);
   }

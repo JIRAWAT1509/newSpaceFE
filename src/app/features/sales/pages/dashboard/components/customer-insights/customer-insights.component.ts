@@ -1,6 +1,7 @@
-// customer-insights.component.ts
+// customer-insights.component.ts - FULL IMPLEMENTATION WITH NAVIGATION
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { RevenueBreakdownChartComponent } from './components/revenue-breakdown-chart/revenue-breakdown-chart.component';
 import { CustomerClassificationChartComponent } from './components/customer-classification-chart/customer-classification-chart.component';
 import { TopCustomersTableComponent } from './components/top-customers-table/top-customers-table.component';
@@ -27,7 +28,10 @@ export class CustomerInsightsComponent implements OnInit {
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
 
-  constructor(private dashboardData: DashboardDataService) {}
+  constructor(
+    private dashboardData: DashboardDataService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadCustomerInsights();
@@ -49,6 +53,10 @@ export class CustomerInsightsComponent implements OnInit {
         console.error('❌ Error loading customer insights:', err);
       }
     });
+  }
+
+  navigateToCustomers(): void {
+    this.router.navigate(['/sales/customer']);
   }
 
   refresh(): void {

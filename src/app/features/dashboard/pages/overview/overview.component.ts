@@ -534,24 +534,24 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         labels: this.revenueLabels,
         datasets: [
-          // Bars: Actual (null months render no bar)
+          // Bars: Budget (left)
           {
             type: 'bar',
-            label: 'Actual',
-            data: this.revenueActual,
-            backgroundColor: primary,
+            label: 'Budget',
+            data: this.revenueBudget,
+            backgroundColor: success,
             borderRadius: 4,
             barPercentage: 0.45,
             categoryPercentage: 0.7,
             order: 3,
             yAxisID: 'y',
           } as any,
-          // Bars: Budget
+          // Bars: Actual (right; null months = no bar)
           {
             type: 'bar',
-            label: 'Budget',
-            data: this.revenueBudget,
-            backgroundColor: success,
+            label: 'Actual',
+            data: this.revenueActual,
+            backgroundColor: primary,
             borderRadius: 4,
             barPercentage: 0.45,
             categoryPercentage: 0.7,

@@ -1,9 +1,9 @@
 <!-- user-form-drawer.component.html -->
 
-<!-- Backdrop - Higher z-index to cover header (z-50) and prevent header clicks -->
+<!-- Backdrop - ใช้ class drawer-overlay ให้ z-index สูงกว่า header และหัวข้อไม่โดนบัง -->
 <div
   *ngIf="isOpen"
-  class="fixed inset-0 bg-black bg-opacity-50 z-[60] transition-opacity duration-300"
+  class="drawer-overlay fixed inset-0 bg-black bg-opacity-50 z-[60] transition-opacity duration-300"
   (click)="onClose()"
   style="pointer-events: auto;"
 ></div>
@@ -11,20 +11,20 @@
 <!-- Drawer (Desktop: Right side, Mobile: Centered) -->
 <div
   *ngIf="isOpen"
-  class="fixed z-[70] bg-white shadow-2xl transition-all duration-300 ease-in-out overflow-hidden
-         md:top-0 md:right-0 md:h-full md:w-[600px]
+  class="drawer-panel fixed z-[70] bg-white shadow-2xl transition-all duration-300 ease-in-out
+         md:top-0 md:right-0 md:h-full md:w-[600px] md:flex md:flex-col
          max-md:top-1/2 max-md:left-1/2 max-md:transform max-md:-translate-x-1/2 max-md:-translate-y-1/2
-         max-md:rounded-lg max-md:w-[95%] max-md:max-w-[500px] max-md:max-h-[90vh]"
+         max-md:rounded-lg max-md:w-[95%] max-md:max-w-[500px] max-md:max-h-[90vh] max-md:flex max-md:flex-col"
   style="pointer-events: auto;"
 >
-  <!-- Header -->
-  <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
-    <h2 class="text-xl font-bold text-white">
+  <!-- Header (สไตล์เดียวกับฟอร์มอื่น: ไม่มีพื้นหลังสีน้ำเงิน) -->
+  <div class="drawer-header flex-shrink-0 bg-gray-50 border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+    <h2 class="text-xl font-bold text-gray-800">
       {{ mode === 'create' ? 'Create New User' : 'Edit User' }}
     </h2>
     <button
       (click)="onClose()"
-      class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1 transition-colors"
+      class="text-gray-500 hover:bg-gray-200 hover:text-gray-700 rounded-full p-1 transition-colors"
     >
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -32,15 +32,13 @@
     </button>
   </div>
 
-  <!-- Form Content (Scrollable) -->
-  <div class="overflow-y-auto p-6" style="max-height: calc(100vh - 140px);">
+  <!-- Form Content (Scrollable - ไม่โดนบัง) -->
+  <div class="drawer-body flex-1 min-h-0 overflow-y-auto p-6">
+    <!-- หัวฟอร์ม: Basic Information -->
+    <h3 class="form-heading-title">Basic Information</h3>
     <form>
       <!-- Basic Information Section -->
       <div class="mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-          Basic Information
-        </h3>
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- User ID -->
           <app-form-input
@@ -173,6 +171,140 @@
         </div>
       </div>
 
+      <!-- Branch Access Control (default all access) - ตามบรีฟ: กด [+] เพิ่มสาขาได้ -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-1 pb-2 border-b border-gray-200">
+          Branch Access Control
+        </h3>
+        <p class="text-sm text-gray-500 mb-4">ค่าเริ่มต้นเข้าถึงทุกสาขา (default all access) ถ้าต้องการจำกัดสิทธิ์ให้เลือกสาขาด้านล่าง</p>
+
+        <div class="space-y-2">
+          <ng-container *ngFor="let item of formData.branchAccess; let i = index">
+            <div class="branch-row-single">
+              <span class="branch-row-num">{{ i + 1 }}.</span>
+              <span class="branch-row-label">Branch</span>
+              <div class="branch-row-select">
+                <p-select
+                  [(ngModel)]="item.branchId"
+                  [ngModelOptions]="{standalone: true}"
+                  [options]="branchOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="เลือกสาขา"
+                  [showClear]="true"
+                  styleClass="w-full"
+                ></p-select>
+              </div>
+              <label class="branch-row-chk">
+                <input type="checkbox" [(ngModel)]="item.read" [ngModelOptions]="{standalone: true}" class="branch-checkbox" />
+                <span>ดูข้อมูล</span>
+              </label>
+              <label class="branch-row-chk">
+                <input type="checkbox" [(ngModel)]="item.write" [ngModelOptions]="{standalone: true}" class="branch-checkbox" />
+                <span>แก้ไขได้</span>
+              </label>
+              <button
+                *ngIf="formData.branchAccess.length > 1"
+                type="button"
+                (click)="removeBranchAccessRow(i)"
+                class="btn-branch-action btn-branch-remove"
+                title="ลบแถว"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+              <button
+                type="button"
+                (click)="addBranchAccessRow()"
+                class="btn-branch-action btn-branch-add"
+                title="เพิ่มสาขา"
+              >
+                <i class="pi pi-plus"></i>
+                <span class="btn-branch-add-text">เพิ่มสาขา</span>
+              </button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Approval & Access (ลำดับการอนุมัติ, หน้าจอ, ขอบเขตข้อมูล) -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+          Approval & Access
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Approval sequence (required) -->
+          <div class="form-group mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Approval sequence
+              <span class="text-red-500 ml-1">*</span>
+            </label>
+            <p-select
+              [(ngModel)]="formData.approvalSequence"
+              name="approvalSequence"
+              [options]="approvalSequenceOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select approval level"
+              [showClear]="true"
+              styleClass="w-full"
+              [class.border-red-500]="!!errors['approvalSequence']"
+            ></p-select>
+            <p *ngIf="errors['approvalSequence']" class="text-red-500 text-xs mt-1">
+              {{ errors['approvalSequence'] }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">ลำดับการอนุมัติ (Level 1 = first approver)</p>
+          </div>
+
+          <!-- Data access scope (required) -->
+          <div class="form-group mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Data access scope
+              <span class="text-red-500 ml-1">*</span>
+            </label>
+            <p-select
+              [(ngModel)]="formData.dataAccessScope"
+              name="dataAccessScope"
+              [options]="dataAccessScopeOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select data access scope"
+              [showClear]="true"
+              styleClass="w-full"
+              [class.border-red-500]="!!errors['dataAccessScope']"
+            ></p-select>
+            <p *ngIf="errors['dataAccessScope']" class="text-red-500 text-xs mt-1">
+              {{ errors['dataAccessScope'] }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">กำหนดขอบเขตการเข้าถึงข้อมูล</p>
+          </div>
+        </div>
+
+        <!-- Allowed screens (show only in edit mode) -->
+        <div class="form-group mb-4" *ngIf="mode === 'edit'">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Allowed screens
+            <span class="text-red-500 ml-1">*</span>
+          </label>
+          <p-multiSelect
+            [(ngModel)]="formData.allowedScreens"
+            name="allowedScreens"
+            [options]="screenOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select screens user can access"
+            [showClear]="true"
+            styleClass="w-full"
+            display="chip"
+            [class.border-red-500]="!!errors['allowedScreens']"
+          ></p-multiSelect>
+          <p *ngIf="errors['allowedScreens']" class="text-red-500 text-xs mt-1">
+            {{ errors['allowedScreens'] }}
+          </p>
+          <p class="text-xs text-gray-500 mt-1">หน้าจอที่ผู้ใช้เข้าถึงได้ (เลือกอย่างน้อย 1 รายการ)</p>
+        </div>
+      </div>
+
       <!-- Settings Section -->
       <div class="mb-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
@@ -216,6 +348,13 @@
           [errorMessage]="errors['email']"
           hint="Optional: Enter email for notifications"
         ></app-form-input>
+      </div>
+
+      <!-- Avatar & Notifications -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+          Avatar & Notifications
+        </h3>
 
         <!-- Avatar Upload -->
         <app-form-file-upload
@@ -281,8 +420,8 @@
     </form>
   </div>
 
-  <!-- Footer Actions -->
-  <div class="border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3">
+  <!-- Footer Actions (ติดล่าง ไม่โดนบัง) -->
+  <div class="drawer-footer flex-shrink-0 border-t border-gray-200 px-6 py-4 bg-gray-50 flex justify-end gap-3">
     <p-button
       label="ยกเลิก"
       icon="pi pi-times"

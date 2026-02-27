@@ -1,14 +1,18 @@
 /* bulk-action-modal.component.css */
-
+/* Form in bulk menu: above header */
 .modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 1000;
+  padding-top: 100px;
+  align-items: flex-start;
+  box-sizing: border-box;
+  z-index: 9998;
   animation: fadeIn 0.2s ease-out;
+  overflow-y: auto;
+  padding-bottom: 2rem;
 }
 
 @keyframes fadeIn {
@@ -21,7 +25,7 @@
   border-radius: 12px;
   width: 100%;
   max-width: 520px;
-  max-height: 90vh;
+  max-height: calc(100vh - 100px - 1rem);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -59,7 +63,7 @@
   font-size: 1.25rem;
 }
 
-/* ใช้โทนฟ้าน้ำเงินให้สอดคล้องกับระบบ */
+/* Blue theme for consistency */
 .header-icon.terminate,
 .header-icon.discount,
 .header-icon.renew,
@@ -282,7 +286,7 @@
   cursor: not-allowed;
 }
 
-/* ปุ่มยืนยันทั้งหมดใช้ธีมฟ้าน้ำเงินเดียวกัน */
+/* Confirm all button - blue theme */
 .btn-primary.terminate,
 .btn-primary.discount,
 .btn-primary.renew,

@@ -1,3 +1,5 @@
+<!-- area-filter-bar.component.html -->
+
 <div class="filter-bar-container">
   <div class="filter-bar-content">
     <!-- Type Filter - Multi-select -->
@@ -60,11 +62,7 @@
           (ngModelChange)="onSearchChange()"
         />
         @if (searchQuery) {
-          <button
-            type="button"
-            class="clear-button"
-            (click)="clearSearch()"
-          >
+          <button type="button" class="clear-button" (click)="clearSearch()">
             <i class="pi pi-times"></i>
           </button>
         }
@@ -84,8 +82,8 @@
     <button
       type="button"
       class="create-floor-button"
-      (click)="onCreateFloor()"
-      title="Add new floor"
+      (click)="onCreateBuilding()"
+      title="Add new building"
     >
       <i class="pi pi-plus"></i>
       New Building

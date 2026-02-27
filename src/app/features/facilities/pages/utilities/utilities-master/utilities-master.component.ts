@@ -37,7 +37,7 @@ export class UtilitiesMasterComponent {
     { id: 'groups', label: 'กลุ่มมิเตอร์', icon: 'pi-sitemap' },
     { id: 'rates', label: 'อัตราค่าบริการ', icon: 'pi-money-bill' },
     { id: 'fill', label: 'ใส่ค่ามิเตอร์', icon: 'pi-pencil' },
-    { id: 'list', label: 'Meter List', icon: 'pi-list' }
+    { id: 'list', label: 'รายการมิเตอร์', icon: 'pi-list' }
   ];
 
   setActiveTab(tabId: string): void {

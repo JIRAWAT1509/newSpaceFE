@@ -1,7 +1,8 @@
-<!-- team-performance.component.html -->
+<!-- team-performance.component.html - FINAL WITH COMPANY SELECTOR -->
 
 <div class="team-performance-container">
 
+  <!-- Section Header -->
   <div class="section-header">
     <div class="header-content">
       <div class="header-title">
@@ -11,14 +12,20 @@
           <p class="subtitle">ผลการปฏิบัติงานของทีม</p>
         </div>
       </div>
-      <button
-        class="btn-refresh"
-        (click)="refresh()"
-        [disabled]="isLoading()"
-        title="Refresh data"
-      >
-        <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
-      </button>
+      <div class="header-actions">
+        <button class="btn-view-all" (click)="navigateToTeamManagement()">
+          <span>View Team</span>
+          <i class="pi pi-arrow-right"></i>
+        </button>
+        <button
+          class="btn-refresh"
+          (click)="refresh()"
+          [disabled]="isLoading()"
+          title="Refresh data"
+        >
+          <i class="pi pi-refresh" [class.spin]="isLoading()"></i>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -77,27 +84,72 @@
         </div>
       </div>
 
-      <!-- Team Leaderboard -->
-      <app-team-leaderboard
-        [members]="teamData()!.leaderboard"
-        [isLoading]="isLoading()"
-        (memberSelect)="onMemberSelect($event)"
-      ></app-team-leaderboard>
+      <!-- Company Selector (Only show in teams view) -->
+      @if (viewLevel() === 'teams') {
+        <app-company-selector-team
+          [companies]="companies"
+          [selectedCompanyIds]="selectedCompanyIds()"
+          (selectionChange)="onCompanySelectionChange($event)"
+        ></app-company-selector-team>
+      }
 
-      <!-- Top Performers Cards -->
-      @if (teamData()!.topPerformers.length > 0) {
-        <div class="top-performers-section">
-          <h3 class="section-title">Top Performers</h3>
-          <div class="rep-cards-scroll">
-            @for (member of teamData()!.topPerformers; track member.id) {
-              <app-rep-performance-card
-                [member]="member"
-                (cardClick)="onMemberSelect($event)"
-              ></app-rep-performance-card>
-            }
+      <!-- Breadcrumb / Back Button (Only show in members view) -->
+      @if (viewLevel() === 'members') {
+        <div class="breadcrumb-section">
+          <button class="btn-back" (click)="onBackToTeams()">
+            <i class="pi pi-arrow-left"></i>
+            <span>Back to Teams</span>
+          </button>
+          <div class="breadcrumb-text">
+            <span class="breadcrumb-home">Teams</span>
+            <i class="pi pi-angle-right"></i>
+            <span class="breadcrumb-current">{{ selectedTeamName() }}</span>
           </div>
         </div>
       }
+
+      <!-- Split Layout: Podium (30%) + Table (70%) -->
+      <div class="split-layout">
+
+        <!-- Left: Award Podium (Top 3) - 30% -->
+        <div class="podium-section">
+          <div class="section-card">
+            <h4 class="section-title">
+              {{ viewLevel() === 'teams' ? 'Top 3 Teams' : 'Top 3 Members' }}
+            </h4>
+            <app-award-podium
+              [topThree]="topThree()"
+              [isLoading]="isLoading()"
+              [showProfileCircle]="showProfileCircle()"
+              (memberClick)="onMemberSelect($event)"
+            ></app-award-podium>
+          </div>
+        </div>
+
+        <!-- Right: Leaderboard Table (Rest) - 70% -->
+        <div class="table-section">
+          <div class="section-card">
+            <h4 class="section-title">Full Leaderboard</h4>
+            <div class="table-scroll-wrapper">
+              <!-- Use simple table for teams, full table for members -->
+              @if (viewLevel() === 'teams') {
+                <app-team-leaderboard-simple
+                  [members]="remainingMembers()"
+                  [isLoading]="isLoading()"
+                  (memberSelect)="onMemberSelect($event)"
+                ></app-team-leaderboard-simple>
+              } @else {
+                <app-team-leaderboard
+                  [members]="remainingMembers()"
+                  [isLoading]="isLoading()"
+                  (memberSelect)="onMemberSelect($event)"
+                ></app-team-leaderboard>
+              }
+            </div>
+          </div>
+        </div>
+
+      </div>
 
     </div>
   }

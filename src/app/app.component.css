@@ -1,8 +1,9 @@
 .app-layout {
   display: flex;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
-  background: rgb(var(--bg));
+  background: #ffffff;
   min-width: 0;
 }
 
@@ -13,23 +14,25 @@
   background: linear-gradient(to bottom, rgb(var(--primary)), rgb(var(--secondary)));
 }
 
-/* Mobile: sidebar as overlay */
-.sidebar-wrapper.sidebar-mobile-overlay {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 45;
-  width: min(320px, 85vw);
-  max-width: 320px;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease-in-out;
-  box-shadow: none;
-}
-
-.sidebar-wrapper.sidebar-mobile-overlay.sidebar-mobile-open {
-  transform: translateX(0);
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+/* Mobile: sidebar as overlay below header */
+@media (max-width: 767px) {
+  .sidebar-wrapper.sidebar-mobile-overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 45;
+    width: min(320px, 85vw);
+    max-width: 320px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: none;
+    padding-top: 0;
+  }
+  .sidebar-wrapper.sidebar-mobile-overlay.sidebar-mobile-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+  }
 }
 
 /* Backdrop when sidebar open on mobile */
@@ -46,7 +49,18 @@
   to { opacity: 1; }
 }
 
-/* Mobile: padding so content is not hidden behind bottom nav */
+/* Main content: mobile has bottom nav + safe area */
 .main-with-bottom-nav {
   padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  min-height: 0;
+}
+
+/* Mobile: content padding; desktop wider */
+@media (max-width: 639px) {
+  .app-layout main .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0.75rem;
+    padding-bottom: 1.5rem;
+  }
 }

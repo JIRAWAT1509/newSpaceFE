@@ -21,7 +21,7 @@
   <!-- Attainment Section -->
   <div class="attainment-section">
     <div class="attainment-label">Attainment</div>
-    <div class="attainment-value">{{ member.attainment }}%</div>
+    <div class="attainment-value">{{ formatAttainment(member.attainment) }}%</div>
     <div class="attainment-bar">
       <div class="attainment-fill" [style.width.%]="member.attainment > 100 ? 100 : member.attainment"></div>
     </div>

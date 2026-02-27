@@ -209,9 +209,21 @@
         <div class="detail-section">
           <h3 class="section-title">Contact Information</h3>
           <div class="detail-item">
-            <span class="detail-label">Address:</span>
+            <span class="detail-label">ที่อยู่ตามทะเบียน:</span>
             <span class="detail-value">{{
               selectedCustomerDetails.ADDRESS
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">ที่อยู่จัดส่งเอกสาร:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.ADDRESS_EN || "-"
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">ใช้ที่อยู่ตามทะเบียนเป็นที่อยู่จัดส่ง:</span>
+            <span class="detail-value">{{
+              selectedCustomerDetails.USE_REGISTERED_ADDRESS_FOR_DELIVERY ? "ใช่" : "ไม่ใช่"
             }}</span>
           </div>
           <div class="detail-item">
@@ -227,9 +239,33 @@
             }}</span>
           </div>
           <div class="detail-item">
+            <span class="detail-label">Debtor Type:</span>
+            <span class="detail-value">{{
+              getDebtorTypeLabel(selectedCustomerDetails.DEBTOR_TYPE)
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Title Prefix:</span>
+            <span class="detail-value">{{
+              getTitlePrefixLabel(selectedCustomerDetails.TITLE_PREFIX)
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Head Office / Branch:</span>
+            <span class="detail-value">{{
+              getOfficeTypeLabel(selectedCustomerDetails.OFFICE_TYPE)
+            }}</span>
+          </div>
+          <div class="detail-item">
             <span class="detail-label">Tax ID:</span>
             <span class="detail-value">{{
               selectedCustomerDetails.TAX_ID || "-"
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Send Document Types:</span>
+            <span class="detail-value">{{
+              getSelectedDocumentEmailSummary(selectedCustomerDetails).join(" | ") || "-"
             }}</span>
           </div>
         </div>
@@ -451,7 +487,7 @@
           </div>
 
           <div class="form-field">
-            <label class="form-label">Customer Type</label>
+            <label class="form-label required">Customer Type</label>
             <p-select
               [(ngModel)]="formData.CUSTOMER_TYPE"
               [options]="customerTypeOptions"
@@ -462,7 +498,7 @@
           </div>
 
           <div class="form-field">
-            <label class="form-label">Nationality</label>
+            <label class="form-label required">Nationality</label>
             <p-select
               [(ngModel)]="formData.NATIONALITY"
               [options]="nationalityOptions"
@@ -496,14 +532,45 @@
         <h3 class="step-title">Contact & Address</h3>
 
         <div class="form-grid">
-          <div class="form-field full-width">
-            <label class="form-label">Address</label>
+          <div class="form-field full-width" [class.has-error]="formErrors['ADDRESS']">
+            <label class="form-label required">ที่อยู่ตามทะเบียน</label>
             <textarea
               pInputTextarea
               [(ngModel)]="formData.ADDRESS"
+              (ngModelChange)="onRegisteredAddressChange()"
               [rows]="3"
-              placeholder="Enter full address"
+              placeholder="กรอกที่อยู่ตามทะเบียนบ้าน/บัตรประชาชน"
             ></textarea>
+            <div *ngIf="formErrors['ADDRESS']" class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ formErrors['ADDRESS'] }}</span>
+            </div>
+          </div>
+
+          <div class="form-field full-width" [class.has-error]="formErrors['ADDRESS_EN']">
+            <label class="form-label required">ที่อยู่จัดส่งเอกสาร</label>
+            <textarea
+              pInputTextarea
+              [(ngModel)]="formData.ADDRESS_EN"
+              [disabled]="!!formData.USE_REGISTERED_ADDRESS_FOR_DELIVERY"
+              [rows]="3"
+              placeholder="กรอกที่อยู่จัดส่งเอกสาร"
+            ></textarea>
+            <div *ngIf="formErrors['ADDRESS_EN']" class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ formErrors['ADDRESS_EN'] }}</span>
+            </div>
+          </div>
+
+          <div class="form-field full-width">
+            <label class="address-copy-toggle">
+              <input
+                type="checkbox"
+                [(ngModel)]="formData.USE_REGISTERED_ADDRESS_FOR_DELIVERY"
+                (change)="onUseRegisteredAddressForDeliveryChange()"
+              />
+              <span>ใช้ที่อยู่ตามทะเบียนเป็นที่อยู่จัดส่ง</span>
+            </label>
           </div>
 
           <div class="form-field">
@@ -516,7 +583,7 @@
             />
           </div>
 
-          <div class="form-field">
+          <div class="form-field" [class.has-error]="formErrors['EMAIL']">
             <label class="form-label">Email</label>
             <input
               type="email"
@@ -524,6 +591,10 @@
               [(ngModel)]="formData.EMAIL"
               placeholder="Email address"
             />
+            <div *ngIf="formErrors['EMAIL']" class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ formErrors['EMAIL'] }}</span>
+            </div>
           </div>
 
           <div class="form-field">
@@ -534,6 +605,168 @@
               [(ngModel)]="formData.TAX_ID"
               placeholder="Tax identification number"
             />
+          </div>
+
+          <div class="form-field" [class.has-error]="formErrors['DEBTOR_TYPE']">
+            <label class="form-label required">ประเภทลูกหนี้</label>
+            <p-select
+              [(ngModel)]="formData.DEBTOR_TYPE"
+              [options]="debtorTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="เลือกประเภทลูกหนี้"
+            ></p-select>
+            <div *ngIf="formErrors['DEBTOR_TYPE']" class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ formErrors['DEBTOR_TYPE'] }}</span>
+            </div>
+          </div>
+
+          <div class="form-field" [class.has-error]="formErrors['TITLE_PREFIX']">
+            <label class="form-label required">คำนำหน้าชื่อ</label>
+            <p-select
+              [(ngModel)]="formData.TITLE_PREFIX"
+              [options]="titlePrefixOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="เลือกคำนำหน้าชื่อ"
+            ></p-select>
+            <div *ngIf="formErrors['TITLE_PREFIX']" class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ formErrors['TITLE_PREFIX'] }}</span>
+            </div>
+          </div>
+
+          <div class="form-field" [class.has-error]="formErrors['OFFICE_TYPE']">
+            <label class="form-label required">สำนักงานใหญ่/ย่อย</label>
+            <p-select
+              [(ngModel)]="formData.OFFICE_TYPE"
+              [options]="officeTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="เลือกสำนักงานใหญ่/ย่อย"
+            ></p-select>
+            <div *ngIf="formErrors['OFFICE_TYPE']" class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ formErrors['OFFICE_TYPE'] }}</span>
+            </div>
+          </div>
+
+          <div class="form-field full-width" [class.has-error]="formErrors['SEND_DOCUMENTS']">
+            <label class="form-label required">เอกสารที่ส่งทาง Email</label>
+            <div class="document-email-grid">
+              <div class="document-email-item">
+                <label class="checkbox-item-inline">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="formData.SEND_INVOICE"
+                    (change)="onDocumentToggle('INVOICE')"
+                  />
+                  <span>ใบแจ้งหนี้</span>
+                </label>
+                <div
+                  *ngIf="formData.SEND_INVOICE"
+                  class="document-email-input"
+                  [class.has-error]="formErrors['INVOICE_EMAIL']"
+                >
+                  <input
+                    type="email"
+                    pInputText
+                    [(ngModel)]="formData.INVOICE_EMAIL"
+                    placeholder="กรอกอีเมลสำหรับใบแจ้งหนี้"
+                  />
+                  <div *ngIf="formErrors['INVOICE_EMAIL']" class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ formErrors['INVOICE_EMAIL'] }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="document-email-item">
+                <label class="checkbox-item-inline">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="formData.SEND_CREDIT_INVOICE"
+                    (change)="onDocumentToggle('CREDIT_INVOICE')"
+                  />
+                  <span>ใบลดหนี้ใบแจ้งหนี้</span>
+                </label>
+                <div
+                  *ngIf="formData.SEND_CREDIT_INVOICE"
+                  class="document-email-input"
+                  [class.has-error]="formErrors['CREDIT_INVOICE_EMAIL']"
+                >
+                  <input
+                    type="email"
+                    pInputText
+                    [(ngModel)]="formData.CREDIT_INVOICE_EMAIL"
+                    placeholder="กรอกอีเมลสำหรับใบลดหนี้ใบแจ้งหนี้"
+                  />
+                  <div *ngIf="formErrors['CREDIT_INVOICE_EMAIL']" class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ formErrors['CREDIT_INVOICE_EMAIL'] }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="document-email-item">
+                <label class="checkbox-item-inline">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="formData.SEND_RECEIPT"
+                    (change)="onDocumentToggle('RECEIPT')"
+                  />
+                  <span>ใบเสร็จรับเงิน</span>
+                </label>
+                <div
+                  *ngIf="formData.SEND_RECEIPT"
+                  class="document-email-input"
+                  [class.has-error]="formErrors['RECEIPT_EMAIL']"
+                >
+                  <input
+                    type="email"
+                    pInputText
+                    [(ngModel)]="formData.RECEIPT_EMAIL"
+                    placeholder="กรอกอีเมลสำหรับใบเสร็จรับเงิน"
+                  />
+                  <div *ngIf="formErrors['RECEIPT_EMAIL']" class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ formErrors['RECEIPT_EMAIL'] }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="document-email-item">
+                <label class="checkbox-item-inline">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="formData.SEND_CREDIT_RECEIPT"
+                    (change)="onDocumentToggle('CREDIT_RECEIPT')"
+                  />
+                  <span>ใบลดหนี้ใบเสร็จ</span>
+                </label>
+                <div
+                  *ngIf="formData.SEND_CREDIT_RECEIPT"
+                  class="document-email-input"
+                  [class.has-error]="formErrors['CREDIT_RECEIPT_EMAIL']"
+                >
+                  <input
+                    type="email"
+                    pInputText
+                    [(ngModel)]="formData.CREDIT_RECEIPT_EMAIL"
+                    placeholder="กรอกอีเมลสำหรับใบลดหนี้ใบเสร็จ"
+                  />
+                  <div *ngIf="formErrors['CREDIT_RECEIPT_EMAIL']" class="error-message">
+                    <i class="pi pi-exclamation-circle"></i>
+                    <span>{{ formErrors['CREDIT_RECEIPT_EMAIL'] }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="formErrors['SEND_DOCUMENTS']" class="error-message">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ formErrors['SEND_DOCUMENTS'] }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -653,7 +886,7 @@
                 class="summary-item"
                 [class.changed]="getChangedFields().includes('ADDRESS')"
               >
-                <span class="summary-label">Address:</span>
+                <span class="summary-label">Address (ตามบัตรประชาชน):</span>
                 <div class="summary-value-container">
                   <span class="summary-value">{{
                     formData.ADDRESS || "-"
@@ -680,8 +913,38 @@
               </div>
 
               <div class="summary-item">
+                <span class="summary-label">ที่อยู่จัดส่งเอกสาร:</span>
+                <span class="summary-value">{{ formData.ADDRESS_EN || "-" }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">ใช้ที่อยู่ตามทะเบียนเป็นที่อยู่จัดส่ง:</span>
+                <span class="summary-value">{{ formData.USE_REGISTERED_ADDRESS_FOR_DELIVERY ? "ใช่" : "ไม่ใช่" }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Debtor Type:</span>
+                <span class="summary-value">{{ getDebtorTypeLabel(formData.DEBTOR_TYPE) }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Title Prefix:</span>
+                <span class="summary-value">{{ getTitlePrefixLabel(formData.TITLE_PREFIX) }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Head Office / Branch:</span>
+                <span class="summary-value">{{ getOfficeTypeLabel(formData.OFFICE_TYPE) }}</span>
+              </div>
+
+              <div class="summary-item">
                 <span class="summary-label">Tax ID:</span>
                 <span class="summary-value">{{ formData.TAX_ID || "-" }}</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Send Document Types:</span>
+                <span class="summary-value">{{ getSelectedDocumentEmailSummary(formData).join(" | ") || "-" }}</span>
               </div>
             </div>
           </div>

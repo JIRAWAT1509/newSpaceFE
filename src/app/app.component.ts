@@ -5,6 +5,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { HeaderService } from '@core/services/header.service';
 import { NavigationService } from '@core/services/navigation.service';
+import { applyUiConfig, loadUiConfig } from '@core/services/ui-settings';
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -23,6 +24,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   headerHeight = signal<number>(96);
   isMobile = signal<boolean>(false);
+  isAuthRoute = signal<boolean>(false);
 
   private mediaQuery: MediaQueryList | null = null;
   private mediaListener?: () => void;
@@ -46,6 +48,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     if (typeof window !== 'undefined') {
+      // ให้ธีมและสีหลักจากหน้า Interface มีผลทั้งระบบ (sync จาก localStorage ทุกครั้งที่โหลดแอป)
+      applyUiConfig(loadUiConfig());
       this.mediaQuery = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
       this.updateMobileState();
       if (this.isMobile()) {
@@ -62,11 +66,18 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd)
     ).subscribe(() => {
+      this.checkAuthRoute();
       if (this.isMobile()) {
         this.navigationService.setSidebarExpanded(false);
       }
     });
+    this.checkAuthRoute();
     setTimeout(() => this.updateHeaderHeight(), 0);
+  }
+
+  private checkAuthRoute(): void {
+    const url = this.router.url;
+    this.isAuthRoute.set(url.startsWith('/login') || url.startsWith('/forgot-password') || url.startsWith('/reset-password'));
   }
 
   ngOnDestroy(): void {

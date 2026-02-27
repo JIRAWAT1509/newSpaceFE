@@ -1,5 +1,5 @@
 // cost-center-form-drawer.component.ts
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
@@ -22,16 +22,38 @@ export class CostCenterFormDrawerComponent implements OnChanges {
   isSubmitting: boolean = false;
   errors: { [key: string]: string } = {};
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['costCenter'] && this.costCenter && this.mode === 'edit') {
+    if (this.mode === 'create') {
+      if (changes['mode']?.currentValue === 'create' || changes['isOpen']?.currentValue === true) {
+        this.resetForm();
+      }
+      this.cdr.detectChanges();
+      return;
+    }
+    // โหมดแก้ไข: เติมฟอร์มทุกครั้งที่ drawer เปิดและมี costCenter (แก้ปัญหาแก้ไขไม่ได้)
+    if (this.isOpen && this.mode === 'edit' && this.costCenter) {
       this.populateForm(this.costCenter);
-    } else if (changes['mode'] && this.mode === 'create') {
-      this.resetForm();
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        if (this.mode === 'edit' && this.costCenter) {
+          this.populateForm(this.costCenter);
+          this.cdr.detectChanges();
+        }
+      }, 0);
     }
   }
 
   populateForm(costCenter: any): void {
-    this.formData = { ...costCenter };
+    this.formData = {
+      ...costCenter,
+      COST_CENTER_CODE: costCenter.COST_CENTER_CODE ?? '',
+      IO: costCenter.IO ?? '',
+      DESCRIPTION: costCenter.DESCRIPTION ?? '',
+      ACC_NO: costCenter.ACC_NO ?? '',
+      INTER_ACC_NO: costCenter.INTER_ACC_NO ?? ''
+    };
   }
 
   resetForm(): void {

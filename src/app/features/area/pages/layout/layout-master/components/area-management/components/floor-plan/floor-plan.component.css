@@ -6,11 +6,12 @@
 
 /* Top Left: Building Selector */
 .top-left-controls {
-  @apply absolute top-4 left-4 z-20;
+  @apply absolute top-2 left-2 sm:top-4 sm:left-4 z-20;
 }
 
 :host ::ng-deep .building-dropdown {
-  @apply min-w-[280px];
+  min-width: 200px;
+  max-width: min(280px, 90vw);
 }
 
 :host ::ng-deep .building-dropdown .p-select {
@@ -25,11 +26,12 @@
 
 /* Top Center: Floor Dropdown */
 .top-center-controls {
-  @apply absolute top-4 left-1/2 transform -translate-x-1/2 z-20;
+  @apply absolute top-2 left-1/2 transform -translate-x-1/2 z-20 sm:top-4;
 }
 
 :host ::ng-deep .floor-dropdown {
-  @apply min-w-[140px];
+  min-width: 120px;
+  max-width: min(140px, 35vw);
 }
 
 :host ::ng-deep .floor-dropdown .p-inputtext {
@@ -40,7 +42,7 @@
 
 /* Top Right: Zoom Controls */
 .top-right-controls {
-  @apply absolute top-4 right-4 z-20;
+  @apply absolute top-2 right-2 sm:top-4 sm:right-4 z-20;
 }
 
 .zoom-controls {
@@ -130,7 +132,7 @@
 }
 
 :host ::ng-deep .status-segment {
-  @apply text-sm; /* ลดขนาดตัวอักษร */
+  @apply text-sm;
 }
 
 
@@ -140,9 +142,9 @@
 }
 
 .edit-button {
-  @apply flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg shadow-md; /* ลด padding */
+  @apply flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg shadow-md;
   @apply hover:bg-blue-700 transition-colors duration-200;
-  @apply font-medium text-sm; /* ลดขนาดตัวอักษร */
+  @apply font-medium text-sm;
 }
 
 .edit-button i {
@@ -180,7 +182,7 @@
   }
 
   .bottom-center-controls {
-    @apply max-w-[350px] bottom-3; /* ลดขนาดและเว้นระยะ */
+    @apply max-w-[350px] bottom-3;
   }
 
   .bottom-right-controls {
@@ -188,7 +190,7 @@
   }
 
   .edit-button {
-    @apply px-3 py-2 text-xs; /* ลดขนาดเพิ่มเติม */
+    @apply px-3 py-2 text-xs;
   }
 }
 
@@ -198,12 +200,12 @@
   }
 
   .bottom-center-controls {
-    @apply max-w-[200px] left-20 transform-none; /* ย้ายไปซ้าย ไม่ center */
+    @apply max-w-[200px] left-20 transform-none;
     @apply bottom-3;
   }
 
   :host ::ng-deep .status-segment {
-    @apply text-xs; /* ลดตัวอักษรมากขึ้นในมือถือ */
+    @apply text-xs;
     min-height: 32px;
   }
 

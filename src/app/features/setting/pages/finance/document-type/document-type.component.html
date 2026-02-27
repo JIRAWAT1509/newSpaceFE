@@ -27,8 +27,8 @@
             type="text"
             class="search-input"
             placeholder="ค้นหารหัส หรือชื่อเอกสาร..."
-            [(ngModel)]="searchQuery"
-            (ngModelChange)="onSearch()"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="updateSearchQuery($event)"
           />
         </div>
 
@@ -72,20 +72,20 @@
                 </td>
                 <td class="actions-column">
                   <div class="flex items-center justify-center gap-2">
-                    <button
-                      class="action-btn action-btn-edit"
-                      (click)="openEditDrawer(doc)"
-                      title="แก้ไข"
-                    >
-                      <i class="pi pi-pencil"></i>
-                    </button>
-                    <button
-                      class="action-btn action-btn-delete"
-                      (click)="deleteDocumentType(doc)"
-                      title="ลบ"
-                    >
-                      <i class="pi pi-trash"></i>
-                    </button>
+                    <p-button
+                      icon="pi pi-pencil"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="info"
+                      (onClick)="onEditClick(doc, $event)"
+                    ></p-button>
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="danger"
+                      (onClick)="deleteDocumentType(doc)"
+                    ></p-button>
                   </div>
                 </td>
               </tr>

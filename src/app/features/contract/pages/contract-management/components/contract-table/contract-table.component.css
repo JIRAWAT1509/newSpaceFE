@@ -109,6 +109,10 @@
   @apply flex items-center gap-3;
 }
 
+.manage-dropdown-wrapper {
+  @apply relative;
+}
+
 .action-btn {
   @apply flex items-center gap-2 px-4 py-2;
   @apply rounded-lg font-medium text-sm;
@@ -129,9 +133,9 @@
   @apply text-sm text-gray-600 font-medium;
 }
 
-/* Bulk Actions Menu - เปิดขึ้นด้านบน ไม่บังตาราง */
+/* Bulk Actions Menu - open upward, right of button */
 .bulk-actions-menu {
-  @apply absolute bottom-full left-0 mb-2 z-20;
+  @apply absolute bottom-full right-0 mb-2 z-20;
   @apply bg-white rounded-lg shadow-lg border border-gray-200;
   @apply py-1 min-w-[220px];
 }
@@ -369,8 +373,8 @@
 
 /* ==================== Modal ==================== */
 .modal-backdrop {
-  @apply fixed inset-0 bg-black bg-opacity-50 z-50;
-  @apply flex items-center justify-center p-4;
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4;
+  z-index: 9998 !important;
 }
 
 .modal-content {

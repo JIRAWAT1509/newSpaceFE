@@ -1,0 +1,93 @@
+<!-- team-leaderboard-simple.component.html -->
+
+<div class="leaderboard-container">
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="loading-skeleton"></div>
+    </div>
+  }
+
+  @if (!isLoading && members.length > 0) {
+    <div class="leaderboard-table">
+
+      <!-- Header -->
+      <div class="table-header">
+        <div class="th rank-col">Rank</div>
+        <div class="th name-col">Team Name</div>
+        <div class="th ytd-col">YTD Sales</div>
+        <div class="th attain-col">Attainment</div>
+        <div class="th trend-col">Trend</div>
+      </div>
+
+      <!-- Rows -->
+      @for (member of members; track member.id) {
+        <div
+          class="table-row"
+          (click)="onRowClick(member.id)"
+        >
+          <!-- Rank -->
+          <div class="td rank-col">
+            <div class="rank-badge" [ngClass]="getRankClass(member.rank)">
+              {{ member.rank }}
+            </div>
+          </div>
+
+          <!-- Team Name -->
+          <div class="td name-col">
+            <div class="team-info">
+              @if (member.avatar) {
+                <span class="team-avatar">{{ member.avatar }}</span>
+              }
+              <div>
+                <div class="team-name">{{ member.name }}</div>
+                @if (member.nameTh) {
+                  <div class="team-name-th">{{ member.nameTh }}</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- YTD Sales -->
+          <div class="td ytd-col">
+            <span class="value-primary">{{ formatCurrency(member.ytdSales) }}</span>
+          </div>
+
+          <!-- Attainment -->
+          <div class="td attain-col">
+            <div class="attainment-cell">
+              <span class="attain-badge" [ngClass]="getAttainmentClass(member.attainment)">
+                {{ formatAttainment(member.attainment) }}%
+              </span>
+              <div class="attain-bar">
+                <div
+                  class="attain-fill"
+                  [ngClass]="getAttainmentClass(member.attainment)"
+                  [style.width.%]="Math.min(member.attainment, 100)"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trend -->
+          <div class="td trend-col">
+            <div class="trend-indicator" [ngClass]="getTrendClass(member.trend)">
+              <i [class]="getTrendIcon(member.trend)"></i>
+              <span>{{ member.trend > 0 ? '+' : '' }}{{ member.trend }}%</span>
+            </div>
+          </div>
+
+        </div>
+      }
+
+    </div>
+  }
+
+  @if (!isLoading && members.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-inbox"></i>
+      <p>No teams to display</p>
+    </div>
+  }
+
+</div>

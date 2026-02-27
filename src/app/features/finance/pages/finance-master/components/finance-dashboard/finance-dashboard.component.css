@@ -8,9 +8,10 @@
   margin-top: 1.5rem;
 }
 
+/* Dashboard Overview - same style as facilities/utilities/master */
 .section-card {
-  @apply rounded-xl border p-4;
-  background: rgb(var(--card));
+  @apply rounded-xl border p-4 mb-4;
+  background: #ffffff !important;
   border-color: rgb(var(--border));
   box-shadow: 0 1px 3px rgb(var(--shadow) / 0.06);
 }
@@ -20,34 +21,23 @@
   color: rgb(var(--fg));
 }
 
-/* Stats Cards */
 .stats-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+  @apply grid gap-4;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .stat-card {
   @apply relative flex items-center gap-4 p-4 rounded-xl overflow-hidden;
   @apply transition-all duration-200 cursor-pointer;
   min-height: 100px;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: #ffffff !important;
+  border: 1px solid rgb(var(--border));
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
-}
-
-/* ✅ เพิ่ม semi-transparent overlay เพื่อเพิ่ม contrast */
-.stat-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.15);
-  pointer-events: none;
-  z-index: 1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .stat-card-bg {
@@ -55,13 +45,9 @@
 }
 
 .stat-card-icon {
-  @apply relative w-11 h-11 rounded-xl flex-shrink-0;
+  @apply relative z-10 w-11 h-11 rounded-xl flex-shrink-0;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.3); /* ✅ เพิ่ม opacity */
-  backdrop-filter: blur(10px); /* ✅ เพิ่ม blur */
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* ✅ เพิ่ม shadow */
 }
 
 .stat-card-icon i {
@@ -72,42 +58,142 @@
   display: block !important;
   text-align: center !important;
   transform: translate(0.03em, 0.06em);
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)); /* ✅ เพิ่ม shadow */
 }
 
 .stat-card-body {
-  @apply relative flex flex-col justify-center min-w-0 flex-1;
-  z-index: 10;
+  @apply relative z-10 flex flex-col justify-center min-w-0 flex-1;
 }
 
 .stat-label {
-  @apply text-sm font-semibold mb-1; /* ✅ เปลี่ยนเป็น semibold */
-  color: rgba(255, 255, 255, 0.95);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* ✅ เพิ่ม text-shadow */
-  letter-spacing: 0.01em;
+  @apply text-sm font-medium mb-0.5;
+  color: #6b7280;
 }
 
 .stat-value {
   @apply font-bold leading-tight mb-1;
-  font-size: 1.5rem; /* ✅ เพิ่มขนาดให้ชัดขึ้น */
-  color: white;
+  font-size: 1.35rem;
+  color: #111827;
   display: flex;
   align-items: baseline;
   gap: 0.25rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* ✅ เพิ่ม text-shadow */
 }
 
 .stat-unit {
-  @apply font-medium; /* ✅ เปลี่ยนเป็น medium */
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.95);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  @apply font-normal;
+  font-size: 0.95rem;
+  color: #374151;
 }
 
 .stat-change {
-  @apply flex items-center gap-1.5 text-xs font-semibold; /* ✅ semibold */
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  @apply flex items-center gap-1.5 text-xs font-medium;
+}
+
+.stat-change--up {
+  color: #059669;
+}
+
+.stat-change--up .stat-change-hint {
+  color: #6b7280;
+}
+
+.stat-change--down {
+  color: #dc2626;
+}
+
+.stat-change--down .stat-change-hint {
+  color: #6b7280;
+}
+
+.stat-change .pi {
+  font-size: 0.6rem;
+}
+
+.stat-change-hint {
+  @apply font-normal;
+}
+
+
+.stat-card--primary {
+  background: #ffffff !important;
+  border-color: rgb(var(--primary) / 0.3);
+}
+.stat-card--primary .stat-card-icon {
+  background: rgb(var(--primary));
+}
+
+.stat-card--warning {
+  background: #ffffff !important;
+  border-color: rgb(var(--warning) / 0.3);
+}
+.stat-card--warning .stat-card-icon {
+  background: rgb(var(--warning));
+}
+
+.stat-card--info {
+  background: #ffffff !important;
+  border-color: rgb(20 184 166 / 0.3);
+}
+.stat-card--info .stat-card-icon {
+  background: rgb(20 184 166);
+}
+
+.stat-card--success {
+  background: #ffffff !important;
+  border-color: rgb(var(--success) / 0.3);
+}
+.stat-card--success .stat-card-icon {
+  background: rgb(var(--success));
+}
+
+@media (max-width: 1280px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .section-card {
+    @apply mb-3 p-3;
+  }
+
+  .section-title {
+    @apply text-lg mb-2;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    @apply gap-3;
+  }
+
+  .stat-card {
+    @apply p-3 gap-3;
+  }
+
+  .stat-card-icon {
+    @apply w-10 h-10;
+  }
+
+  .stat-card-icon i {
+    font-size: 1.1rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    @apply p-2.5 gap-2.5;
+  }
+
+  .stat-label {
+    @apply text-xs;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
 }
 
 /* Debt Section */
@@ -237,7 +323,7 @@
   @apply text-gray-500;
 }
 
-/* เพิ่มท้ายไฟล์ */
+/* End of file */
 
 /* Sortable Table Headers */
 .debt-table th {

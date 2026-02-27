@@ -1,5 +1,5 @@
 // document-type-form-drawer.component.ts
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
@@ -33,11 +33,26 @@ export class DocumentTypeFormDrawerComponent implements OnChanges {
   isSubmitting: boolean = false;
   errors: { [key: string]: string } = {};
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['documentType'] && this.documentType && this.mode === 'edit') {
+    if (this.mode === 'create') {
+      if (changes['mode']?.currentValue === 'create') {
+        this.resetForm();
+      }
+      return;
+    }
+    // โหมดแก้ไข: เติมฟอร์มทุกครั้งที่ drawer เปิดและมี documentType (แก้ปัญหาแก้ไขไม่ได้)
+    if (this.isOpen && this.mode === 'edit' && this.documentType) {
       this.populateForm(this.documentType);
-    } else if (changes['mode'] && this.mode === 'create') {
-      this.resetForm();
+      this.cdr.detectChanges();
+      // เติมอีกครั้งหลัง view สร้างแล้ว (แก้กรณี binding ยังไม่อัปเดต)
+      setTimeout(() => {
+        if (this.mode === 'edit' && this.documentType) {
+          this.populateForm(this.documentType);
+          this.cdr.detectChanges();
+        }
+      }, 0);
     }
   }
 
@@ -50,7 +65,12 @@ export class DocumentTypeFormDrawerComponent implements OnChanges {
   }
 
   populateForm(documentType: DocumentType): void {
-    this.formData = { ...documentType };
+    this.formData = {
+      ...documentType,
+      OU_CODE: documentType.OU_CODE ?? '001',
+      DOC_CODE: documentType.DOC_CODE ?? '',
+      DOC_NAME: documentType.DOC_NAME ?? ''
+    };
   }
 
   resetForm(): void {

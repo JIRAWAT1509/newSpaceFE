@@ -1,0 +1,81 @@
+<div class="auth-page">
+  <div class="auth-bg">
+    <div class="auth-bg-mesh"></div>
+    <div class="auth-bg-orb auth-bg-orb-1"></div>
+    <div class="auth-bg-orb auth-bg-orb-2"></div>
+    <div class="auth-bg-orb auth-bg-orb-3"></div>
+    <div class="auth-bg-dots"></div>
+  </div>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-card-brand">
+        <div class="auth-brand-inner">
+          <span class="auth-brand-logo">SPACE</span>
+          <p class="auth-brand-tagline">Property Management Solution</p>
+        </div>
+      </div>
+
+      <div class="auth-card-form">
+        <h1 class="auth-title">Welcome</h1>
+        <p class="auth-subtitle">Login to your account to continue.</p>
+
+        <form (ngSubmit)="onSubmit()" class="auth-form">
+          @if (error) {
+            <div class="auth-error" role="alert">{{ error }}</div>
+          }
+          <div class="auth-field">
+            <label for="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              [(ngModel)]="username"
+              name="username"
+              placeholder="Enter username"
+              class="auth-input w-full"
+              autocomplete="username"
+            />
+          </div>
+          <div class="auth-field">
+            <label for="password">Password</label>
+            <p-password
+              id="password"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter password"
+              [feedback]="false"
+              [toggleMask]="true"
+              inputStyleClass="auth-input w-full"
+              inputId="password"
+            ></p-password>
+          </div>
+          <div class="auth-field">
+            <label for="company">Company</label>
+            <p-select
+              id="company"
+              [(ngModel)]="companyId"
+              name="company"
+              [options]="companyOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select company"
+              styleClass="auth-select w-full"
+            />
+          </div>
+          <div class="auth-forgot">
+            <a routerLink="/forgot-password" class="auth-forgot-link">Forgot your password?</a>
+          </div>
+          <button
+            type="submit"
+            pButton
+            label="Log in"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            [loading]="loading"
+            class="auth-submit w-full p-button-lg"
+          ></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

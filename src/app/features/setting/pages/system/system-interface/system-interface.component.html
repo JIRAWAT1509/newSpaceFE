@@ -71,7 +71,7 @@
 
     <!-- Right Content: Settings Panel -->
     <main class="settings-content">
-      <!-- Global Settings: ธีมและสีหลัก — ออกแบบให้อยู่หน้าเดียว ไม่ต้องสกอร์ล -->
+      <!-- Global Settings: theme and colors — single view, no scroll -->
       @if (selectedModule === 'global') {
         <div class="settings-panel global-theme-panel">
           <div class="panel-header panel-header--compact">
@@ -81,7 +81,7 @@
             </div>
           </div>
 
-          <!-- แถวที่ 1: โหมดธีม + รูปแบบไอคอน (คู่กัน) -->
+          <!-- Row 1: Theme mode + Icon style -->
           <div class="global-theme-row global-theme-row--toggles">
             <div class="settings-card settings-card--compact">
               <div class="card-header card-header--compact">
@@ -153,7 +153,7 @@
             </div>
           </div>
 
-          <!-- แถวที่ 2: ชุดสีหลัก | ชุดสีสถานะ (สองคอลัมน์) -->
+          <!-- Row 2: Primary colors | Status colors (two columns) -->
           <div class="global-theme-row global-theme-row--presets">
             <div class="settings-card settings-card--compact global-theme-card-presets">
               <div class="card-header card-header--compact">
@@ -218,7 +218,7 @@
             </div>
           </div>
 
-          <!-- แถวที่ 3: รีเซ็ตเท่านั้น (การเปลี่ยนแปลงจะบันทึกอัตโนมัติ) -->
+          <!-- Row 3: Reset only (auto-save) -->
           <div class="panel-actions-footer panel-actions-footer--compact">
             <p class="panel-footer-hint"><i class="pi pi-info-circle"></i> การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
             <button
@@ -386,7 +386,7 @@
             </div>
           </div>
 
-          <!-- Panel Actions Footer: hint + รีเซ็ต -->
+          <!-- Panel footer: hint + reset -->
           <div class="panel-actions-footer">
             <p class="panel-footer-hint"><i class="pi pi-info-circle"></i> การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
             <button
@@ -680,7 +680,7 @@
             </div>
           </div>
 
-          <!-- Panel Actions Footer: hint + รีเซ็ต -->
+          <!-- Panel footer: hint + reset -->
           <div class="panel-actions-footer">
             <p class="panel-footer-hint"><i class="pi pi-info-circle"></i> การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
             <button

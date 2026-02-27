@@ -1,6 +1,7 @@
-// pipeline-overview.component.ts
+// pipeline-overview.component.ts - FULL IMPLEMENTATION WITH NAVIGATION
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 // Import sub-components
 import { PipelineFunnelChartComponent } from './components/pipeline-funnel-chart/pipeline-funnel-chart.component';
@@ -34,7 +35,10 @@ export class PipelineOverviewComponent implements OnInit {
 
   // ==================== CONSTRUCTOR ====================
 
-  constructor(private dashboardData: DashboardDataService) {}
+  constructor(
+    private dashboardData: DashboardDataService,
+    private router: Router
+  ) {}
 
   // ==================== LIFECYCLE ====================
 
@@ -73,6 +77,12 @@ export class PipelineOverviewComponent implements OnInit {
         console.error('❌ Error loading velocity:', err);
       }
     });
+  }
+
+  // ==================== NAVIGATION ====================
+
+  navigateToPipeline(): void {
+    this.router.navigate(['/sales/pipeline']);
   }
 
   // ==================== UTILITY ====================

@@ -1,8 +1,10 @@
-// finance-master.component.ts
+// src/app/features/finance/finance-master.component.ts
+
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FinanceDashboardComponent } from './components/finance-dashboard/finance-dashboard.component';
 import { InvoiceManagementComponent } from './components/invoice-management/invoice-management.component';
+import { PreReceiptManagementComponent } from './components/pre-receipt-management/pre-receipt-management.component'; // ✅ import
 import { ReceiptManagementComponent } from './components/receipt-management/receipt-management.component';
 
 interface Tab {
@@ -18,6 +20,7 @@ interface Tab {
     CommonModule,
     FinanceDashboardComponent,
     InvoiceManagementComponent,
+    PreReceiptManagementComponent, // ✅ เพิ่มใน imports
     ReceiptManagementComponent
   ],
   templateUrl: './finance-master.component.html',
@@ -28,9 +31,9 @@ export class FinanceMasterComponent {
 
   tabs: Tab[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'pi-chart-bar' },
-    { id: 'invoices', label: 'ใบแจ้งหนี้', icon: 'pi-money-bill' },
-    { id: 'pre-invoices', label: 'รอออกใบเสร็จรับเงิน', icon: 'pi-money-bill' },
-    { id: 'receipts', label: 'ใบเสร็จรับเงิน', icon: 'pi-receipt' }
+    { id: 'invoices', label: 'รอออกใบแจ้งหนี้', icon: 'pi-money-bill' },
+    { id: 'pre-receipts', label: 'รอออกใบเสร็จรับเงิน', icon: 'pi-clock' }, // ✅ ตรวจสอบ id
+    { id: 'receipts', label: 'ประวัติใบเสร็จรับเงิน', icon: 'pi-receipt' }
   ];
 
   setActiveTab(tabId: string): void {
@@ -41,3 +44,4 @@ export class FinanceMasterComponent {
     return this.activeTab() === tabId;
   }
 }
+

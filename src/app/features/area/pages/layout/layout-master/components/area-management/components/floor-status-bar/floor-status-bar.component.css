@@ -1,9 +1,12 @@
 .floor-status-bar-container {
-  @apply w-full;
+  @apply w-[140%] relative;
+  left: 45%;
+  transform: translateX(-50%) translateY(20%) scale(0.9);
 }
 
 .status-bar {
-  @apply flex h-12 rounded-lg overflow-hidden shadow-lg;
+  @apply flex h-8 overflow-hidden shadow-md;
+  border-radius: 10px;
   @apply bg-gray-100;
 }
 
@@ -14,21 +17,18 @@
 }
 
 .segment-text {
-  @apply text-sm font-bold text-white;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  
+  @apply text-[10px] font-bold text-white uppercase tracking-widest;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* Hover effect */
 .status-segment:hover {
-  @apply brightness-110;
+  @apply brightness-105;
 }
 
 /* Animation on load */
 @keyframes slideIn {
-  from {
-    width: 0;
-  }
-  to {
-    width: var(--segment-width);
-  }
+  from { width: 0; }
+  to { width: var(--segment-width); }
 }

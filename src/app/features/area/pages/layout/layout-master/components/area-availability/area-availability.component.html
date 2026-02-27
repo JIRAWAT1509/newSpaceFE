@@ -1,40 +1,34 @@
 <div class="area-availability-container" data-module="areaAvailability">
-  <div class="section-header">
+  <div class="section-card">
     <h2 class="section-title">Area Availability</h2>
-  </div>
 
-  <!-- Status Cards Grid (4 main statuses) -->
-  <div class="status-cards-grid">
-    @for (status of mainStatusDistribution(); track status.id) {
-      <div
-        [class]="getStatusCardClasses(status.id)"
-        (click)="toggleFilter(status.id)"
-      >
-        <!-- Status Icon -->
-        <div class="icon-circle" [style.backgroundColor]="status.color" [attr.aria-hidden]="true">
-          @if (getStatusIconType(status.id) === 'upload') {
-            <img [src]="getStatusIcon(status.id)" alt="" class="status-icon-image" />
-          } @else {
-            <i class="pi" [ngClass]="getStatusIcon(status.id)" aria-hidden="true"></i>
+    <!-- Status Cards (รูปแบบเดียวกับ Dashboard Overview) -->
+    <div class="stats-grid">
+      @for (status of mainStatusDistribution(); track status.id) {
+        <article
+          [class]="getStatusCardClasses(status.id)"
+          (click)="toggleFilter(status.id)"
+        >
+          <div class="stat-card-icon" [style.background]="status.color">
+            @if (getStatusIconType(status.id) === 'upload') {
+              <img [src]="getStatusIcon(status.id)" alt="" class="status-icon-image" />
+            } @else {
+              <i class="pi" [ngClass]="getStatusIcon(status.id)" aria-hidden="true"></i>
+            }
+          </div>
+          <div class="stat-card-body">
+            <p class="stat-label">{{ status.labelTh }}</p>
+            <p class="stat-value">{{ status.count }}</p>
+            <span class="stat-sublabel">{{ status.label }}</span>
+          </div>
+          @if (isSelected(status.id)) {
+            <div class="selection-check">
+              <i class="pi pi-check"></i>
+            </div>
           }
-        </div>
-        <!-- Content -->
-        <div class="card-content">
-          <div class="card-header">
-            <span class="card-label-th">{{ status.labelTh }}</span>
-            <span class="card-count">{{ status.count }}</span>
-          </div>
-          <span class="card-label-en">{{ status.label }}</span>
-        </div>
-
-        <!-- Selection Indicator -->
-        @if (isSelected(status.id)) {
-          <div class="selection-check">
-            <i class="pi pi-check"></i>
-          </div>
-        }
-      </div>
-    }
+        </article>
+      }
+    </div>
   </div>
 
   <!-- Percentage Bar -->

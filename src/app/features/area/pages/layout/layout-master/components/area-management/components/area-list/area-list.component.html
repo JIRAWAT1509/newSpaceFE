@@ -1,9 +1,24 @@
+<!-- area-list.component.html -->
+
 <div class="area-list-container">
   <!-- Header with Title and Count -->
-  <div class="area-list-header">
+  <!-- <div class="area-list-header">
     <h3 class="list-title">Floor Areas</h3>
     <span class="list-count">{{ totalItems() }} areas</span>
-  </div>
+  </div> -->
+
+  <!-- ✅ Building + Floor Info Badge -->
+  <!-- <div class="building-floor-info">
+    <span class="info-badge">
+      <i class="pi pi-building"></i>
+      {{ currentBuildingName() }}
+    </span>
+    <span class="info-separator">›</span>
+    <span class="info-badge">
+      <i class="pi pi-th-large"></i>
+      {{ currentFloorName() }}
+    </span>
+  </div> -->
 
   <!-- Sort Bar -->
   <div class="sort-bar">
@@ -35,10 +50,7 @@
             [class.expanded]="isExpanded(area.id)"
             (click)="onAreaClick(area.id)"
           >
-            <!-- Status Indicator -->
             <div class="status-dot" [style.backgroundColor]="getStatusColor(area.status)"></div>
-
-            <!-- Area Info -->
             <div class="area-info">
               <div class="room-number">{{ area.roomNumber }}</div>
               <div class="tenant-info">
@@ -49,47 +61,39 @@
                 }
               </div>
             </div>
-
-            <!-- Expand Icon -->
             <div class="expand-icon">
               <i [class]="isExpanded(area.id) ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
             </div>
           </div>
 
-          <!-- Expanded Details -->
           @if (isExpanded(area.id)) {
             <div class="area-details">
               <div class="detail-row">
                 <span class="detail-label">Room Number</span>
                 <span class="detail-value">{{ area.roomNumber }}</span>
               </div>
-
               <div class="detail-row">
                 <span class="detail-label">Area Type</span>
                 <span class="detail-value">{{ getTypeLabel(area.type) }}</span>
               </div>
-
               @if (area.size) {
                 <div class="detail-row">
                   <span class="detail-label">Size</span>
                   <span class="detail-value">{{ formatNumber(area.size) }} sq.m.</span>
                 </div>
               }
-
               <div class="detail-row">
                 <span class="detail-label">Current Status</span>
                 <span class="status-badge" [style.backgroundColor]="getStatusColor(area.status)">
                   {{ getStatusLabel(area.status) }}
                 </span>
               </div>
-
               @if (area.monthlyRent) {
                 <div class="detail-row">
                   <span class="detail-label">Monthly Rent</span>
                   <span class="detail-value">฿{{ formatNumber(area.monthlyRent) }}</span>
                 </div>
               }
-
               @if (area.currentTenant) {
                 <div class="detail-row">
                   <span class="detail-label">Tenant</span>
@@ -102,8 +106,16 @@
                   </div>
                 }
               }
-
               <div class="detail-actions">
+                <!-- ✅ เพิ่มปุ่ม Edit -->
+                <button
+                  type="button"
+                  class="btn-edit-area"
+                  (click)="onEditArea(area, $event)"
+                >
+                  <i class="pi pi-pencil"></i>
+                  แก้ไขรายละเอียด
+                </button>
                 <button type="button" class="btn-view-details">
                   <i class="pi pi-external-link"></i>
                   ทำใบเสนอราคา
@@ -116,30 +128,18 @@
     }
   </div>
 
-  <!-- Pagination Controls (Mimic building-block style) -->
+  <!-- Pagination -->
   <div class="pagination-controls">
-    <!-- Previous Button -->
-    <button
-      (click)="previousPage()"
-      [disabled]="currentPage() === 1"
-      class="pagination-button"
-    >
+    <button (click)="previousPage()" [disabled]="currentPage() === 1" class="pagination-button">
       &lt;
     </button>
-
-    <!-- Page Range Dropdown -->
     <div class="page-dropdown-wrapper">
-      <button
-        (click)="togglePageDropdown($event)"
-        class="page-dropdown-button"
-      >
+      <button (click)="togglePageDropdown($event)" class="page-dropdown-button">
         <span>{{ currentPageRange() }} of {{ totalItems() }}</span>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg>
       </button>
-
-      <!-- Dropdown Menu -->
       @if (showPageDropdown) {
         <div class="page-dropdown-menu" (click)="$event.stopPropagation()">
           @for (range of pageRanges(); track range.page) {
@@ -154,14 +154,14 @@
         </div>
       }
     </div>
-
-    <!-- Next Button -->
-    <button
-      (click)="nextPage()"
-      [disabled]="currentPage() === totalPages()"
-      class="pagination-button"
-    >
+    <button (click)="nextPage()" [disabled]="currentPage() === totalPages()" class="pagination-button">
       &gt;
     </button>
   </div>
 </div>
+
+<!-- ✅ Edit Area Modal -->
+<app-edit-area-modal
+  #editAreaModal
+  (areaSaved)="onAreaSaved($event)"
+/>

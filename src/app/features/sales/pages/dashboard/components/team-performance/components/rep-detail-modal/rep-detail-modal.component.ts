@@ -47,6 +47,15 @@ export class RepDetailModalComponent implements OnChanges {
     return `฿${Math.round(value).toLocaleString()}`;
   }
 
+  formatAttainment(value: number): string {
+    // Handle NaN, Infinity, and invalid numbers
+    if (!isFinite(value) || isNaN(value)) {
+      return '0';
+    }
+    // Round to whole number for cleaner display
+    return Math.round(value).toString();
+  }
+
   getAttainmentClass(attainment: number): string {
     if (attainment >= 100) return 'excellent';
     if (attainment >= 80) return 'good';

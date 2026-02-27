@@ -1,100 +1,92 @@
 /* marker-list-panel.component.css */
 
 .marker-list-panel {
-  @apply h-full flex flex-col bg-white;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: white;
 }
 
 /* Panel Header */
 .panel-header {
   @apply px-4 py-3 border-b border-gray-200 bg-gray-50;
+  flex-shrink: 0;
 }
 
 .panel-title {
-  @apply text-lg font-bold text-gray-800 flex items-center gap-2;
+  @apply text-base font-bold text-gray-800 flex items-center gap-2;
 }
 
 .panel-title i {
   @apply text-blue-600;
 }
 
-/* List Section */
+
 .list-section {
-  @apply flex-1 overflow-y-auto;
-  transition: all 0.3s ease;
-}
-
-.list-section.collapsed {
-  flex: 0 0 auto;
-}
-
-.section-header {
-  @apply flex items-center justify-between px-4 py-3 bg-gray-100;
-  @apply sticky top-0 z-10;
-  @apply cursor-pointer hover:bg-gray-200 transition-colors duration-200;
-}
-
-.section-title {
-  @apply text-sm font-semibold text-gray-700 flex items-center gap-2;
-}
-
-.section-title i {
-  @apply text-xs;
-}
-
-.toggle-icon {
-  @apply text-gray-500 transition-transform duration-200 ml-2;
-}
-
-.toggle-icon.collapsed {
-  @apply rotate-180;
-}
-
-.count-badge {
-  @apply px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold;
-}
-
-/* Area List */
-.area-list {
-  @apply px-3 py-3;
-  min-height: 120px;
-  transition: all 0.3s ease;
-  max-height: 2000px;
+  flex-shrink: 0;
   overflow: hidden;
 }
 
+.section-header {
+  @apply flex items-center justify-between px-4 py-2.5 bg-gray-100;
+  @apply cursor-pointer hover:bg-gray-200 transition-colors duration-200;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.section-title {
+  @apply text-xs font-semibold text-gray-700 flex items-center gap-1.5;
+}
+
+.toggle-icon {
+  @apply text-gray-500 transition-transform duration-200 ml-1;
+}
+
+.toggle-icon.collapsed {
+  transform: rotate(180deg);
+}
+
+.count-badge {
+  @apply px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold;
+}
+
+
+.area-list {
+  @apply px-2 py-2;
+  overflow-y: auto;
+  transition: max-height 0.25s ease, padding 0.25s ease;
+}
+
 .area-list.collapsed {
-  max-height: 0;
+  max-height: 0 !important;
   padding-top: 0;
   padding-bottom: 0;
-  min-height: 0;
+  overflow: hidden;
 }
 
 .area-list.drop-zone-active {
-  @apply bg-blue-50 ring-2 ring-blue-400 ring-inset;
-  @apply relative;
+  @apply bg-blue-50;
+  box-shadow: inset 0 0 0 2px #60a5fa;
 }
 
-.area-list.drop-zone-active::before {
-  content: 'Drop here';
-  @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
-  @apply text-blue-600 font-bold text-sm pointer-events-none;
-  @apply bg-white px-3 py-1 rounded shadow-md;
-}
-
+/* Area Items */
 .area-item-wrapper {
-  @apply mb-3;
+  @apply mb-1.5;
 }
 
 .area-item {
-  @apply flex items-center gap-4 px-4 py-4 rounded-lg;
-  @apply bg-white border-2 border-gray-200;
-  @apply cursor-pointer transition-all duration-200;
+  @apply flex items-center gap-2 px-3 py-2 rounded-lg;
+  @apply bg-white border border-gray-200;
+  @apply cursor-pointer transition-all duration-150;
   @apply hover:border-blue-300 hover:bg-blue-50;
-  min-height: 68px;
+  min-height: 48px;
 }
 
 .area-item.selected {
-  @apply border-blue-500 bg-blue-600 shadow-md;
+  @apply border-blue-500 bg-blue-600;
 }
 
 .area-item.selected .room-number,
@@ -104,11 +96,11 @@
 
 .area-item.selected .drag-handle i,
 .area-item.selected .expand-icon i {
-  @apply text-blue-100;
+  @apply text-blue-200;
 }
 
 .area-item.inactive {
-  @apply bg-gray-50 border-gray-300;
+  @apply bg-gray-50 border-gray-200 opacity-75;
 }
 
 .area-item.expanded {
@@ -116,183 +108,124 @@
 }
 
 .drag-handle {
-  @apply text-gray-400 cursor-move flex-shrink-0;
+  @apply text-gray-300 cursor-move flex-shrink-0;
 }
 
-.drag-handle i {
-  @apply text-base;
-}
+.drag-handle i { font-size: 0.7rem; }
 
 .status-dot {
-  @apply w-4 h-4 rounded-full flex-shrink-0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  @apply w-3 h-3 rounded-full flex-shrink-0;
 }
 
-.status-dot.inactive {
-  @apply opacity-50;
-}
+.status-dot.inactive { @apply opacity-50; }
 
 .area-info {
-  @apply flex-1 flex flex-col gap-1.5;
+  flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .room-number {
-  @apply text-base font-semibold text-gray-800;
-  @apply truncate;
+  @apply text-sm font-semibold text-gray-800 truncate;
 }
 
 .area-type {
-  @apply text-sm text-gray-500;
+  @apply text-xs text-gray-400;
 }
 
-.area-actions {
-  @apply flex items-center gap-1;
-}
+.expand-icon { @apply text-gray-400 flex-shrink-0; }
+.expand-icon i { font-size: 0.7rem; }
 
-.action-button {
-  @apply w-8 h-8 flex items-center justify-center rounded;
-  @apply text-gray-500 hover:text-red-600 hover:bg-red-50;
-  @apply transition-colors duration-200;
-}
-
-.expand-icon {
-  @apply text-gray-400 flex-shrink-0;
-}
-
-.expand-icon i {
-  @apply text-sm;
-}
-
-/* Area Details (Expanded) */
+/* Expanded Details */
 .area-details {
-  @apply px-4 py-4 bg-white border-2 border-t-0 border-gray-200 rounded-b-lg;
-  @apply space-y-3.5;
+  @apply px-3 py-3 bg-white border border-t-0 border-gray-200 rounded-b-lg;
+  @apply space-y-2;
 }
 
 .detail-row {
-  @apply flex items-center justify-between gap-3;
-  @apply py-1;
+  @apply flex items-center justify-between gap-2;
 }
 
 .detail-label {
-  @apply text-sm text-gray-600 font-medium;
-  min-width: 80px;
+  @apply text-xs text-gray-500 font-medium;
+  min-width: 60px;
 }
 
 .detail-value {
-  @apply text-sm text-gray-900 font-medium;
-  @apply text-right;
+  @apply text-xs text-gray-800 font-medium text-right;
 }
 
 .status-badge {
-  @apply px-3 py-1.5 rounded-md text-xs text-white font-semibold;
-  @apply uppercase tracking-wide;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  @apply px-2 py-0.5 rounded text-xs text-white font-semibold uppercase;
 }
 
 .detail-actions {
-  @apply flex gap-2.5 pt-3 mt-1 border-t border-gray-200;
+  @apply flex gap-1.5 pt-2 border-t border-gray-100;
 }
 
 .btn-see-more,
 .btn-activate,
 .btn-deactivate {
-  @apply flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg;
-  @apply text-sm font-semibold transition-all duration-200;
-  @apply shadow-sm;
-  min-height: 40px;
+  flex: 1;
+  @apply flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg;
+  @apply text-xs font-medium transition-all duration-150;
+  min-height: 32px;
 }
 
 .btn-see-more {
-  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow;
-  @apply border border-gray-200;
+  @apply bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200;
 }
 
 .btn-activate {
-  @apply bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md;
+  @apply bg-blue-600 text-white hover:bg-blue-700;
 }
 
 .btn-deactivate {
-  @apply bg-red-600 text-white hover:bg-red-700 hover:shadow-md;
-}
-
-.btn-see-more i,
-.btn-activate i,
-.btn-deactivate i {
-  @apply text-sm;
+  @apply bg-red-500 text-white hover:bg-red-600;
 }
 
 /* Empty State */
 .empty-state {
-  @apply flex flex-col items-center justify-center py-12 text-gray-400;
+  @apply flex flex-col items-center justify-center py-6 text-gray-300;
 }
 
-.empty-state i {
-  @apply text-5xl mb-3;
-}
-
-.empty-state p {
-  @apply text-sm font-medium;
-}
+.empty-state i { @apply text-3xl mb-1.5; }
+.empty-state p { @apply text-xs; }
 
 /* Panel Footer */
 .panel-footer {
-  @apply px-4 py-3 border-t border-gray-200 bg-gray-50;
+  @apply px-3 py-2.5 border-t border-gray-200 bg-gray-50;
+  flex-shrink: 0;
 }
 
 .btn-add-area {
-  @apply w-full flex items-center justify-center gap-2 px-4 py-3.5;
-  @apply bg-blue-600 text-white rounded-lg font-semibold;
-  @apply hover:bg-blue-700 transition-all duration-200;
-  @apply shadow-sm hover:shadow-md;
-  min-height: 48px;
+  @apply w-full flex items-center justify-center gap-1.5 px-3 py-2.5;
+  @apply bg-blue-600 text-white rounded-lg font-medium text-sm;
+  @apply hover:bg-blue-700 transition-colors duration-150;
 }
 
-.btn-add-area i {
-  @apply text-lg;
-}
+.btn-add-area i { @apply text-base; }
 
-/* Drop Zone Overlay (shown during drag from map) */
+/* Drop Zone Overlay */
 .drop-zone-overlay {
-  @apply absolute inset-0 bg-red-50 bg-opacity-90 z-50;
+  @apply absolute inset-0 z-50;
   @apply flex items-center justify-center;
-  @apply border-4 border-dashed border-red-400;
-  @apply animate-pulse;
+  background: rgba(254, 242, 242, 0.92);
+  border: 3px dashed #f87171;
 }
 
 .drop-zone-indicator {
-  @apply flex flex-col items-center gap-3 px-6 py-8;
-  @apply bg-white rounded-lg shadow-xl;
-  @apply border-2 border-red-500;
+  @apply flex flex-col items-center gap-2 px-5 py-6;
+  @apply bg-white rounded-lg shadow-lg border-2 border-red-400;
 }
 
-.drop-zone-indicator i {
-  @apply text-4xl text-red-600;
-}
-
-.drop-zone-indicator p {
-  @apply text-lg font-bold text-red-700;
-}
-
-/* Drag States */
-.area-item[draggable="true"]:active {
-  @apply opacity-50 cursor-grabbing;
-}
+.drop-zone-indicator i { @apply text-3xl text-red-500; }
+.drop-zone-indicator p { @apply text-sm font-bold text-red-600; }
 
 /* Scrollbar */
-.list-section::-webkit-scrollbar {
-  @apply w-2;
-}
-
-.list-section::-webkit-scrollbar-track {
-  @apply bg-gray-100;
-}
-
-.list-section::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
-}
-
-.list-section::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
-}
+.area-list::-webkit-scrollbar { width: 4px; }
+.area-list::-webkit-scrollbar-track { background: transparent; }
+.area-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; }
+.area-list::-webkit-scrollbar-thumb:hover { background: #9ca3af; }

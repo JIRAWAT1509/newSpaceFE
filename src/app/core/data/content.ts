@@ -13,7 +13,6 @@ import { NavigationItem } from '../models/navigation.model';
  */
 
 export const NAVIGATION_CONTENT: NavigationItem[] = [
-
   // ============================================
   // SALES MODULE - RESTRUCTURED (5 Pages)
   // ============================================
@@ -55,13 +54,6 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     primary_content: 'area',
     secondary_content: [
       {
-        name: 'master_data',
-        icon: 'assets/icons/briefcase-outline.svg',
-        route: '/area/layout/master',
-        hasDeeper: true,
-        deeperNote: 'Contains: Building, Floor, Zone, Layout, Price List, etc.',
-      },
-      /* {
         name: 'area_layout_management',
         icon: 'assets/icons/briefcase-outline.svg',
         sub: [
@@ -72,7 +64,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             deeperNote:
               'Contains: Building, Floor, Zone, Layout, Price List, etc.',
           },
-          /* {
+          {
             name: 'inquiry',
             route: '/area/layout/inquiry',
             hasDeeper: true,
@@ -83,10 +75,10 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             route: '/area/layout/reports',
             hasDeeper: true,
             deeperNote: 'Contains: Layout reports, Current area reports',
-          }, */
-      /*  ],
-      }, */
-      /* {
+          },
+        ],
+      },
+      {
         name: 'area_maintenance_closure',
         icon: 'assets/icons/clipboard-outline.svg',
         sub: [
@@ -112,7 +104,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           { name: 'daily_transactions', route: '/area/measurement/daily' },
           { name: 'reports', route: '/area/measurement/reports' },
         ],
-      }, */
+      },
     ],
   },
 
@@ -135,7 +127,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
         //   }
         // ]
       },
-      /* {
+      {
         name: 'quotation_management',
         icon: 'assets/icons/briefcase-outline.svg',
         sub: [
@@ -192,7 +184,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             name: 'daily_transactions',
             route: '/contract/lease/daily',
             hasDeeper: true,
-            deeperNote: 'Contains: Lease, Copy, ภาคผนวก, etc.',
+            deeperNote: 'Contains: Lease, Copy, Addendum, etc.',
           },
           {
             name: 'processing',
@@ -255,7 +247,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
         name: 'fit_out_contract',
         icon: 'assets/icons/clipboard-outline.svg',
         sub: [{ name: 'daily_transactions', route: '/contract/fitout/daily' }],
-      }, */
+      },
     ],
   },
 
@@ -267,21 +259,11 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       // --- FINANCE SECTION ---
       {
-        name: 'dashboard',
-        icon: 'pi-chart-bar',
+        name: 'finance_master',
+        icon: 'assets/icons/business-outline.svg',
         route: '/finance/master',
       },
-      /* {
-        name: 'invoices',
-        icon: 'pi-money-bill',
-        route: '/collection/invoice/daily',
-      },
       {
-        name: 'finance_receipts',
-        icon: 'pi-receipt',
-        route: '/finance/receipt/daily',
-      }, */
-      /* {
         name: 'finance_receipts',
         icon: 'assets/icons/business-outline.svg',
         sub: [
@@ -299,8 +281,8 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             deeperNote: 'Contains: 20 different receipt reports',
           },
         ],
-      }, */
-      /* {
+      },
+      {
         name: 'finance_credit_note',
         icon: 'assets/icons/clipboard-outline.svg',
         sub: [
@@ -317,10 +299,10 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
             deeperNote: 'Contains: Details, Print/Confirm',
           },
         ],
-      }, */
+      },
 
       // --- COLLECTION SECTION ---
-      /* {
+      {
         name: 'collection_sales_recording',
         icon: 'assets/icons/briefcase-outline.svg',
         sub: [
@@ -398,7 +380,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
               'Contains: Print, Outstanding summaries, Daily/Monthly reports, Bounced check tracking',
           },
         ],
-      }, */
+      },
     ],
   },
 
@@ -407,15 +389,9 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   // ============================================
   {
     primary_content: 'facilities',
-
     secondary_content: [
-      {
-        name: 'utilities',
-        icon: 'assets/icons/briefcase-outline.svg',
-        route: '/facilities/utilities/master',
-      },
       // --- UTILITIES SECTION ---
-      /* {
+      {
         name: 'utilities_meter_management',
         icon: 'assets/icons/briefcase-outline.svg',
         sub: [
@@ -473,7 +449,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           },
           { name: 'reports', route: '/facilities/workorder/reports' },
         ],
-      }, */
+      },
     ],
   },
 
@@ -557,11 +533,11 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           },
         ],
       },
-      /* {
+      {
         name: 'dashboard',
         icon: 'assets/icons/dashboard.svg',
         route: '/dashboard/overview',
-      }, */
+      },
     ],
   },
 
@@ -571,29 +547,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   {
     primary_content: 'setting',
     secondary_content: [
-      // --- USER SETTING ---
-      {
-        name: 'user_accounts',
-        icon: 'assets/icons/briefcase-outline.svg',
-        sub: [
-          {
-            name: 'user_data_management',
-            route: '/setting/user-accounts/data',
-            hasDeeper: true,
-            deeperNote:
-              'Contains: User setup, User groups, Display preferences',
-          },
-          {
-            name: 'roles_permissions',
-            route: '/setting/user-accounts/roles',
-            hasDeeper: true,
-            deeperNote:
-              'Contains: Permissions, Email recipients, Positions, Access scope, Approval period',
-          },
-        ],
-      },
-
-      // --- COMPANY SETTING ---
+      // --- COMPANY SETTING (อันดับแรก) ---
       {
         name: 'company_info',
         icon: 'assets/icons/clipboard-outline.svg',
@@ -614,6 +568,28 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
           {
             name: 'customer_info',
             route: '/setting/company/customer',
+          },
+        ],
+      },
+
+      // --- USER SETTING ---
+      {
+        name: 'user_accounts',
+        icon: 'assets/icons/briefcase-outline.svg',
+        sub: [
+          {
+            name: 'user_data_management',
+            route: '/setting/user-accounts/data',
+            hasDeeper: true,
+            deeperNote:
+              'Contains: User setup, User groups, Display preferences',
+          },
+          {
+            name: 'roles_permissions',
+            route: '/setting/user-accounts/roles',
+            hasDeeper: true,
+            deeperNote:
+              'Contains: Permissions, Email recipients, Positions, Access scope, Approval period',
           },
         ],
       },

@@ -12,6 +12,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { TextareaModule } from 'primeng/textarea';
 import { TabsModule } from 'primeng/tabs';
 import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface Bank {
   OU_CODE: string;
@@ -85,7 +86,8 @@ interface GLAccount {
     ConfirmDialogModule,
     TextareaModule,
     TabsModule,
-    SelectModule
+    SelectModule,
+    TooltipModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './company-bank.component.html',
@@ -113,6 +115,7 @@ export class CompanyBankComponent implements OnInit {
   showDetailsModal = false;
   isEditMode = false;
   isAccountEditMode = false;  // ✅ Added for account edit mode
+  isAccountViewMode = false;  // โหมดดูอย่างเดียว (กดแถว) — แก้ไขได้เฉพาะกดไอคอนแก้ไข
 
   // Forms
   bankForm: Bank = this.getEmptyBank();
@@ -143,6 +146,15 @@ billPaymentColumns = Array.from({ length: 26 }, (_, i) => ({
   label: String.fromCharCode(65 + i), // A-Z
   value: String.fromCharCode(65 + i)
 }));
+
+private readonly bankLogoMap: Record<string, { text: string; cssClass: string }> = {
+  '001': { text: 'SCB', cssClass: 'logo-scb' },
+  '002': { text: 'BBL', cssClass: 'logo-bbl' },
+  '003': { text: 'KTB', cssClass: 'logo-ktb' },
+  '004': { text: 'KBK', cssClass: 'logo-kbk' },
+  '005': { text: 'BAY', cssClass: 'logo-bay' },
+  '006': { text: 'TTB', cssClass: 'logo-ttb' }
+};
 
   constructor(
     private confirmationService: ConfirmationService,
@@ -267,7 +279,47 @@ loadAccountInfo(bankCode: string, branchCode: string) {
   selectBank(bank: Bank) {
     this.selectedBank = bank;
     this.selectedBranch = null;
+    this.branchForm = this.getEmptyBranch();
+    this.branchErrors = {};
+    this.accounts = [];
     this.loadBranches(bank.BANK_CODE);
+  }
+
+  /** เลือกสาขา แล้วแสดงหน้าจอ รหัสการนำส่งเงิน + บันทึกข้อมูลสาขาธนาคาร บนหน้าหลัก */
+  selectBranch(branch: Branch) {
+    this.selectedBranch = branch;
+    this.branchForm = { ...branch };
+    this.branchErrors = {};
+    this.loadAccountsForBranch(branch.BANK_CODE, branch.BRANCH_CODE);
+  }
+
+  /** บันทึกข้อมูลสาขาจากหน้าจอบนหน้าหลัก (ไม่ใช้โมดัล) */
+  saveBranchInline() {
+    if (!this.selectedBranch) return;
+    if (!this.validateBranchForm()) return;
+    this.isSaving = true;
+    const index = this.branches.findIndex(b => b.BRANCH_CODE === this.branchForm.BRANCH_CODE);
+    if (index !== -1) {
+      this.branches[index] = { ...this.branchForm };
+      this.selectedBranch = { ...this.branchForm };
+      this.showSuccess('บันทึกข้อมูลสาขาธนาคารเรียบร้อย');
+    }
+    this.isSaving = false;
+  }
+
+  resetBranchInlineForm() {
+    if (!this.selectedBranch) return;
+    this.branchForm = { ...this.selectedBranch };
+    this.branchErrors = {};
+    this.showSuccess('คืนค่าฟอร์มสาขาตามข้อมูลเดิมแล้ว');
+  }
+
+  get hasBranchInlineChanges(): boolean {
+    if (!this.selectedBranch) return false;
+    return (
+      this.branchForm.BRANCH_NAME_EN !== this.selectedBranch.BRANCH_NAME_EN ||
+      this.branchForm.BRANCH_NAME_TH !== this.selectedBranch.BRANCH_NAME_TH
+    );
   }
 
   openAddBankModal() {
@@ -466,6 +518,11 @@ saveBranchModal() {
 
     // Mock
     this.branches = this.branches.filter(b => b.BRANCH_CODE !== branch.BRANCH_CODE);
+    if (this.selectedBranch?.BRANCH_CODE === branch.BRANCH_CODE) {
+      this.selectedBranch = null;
+      this.accounts = [];
+      this.branchForm = this.getEmptyBranch();
+    }
     this.showSuccess('Branch deleted successfully');
   }
 
@@ -521,8 +578,8 @@ viewBranchDetails(branch: Branch) {
 
   closeDetailsModal() {
     this.showDetailsModal = false;
-    this.selectedBranch = null;
     this.selectedAccount = null;
+    /* ไม่ล้าง selectedBranch เพื่อให้หน้าจอ รหัสการนำส่งเงินเข้าบัญชีธนาคาร ยังแสดงบนหน้าหลัก */
   }
 
 editBranchFromDetails() {
@@ -551,20 +608,39 @@ openAddAccountModal() {
   }
 
   this.isAccountEditMode = false;
+  this.isAccountViewMode = false;
   this.accountForm = this.getEmptyAccount();
   this.accountForm.BANK_CODE = this.selectedBranch.BANK_CODE;
   this.accountForm.BRANCH_CODE = this.selectedBranch.BRANCH_CODE;
   this.accountErrors = {};
+  this.selectedAccount = null;
   this.showAccountModal = true;
 }
 
-// This method is already there, just make sure it exists
-openEditAccountModal(account: AccountInfo) {
-  this.isAccountEditMode = true;
-  this.accountForm = { ...account };
+/** เปิดโม달ดูรายละเอียดอย่างเดียว (ห้ามแก้ไข) — ใช้เมื่อคลิกแถว */
+openViewAccountModal(account: AccountInfo) {
   this.selectedAccount = account;
+  this.accountForm = { ...account };
+  this.isAccountViewMode = true;
+  this.isAccountEditMode = false;
   this.accountErrors = {};
   this.showAccountModal = true;
+}
+
+/** เปิดโม달แก้ไข — ใช้เฉพาะเมื่อกดไอคอนแก้ไข */
+openEditAccountModal(account: AccountInfo) {
+  this.selectedAccount = account;
+  this.accountForm = { ...account };
+  this.isAccountViewMode = false;
+  this.isAccountEditMode = true;
+  this.accountErrors = {};
+  this.showAccountModal = true;
+}
+
+/** จากโหมดดูอย่างเดียว ไปโหมดแก้ไข (ปุ่ม "แก้ไข" ในโม달) */
+switchAccountToEditMode() {
+  this.isAccountViewMode = false;
+  this.isAccountEditMode = true;
 }
 
 saveAccountModal() {
@@ -657,8 +733,10 @@ performDeleteAccount(account: AccountInfo) {
 
 closeAccountModal() {
   this.showAccountModal = false;
+  this.isAccountViewMode = false;
   this.accountForm = this.getEmptyAccount();
   this.accountErrors = {};
+  this.selectedAccount = null;
 }
 
 validateAccountForm(): boolean {
@@ -754,6 +832,19 @@ getEmptyAccount(): AccountInfo {
       b.BRANCH_NAME_EN.toLowerCase().includes(query) ||
       b.BRANCH_NAME_TH.toLowerCase().includes(query)
     );
+  }
+
+  getBankLogoText(bank: Bank): string {
+    const mapped = this.bankLogoMap[bank.BANK_CODE];
+    if (mapped) return mapped.text;
+
+    const words = bank.BANK_NAME_EN.split(' ').filter(Boolean);
+    if (words.length === 0) return bank.BANK_CODE || 'BANK';
+    return words.slice(0, 3).map(word => word.charAt(0).toUpperCase()).join('');
+  }
+
+  getBankLogoClass(bank: Bank): string {
+    return this.bankLogoMap[bank.BANK_CODE]?.cssClass || 'logo-default';
   }
 
   // ✅ ADD: Load GL Accounts

@@ -1,20 +1,53 @@
 /* revenue-form-drawer.component.css */
 
+/* Drawer below header (defect fix) */
+@media (min-width: 768px) {
+  .drawer-panel--revenue {
+    top: 100px !important;
+    bottom: 0 !important;
+    max-height: calc(100vh - 100px) !important;
+  }
+}
+
+/* Drawer flex: fixed header/footer, scrollable middle */
+.drawer-panel--revenue {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-panel--revenue .drawer-header {
+  flex-shrink: 0;
+}
+
+.drawer-panel--revenue .drawer-body {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.drawer-panel--revenue .drawer-footer {
+  flex-shrink: 0;
+}
+
 /* Custom scrollbar */
+.drawer-body::-webkit-scrollbar,
 .overflow-y-auto::-webkit-scrollbar {
   width: 8px;
 }
 
+.drawer-body::-webkit-scrollbar-track,
 .overflow-y-auto::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
 
+.drawer-body::-webkit-scrollbar-thumb,
 .overflow-y-auto::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 4px;
 }
 
+.drawer-body::-webkit-scrollbar-thumb:hover,
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #555;
 }

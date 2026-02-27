@@ -1,28 +1,37 @@
 <!-- meter-list.component.html - TABLE VERSION -->
 
 <div class="meter-list-container">
-  <!-- Header Stats -->
-  <div class="header-stats">
-    <div class="stat-card stat-card--blue">
-      <div class="stat-icon"><i class="pi pi-th-large"></i></div>
-      <div class="stat-info">
-        <div class="stat-value">{{ totalMeters() }}</div>
-        <div class="stat-label">Total Meters</div>
-      </div>
-    </div>
-    <div class="stat-card stat-card--amber">
-      <div class="stat-icon"><i class="pi pi-clock"></i></div>
-      <div class="stat-info">
-        <div class="stat-value">{{ pendingCount() }}</div>
-        <div class="stat-label">Pending</div>
-      </div>
-    </div>
-    <div class="stat-card stat-card--emerald">
-      <div class="stat-icon"><i class="pi pi-check-circle"></i></div>
-      <div class="stat-info">
-        <div class="stat-value">{{ completeCount() }}</div>
-        <div class="stat-label">Complete</div>
-      </div>
+  <!-- Dashboard Overview -->
+  <div class="section-card">
+    <h2 class="section-title">Dashboard Overview</h2>
+    <div class="stats-grid">
+      <article class="stat-card stat-card--primary">
+        <div class="stat-card-icon">
+          <i class="pi pi-th-large"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">Total Meters</p>
+          <p class="stat-value">{{ totalMeters() }}</p>
+        </div>
+      </article>
+      <article class="stat-card stat-card--warning">
+        <div class="stat-card-icon">
+          <i class="pi pi-clock"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">Pending</p>
+          <p class="stat-value">{{ pendingCount() }}</p>
+        </div>
+      </article>
+      <article class="stat-card stat-card--success">
+        <div class="stat-card-icon">
+          <i class="pi pi-check-circle"></i>
+        </div>
+        <div class="stat-card-body">
+          <p class="stat-label">Complete</p>
+          <p class="stat-value">{{ completeCount() }}</p>
+        </div>
+      </article>
     </div>
   </div>
 
@@ -78,13 +87,26 @@
   <div class="table-card">
     <div class="table-header-bar">
       <h3 class="table-title">
-        Meter List
+        รายการมิเตอร์
         <span class="table-count">({{ filteredMeters().length }})</span>
       </h3>
     </div>
 
     <div class="table-wrapper">
       <table class="meter-table">
+        <colgroup>
+          <col class="col-name" />
+          <col class="col-group" />
+          <col class="col-type" />
+          <col class="col-building" />
+          <col class="col-room" />
+          <col class="col-status" />
+          <col class="col-date" />
+          <col class="col-reading" />
+          <col class="col-avg" />
+          <col class="col-cost" />
+          <col class="col-actions" />
+        </colgroup>
         <thead>
           <tr>
             <th>ชื่อ Meter</th>
@@ -93,29 +115,29 @@
             <th>อาคาร</th>
             <th>ห้อง</th>
             <th>สถานะ</th>
-            <th>วันที่บันทึกล่าสุด</th>
-            <th>ค่ามิเตอร์ปัจจุบัน</th>
-            <th>Avg. Consumption</th>
-            <th>ค่าใช้จ่าย (฿)</th>
+            <th>ล่าสุด</th>
+            <th>ค่าปัจจุบัน</th>
+            <th>Avg.</th>
+            <th>ค่าใช้จ่าย</th>
             <th class="actions-col"></th>
           </tr>
         </thead>
         <tbody>
           @for (row of filteredMeters(); track row.id) {
             <tr [class.editing-row]="row.isEditing">
-              <!-- 1. ชื่อ Meter -->
+              <!-- 1. Meter name -->
               <td>
                 <div class="meter-name-cell">
                   <span class="meter-number">{{ row.meterNumber }}</span>
                 </div>
               </td>
 
-              <!-- 2. กลุ่ม Meter -->
+              <!-- 2. Meter group -->
               <td>
                 <span class="group-tag">{{ row.groupName }}</span>
               </td>
 
-              <!-- 3. ประเภท Meter -->
+              <!-- 3. Meter type -->
               <td>
                 <div class="type-badge" [style.background-color]="row.meterTypeColor + '20'" [style.color]="row.meterTypeColor">
                   <i class="pi" [ngClass]="row.meterTypeIcon"></i>
@@ -123,25 +145,25 @@
                 </div>
               </td>
 
-              <!-- 4. อาคาร -->
+              <!-- 4. Building -->
               <td>{{ row.building }}</td>
 
-              <!-- 5. ห้อง -->
+              <!-- 5. Room -->
               <td>
                 <span class="room-badge">{{ row.room }}</span>
               </td>
 
-              <!-- 6. สถานะ -->
+              <!-- 6. Status -->
               <td>
                 <span class="status-badge" [ngClass]="getStatusClass(row.status)">
                   {{ getStatusLabel(row.status) }}
                 </span>
               </td>
 
-              <!-- 7. วันที่บันทึกล่าสุด -->
+              <!-- 7. Last recorded date -->
               <td>{{ formatDate(row.lastRecordedDate) }}</td>
 
-              <!-- 8. ค่ามิเตอร์ปัจจุบัน (editable) -->
+              <!-- 8. Current reading (editable) -->
               <td>
                 @if (row.isEditing) {
                   <div class="inline-edit">
@@ -175,7 +197,7 @@
                 <span class="consumption-unit">{{ row.unit }}</span>
               </td>
 
-              <!-- 10. ค่าใช้จ่าย -->
+              <!-- 10. Cost -->
               <td>
                 <span class="cost-value">฿{{ formatCost(row.currentCost) }}</span>
               </td>

@@ -1,4 +1,4 @@
-import { Component, OnInit, output, signal, computed, input, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, output, signal, computed, input, ElementRef, AfterViewInit, OnDestroy, effect, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AreaDataService, StatusDistribution } from '@core/services/area/area-data.service';
 import { AreaStatus } from '@core/models/area.model';
@@ -19,12 +19,13 @@ export interface FilterChangeEvent {
 export class AreaAvailabilityComponent implements OnInit, AfterViewInit, OnDestroy {
   mode = input<'per-building' | 'per-floor'>('per-building');
 
-  statusDistribution = signal<StatusDistribution[]>([]);
   selectedStatuses = signal<Set<AreaStatus>>(new Set());
 
-  // Show all 4 statuses (service now returns only 4 statuses, no 'inactive')
+  // ✅ computed จาก service โดยตรง — reactive ตาม building/floor ที่เปลี่ยน
   mainStatusDistribution = computed(() => {
-    return this.statusDistribution();
+    return this.mode() === 'per-building'
+      ? this.areaDataService.buildingStatusDistribution()
+      : this.areaDataService.currentFloorStatusDistribution();
   });
 
   hasSelection = computed(() => this.selectedStatuses().size > 0);
@@ -38,18 +39,22 @@ export class AreaAvailabilityComponent implements OnInit, AfterViewInit, OnDestr
     private areaDataService: AreaDataService,
     private elementRef: ElementRef,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    // ✅ effect จะ re-run อัตโนมัติทุกครั้งที่ mainStatusDistribution เปลี่ยน
+    // (เช่น เวลา toggle ตึก) เพื่อ trigger change detection
+    effect(() => {
+      this.mainStatusDistribution(); // track dependency
+      this.cdr.markForCheck();
+    });
+  }
 
   ngOnInit(): void {
-    this.loadStatusDistribution();
-    // Check for config changes every 1 second (lightweight polling)
     this.configCheckInterval = interval(1000).subscribe(() => {
       this.checkAndApplyConfigChanges();
     });
   }
 
   ngAfterViewInit(): void {
-    // Apply scoped CSS variables for Area Availability module
     this.applyScopedColors();
   }
 
@@ -61,7 +66,6 @@ export class AreaAvailabilityComponent implements OnInit, AfterViewInit, OnDestr
 
   private checkAndApplyConfigChanges(): void {
     const areaConfig = getAreaAvailabilityConfig();
-    // Create a hash of the config to detect changes (including icons)
     const configHash = JSON.stringify({
       colors: areaConfig.colors,
       labels: areaConfig.labels,
@@ -69,13 +73,10 @@ export class AreaAvailabilityComponent implements OnInit, AfterViewInit, OnDestr
       statusIcons: areaConfig.statusIcons,
       statusIconTypes: areaConfig.statusIconTypes
     });
-    
+
     if (configHash !== this.lastConfigHash) {
       this.lastConfigHash = configHash;
       this.applyScopedColors();
-      // Reload status distribution to get updated labels and colors
-      this.loadStatusDistribution();
-      // Trigger change detection to update the view
       this.cdr.markForCheck();
     }
   }
@@ -83,29 +84,8 @@ export class AreaAvailabilityComponent implements OnInit, AfterViewInit, OnDestr
   private applyScopedColors(): void {
     const areaConfig = getAreaAvailabilityConfig();
     const container = this.elementRef.nativeElement.querySelector('.area-availability-container');
-    
     if (container && areaConfig.colors) {
-      // Apply scoped colors to the container element
       applyModuleScopedColors(container, 'areaAvailability', areaConfig.colors);
-    }
-  }
-
-  private loadStatusDistribution(): void {
-    const building = this.areaDataService.building();
-    if (!building.floors || building.floors.length === 0) {
-      console.warn('No floors available');
-      return;
-    }
-
-    if (this.mode() === 'per-building') {
-      // Aggregate all floors
-      const distribution = this.areaDataService.getBuildingStatusDistribution();
-      this.statusDistribution.set(distribution);
-    } else {
-      // Per-floor (for future use)
-      const floor = building.floors[0];
-      const distribution = this.areaDataService.getStatusDistribution(floor);
-      this.statusDistribution.set(distribution);
     }
   }
 
@@ -130,12 +110,8 @@ export class AreaAvailabilityComponent implements OnInit, AfterViewInit, OnDestr
 
   getStatusCardClasses(statusId: AreaStatus): string {
     const classes = ['status-card'];
-    if (this.isSelected(statusId)) {
-      classes.push('active');
-    }
-    if (this.shouldDim(statusId)) {
-      classes.push('dimmed');
-    }
+    if (this.isSelected(statusId)) classes.push('active');
+    if (this.shouldDim(statusId)) classes.push('dimmed');
     return classes.join(' ');
   }
 

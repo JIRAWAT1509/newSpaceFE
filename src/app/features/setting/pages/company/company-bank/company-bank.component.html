@@ -9,14 +9,16 @@
   <!-- Header -->
   <div class="header-section">
     <div class="header-content">
+      <div class="header-icon-wrap">
+        <i class="pi pi-credit-card"></i>
+      </div>
       <div class="title-section">
         <h1 class="page-title">Bank Management</h1>
-        <p class="page-subtitle">Manage banks, branches, and account information</p>
+        <p class="page-subtitle">จัดการธนาคาร สาขา และรหัสการนำส่งเงินเข้าบัญชี</p>
       </div>
-
       <div class="header-actions">
         <p-button
-          label="เพิ่ม"
+          label="เพิ่มธนาคาร"
           icon="pi pi-plus"
           severity="primary"
           (onClick)="openAddBankModal()"
@@ -25,15 +27,15 @@
     </div>
   </div>
 
-  <!-- Main Content - Split Layout -->
-  <div class="main-content" [class.split-layout]="selectedBank">
+  <!-- Main Content - Split Layout (2 or 3 columns) -->
+  <div class="main-content" [class.split-layout]="selectedBank" [class.with-remittance]="selectedBranch">
 
-    <!-- Banks Section -->
+    <!-- Banks Section: รายการธนาคารแบบลิสต์ -->
     <div class="banks-section" [class.half-width]="selectedBank">
       <div class="section-header">
         <h2 class="section-title">
           <i class="pi pi-building"></i>
-          Banks
+          รายการธนาคาร
         </h2>
         <div class="search-box">
           <i class="pi pi-search search-icon"></i>
@@ -41,43 +43,41 @@
             type="text"
             pInputText
             [(ngModel)]="bankSearchQuery"
-            placeholder="Search banks..."
+            placeholder="ค้นหาธนาคาร..."
             class="search-input"
           />
         </div>
       </div>
 
-      <!-- Loading -->
       <div *ngIf="isLoadingBanks" class="loading-state">
         <i class="pi pi-spin pi-spinner loading-icon"></i>
-        <p>Loading banks...</p>
+        <p>กำลังโหลด...</p>
       </div>
 
-      <!-- Banks Grid -->
-      <div *ngIf="!isLoadingBanks && filteredBanks.length > 0" class="banks-grid">
+      <div *ngIf="!isLoadingBanks && filteredBanks.length > 0" class="bank-list">
         <div
           *ngFor="let bank of filteredBanks"
-          class="bank-card"
+          class="bank-list-item"
           [class.selected]="selectedBank?.BANK_CODE === bank.BANK_CODE"
+          [pTooltip]="bank.BANK_NAME_EN + ' / ' + bank.BANK_NAME_TH"
+          tooltipPosition="right"
           (click)="selectBank(bank)"
         >
-          <div class="bank-card-header">
-            <div class="bank-icon">
-              <i class="pi pi-building"></i>
-            </div>
-            <div class="bank-code">{{ bank.BANK_CODE }}</div>
+          <div class="bank-list-icon" [ngClass]="getBankLogoClass(bank)">
+            <span>{{ getBankLogoText(bank) }}</span>
           </div>
-          <div class="bank-card-body">
-            <h3 class="bank-name-en">{{ bank.BANK_NAME_EN }}</h3>
-            <p class="bank-name-th">{{ bank.BANK_NAME_TH }}</p>
+          <div class="bank-list-info">
+            <span class="bank-list-code">{{ bank.BANK_CODE }}</span>
+            <span class="bank-list-name">{{ bank.BANK_NAME_TH || bank.BANK_NAME_EN }}</span>
           </div>
-          <div class="bank-card-actions">
+          <div class="bank-list-actions">
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"
               [text]="true"
-              severity="info"
+              severity="secondary"
               size="small"
+              pTooltip="แก้ไข"
               (onClick)="openEditBankModal(bank); $event.stopPropagation()"
             ></p-button>
             <p-button
@@ -86,16 +86,16 @@
               [text]="true"
               severity="danger"
               size="small"
+              pTooltip="ลบ"
               (onClick)="deleteBank(bank); $event.stopPropagation()"
             ></p-button>
           </div>
         </div>
       </div>
 
-      <!-- Empty State -->
       <div *ngIf="!isLoadingBanks && filteredBanks.length === 0" class="empty-state">
         <i class="pi pi-inbox empty-icon"></i>
-        <p>No banks found</p>
+        <p>ไม่พบธนาคาร</p>
       </div>
     </div>
 
@@ -105,7 +105,7 @@
         <div class="selected-bank-info">
           <h2 class="section-title">
             <i class="pi pi-map-marker"></i>
-            Branches
+            สาขา
           </h2>
           <span class="bank-badge">{{ selectedBank.BANK_CODE }}</span>
         </div>
@@ -116,11 +116,11 @@
               type="text"
               pInputText
               [(ngModel)]="branchSearchQuery"
-              placeholder="Search branches..."
+              placeholder="ค้นหาสาขา..."
               class="search-input"
             />
           </div>
-            <p-button
+          <p-button
             label="เพิ่ม"
             icon="pi pi-plus"
             severity="primary"
@@ -130,45 +130,103 @@
         </div>
       </div>
 
-      <!-- Loading -->
       <div *ngIf="isLoadingBranches" class="loading-state">
         <i class="pi pi-spin pi-spinner loading-icon"></i>
         <p>Loading branches...</p>
       </div>
 
-      <!-- Branches Grid -->
-      <div *ngIf="!isLoadingBranches && filteredBranches.length > 0" class="branches-grid">
+      <div *ngIf="!isLoadingBranches && filteredBranches.length > 0" class="branch-list">
         <div
           *ngFor="let branch of filteredBranches"
-          class="branch-card"
-          (click)="viewBranchDetails(branch)"
+          class="branch-list-item"
+          [class.selected]="selectedBranch?.BRANCH_CODE === branch.BRANCH_CODE"
+          (click)="selectBranch(branch)"
         >
-          <div class="branch-card-header">
-            <div class="branch-icon">
-              <i class="pi pi-map-marker"></i>
-            </div>
-            <div class="branch-code">{{ branch.BRANCH_CODE }}</div>
+          <div class="branch-list-icon">
+            <i class="pi pi-map-marker"></i>
           </div>
-          <div class="branch-card-body">
-            <h4 class="branch-name-en">{{ branch.BRANCH_NAME_EN }}</h4>
-            <p class="branch-name-th">{{ branch.BRANCH_NAME_TH }}</p>
+          <div class="branch-list-info">
+            <span class="branch-list-code">{{ branch.BRANCH_CODE }}</span>
+            <span class="branch-list-name">{{ branch.BRANCH_NAME_TH || branch.BRANCH_NAME_EN }}</span>
           </div>
-          <div class="branch-card-footer">
-            <p-button
-              icon="pi pi-eye"
-              label="View Details"
-              [text]="true"
-              size="small"
-              (onClick)="viewBranchDetails(branch); $event.stopPropagation()"
-            ></p-button>
+          <div class="branch-list-actions">
+            <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small" pTooltip="แก้ไข" (onClick)="openEditBranchModal(branch); $event.stopPropagation()"></p-button>
+            <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary" size="small" pTooltip="ดูรายละเอียด" (onClick)="viewBranchDetails(branch); $event.stopPropagation()"></p-button>
+            <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" pTooltip="ลบ" (onClick)="deleteBranch(branch); $event.stopPropagation()"></p-button>
           </div>
         </div>
       </div>
 
-      <!-- Empty State -->
       <div *ngIf="!isLoadingBranches && filteredBranches.length === 0" class="empty-state">
         <i class="pi pi-inbox empty-icon"></i>
         <p>No branches found for this bank</p>
+      </div>
+
+      </div>
+
+    <!-- รหัสการนำส่งเงินเข้าบัญชีธนาคาร (แสดงเมื่อเลือกสาขา) -->
+    <div *ngIf="selectedBranch" class="remittance-section half-width">
+      <div class="section-header">
+        <div class="selected-bank-info">
+          <h2 class="section-title">
+            <i class="pi pi-wallet"></i>
+            รหัสการนำส่งเงินเข้าบัญชีธนาคาร
+          </h2>
+          <span class="bank-badge">{{ selectedBranch.BRANCH_CODE }}</span>
+        </div>
+        <div class="branch-actions">
+          <p-button label="ดูรายละเอียด" icon="pi pi-eye" [outlined]="true" size="small" (onClick)="viewBranchDetails(selectedBranch!)"></p-button>
+          <p-button label="เพิ่ม" icon="pi pi-plus" severity="primary" size="small" (onClick)="openAddAccountModal()"></p-button>
+        </div>
+      </div>
+
+      <div *ngIf="isLoadingAccounts" class="loading-state">
+        <i class="pi pi-spin pi-spinner loading-icon"></i>
+        <p>Loading...</p>
+      </div>
+
+      <div *ngIf="!isLoadingAccounts && accounts.length > 0" class="accounts-table">
+        <table class="data-table remittance-data-table">
+          <colgroup>
+            <col style="width: 12%" />
+            <col style="width: 14%" />
+            <col style="width: 16%" />
+            <col style="width: 16%" />
+            <col style="width: 28%" />
+            <col style="width: 120px" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>รหัสการนำส่งเงินเข้าบัญชี</th>
+              <th class="col-account-no">เลขบัญชี</th>
+              <th class="col-account-type">ประเภทบัญชี</th>
+              <th>บัญชีแยกประเภท (GL)</th>
+              <th>รายละเอียด</th>
+              <th class="text-center actions-col-header">การดำเนินการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let account of accounts" class="clickable-row" (click)="openViewAccountModal(account)">
+              <td>{{ account.PAID_FOR_CODE }}</td>
+              <td class="col-account-no">{{ account.ACC_BANK }}</td>
+              <td class="col-account-type">{{ account.ACC_TYPE }}</td>
+              <td>{{ account.ACC_GL }}</td>
+              <td>{{ account.NB_LONG_TEXT || '-' }}</td>
+              <td class="text-center actions-cell" (click)="$event.stopPropagation()">
+                <div class="action-buttons">
+                  <p-button icon="pi pi-pencil" [text]="true" [rounded]="true" severity="info" size="small" pTooltip="แก้ไข" (onClick)="openEditAccountModal(account)"></p-button>
+                  <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" size="small" pTooltip="ลบ" (onClick)="deleteAccount(account)"></p-button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!isLoadingAccounts && accounts.length === 0" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <p>ยังไม่มีรหัสการนำส่งเงินเข้าบัญชี</p>
+        <p-button label="เพิ่มรหัสการนำส่งเงิน" icon="pi pi-plus" severity="primary" size="small" (onClick)="openAddAccountModal()"></p-button>
       </div>
     </div>
 
@@ -394,12 +452,12 @@
       </div>
     </div>
 
-    <!-- Accounts Table Section -->
+    <!-- รหัสการนำส่งเงินเข้าบัญชีธนาคาร / Account Information -->
     <div class="accounts-section">
       <div class="accounts-header">
         <h3 class="section-title">
           <i class="pi pi-wallet"></i>
-          Account Information
+          รหัสการนำส่งเงินเข้าบัญชีธนาคาร
         </h3>
           <p-button
           label="เพิ่ม"
@@ -422,24 +480,47 @@
   <table class="data-table">
     <thead>
       <tr>
-        <th>Payment Code</th>
-        <th>Account Number</th>
-        <th>Account Type</th>
-        <th>GL Account</th>
-        <th>Description</th>
+        <th>รหัสการนำส่งเงินเข้าบัญชี</th>
+        <th class="col-account-no">เลขบัญชี</th>
+        <th class="col-account-type">ประเภทบัญชี</th>
+        <th>บัญชีแยกประเภท (GL)</th>
+        <th>รายละเอียด</th>
+        <th class="text-center actions-col-header">การดำเนินการ</th>
       </tr>
     </thead>
     <tbody>
       <tr
         *ngFor="let account of accounts"
         class="clickable-row"
-        (click)="openEditAccountModal(account)"
+        (click)="openViewAccountModal(account)"
       >
         <td>{{ account.PAID_FOR_CODE }}</td>
-        <td>{{ account.ACC_BANK }}</td>
-        <td>{{ account.ACC_TYPE }}</td>
+        <td class="col-account-no">{{ account.ACC_BANK }}</td>
+        <td class="col-account-type">{{ account.ACC_TYPE }}</td>
         <td>{{ account.ACC_GL }}</td>
         <td>{{ account.NB_LONG_TEXT || '-' }}</td>
+        <td class="text-center actions-cell" (click)="$event.stopPropagation()">
+          <div class="action-buttons">
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              severity="info"
+              size="small"
+              pTooltip="แก้ไข"
+              (onClick)="openEditAccountModal(account)"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              size="small"
+              pTooltip="ลบ"
+              (onClick)="deleteAccount(account)"
+            ></p-button>
+          </div>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -491,7 +572,7 @@
 </p-dialog>
 
 <!-- ============================================ -->
-<!-- MODAL 4: Account Add/Edit Modal -->
+<!-- MODAL 4: Account Add/Edit/View (รหัสการนำส่งเงินเข้าบัญชีธนาคาร) -->
 <!-- ============================================ -->
 <p-dialog
   [(visible)]="showAccountModal"
@@ -500,9 +581,70 @@
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: '700px', maxWidth: '95vw' }"
-  [header]="isAccountEditMode ? 'Edit Account' : 'Add New Account'"
+  [header]="isAccountViewMode ? 'รายละเอียดรหัสการนำส่งเงินเข้าบัญชี' : (isAccountEditMode ? 'แก้ไขรหัสการนำส่งเงินเข้าบัญชี' : 'เพิ่มรหัสการนำส่งเงินเข้าบัญชีธนาคาร')"
 >
   <div class="modal-content">
+    <h4 class="modal-section-title">
+      <i class="pi pi-wallet"></i>
+      รหัสการนำส่งเงินเข้าบัญชีธนาคาร
+    </h4>
+
+    <!-- โหมดดูอย่างเดียว: แสดงเฉพาะข้อมูล ไม่มี input แก้ไข -->
+    <div *ngIf="isAccountViewMode" class="view-only-content">
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label">Bank Code</label>
+          <p class="view-value">{{ accountForm.BANK_CODE }}</p>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Branch Code</label>
+          <p class="view-value">{{ accountForm.BRANCH_CODE }}</p>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">เลขบัญชี</label>
+        <p class="view-value">{{ accountForm.ACC_BANK }}</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">ประเภทบัญชี</label>
+        <p class="view-value">{{ accountForm.ACC_TYPE }}</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">บัญชีแยกประเภท (GL)</label>
+        <p class="view-value">{{ accountForm.ACC_GL || '-' }}</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">รหัสการนำส่งเงินเข้าบัญชีธนาคาร</label>
+        <p class="view-value">{{ accountForm.PAID_FOR_CODE }}</p>
+      </div>
+      <div class="form-field">
+        <label class="form-label">รายละเอียด</label>
+        <p class="view-value">{{ accountForm.NB_LONG_TEXT || '-' }}</p>
+      </div>
+      <div class="bill-payment-section">
+        <h4 class="subsection-title">
+          <i class="pi pi-file-edit"></i>
+          Bill Payment Column Mapping
+        </h4>
+        <div class="form-row-three">
+          <div class="form-field">
+            <label class="form-label">Customer (Ref1)</label>
+            <p class="view-value">{{ accountForm.BILL_PAYMENT_REF1 || '-' }}</p>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Invoice No (Ref2)</label>
+            <p class="view-value">{{ accountForm.BILL_PAYMENT_REF2 || '-' }}</p>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Payment Amount</label>
+            <p class="view-value">{{ accountForm.BILL_PAYMENT_REF3 || '-' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- โหมดเพิ่ม/แก้ไข: ฟอร์มกรอกข้อมูล -->
+    <div *ngIf="!isAccountViewMode">
     <div class="form-row">
       <div class="form-field">
         <label class="form-label">Bank Code</label>
@@ -573,16 +715,21 @@
       ></p-select>
     </div>
 
-    <div class="form-field">
-      <label class="form-label">Payment Code</label>
+    <div class="form-field form-field-paid-for" [class.has-error]="accountErrors['PAID_FOR_CODE']">
+      <label class="form-label required">รหัสการนำส่งเงินเข้าบัญชีธนาคาร</label>
       <input
         type="text"
         pInputText
         [(ngModel)]="accountForm.PAID_FOR_CODE"
         [disabled]="isAccountEditMode"
-        placeholder="Auto-generated if empty"
+        placeholder="กรอกรหัสการนำส่งเงิน (เช่น 001, B001)"
         class="form-input"
       />
+      <div *ngIf="accountErrors['PAID_FOR_CODE']" class="error-message">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ accountErrors['PAID_FOR_CODE'] }}</span>
+      </div>
+      <p class="form-hint">รหัสใช้ระบุการนำส่งเงินเข้าบัญชีนี้ (ต้องไม่ซ้ำในระบบ)</p>
     </div>
 
     <div class="form-field">
@@ -647,37 +794,57 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 
 <ng-template pTemplate="footer">
   <div class="modal-footer">
-    <div class="left-actions">
+    <!-- โหมดดูอย่างเดียว: ปิด + แก้ไข -->
+    <div *ngIf="isAccountViewMode" class="right-actions">
       <p-button
-        *ngIf="isAccountEditMode"
-        label="Delete"
-        icon="pi pi-trash"
-        severity="danger"
-        [outlined]="true"
-        (onClick)="deleteAccountFromModal()"
-      ></p-button>
-    </div>
-    <div class="right-actions">
-      <p-button
-        label="ยกเลิก"
+        label="ปิด"
         icon="pi pi-times"
         severity="secondary"
         [outlined]="true"
         (onClick)="closeAccountModal()"
-        [disabled]="isSaving"
       ></p-button>
       <p-button
-        [label]="isAccountEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างบัญชี'"
-        icon="pi pi-check"
+        label="แก้ไข"
+        icon="pi pi-pencil"
         severity="primary"
-        (onClick)="saveAccountModal()"
-        [loading]="isSaving"
+        (onClick)="switchAccountToEditMode()"
       ></p-button>
     </div>
+    <!-- โหมดเพิ่ม/แก้ไข: ยกเลิก บันทึก/สร้าง ลบ -->
+    <ng-container *ngIf="!isAccountViewMode">
+      <div class="left-actions">
+        <p-button
+          *ngIf="isAccountEditMode"
+          label="Delete"
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          (onClick)="deleteAccountFromModal()"
+        ></p-button>
+      </div>
+      <div class="right-actions">
+        <p-button
+          label="ยกเลิก"
+          icon="pi pi-times"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="closeAccountModal()"
+          [disabled]="isSaving"
+        ></p-button>
+        <p-button
+          [label]="isAccountEditMode ? 'บันทึกการเปลี่ยนแปลง' : 'สร้างบัญชี'"
+          icon="pi pi-check"
+          severity="primary"
+          (onClick)="saveAccountModal()"
+          [loading]="isSaving"
+        ></p-button>
+      </div>
+    </ng-container>
   </div>
 </ng-template>
 </p-dialog>

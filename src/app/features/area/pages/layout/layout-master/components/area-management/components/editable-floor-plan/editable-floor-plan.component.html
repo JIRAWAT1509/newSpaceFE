@@ -1,13 +1,11 @@
 <div class="editable-floor-plan-wrapper">
-  <!-- Top Center: Floor Info -->
   <div class="top-center-info">
     <div class="floor-info-badge">
       <i class="pi pi-building"></i>
-      <span>{{ floor()?.floorName || 'Floor' }}</span>
+      <span>{{ floor()?.floorName || "Floor" }}</span>
     </div>
   </div>
 
-  <!-- Top Right: Zoom Controls -->
   <div class="top-right-controls">
     <div class="zoom-controls">
       <button
@@ -29,7 +27,6 @@
     </div>
   </div>
 
-  <!-- Floor Plan Container -->
   <div
     #floorPlanContainer
     class="floor-plan-container"
@@ -45,9 +42,16 @@
     <div
       #floorPlanContent
       class="floor-plan-content"
-      [style.transform]="'translate(' + panOffset().x + 'px, ' + panOffset().y + 'px) scale(' + zoomLevel() + ')'"
+      [style.transform]="
+        'translate(' +
+        panOffset().x +
+        'px, ' +
+        panOffset().y +
+        'px) scale(' +
+        zoomLevel() +
+        ')'
+      "
     >
-      <!-- Floor Plan Image -->
       @if (currentFloorImage()) {
         <img
           [src]="currentFloorImage()"
@@ -59,10 +63,12 @@
         <div class="no-image-placeholder">
           <i class="pi pi-image"></i>
           <p>No floor plan image</p>
+          <span class="upload-hint"
+            >Upload a floor plan image using the button below</span
+          >
         </div>
       }
 
-      <!-- Area Markers (Draggable) - Only show active areas -->
       @for (area of activeAreas(); track area.id) {
         <app-area-marker
           [area]="area"
@@ -79,36 +85,35 @@
         />
       }
 
-      <!-- Ghost Marker (shown while dragging from list) -->
       @if (ghostMarkerPosition() && getDraggedArea()) {
         <div class="ghost-marker" [style]="getGhostMarkerStyle()">
-          <div class="marker-circle" [style.backgroundColor]="getStatusColor(getDraggedArea().status)">
-          </div>
-          <div class="room-label">
-            {{ getDraggedArea().roomNumber }}
-          </div>
+          <div
+            class="marker-circle"
+            [style.backgroundColor]="getStatusColor(getDraggedArea().status)"
+          ></div>
+          <div class="room-label">{{ getDraggedArea().roomNumber }}</div>
         </div>
       }
     </div>
   </div>
 
-  <!-- Bottom Right: Upload Button -->
+  <!-- ✅ แยก input ออกมานอก label แล้วใช้ (click) trigger แทน -->
   <div class="bottom-right-controls">
-    <label class="upload-button">
-      <input
-        type="file"
-        accept="image/png,image/jpeg,image/jpg,image/svg+xml"
-        (change)="onFileSelected($event)"
-        #fileInput
-      />
+    <input
+      #fileInput
+      type="file"
+      accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+      (change)="onFileSelected($event)"
+      class="hidden-file-input"
+    />
+    <button type="button" class="upload-button" (click)="fileInput.click()">
       <i class="pi pi-upload"></i>
       <span>Upload Floor Plan</span>
-    </label>
+    </button>
   </div>
 
-  <!-- Edit Instructions -->
   <div class="edit-instructions">
     <i class="pi pi-info-circle"></i>
-    Drag markers to reposition • Click to select • Upload new floor plan to update layout
+    Drag markers to reposition • Click to select • Upload new floor plan
   </div>
 </div>

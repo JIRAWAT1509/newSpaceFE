@@ -1,4 +1,4 @@
-<!-- sales-dashboard-page.component.html -->
+<!-- sales-dashboard-page.component.html - FINAL VERSION -->
 
 <div class="dashboard-page">
 
@@ -25,7 +25,7 @@
       <app-pipeline-overview></app-pipeline-overview>
     </section>
 
-    <!-- Section 3: Customer Insights -->
+    <!-- Section 3: Customer Insights (WITHOUT At-Risk) -->
     <section class="dashboard-section">
       <app-customer-insights></app-customer-insights>
     </section>
@@ -33,6 +33,14 @@
     <!-- Section 4: Team Performance -->
     <section class="dashboard-section">
       <app-team-performance></app-team-performance>
+    </section>
+
+    <!-- Section 5: At-Risk Customers (MOVED TO BOTTOM) -->
+    <section class="dashboard-section at-risk-section">
+      <app-at-risk-customers-alert
+        [customers]="atRiskCustomers()"
+        [isLoading]="isLoadingAtRisk()"
+      ></app-at-risk-customers-alert>
     </section>
 
   </div>

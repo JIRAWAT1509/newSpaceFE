@@ -35,12 +35,12 @@
 }
 
 [data-theme='dark'] {
-  --bg: 11 18 32;
+  --bg: 255 255 255;
   --fg: 226 232 240;
   --muted: 148 163 184;
   --border: 31 42 68;
-  --card: 17 28 47;
-  --input: 17 28 47;
+  --card: 255 255 255;
+  --input: 255 255 255;
   --primary: 59 130 246;
   --primary-fg: 226 232 240;
   --secondary: 56 189 248;
@@ -81,14 +81,263 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
   font-size: 14px;
   color: rgb(var(--fg));
-  background-color: rgb(var(--bg));
+  background-color: #ffffff;
 }
 
+/* ==================== Typography ==================== */
+html {
+  font-size: 14px;
+}
+
+/* Body text 14px */
+body, p, span, div, td, th, li, label, input, select, textarea, button, a,
+.p-datatable .p-datatable-thead th,
+.p-datatable .p-datatable-tbody td,
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-footer,
+.p-card .p-card-content,
+.p-panel .p-panel-content,
+.p-tabview .p-tabview-panels,
+.p-select .p-select-label,
+.p-inputtext,
+.p-dropdown .p-dropdown-label {
+  font-size: 14px !important;
+}
+
+/* Page/section headings */
+h1 {
+  font-size: 22px !important;
+  line-height: 1.3;
+  font-weight: 700;
+}
+h2 {
+  font-size: 18px !important;
+  line-height: 1.35;
+  font-weight: 700;
+}
+h3 {
+  font-size: 16px !important;
+  line-height: 1.4;
+  font-weight: 600;
+}
+h4, h5, h6 {
+  font-size: 15px !important;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.page-title,
+.form-heading-title {
+  font-size: 18px !important;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.section-title {
+  font-size: 16px !important;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.card-title {
+  font-size: 15px !important;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-title,
+.p-panel .p-panel-title,
+.p-card .p-card-title {
+  font-size: 16px !important;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+/* Component font-size scope */
+body,
+body *,
+main,
+main *,
+.p-dialog *,
+.p-drawer *,
+.drawer-panel *,
+.content-container * {
+  font-size: inherit;
+}
+
+/* Main content area background */
+main {
+  background-color: #ffffff !important;
+}
+
+/* ==================== RESPONSIVE ==================== */
+/* Breakpoints (Tailwind) */
+
+:root {
+  --bp-mobile: 639px;
+  --bp-tablet: 1023px;
+  --bp-desktop: 1024px;
+  --content-padding-mobile: 0.75rem;
+  --content-padding-tablet: 1rem;
+  --content-padding-desktop: 1.5rem;
+  --touch-min: 44px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Safe area for notch / home indicator */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Content container width */
 .content-container {
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   max-width: var(--content-max);
-  padding-left: var(--content-padding);
-  padding-right: var(--content-padding);
+  padding-left: var(--content-padding-mobile);
+  padding-right: var(--content-padding-mobile);
+}
+@media (min-width: 640px) {
+  .content-container {
+    padding-left: var(--content-padding-tablet);
+    padding-right: var(--content-padding-tablet);
+  }
+}
+@media (min-width: 1024px) {
+  .content-container {
+    padding-left: var(--content-padding-desktop);
+    padding-right: var(--content-padding-desktop);
+  }
+}
+
+/* Touch target size on mobile */
+@media (max-width: 639px) {
+  button:not(.icon-only),
+  .p-button:not([class*="p-button-icon-only"]),
+  a[role="button"] {
+    min-height: var(--touch-min);
+    min-width: var(--touch-min);
+  }
+}
+
+/* Table horizontal scroll on mobile */
+.table-scroll-mobile,
+.table-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+@media (max-width: 639px) {
+  .table-scroll-mobile .p-datatable-table,
+  .table-scroll-mobile table,
+  .table-container .p-datatable-table,
+  .table-container table {
+    min-width: 480px;
+  }
+}
+
+/* Cards/forms full width on mobile */
+@media (max-width: 639px) {
+  .p-card,
+  .p-panel,
+  .p-dialog .p-dialog-content {
+    border-radius: 0.75rem;
+  }
+  .p-dialog {
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+/* Drawer/Modal full screen on mobile */
+@media (max-width: 639px) {
+  .drawer-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 1rem 1rem 0 0 !important;
+  }
+  .drawer-body,
+  .p-dialog .p-dialog-content {
+    padding-left: var(--content-padding-mobile);
+    padding-right: var(--content-padding-mobile);
+  }
+}
+
+/* Utility: stack on mobile, row on desktop */
+.responsive-stack-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+@media (min-width: 640px) {
+  .responsive-stack-mobile {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+/* ==================== OVERLAY / DRAWER / MODAL ==================== */
+/* Header z-index and overlay */
+.drawer-overlay,
+.drawer-backdrop {
+  z-index: 9998 !important;
+}
+/* Panel above overlay */
+.drawer-panel {
+  z-index: 9999 !important;
+}
+/* Modal overlay: content below header */
+.modal-overlay {
+  z-index: 9998 !important;
+  padding-top: 100px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  overflow-y: auto !important;
+  padding-bottom: 2rem !important;
+}
+.modal-overlay .modal-container,
+.modal-overlay .edit-modal-container {
+  max-height: calc(100vh - 120px) !important;
+  margin: 0 auto !important;
+}
+/* Drawer panel: start below header */
+@media (min-width: 768px) {
+  .drawer-container,
+  .drawer-panel {
+    top: 100px !important;
+    bottom: 0 !important;
+    height: auto !important;
+    max-height: calc(100vh - 100px) !important;
+  }
+}
+/* Mobile: drawer full width from bottom */
+@media (max-width: 639px) {
+  .modal-overlay {
+    padding-top: 0.5rem !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+    padding-bottom: 1rem !important;
+  }
+  .modal-overlay .modal-container,
+  .modal-overlay .edit-modal-container {
+    max-height: calc(100dvh - 2rem) !important;
+  }
 }
 
 html[data-icon-style='solid'] .pi {
@@ -101,23 +350,22 @@ html[data-icon-style='outline'] .pi {
 
 /* ==================== STANDARD ACTION ICON BUTTONS ==================== */
 /*
- * Universal edit/delete icon button styles.
- *
- *  EDIT  → dark pencil icon, no background (transparent)
- *  DELETE → white trash icon inside a soft coral circle
- *
- * Usage (HTML buttons):
- *   <button class="sp-edit-btn" ...><i class="pi pi-pencil"></i></button>
- *   <button class="sp-delete-btn" ...><i class="pi pi-trash"></i></button>
- *
- * PrimeNG <p-button> are auto-matched via attribute selectors.
+ * Edit button: 34x34px, #374151, transparent bg, 1rem icon
+ * Delete button: 34x34px, #E8847C bg, white icon
+ * !important to override component styles
  */
 
-/* ---- EDIT ---- */
+/* Edit button (all usages) */
 .sp-edit-btn,
 .action-btn-edit,
+.action-btn.edit,
+.action-btn.edit-btn,
 .btn-icon-edit,
+.btn-edit,
 .square-edit-btn,
+.team-action-btn:not(.danger),
+.btn-icon.btn-edit,
+.btn-edit-row,
 .p-button[icon="pi pi-pencil"],
 .p-button[icon*="pi-pencil"],
 .p-button.p-button-text[icon="pi pi-pencil"],
@@ -138,6 +386,7 @@ html[data-icon-style='outline'] .pi {
   width: 34px !important;
   height: 34px !important;
   min-width: 34px !important;
+  max-width: 34px !important;
   cursor: pointer !important;
   outline: none !important;
   box-shadow: none !important;
@@ -145,8 +394,14 @@ html[data-icon-style='outline'] .pi {
 
 .sp-edit-btn:hover,
 .action-btn-edit:hover,
+.action-btn.edit:hover,
+.action-btn.edit-btn:hover,
 .btn-icon-edit:hover,
+.btn-edit:hover,
 .square-edit-btn:hover,
+.team-action-btn:not(.danger):hover,
+.btn-icon.btn-edit:hover,
+.btn-edit-row:hover,
 .p-button[icon="pi pi-pencil"]:hover,
 .p-button[icon*="pi-pencil"]:hover,
 .p-button.p-button-text[icon="pi pi-pencil"]:hover,
@@ -155,24 +410,36 @@ html[data-icon-style='outline'] .pi {
 .p-button[icon*="pi-pencil"][text]:hover,
 .p-button[rounded][icon="pi pi-pencil"]:hover,
 .p-button[rounded][icon*="pi-pencil"]:hover {
-  background-color: #f3f4f6 !important;
+  background-color: #e5e7eb !important;
   color: #1f2937 !important;
 }
 
 .sp-edit-btn i,
 .action-btn-edit i,
+.action-btn.edit i,
+.action-btn.edit-btn i,
 .btn-icon-edit i,
-.square-edit-btn i {
+.btn-edit i,
+.square-edit-btn i,
+.team-action-btn:not(.danger) i,
+.btn-icon.btn-edit i,
+.btn-edit-row i {
   color: inherit !important;
   font-size: 1rem !important;
 }
 
-/* ---- DELETE ---- */
+/* Delete button (all usages) */
 .sp-delete-btn,
 .action-btn-delete,
+.action-btn.delete,
+.action-btn.delete-btn,
+.action-btn.danger,
 .btn-icon-delete,
+.btn-icon-delete-sm,
+.btn-delete,
 .draft-btn.delete,
 .btn-danger-small,
+.team-action-btn.danger,
 .p-button[icon="pi pi-trash"],
 .p-button[icon*="pi-trash"],
 .p-button.p-button-text[icon="pi pi-trash"],
@@ -181,7 +448,7 @@ html[data-icon-style='outline'] .pi {
 .p-button[icon*="pi-trash"][text],
 .p-button[rounded][icon="pi pi-trash"],
 .p-button[rounded][icon*="pi-trash"] {
-  background-color: #E8847C !important;
+  background-color: #dc2626 !important;
   border: none !important;
   color: #ffffff !important;
   padding: 0.5rem !important;
@@ -193,6 +460,7 @@ html[data-icon-style='outline'] .pi {
   width: 34px !important;
   height: 34px !important;
   min-width: 34px !important;
+  max-width: 34px !important;
   cursor: pointer !important;
   outline: none !important;
   box-shadow: none !important;
@@ -200,9 +468,14 @@ html[data-icon-style='outline'] .pi {
 
 .sp-delete-btn:hover,
 .action-btn-delete:hover,
+.action-btn.delete:hover,
+.action-btn.danger:hover,
 .btn-icon-delete:hover,
+.btn-icon-delete-sm:hover,
+.btn-delete:hover,
 .draft-btn.delete:hover,
 .btn-danger-small:hover,
+.team-action-btn.danger:hover,
 .p-button[icon="pi pi-trash"]:hover,
 .p-button[icon*="pi-trash"]:hover,
 .p-button.p-button-text[icon="pi pi-trash"]:hover,
@@ -211,20 +484,26 @@ html[data-icon-style='outline'] .pi {
 .p-button[icon*="pi-trash"][text]:hover,
 .p-button[rounded][icon="pi pi-trash"]:hover,
 .p-button[rounded][icon*="pi-trash"]:hover {
-  background-color: #D6726A !important;
+  background-color: #b91c1c !important;
   color: #ffffff !important;
 }
 
 .sp-delete-btn i,
 .action-btn-delete i,
+.action-btn.delete i,
+.action-btn.delete-btn i,
+.action-btn.danger i,
 .btn-icon-delete i,
+.btn-icon-delete-sm i,
+.btn-delete i,
 .draft-btn.delete i,
-.btn-danger-small i {
+.btn-danger-small i,
+.team-action-btn.danger i {
   color: #ffffff !important;
-  font-size: 0.875rem !important;
+  font-size: 1rem !important;
 }
 
-/* ---- EDIT + DELETE in action pairs (table rows) ---- */
+/* Edit + Delete button pair spacing */
 .sp-action-icons {
   display: inline-flex;
   align-items: center;

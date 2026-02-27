@@ -203,14 +203,7 @@
   transition: all 0.15s ease;
 }
 
-.btn-edit {
-  background: rgb(var(--primary) / 0.08);
-  color: rgb(var(--primary));
-}
-
-.btn-edit:hover {
-  background: rgb(var(--primary) / 0.15);
-}
+/* .btn-edit from global styles */
 
 .btn-save {
   background: #10b98118;
@@ -341,31 +334,9 @@
   @apply flex items-center justify-center gap-2;
 }
 
+/* Edit/delete buttons from global */
 .action-btn {
-  @apply flex items-center justify-center;
-  width: 34px;
-  height: 34px;
-  background: transparent;
-  color: rgb(var(--muted));
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.action-btn:hover {
-  background: rgb(var(--bg));
-  color: rgb(var(--fg));
-}
-
-.action-btn.danger {
-  background: #E8847C;
-  color: #ffffff;
-  border-radius: 50%;
-}
-
-.action-btn.danger:hover {
-  background: #D6726A;
+  @apply flex items-center justify-center border-none cursor-pointer transition-all duration-150;
 }
 
 /* ===== EMPTY STATE ===== */

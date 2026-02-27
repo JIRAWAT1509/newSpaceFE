@@ -348,6 +348,12 @@ textarea.p-inputtextarea:enabled:focus {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
 }
 
+/* Dropdown appendTo body above dialog */
+.p-select-overlay,
+.p-select-overlay .p-select-panel {
+  z-index: 99999 !important;
+}
+
 .p-select-option,
 .p-select-item,
 .p-dropdown-item {
@@ -430,10 +436,42 @@ button.p-button-primary {
 
 /* ==================== DIALOG/MODAL FIXES ==================== */
 
+/* Scrollable mask when dialog taller than viewport */
+.p-dialog-mask {
+  align-items: flex-start !important;
+  padding: 2rem 1rem 2rem !important;
+  overflow-y: auto !important;
+}
+
+/* ==================== DIALOG/DRAWER ==================== */
+/* Header z-index; dialog in safe zone below */
+.p-dialog-mask,
+.p-drawer-mask,
+.p-overlay-modal.p-overlay-mask {
+  z-index: 9999 !important;
+}
+/* Dialog mask: dialog below header */
+.p-dialog-mask {
+  align-items: flex-start !important;
+  padding-top: 100px !important;
+  overflow-y: auto !important;
+  padding-bottom: 2rem !important;
+}
+/* Dialog box: max height and bottom margin */
+.p-dialog-mask .p-dialog {
+  margin: 0 auto 0 !important;
+  max-height: calc(100vh - 120px) !important;
+}
+
 .p-dialog {
   background-color: rgb(var(--card)) !important;
   border-radius: 12px;
   box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15) !important;
+  max-height: 85vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  margin: auto !important;
 }
 
 .p-dialog .p-dialog-header {
@@ -442,12 +480,16 @@ button.p-button-primary {
   border-bottom: 1px solid rgb(var(--border)) !important;
   padding: 1.25rem 1.5rem;
   border-radius: 12px 12px 0 0;
+  flex-shrink: 0;
 }
 
 .p-dialog .p-dialog-content {
   background-color: rgb(var(--card)) !important;
   color: rgb(var(--fg)) !important;
   padding: 1.5rem;
+  overflow-y: auto !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
 }
 
 .p-dialog .p-dialog-footer {
@@ -455,6 +497,45 @@ button.p-button-primary {
   border-top: 1px solid rgb(var(--border)) !important;
   padding: 1rem 1.5rem;
   border-radius: 0 0 12px 12px;
+  flex-shrink: 0 !important;
+}
+
+/* Role/Permission dialogs: footer always visible */
+.role-permission-dialog.p-dialog {
+  max-height: 85vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+.role-permission-dialog.p-dialog .p-dialog-content {
+  overflow-y: auto !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+}
+.role-permission-dialog.p-dialog .p-dialog-footer {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 56px !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 1rem 1.5rem !important;
+  border-top: 1px solid rgb(var(--border)) !important;
+  background-color: rgb(var(--bg)) !important;
+}
+/* Role-permission dialog footer buttons */
+.role-permission-dialog.p-dialog .p-dialog-footer .dialog-footer-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+}
+.role-permission-dialog.p-dialog .p-dialog-footer .dialog-footer-actions .p-button,
+.role-permission-dialog.p-dialog .p-dialog-footer .dialog-footer-actions p-button {
+  flex-shrink: 0 !important;
 }
 
 /* ==================== FOCUS RING CONSISTENCY ==================== */
@@ -635,4 +716,36 @@ body {
 .finance-basic-container .fieldset {
   background: rgb(var(--card)) !important;
   color: rgb(var(--fg)) !important;
+}
+
+/* ==================== RESPONSIVE – PrimeNG ==================== */
+@media (max-width: 639px) {
+  .p-dialog-mask {
+    padding: 0.5rem !important;
+    padding-top: 3rem !important;
+    align-items: flex-start !important;
+  }
+  .p-dialog-mask .p-dialog {
+    width: calc(100vw - 1rem) !important;
+    max-width: none !important;
+    max-height: calc(100dvh - 4rem) !important;
+    margin: 0 auto !important;
+    border-radius: 1rem !important;
+  }
+  .p-dialog .p-dialog-header,
+  .p-dialog .p-dialog-footer {
+    padding: 0.75rem 1rem !important;
+  }
+  .p-dialog .p-dialog-content {
+    padding: 1rem !important;
+  }
+  /* Table horizontal scroll on mobile */
+  .p-datatable-wrapper,
+  .p-datatable .p-datatable-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .p-datatable .p-datatable-table {
+    min-width: 480px;
+  }
 }

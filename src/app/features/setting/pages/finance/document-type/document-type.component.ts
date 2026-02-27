@@ -298,6 +298,11 @@ export class DocumentTypeComponent implements OnInit {
     this.filteredDocumentTypes.set(this.documentTypes());
   }
 
+  updateSearchQuery(value: string): void {
+    this.searchQuery.set(value);
+    this.onSearch();
+  }
+
   // ==================== DRAWER ACTIONS ====================
 
   openCreateDrawer(): void {
@@ -308,8 +313,15 @@ export class DocumentTypeComponent implements OnInit {
 
   openEditDrawer(documentType: DocumentType): void {
     this.drawerMode.set('edit');
-    this.selectedDocumentType.set(documentType);
+    this.selectedDocumentType.set({ ...documentType });
     this.isDrawerOpen.set(true);
+  }
+
+  /** เรียกเมื่อกดไอคอนแก้ไข — หยุด bubbling แล้วเปิด drawer */
+  onEditClick(documentType: DocumentType, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.openEditDrawer(documentType);
   }
 
   closeDrawer(): void {

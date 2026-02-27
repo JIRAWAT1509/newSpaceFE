@@ -71,7 +71,7 @@
               <td class="text-center">
                 <div class="attainment-cell">
                   <span class="attainment-badge" [ngClass]="getAttainmentClass(member.attainment)">
-                    {{ member.attainment }}%
+                    {{ formatAttainment(member.attainment) }}%
                   </span>
                   <div class="attainment-bar">
                     <div class="attainment-fill"

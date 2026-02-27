@@ -33,6 +33,9 @@
 
 
 
+@if (isAuthRoute()) {
+  <router-outlet />
+} @else {
 <app-header
   #headerRef
   [style.--sidebar-width]="isMobile() ? '0' : (isSidebarExpanded() ? '16rem' : '5rem')"
@@ -72,9 +75,10 @@
       [style.padding-top.px]="headerHeight()"
       [class.main-with-bottom-nav]="isMobile()"
     >
-      <div class="container mx-auto px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:pt-4 md:pb-8 max-w-[1600px]">
+      <div class="container mx-auto px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:pt-4 md:pb-8 max-w-[1600px] bg-white">
         <router-outlet />
       </div>
     </main>
   </div>
 </div>
+}
