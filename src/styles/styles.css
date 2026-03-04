@@ -110,6 +110,38 @@ h1 {
   line-height: 1.3;
   font-weight: 700;
 }
+/* Login page – บังคับขนาดหัวข้อให้ใหญ่ (override global typography) */
+.auth-page #login-title {
+  font-size: 46px !important;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.auth-page #login-title,
+.auth-page #login-title * {
+  font-size: 43px !important;
+  line-height: 1.2 !important;
+}
+.auth-page #login-subtitle {
+  font-size: 18px !important;
+  line-height: 1.35;
+  margin: 0.5rem 0 0;
+  color: #ffffff;
+  opacity: 0.95;
+}
+/* Forgot password modal – ขนาดหัวข้อให้สอดคล้องกับหน้าล็อกอิน */
+#forgot-modal-title {
+  font-size: 2.5rem !important;
+  line-height: 1.2;
+  font-weight: 600;
+}
+#forgot-modal-title,
+#forgot-modal-title * {
+  font-size: inherit !important;
+}
+#forgot-modal-subtitle {
+  font-size: 1.1rem !important;
+  line-height: 1.35;
+}
 h2 {
   font-size: 18px !important;
   line-height: 1.35;
@@ -164,6 +196,14 @@ main *,
 .drawer-panel *,
 .content-container * {
   font-size: inherit;
+}
+
+/* ยกเว้นหัวข้อหน้า login ไม่ให้ inherit ทับขนาดที่กำหนด */
+.auth-page .auth-welcome,
+.auth-page .auth-welcome #login-title,
+.auth-page .auth-welcome #login-title *,
+.auth-page .auth-welcome #login-subtitle {
+  font-size: unset;
 }
 
 /* Main content area background */
@@ -508,4 +548,19 @@ html[data-icon-style='outline'] .pi {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+/* ========== Login: ขนาดหัวข้อต้นทาง (ID + px ไม่พึ่ง rem/inherit) ========== */
+#login-title,
+#login-title * {
+  font-size: 43px !important;
+  line-height: 1.2 !important;
+  font-weight: 600;
+}
+#login-subtitle {
+  font-size: 18px !important;
+  line-height: 1.35 !important;
+  margin: 0.5rem 0 0;
+  color: #ffffff;
+  opacity: 0.95;
 }
