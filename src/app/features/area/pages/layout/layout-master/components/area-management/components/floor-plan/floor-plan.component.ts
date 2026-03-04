@@ -146,9 +146,16 @@ export class FloorPlanComponent implements OnInit {
     this.selectedBranchId.set(building.branchId);
 
     const currentFloorId = this.areaDataService.currentFloorId();
+    const activeFloors = building.floors.filter((f) => f.isActive !== false);
+
+    if (!activeFloors.length) {
+      console.warn('No active floors available');
+      return;
+    }
+
     const floor = currentFloorId
-      ? (building.floors.find((f) => f.id === currentFloorId) ?? building.floors[0])
-      : building.floors[0];
+      ? (activeFloors.find((f) => f.id === currentFloorId) ?? activeFloors[0])
+      : activeFloors[0];
 
     this.currentFloor.set(floor);
     this.selectedFloorId.set(floor.id);
@@ -166,7 +173,9 @@ export class FloorPlanComponent implements OnInit {
 
     const doZoom = () => {
       const container = document.querySelector('.floor-plan-container');
-      const image = container?.querySelector('.floor-plan-image') as HTMLImageElement | null;
+      const image = container?.querySelector(
+        '.floor-plan-image',
+      ) as HTMLImageElement | null;
       if (!container || !image) return;
 
       this.zoomLevel.set(1.8);
@@ -187,7 +196,9 @@ export class FloorPlanComponent implements OnInit {
       });
     };
 
-    const image = document.querySelector('.floor-plan-image') as HTMLImageElement | null;
+    const image = document.querySelector(
+      '.floor-plan-image',
+    ) as HTMLImageElement | null;
     if (image && image.complete && image.naturalWidth > 0) {
       doZoom();
     } else if (image) {
@@ -197,8 +208,7 @@ export class FloorPlanComponent implements OnInit {
 
   // ── Branch options — ดึงจาก MOCK_BRANCHES (single source of truth) ──────────
   getBranchOptions(): { label: string; value: string }[] {
-    return MOCK_BRANCHES
-      .filter((b) => b.id !== '')   // ตัด "All" ออก
+    return MOCK_BRANCHES.filter((b) => b.id !== '') // ตัด "All" ออก
       .map((b) => ({ label: b.nameTh, value: b.id }));
   }
 
@@ -206,7 +216,7 @@ export class FloorPlanComponent implements OnInit {
     this.selectedBranchId.set(branchId);
     const building = this.areaDataService
       .buildings()
-      .find((b) => b.branchId === branchId);
+      .find((b) => b.branchId === branchId && b.isActive);
     if (building) {
       this.onBuildingChanged(building.id);
     }
@@ -217,7 +227,7 @@ export class FloorPlanComponent implements OnInit {
     const selectedBranch = this.selectedBranchId();
     return this.areaDataService
       .buildings()
-      .filter((b) => b.branchId === selectedBranch)
+      .filter((b) => b.branchId === selectedBranch && b.isActive)
       .map((b) => ({ label: `${b.code} - ${b.nameTh}`, value: b.id }));
   }
 
@@ -225,7 +235,9 @@ export class FloorPlanComponent implements OnInit {
     this.selectedBuildingId.set(buildingId);
     this.areaDataService.setCurrentBuilding(buildingId);
 
-    const building = this.areaDataService.buildings().find((b) => b.id === buildingId);
+    const building = this.areaDataService
+      .buildings()
+      .find((b) => b.id === buildingId);
     if (building && building.branchId !== this.selectedBranchId()) {
       this.selectedBranchId.set(building.branchId);
     }
@@ -235,10 +247,12 @@ export class FloorPlanComponent implements OnInit {
 
   // ── Floor options ──────────────────────────────────────────────────────────
   getFloorOptions(): FloorOption[] {
-    return this.getFloors().map((floor) => ({
-      label: `Fl. ${floor.floorNumber}`,
-      value: floor.id,
-    }));
+    return this.getFloors()
+      .filter((floor) => floor.isActive !== false)
+      .map((floor) => ({
+        label: `Fl. ${floor.floorNumber}`,
+        value: floor.id,
+      }));
   }
 
   onFloorChanged(floorId: string): void {
@@ -256,7 +270,7 @@ export class FloorPlanComponent implements OnInit {
   }
 
   goToNextFloor(): void {
-    const floors = this.getFloors();
+    const floors = this.getFloors().filter((f) => f.isActive !== false); // ← filter
     if (!floors.length) return;
     const currentFloor = this.currentFloor();
     if (!currentFloor) return;
@@ -266,7 +280,7 @@ export class FloorPlanComponent implements OnInit {
   }
 
   goToPreviousFloor(): void {
-    const floors = this.getFloors();
+    const floors = this.getFloors().filter((f) => f.isActive !== false); // ← filter
     if (!floors.length) return;
     const currentFloor = this.currentFloor();
     if (!currentFloor) return;
