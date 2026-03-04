@@ -52,22 +52,12 @@
         ')'
       "
     >
-      @if (currentFloorImage()) {
-        <img
-          [src]="currentFloorImage()"
-          alt="Floor Plan"
-          class="floor-plan-image"
-          #floorImage
-        />
-      } @else {
-        <div class="no-image-placeholder">
-          <i class="pi pi-image"></i>
-          <p>No floor plan image</p>
-          <span class="upload-hint"
-            >Upload a floor plan image using the button below</span
-          >
-        </div>
-      }
+      <img
+        [src]="currentFloorImage()"
+        alt="Floor Plan"
+        class="floor-plan-image"
+        #floorImage
+      />
 
       @for (area of activeAreas(); track area.id) {
         <app-area-marker

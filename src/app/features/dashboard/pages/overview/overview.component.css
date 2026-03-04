@@ -791,6 +791,9 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  /* Constrain height so full chart + axes visible without page scroll */
+  min-height: 240px;
+  max-height: min(340px, 42vh);
 }
 
 .exec-mini-title {
@@ -812,6 +815,9 @@
 .exec-chart-rev {
   flex: 1;
   min-height: 0;
+  /* Fixed height so Chart.js renders fully; parent .exec-rev-body has max-height */
+  min-height: 220px;
+  height: 100%;
 }
 
 /* Occupancy by Business Type: side-by-side donut + legend */

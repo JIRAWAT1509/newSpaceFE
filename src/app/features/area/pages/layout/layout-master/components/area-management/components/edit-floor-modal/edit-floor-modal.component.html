@@ -43,12 +43,12 @@
         [draftFloorPlanImage]="effectiveDraftImage()"
         (markerDragged)="onMarkerDragged($event)"
         (markerClicked)="onMarkerClicked($event)"
-        (uploadPlan)="onUploadPlan($event)"
-        (areaDroppedOnMap)="onAreaDroppedOnMap($event)"
-        (cursorOverMap)="onCursorOverMap($event)"
         (markerDragStarted)="onMarkerDragStarted($event)"
         (markerDragEnded)="onMarkerDragEnded()"
         (markerDraggedOutside)="onMarkerDraggedOutside($event)"
+        (areaDroppedOnMap)="onAreaDroppedOnMap($event)"
+        (cursorOverMap)="onCursorOverMap($event)"
+        (uploadPlan)="onUploadPlan($event)"
       />
     </div>
 
@@ -114,17 +114,8 @@
   </ng-template>
 </p-dialog>
 
-<app-editable-floor-plan
-  [floor]="currentFloor()"
-  [activeAreas]="activeAreas()"
-  [selectedAreaId]="selectedAreaId()"
-  [draftFloorPlanImage]="effectiveDraftImage()"
-  (markerDragged)="onMarkerDragged($event)"
-  (markerClicked)="onMarkerClicked($event)"
-  (uploadPlan)="onUploadPlan($event)"
-  (areaDroppedOnMap)="onAreaDroppedOnMap($event)"
-  (cursorOverMap)="onCursorOverMap($event)"
-  (markerDragStarted)="onMarkerDragStarted($event)"
-  (markerDragEnded)="onMarkerDragEnded()"
-  (markerDraggedOutside)="onMarkerDraggedOutside($event)"
+<app-add-area-wizard
+  [visible]="showAddAreaWizard()"
+  [floorId]="currentFloor()?.id || ''"
+  (closed)="onAddAreaWizardClose($event)"
 />

@@ -14,7 +14,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'somchai@thaitech.com',
     phone: '02-123-4567',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-001', areaName: '2MD010B', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-001', areaName: '2MD010B', floorNumber: 1 }
     ],
     budget: 600000,
     expectedClosingDate: '2025-03-15',
@@ -45,7 +45,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'wipa@smeconsult.com',
     phone: '089-234-5678',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-004', areaName: '2MD012', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-004', areaName: '2MD012', floorNumber: 1 }
     ],
     budget: 250000,
     segment: 'SME',
@@ -74,8 +74,8 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'tanawat@startupinno.com',
     phone: '092-345-6789',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-009', areaName: 'OP-01', floorNumber: 55 },
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-010', areaName: 'OP-02', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-009', areaName: 'OP-01', floorNumber: 1 },
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-010', areaName: 'OP-02', floorNumber: 1 }
     ],
     budget: 180000,
     expectedClosingDate: '2025-04-01',
@@ -106,7 +106,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'napa@bkktrading.com',
     phone: '02-456-7890',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-008', areaName: 'LOG-02', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-008', areaName: 'LOG-02', floorNumber: 1 }
     ],
     budget: 800000,
     segment: 'Corporate',
@@ -135,7 +135,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'prasert@coffeecity.com',
     phone: '081-567-8901',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-002', areaName: 'KK-01', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-002', areaName: 'KK-01', floorNumber: 1 }
     ],
     budget: 80000,
     segment: 'Retail',
@@ -164,7 +164,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'arunee.design@gmail.com',
     phone: '095-678-9012',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-011', areaName: 'KK-03', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-011', areaName: 'KK-03', floorNumber: 1 }
     ],
     budget: 15000,
     expectedClosingDate: '2025-05-01',
@@ -195,7 +195,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'pongsakorn@digitalmarketingpro.com',
     phone: '02-789-0123',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-010', areaName: 'OP-02', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-010', areaName: 'OP-02', floorNumber: 1 }
     ],
     budget: 350000,
     segment: 'SME',
@@ -224,7 +224,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'suda@petchpittaya.com',
     phone: '089-890-1234',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-007', areaName: 'LOG-01', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-007', areaName: 'LOG-01', floorNumber: 1 }
     ],
     budget: 120000,
     segment: 'Education',
@@ -253,9 +253,9 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'ratchapon@itallservice.com',
     phone: '02-234-5678',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-001', areaName: '2MD010B', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-001', areaName: '2MD010B', floorNumber: 1 }
     ],
-    budget: 550000,
+    budget: 10000,
     segment: 'Enterprise',
     owner: 'Ratchapon',
     ownerId: 'user-009',
@@ -282,7 +282,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
     email: 'wanna@healthclinic.com',
     phone: '091-345-6789',
     interestedAreas: [
-      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-004', areaName: '2MD012', floorNumber: 55 }
+      { buildingId: 'bld-001', buildingName: 'อาคารอิมพีเรียล ทาวเวอร์ 3', areaId: 'area-004', areaName: '2MD012', floorNumber: 1 }
     ],
     budget: 220000,
     segment: 'Healthcare',

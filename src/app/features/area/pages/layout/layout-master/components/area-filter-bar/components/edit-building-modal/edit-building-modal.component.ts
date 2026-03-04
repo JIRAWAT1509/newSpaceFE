@@ -1,4 +1,4 @@
-/* add - building - modal.component.ts; */
+/* /edit-building-modal.component.ts */
 
 import { Component, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -13,25 +13,26 @@ import { SelectModule } from 'primeng/select';
 import { Building } from '@core/models/building.model';
 import { Branch } from '@core/models/branch.model';
 
-export interface AddBuildingResult {
+export interface EditBuildingResult {
   building: Building;
 }
 
 @Component({
-  selector: 'app-add-building-modal',
+  selector: 'app-edit-building-modal',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, DialogModule, SelectModule],
-  templateUrl: './add-building-modal.component.html',
-  styleUrl: './add-building-modal.component.css',
+  templateUrl: './edit-building-modal.component.html',
+  styleUrl: './edit-building-modal.component.css',
 })
-export class AddBuildingModalComponent {
+export class EditBuildingModalComponent {
   visible = signal<boolean>(false);
   isSaving = signal<boolean>(false);
 
-  buildingCreated = output<AddBuildingResult>();
+  buildingUpdated = output<EditBuildingResult>();
   closed = output<void>();
 
   buildingForm: FormGroup;
+  editingBuildingId = signal<string>('');
 
   // Mock branches - in real app, should come from service
   branches = signal<any[]>([
@@ -46,11 +47,27 @@ export class AddBuildingModalComponent {
       code: ['', Validators.required],
       name: ['', Validators.required],
       nameTh: [''],
+      addressTh: [''],
+      addressEn: [''],
+      contactPerson: [''],
+      contactPhone: [''],
+      optionalInfo: [''],
     });
   }
 
-  open(): void {
-    this.buildingForm.reset();
+  open(building: Building): void {
+    this.editingBuildingId.set(building.id);
+    this.buildingForm.patchValue({
+      branchId: building.branchId,
+      code: building.code,
+      name: building.name,
+      nameTh: building.nameTh,
+      addressTh: building.addressTh || '',
+      addressEn: building.addressEn || '',
+      contactPerson: (building as any).contactPerson || '',
+      contactPhone: (building as any).contactPhone || '',
+      optionalInfo: (building as any).optionalInfo || '',
+    });
     this.visible.set(true);
   }
 
@@ -74,25 +91,30 @@ export class AddBuildingModalComponent {
 
     try {
       const formValue = this.buildingForm.value;
-      const newBuilding: Building = {
-        id: `bld-${Date.now()}`,
+      const updatedBuilding: Building = {
+        id: this.editingBuildingId(),
         branchId: formValue.branchId,
         code: formValue.code,
         name: formValue.name,
         nameTh: formValue.nameTh || formValue.name,
         nameEn: formValue.name,
         address: '',
-        addressTh: '',
-        addressEn: '',
+        addressTh: formValue.addressTh || '',
+        addressEn: formValue.addressEn || '',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      this.buildingCreated.emit({ building: newBuilding });
+      // attach optional fields onto the object using type assertion so mocks persist
+      (updatedBuilding as any).contactPerson = formValue.contactPerson || '';
+      (updatedBuilding as any).contactPhone = formValue.contactPhone || '';
+      (updatedBuilding as any).optionalInfo = formValue.optionalInfo || '';
+
+      this.buildingUpdated.emit({ building: updatedBuilding });
       this.visible.set(false);
     } catch (error) {
-      console.error('Error creating building:', error);
-      alert('Failed to create building. Please try again.');
+      console.error('Error updating building:', error);
+      alert('Failed to update building. Please try again.');
     } finally {
       this.isSaving.set(false);
     }

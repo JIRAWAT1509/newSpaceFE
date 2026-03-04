@@ -2,124 +2,408 @@
 
 <p-dialog
   [visible]="visible()"
+  (visibleChange)="visible.set($event)"
   [modal]="true"
-  [closable]="false"
+  [closable]="true"
   [draggable]="false"
-  [resizable]="false"
-  [style]="{ width: '480px' }"
-  styleClass="edit-area-modal"
+  [style]="{ width: '600px' }"
+  styleClass="edit-area-wizard-modal"
   (onHide)="onModalHide()"
 >
   <ng-template pTemplate="header">
-    <div class="modal-header">
-      <h2 class="modal-title">
+    <div class="wizard-header">
+      <h2 class="wizard-title">
         <i class="pi pi-pencil"></i>
-        แก้ไขรายละเอียดพื้นที่
-        @if (currentArea()) {
-          <span class="area-id-badge">{{ currentArea()!.roomNumber }}</span>
-        }
+        แก้ไขข้อมูลพื้นที่
       </h2>
-      <button type="button" class="btn-close-header" (click)="onCancel()">
-        <i class="pi pi-times"></i>
-      </button>
+      <div class="wizard-steps">
+        @for (step of steps; track step.number) {
+          <div
+            class="step-indicator"
+            [class.active]="currentStep() === step.number"
+            [class.completed]="currentStep() > step.number"
+          >
+            <span class="step-number">{{ step.number }}</span>
+            <span class="step-label">{{ step.label }}</span>
+          </div>
+        }
+      </div>
     </div>
   </ng-template>
 
-  <div class="modal-content">
-    <form [formGroup]="areaForm" class="area-form">
-      <div class="form-group">
-        <label class="form-label required">หมายเลขห้อง</label>
-        <input
-          type="text"
-          formControlName="roomNumber"
-          class="form-input"
-          placeholder="e.g., 2MD010B"
-          [class.error]="isFieldInvalid('roomNumber')"
-        />
-        @if (isFieldInvalid("roomNumber")) {
-          <span class="error-message">กรุณากรอกหมายเลขห้อง</span>
-        }
-      </div>
+  <!-- ✅ formGroup bind ที่ wrapper -->
+  <div class="wizard-content" [formGroup]="areaForm">
 
-      <div class="form-group">
-        <label class="form-label required">ประเภทพื้นที่</label>
-        <select formControlName="type" class="form-select">
-          @for (t of areaTypes; track t.value) {
-            <option [value]="t.value">{{ t.label }}</option>
+    <!-- Step 1: Basic Info -->
+    @if (currentStep() === 1) {
+      <div class="wizard-step">
+        <h3 class="step-title">
+          <i class="pi pi-info-circle"></i>
+          ข้อมูลพื้นฐาน
+        </h3>
+
+        <div class="form-group">
+          <label class="form-label">Room Number <span class="required">*</span></label>
+          <input
+            type="text"
+            class="form-input"
+            [class.input-error]="isFieldInvalid('roomNumber')"
+            formControlName="roomNumber"
+            placeholder="e.g., 2MD001"
+          />
+          @if (isFieldInvalid('roomNumber')) {
+            <span class="error-message">Room number is required</span>
           }
-        </select>
-      </div>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label required">สถานะ</label>
-        <select formControlName="status" class="form-select">
-          @for (s of areaStatuses; track s.value) {
-            <option [value]="s.value">{{ s.label }}</option>
-          }
-        </select>
-      </div>
+        <div class="form-group">
+          <label class="form-label">Area Type <span class="required">*</span></label>
+          <select
+            class="form-input"
+            formControlName="type"
+            style="appearance: auto; -webkit-appearance: auto;"
+          >
+            @for (t of areaTypes; track t.value) {
+              <option [value]="t.value">{{ t.label }}</option>
+            }
+          </select>
+        </div>
 
-      <div class="form-row">
-        <div class="form-group form-col">
-          <label class="form-label required">ขนาด (ตร.ม.)</label>
+        <div class="form-group">
+          <label class="form-label">Status <span class="required">*</span></label>
+          <select
+            class="form-input"
+            formControlName="status"
+            style="appearance: auto; -webkit-appearance: auto;"
+          >
+            @for (s of areaStatuses; track s.value) {
+              <option [value]="s.value">{{ s.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
+
+    <!-- Step 2: Size & Rent -->
+    @if (currentStep() === 2) {
+      <div class="wizard-step">
+        <h3 class="step-title">
+          <i class="pi pi-calculator"></i>
+          ขนาดและค่าเช่า
+        </h3>
+
+        <div class="form-group">
+          <label class="form-label">Size (sqm) <span class="required">*</span></label>
           <input
             type="number"
-            formControlName="size"
             class="form-input"
-            placeholder="25.5"
+            [class.input-error]="isFieldInvalid('size')"
+            formControlName="size"
+            placeholder="e.g., 25.5"
             min="0.1"
             step="0.1"
-            [class.error]="isFieldInvalid('size')"
           />
-          @if (isFieldInvalid("size")) {
-            <span class="error-message">กรุณากรอกขนาดพื้นที่</span>
+          @if (isFieldInvalid('size')) {
+            <span class="error-message">Size must be at least 0.1 sqm</span>
           }
         </div>
-        <div class="form-group form-col">
-          <label class="form-label">ค่าเช่า/เดือน (฿)</label>
+
+        <div class="form-group">
+          <label class="form-label">Monthly Rent (฿)</label>
           <input
             type="number"
-            formControlName="monthlyRent"
             class="form-input"
-            placeholder="15000"
+            formControlName="monthlyRent"
+            placeholder="e.g., 15000"
             min="0"
           />
+          <span class="form-hint">Optional — Leave empty if not yet determined</span>
+        </div>
+
+        @if (ratePerSqm) {
+          <div class="form-group">
+            <label class="form-label">Rate per sqm (อัตราต่อ ตร.ม.)</label>
+            <div class="form-input readonly-display">
+              <i class="pi pi-calculator" style="color:#6b7280;"></i>
+              <strong>฿{{ ratePerSqm }}</strong>
+              <span style="color:#6b7280; font-size:13px;">/ sqm / month</span>
+            </div>
+            <span class="form-hint">คำนวณอัตโนมัติจาก Monthly Rent ÷ Size</span>
+          </div>
+        }
+
+        <div class="form-group">
+          <label class="form-label">Notes (หมายเหตุ)</label>
+          <textarea
+            class="form-input"
+            formControlName="notes"
+            placeholder="ข้อมูลเพิ่มเติม เช่น เงื่อนไขพิเศษ ฯลฯ"
+            rows="3"
+            style="resize: vertical;"
+          ></textarea>
+          <span class="form-hint">Optional</span>
         </div>
       </div>
+    }
 
-      @if (ratePerSqm) {
-        <div class="calculated-info">
-          <i class="pi pi-calculator"></i>
-          <span>อัตรา: ฿{{ ratePerSqm }} / ตร.ม. / เดือน</span>
+    <!-- Step 3: Tenant Info -->
+    @if (currentStep() === 3) {
+      <div class="wizard-step" formGroupName="tenant">
+        <h3 class="step-title">
+          <i class="pi pi-user"></i>
+          ข้อมูลผู้เช่า (Tenant)
+        </h3>
+
+        <div class="section-note">
+          <i class="pi pi-info-circle"></i>
+          กรอกเฉพาะเมื่อมีผู้เช่าปัจจุบัน — ถ้าไม่มีผู้เช่าสามารถข้ามได้
         </div>
-      }
 
-      <div class="form-group">
-        <label class="form-label">หมายเหตุ</label>
-        <textarea
-          formControlName="notes"
-          class="form-input form-textarea"
-          placeholder="บันทึกเพิ่มเติม..."
-          rows="3"
-        ></textarea>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">ชื่อ (TH)</label>
+            <input type="text" class="form-input" formControlName="nameTh" placeholder="เช่น ร้านขายของ เอ" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Name (EN)</label>
+            <input type="text" class="form-input" formControlName="nameEn" placeholder="e.g., Store A" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">เบอร์โทรศัพท์</label>
+            <input type="tel" class="form-input" formControlName="contactPhone" placeholder="02-xxx-xxxx" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" formControlName="contactEmail" placeholder="example@email.com" />
+          </div>
+        </div>
+
+        <div class="form-divider"><span>สัญญาเช่า</span></div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">วันเริ่มต้นสัญญา</label>
+            <input type="date" class="form-input" formControlName="leaseStart" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">วันสิ้นสุดสัญญา</label>
+            <input type="date" class="form-input" formControlName="leaseEnd" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ค่าเช่าต่อเดือน (฿)</label>
+          <input type="number" class="form-input" formControlName="monthlyRent" placeholder="e.g., 44000" min="0" />
+          <span class="form-hint">ค่าเช่าตามสัญญาของผู้เช่าคนนี้</span>
+        </div>
+
+        @if (leaseExpiryDays !== null) {
+          <div
+            class="expiry-preview"
+            [class.warning]="leaseExpiryDays <= 90"
+            [class.expired]="leaseExpiryDays < 0"
+          >
+            <i [class]="leaseExpiryDays < 0 ? 'pi pi-times-circle' : leaseExpiryDays <= 90 ? 'pi pi-exclamation-triangle' : 'pi pi-check-circle'"></i>
+            <span>
+              @if (leaseExpiryDays < 0) { สัญญาหมดอายุแล้ว {{ -leaseExpiryDays }} วัน }
+              @else if (leaseExpiryDays === 0) { สัญญาหมดอายุวันนี้ }
+              @else { สัญญาเหลืออีก {{ leaseExpiryDays }} วัน }
+            </span>
+          </div>
+        }
       </div>
-    </form>
+    }
+
+    <!-- Step 4: Inactive Period -->
+    @if (currentStep() === 4) {
+      <div class="wizard-step" formGroupName="inactivePeriod">
+        <h3 class="step-title">
+          <i class="pi pi-clock"></i>
+          ช่วงเวลาปิดปรับปรุง (Inactive Period)
+        </h3>
+
+        <div class="section-note">
+          <i class="pi pi-info-circle"></i>
+          กรอกเฉพาะเมื่อพื้นที่นี้มีช่วงเวลาปิดปรับปรุง/ปิดชั่วคราว
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">เหตุผล (TH)</label>
+          <input type="text" class="form-input" formControlName="reasonTh" placeholder="เช่น ปรับปรุง, ปิดชั่วคราว" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason (EN)</label>
+          <input type="text" class="form-input" formControlName="reasonEn" placeholder="e.g., Renovation, Temporarily Closed" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">วันเริ่มต้น</label>
+            <input type="date" class="form-input" formControlName="startDate" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">วันสิ้นสุด</label>
+            <input type="date" class="form-input" formControlName="endDate" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">หมายเหตุเพิ่มเติม</label>
+          <textarea class="form-input" formControlName="notes" placeholder="รายละเอียดเพิ่มเติม..." rows="3" style="resize: vertical;"></textarea>
+        </div>
+
+        @if (inactivePeriodActive !== null) {
+          <div class="expiry-preview" [class.warning]="inactivePeriodActive">
+            <i [class]="inactivePeriodActive ? 'pi pi-pause-circle' : 'pi pi-check-circle'"></i>
+            <span>{{ inactivePeriodActive ? 'พื้นที่นี้กำลังอยู่ในช่วงปิดปรับปรุง' : 'พื้นที่นี้ไม่ได้อยู่ในช่วงปิดปรับปรุง' }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Step 5: Confirm -->
+    @if (currentStep() === 5) {
+      <div class="wizard-step">
+        <h3 class="step-title">
+          <i class="pi pi-check-square"></i>
+          ตรวจสอบและยืนยัน
+        </h3>
+
+        <div class="summary-card">
+          <div class="summary-section-title">ข้อมูลพื้นฐาน</div>
+          <div class="summary-row">
+            <span class="summary-label">Room Number:</span>
+            <span class="summary-value">{{ areaForm.get('roomNumber')?.value }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Type:</span>
+            <span class="summary-value">{{ getTypeLabel(areaForm.get('type')?.value) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Status:</span>
+            <span class="summary-value">{{ getStatusLabel(areaForm.get('status')?.value) }}</span>
+          </div>
+
+          <div class="summary-divider"></div>
+          <div class="summary-section-title">ขนาดและค่าเช่า</div>
+          <div class="summary-row">
+            <span class="summary-label">Size:</span>
+            <span class="summary-value">{{ areaForm.get('size')?.value }} sqm</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Monthly Rent:</span>
+            <span class="summary-value">
+              {{ areaForm.get('monthlyRent')?.value ? '฿' + areaForm.get('monthlyRent')?.value.toLocaleString() : 'Not set' }}
+            </span>
+          </div>
+          @if (ratePerSqm) {
+            <div class="summary-row">
+              <span class="summary-label">Rate / sqm:</span>
+              <span class="summary-value">฿{{ ratePerSqm }} / sqm</span>
+            </div>
+          }
+          @if (areaForm.get('notes')?.value) {
+            <div class="summary-row" style="flex-direction:column; align-items:flex-start; gap:4px;">
+              <span class="summary-label">Notes:</span>
+              <span class="summary-value" style="font-weight:400; color:#4b5563; white-space:pre-wrap;">{{ areaForm.get('notes')?.value }}</span>
+            </div>
+          }
+
+          @if (areaForm.get('tenant.nameEn')?.value || areaForm.get('tenant.nameTh')?.value) {
+            <div class="summary-divider"></div>
+            <div class="summary-section-title">ผู้เช่า</div>
+            <div class="summary-row">
+              <span class="summary-label">ชื่อ:</span>
+              <span class="summary-value">
+                {{ areaForm.get('tenant.nameTh')?.value }}
+                @if (areaForm.get('tenant.nameEn')?.value) {
+                  <span style="color:#6b7280"> / {{ areaForm.get('tenant.nameEn')?.value }}</span>
+                }
+              </span>
+            </div>
+            @if (areaForm.get('tenant.contactPhone')?.value) {
+              <div class="summary-row">
+                <span class="summary-label">โทร:</span>
+                <span class="summary-value">{{ areaForm.get('tenant.contactPhone')?.value }}</span>
+              </div>
+            }
+            @if (areaForm.get('tenant.leaseStart')?.value && areaForm.get('tenant.leaseEnd')?.value) {
+              <div class="summary-row">
+                <span class="summary-label">สัญญา:</span>
+                <span class="summary-value">
+                  {{ areaForm.get('tenant.leaseStart')?.value | date:'dd/MM/yyyy' }}
+                  – {{ areaForm.get('tenant.leaseEnd')?.value | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+            }
+          }
+
+          @if (areaForm.get('inactivePeriod.reasonTh')?.value || areaForm.get('inactivePeriod.reasonEn')?.value) {
+            <div class="summary-divider"></div>
+            <div class="summary-section-title">ช่วงปิดปรับปรุง</div>
+            <div class="summary-row">
+              <span class="summary-label">เหตุผล:</span>
+              <span class="summary-value">{{ areaForm.get('inactivePeriod.reasonTh')?.value }}</span>
+            </div>
+            @if (areaForm.get('inactivePeriod.startDate')?.value && areaForm.get('inactivePeriod.endDate')?.value) {
+              <div class="summary-row">
+                <span class="summary-label">ช่วงเวลา:</span>
+                <span class="summary-value">
+                  {{ areaForm.get('inactivePeriod.startDate')?.value | date:'dd/MM/yyyy' }}
+                  – {{ areaForm.get('inactivePeriod.endDate')?.value | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="info-box">
+          <i class="pi pi-info-circle"></i>
+          <p>ตรวจสอบข้อมูลให้ถูกต้องก่อนบันทึก การแก้ไขจะมีผลทันที</p>
+        </div>
+      </div>
+    }
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="modal-footer">
+    <div class="wizard-footer">
       <button type="button" class="btn-cancel" (click)="onCancel()">
-        <i class="pi pi-times"></i> ยกเลิก
+        <i class="pi pi-times"></i> Cancel
       </button>
-      <button
-        type="button"
-        class="btn-save"
-        (click)="onSave()"
-        [disabled]="!areaForm.valid || isSaving()"
-      >
-        <i class="pi pi-check"></i>
-        {{ isSaving() ? "กำลังบันทึก..." : "บันทึก" }}
-      </button>
+      @if (currentStep() > 1) {
+        <button type="button" class="btn-back" (click)="previousStep()">
+          <i class="pi pi-arrow-left"></i> Back
+        </button>
+      }
+      @if (currentStep() < 5) {
+        <button type="button" class="btn-next" (click)="nextStep()">
+          Next <i class="pi pi-arrow-right"></i>
+        </button>
+      }
+      @if (currentStep() === 5) {
+        <button type="button" class="btn-save" (click)="onSave()" [disabled]="isSaving()">
+          <i [class]="isSaving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>
+          {{ isSaving() ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข' }}
+        </button>
+      }
     </div>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="showCloseWarning"
+  [modal]="true"
+  [closable]="false"
+  [style]="{ width: '400px' }"
+  header="ยกเลิกการแก้ไข?"
+>
+  <p class="warning-message">ข้อมูลที่แก้ไขจะไม่ถูกบันทึก ต้องการยกเลิกหรือไม่?</p>
+  <ng-template pTemplate="footer">
+    <button type="button" class="btn-secondary" (click)="showCloseWarning = false">แก้ไขต่อ</button>
+    <button type="button" class="btn-danger" (click)="confirmCancel()">ยืนยันยกเลิก</button>
   </ng-template>
 </p-dialog>

@@ -107,7 +107,6 @@
                 }
               }
               <div class="detail-actions">
-                <!-- ✅ เพิ่มปุ่ม Edit -->
                 <button
                   type="button"
                   class="btn-edit-area"
@@ -116,7 +115,13 @@
                   <i class="pi pi-pencil"></i>
                   แก้ไขรายละเอียด
                 </button>
-                <button type="button" class="btn-view-details">
+
+                <!-- ✅ ปุ่มทำใบเสนอราคา — navigate ไป contract พร้อม pre-fill -->
+                <button
+                  type="button"
+                  class="btn-view-details"
+                  (click)="onCreateQuotation(area, $event)"
+                >
                   <i class="pi pi-external-link"></i>
                   ทำใบเสนอราคา
                 </button>
@@ -160,7 +165,7 @@
   </div>
 </div>
 
-<!-- ✅ Edit Area Modal -->
+<!-- Edit Area Modal -->
 <app-edit-area-modal
   #editAreaModal
   (areaSaved)="onAreaSaved($event)"

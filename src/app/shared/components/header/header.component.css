@@ -395,7 +395,6 @@ header {
   line-height: 1.25rem;
   color: #fff;
   background: #dc2626;
-  border: 2px solid rgb(var(--primary));
   border-radius: 9999px;
   display: flex;
   align-items: center;

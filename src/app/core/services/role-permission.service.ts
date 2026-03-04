@@ -23,6 +23,25 @@ import {
 
 import { ALL_PERMISSION_TABS } from '@core/data/permissions/index';
 
+const STORAGE_KEY_PERMISSIONS = 'space_role_management_permissions';
+
+function loadStoredPermissions(): Record<string, Permission[]> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_PERMISSIONS);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Record<string, Permission[]>;
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch (_) {}
+  return {};
+}
+
+function saveStoredPermissions(data: Record<string, Permission[]>): void {
+  try {
+    localStorage.setItem(STORAGE_KEY_PERMISSIONS, JSON.stringify(data));
+  } catch (_) {}
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -217,6 +236,16 @@ export class RolePermissionService {
 getPermissions(request: GetPermissionsRequest): Observable<GetPermissionsResponse> {
     console.log('Getting permissions for:', request);
 
+    // Check stored permissions first (saved from Save button)
+    const stored = loadStoredPermissions();
+    const storedForRole = request.USER_GROUP ? stored[request.USER_GROUP] : undefined;
+    if (storedForRole && Array.isArray(storedForRole) && storedForRole.length > 0) {
+      return of({
+        data: storedForRole,
+        total: storedForRole.length
+      }).pipe(delay(300));
+    }
+
     // Convert your data structure to the Permission interface
     const allPermissions: Permission[] = [];
 
@@ -264,8 +293,12 @@ getPermissions(request: GetPermissionsRequest): Observable<GetPermissionsRespons
   savePermissions(
     request: SavePermissionsRequest
   ): Observable<SavePermissionsResponse> {
-    // TODO: Replace with actual API call
-    console.log('Saving permissions:', request);
+    // Persist to localStorage so they survive refresh and load correctly next time
+    const stored = loadStoredPermissions();
+    stored[request.USER_GROUP] = request.permissions;
+    saveStoredPermissions(stored);
+
+    console.log('Saving permissions:', request.USER_GROUP, request.permissions.length);
 
     return of({
       success: true,

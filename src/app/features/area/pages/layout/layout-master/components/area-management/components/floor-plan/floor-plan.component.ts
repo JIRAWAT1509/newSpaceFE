@@ -22,8 +22,10 @@ import {
   StatusDistribution,
 } from '@core/services/area/area-data.service';
 import { Area, AreaStatus } from '@core/models/area.model';
-import { Building } from '@core/models/building.model';
 import { ActionType } from '../../../area-filter-bar/area-filter-bar.component';
+
+// ── Single source of truth — ห้าม hardcode branches/buildings ที่นี่ ──────────
+import { MOCK_BRANCHES } from '@core/data/branch.mock';
 
 interface FloorOption {
   label: string;
@@ -53,6 +55,7 @@ export class FloorPlanComponent implements OnInit {
   selectedFilters = input<AreaStatus[]>([]);
   selectedTypeFilters = input<ActionType[]>([]);
   selectedAreaId = input<string | null>(null);
+  draftFloorPlanImage = signal<string | null>(null);
 
   areaSelected = output<string | null>();
 
@@ -64,19 +67,17 @@ export class FloorPlanComponent implements OnInit {
   showEditModal = signal<boolean>(false);
 
   selectedBuildingId = signal<string>('');
+  selectedBranchId = signal<string>('');
   selectedFloorId = signal<string>('');
-  draftFloorPlanImage = signal<string | null>(null);
 
   currentFloorImage = computed<string>(() => {
     const draft = this.draftFloorPlanImage();
-    if (draft) return draft; // ✅ ถ้ามี draft ใช้เลย
-
-    const floor = this.currentFloor();
-    if (!floor) return '';
-    const version = this.areaDataService.getLatestVersion(floor);
-    return version?.planImage || '';
+    if (draft && draft.startsWith('data:')) return draft;
+    return 'assets/floorPlan1.png';
   });
+
   editFloorModal = viewChild<EditFloorModalComponent>('editFloorModal');
+
   visibleAreas = computed<Area[]>(() => {
     let areas = this.areas().filter((a) => a.isActive);
 
@@ -92,10 +93,7 @@ export class FloorPlanComponent implements OnInit {
 
     const typeFilters = this.selectedTypeFilters();
     if (typeFilters.length > 0) {
-      areas = areas.filter((a) => {
-        const actionLabel = this.getActionLabel(a.status);
-        return typeFilters.includes(actionLabel as ActionType);
-      });
+      areas = areas.filter((a) => typeFilters.includes(a.type as ActionType));
     }
 
     return areas;
@@ -108,7 +106,6 @@ export class FloorPlanComponent implements OnInit {
   });
 
   constructor(private areaDataService: AreaDataService) {
-    // Watch for current floor changes from service
     effect(() => {
       const floorId = this.areaDataService.currentFloorId();
       if (floorId && floorId !== this.selectedFloorId()) {
@@ -124,7 +121,6 @@ export class FloorPlanComponent implements OnInit {
       }
     });
 
-    // Watch for area selection changes
     effect(() => {
       const areaId = this.selectedAreaId();
       if (areaId) {
@@ -146,13 +142,12 @@ export class FloorPlanComponent implements OnInit {
       return;
     }
 
-    // ✅ sync selectedBuildingId กับ service
     this.selectedBuildingId.set(building.id);
+    this.selectedBranchId.set(building.branchId);
 
     const currentFloorId = this.areaDataService.currentFloorId();
     const floor = currentFloorId
-      ? (building.floors.find((f) => f.id === currentFloorId) ??
-        building.floors[0])
+      ? (building.floors.find((f) => f.id === currentFloorId) ?? building.floors[0])
       : building.floors[0];
 
     this.currentFloor.set(floor);
@@ -171,9 +166,7 @@ export class FloorPlanComponent implements OnInit {
 
     const doZoom = () => {
       const container = document.querySelector('.floor-plan-container');
-      const image = container?.querySelector(
-        '.floor-plan-image',
-      ) as HTMLImageElement | null;
+      const image = container?.querySelector('.floor-plan-image') as HTMLImageElement | null;
       if (!container || !image) return;
 
       this.zoomLevel.set(1.8);
@@ -194,43 +187,53 @@ export class FloorPlanComponent implements OnInit {
       });
     };
 
-    const image = document.querySelector(
-      '.floor-plan-image',
-    ) as HTMLImageElement | null;
+    const image = document.querySelector('.floor-plan-image') as HTMLImageElement | null;
     if (image && image.complete && image.naturalWidth > 0) {
       doZoom();
     } else if (image) {
-      // รอรูปโหลดเสร็จก่อน
       image.onload = () => doZoom();
     }
   }
 
-  private getActionLabel(status: AreaStatus): string {
-    const actionLabels: { [key: string]: string } = {
-      vacant: 'Log',
-      leased: 'Log',
-      quotation: 'OP',
-      unallocated: 'Kiosk',
-      inactive: 'View',
-    };
-    return actionLabels[status] || 'View';
+  // ── Branch options — ดึงจาก MOCK_BRANCHES (single source of truth) ──────────
+  getBranchOptions(): { label: string; value: string }[] {
+    return MOCK_BRANCHES
+      .filter((b) => b.id !== '')   // ตัด "All" ออก
+      .map((b) => ({ label: b.nameTh, value: b.id }));
   }
 
-  // ✅ ดึง buildings ทั้งหมดจาก service (reactive signal)
+  onBranchChanged(branchId: string): void {
+    this.selectedBranchId.set(branchId);
+    const building = this.areaDataService
+      .buildings()
+      .find((b) => b.branchId === branchId);
+    if (building) {
+      this.onBuildingChanged(building.id);
+    }
+  }
+
+  // ── Building options — filter ตาม branch ที่เลือก ────────────────────────────
   getBuildingOptions(): BuildingOption[] {
-    return this.areaDataService.buildings().map((b) => ({
-      label: `${b.code} - ${b.nameTh}`,
-      value: b.id,
-    }));
+    const selectedBranch = this.selectedBranchId();
+    return this.areaDataService
+      .buildings()
+      .filter((b) => b.branchId === selectedBranch)
+      .map((b) => ({ label: `${b.code} - ${b.nameTh}`, value: b.id }));
   }
 
-  // ✅ switch building จริง + reload floor
   onBuildingChanged(buildingId: string): void {
     this.selectedBuildingId.set(buildingId);
     this.areaDataService.setCurrentBuilding(buildingId);
+
+    const building = this.areaDataService.buildings().find((b) => b.id === buildingId);
+    if (building && building.branchId !== this.selectedBranchId()) {
+      this.selectedBranchId.set(building.branchId);
+    }
+
     this.loadFloorData();
   }
 
+  // ── Floor options ──────────────────────────────────────────────────────────
   getFloorOptions(): FloorOption[] {
     return this.getFloors().map((floor) => ({
       label: `Fl. ${floor.floorNumber}`,
@@ -239,7 +242,7 @@ export class FloorPlanComponent implements OnInit {
   }
 
   onFloorChanged(floorId: string): void {
-    this.draftFloorPlanImage.set(null); // reset ก่อน
+    this.draftFloorPlanImage.set(null);
     const building = this.areaDataService.building();
     const floor = building.floors.find((f) => f.id === floorId);
     if (floor) {
@@ -272,6 +275,7 @@ export class FloorPlanComponent implements OnInit {
     this.onFloorChanged(floors[prevIndex].id);
   }
 
+  // ── Zoom & Pan ─────────────────────────────────────────────────────────────
   onZoomIn(): void {
     this.zoomLevel.set(Math.min(this.zoomLevel() + 0.1, 3.0));
   }
@@ -283,52 +287,6 @@ export class FloorPlanComponent implements OnInit {
   resetZoom(): void {
     this.zoomLevel.set(1.0);
     this.panOffset.set({ x: 0, y: 0 });
-  }
-
-  onMarkerClicked(areaId: string): void {
-    const currentSelectedId = this.selectedAreaId();
-    this.areaSelected.emit(currentSelectedId === areaId ? null : areaId);
-  }
-
-  shouldPulseMarker(area: Area): boolean {
-    const selectedId = this.selectedAreaId();
-    if (selectedId === area.id) return true;
-    if (area.currentTenant?.hasWarning) return true;
-    const filters = this.selectedFilters();
-    if (filters.length === 0) return false;
-    return filters.includes(area.status);
-  }
-
-  toggleFilterBar(): void {
-    this.showFilterBar.set(!this.showFilterBar());
-  }
-
-  onEditAreas(): void {
-    const modal = this.editFloorModal();
-    if (modal) {
-      modal.open();
-    } else {
-      console.warn('EditFloorModal not found');
-    }
-  }
-
-  onEditModalClose(): void {}
-
-  // แก้ onEditModalSave → ไม่ loadFloorData() ทั้งหมด reload เฉพาะ areas
-onEditModalSave(changes: any): void {
-  if (changes.floorPlanImage) {
-    this.draftFloorPlanImage.set(changes.floorPlanImage);
-  }
-  // ✅ reload เฉพาะ areas ไม่ reset floor ทั้งหมด
-  const floor = this.currentFloor();
-  if (floor) {
-    const areas = this.areaDataService.getAreasForCurrentContext(floor);
-    this.areas.set(areas);
-  }
-}
-
-  getFloors(): FloorWithAreas[] {
-    return this.areaDataService.getFloors();
   }
 
   onWheel(event: WheelEvent): void {
@@ -362,5 +320,70 @@ onEditModalSave(changes: any): void {
 
   onMouseUp(event: MouseEvent): void {
     this.isPanning = false;
+  }
+
+  // ── Marker helpers ─────────────────────────────────────────────────────────
+  onMarkerClicked(areaId: string): void {
+    const currentSelectedId = this.selectedAreaId();
+    this.areaSelected.emit(currentSelectedId === areaId ? null : areaId);
+  }
+
+  shouldPulseMarker(area: Area): boolean {
+    const selectedId = this.selectedAreaId();
+    if (selectedId === area.id) return true;
+    if (area.currentTenant?.hasWarning) return true;
+    const filters = this.selectedFilters();
+    if (filters.length === 0) return false;
+    return filters.includes(area.status);
+  }
+
+  // ── Filter bar ─────────────────────────────────────────────────────────────
+  toggleFilterBar(): void {
+    this.showFilterBar.set(!this.showFilterBar());
+  }
+
+  // ── Edit modal ─────────────────────────────────────────────────────────────
+  onEditAreas(): void {
+    const modal = this.editFloorModal();
+    if (modal) {
+      modal.open();
+    } else {
+      console.warn('EditFloorModal not found');
+    }
+  }
+
+  onEditModalClose(): void {}
+
+  onEditModalSave(changes: any): void {
+    const floor = this.currentFloor();
+    if (!floor) return;
+
+    if (
+      Object.keys(changes.positions).length > 0 ||
+      Object.keys(changes.activeStates).length > 0
+    ) {
+      const updatedAreas = this.areas().map((area) => ({
+        ...area,
+        position: changes.positions[area.id] ?? area.position,
+        isActive:
+          changes.activeStates[area.id] !== undefined
+            ? changes.activeStates[area.id]
+            : area.isActive,
+      }));
+      updatedAreas.forEach((area) => this.areaDataService.updateArea(area));
+    }
+
+    const newAreas: Area[] = changes.newAreas ?? [];
+    newAreas.forEach((newArea) => this.areaDataService.addArea(newArea));
+
+    if (changes.floorPlanImage) {
+      this.draftFloorPlanImage.set(changes.floorPlanImage);
+    }
+
+    this.loadFloorData();
+  }
+
+  getFloors(): FloorWithAreas[] {
+    return this.areaDataService.getFloors();
   }
 }
