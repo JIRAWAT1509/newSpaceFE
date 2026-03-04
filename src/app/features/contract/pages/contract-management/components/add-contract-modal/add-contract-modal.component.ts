@@ -143,6 +143,7 @@ export class AddContractModalComponent implements OnInit {
 
     // field ใน generalDetailForm ที่รับค่าจาก area ได้
     const generalFields = [
+      'branch',
       'areaBuilding',
       'areaFloor',
       'areaUnitNumber',

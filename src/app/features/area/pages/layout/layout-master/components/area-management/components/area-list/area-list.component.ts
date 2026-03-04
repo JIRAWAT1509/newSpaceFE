@@ -205,7 +205,7 @@ export class AreaListComponent {
 
     // สร้าง prefill payload ที่ตรงกับ field ใน generalDetailForm
     const areaData = {
-      branch: branch?.nameTh ?? '', // ✅ สาขา เช่น "สาขา สีลม"
+      branch: branch?.name ?? '', // ✅ สาขา เช่น "สาขา สีลม"
       areaBuilding: building?.code ?? '',
       areaFloor: floor?.floorNumber?.toString() ?? '',
       areaUnitNumber: area.roomNumber,
