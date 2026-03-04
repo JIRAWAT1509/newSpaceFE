@@ -22,21 +22,21 @@
   min-height: 100dvh;
   width: 100%;
   position: relative;
-  background-color: #081420;
+  background-color: #152535;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-/* Full-screen semi-transparent tinted overlay (frosted/glass) */
+/* Overlay – โทนน้ำเงินเทา เบลอพื้นหลัง */
 .auth-overlay {
   position: fixed;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(135deg, rgba(8, 20, 32, 0.65), rgba(8, 20, 32, 0.35));
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-  box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(135deg, rgba(15, 30, 50, 0.45), rgba(20, 40, 65, 0.3));
+  backdrop-filter: blur(3.7px) saturate(110%);
+  -webkit-backdrop-filter: blur(3px) saturate(110%);
+  box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.08);
   pointer-events: none;
 }
 
@@ -68,21 +68,24 @@
 
 .auth-welcome-title {
   margin: 0;
-  font-size: 2rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: #ffffff;
   line-height: 1.2;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
-
+.auth-welcome-title,
+.auth-welcome-title * {
+  font-size: 43px !important;
+}
 .auth-welcome-sub {
   margin: 0.5rem 0 0;
-  font-size: 1.05rem;
+  font-size: 18px !important;
   font-weight: 400;
   color: #ffffff;
   letter-spacing: 0.02em;
   opacity: 0.95;
+  line-height: 1.35;
 }
 
 .auth-form {
@@ -101,7 +104,7 @@
   margin-bottom: 0;
 }
 
-/* Pill ช่องกรอก – ซ้ายน้ำเงินเทา+ไอคอนขาว ขวาพื้นขาวแบบรูป */
+/* Pill ช่องกรอก – ฟรอสต์โทนเดียวกับแผง */
 .auth-field {
   position: relative;
   display: flex;
@@ -109,21 +112,33 @@
   width: 100%;
   height: 56px;
   border-radius: 999px;
-  overflow: hidden;
-  background: linear-gradient(to right, #5a6b7d 0, #5a6b7d 56px, #ffffff 56px);
-  border: none;
-  outline: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.2s ease;
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.auth-field:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.09));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
 }
 
 .auth-field:focus-within {
-  outline: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.12));
+  border-color: rgba(255, 255, 255, 0.45);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 2px 8px rgba(0, 0, 0, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04);
 }
 
 .auth-field-icon {
@@ -132,15 +147,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #5a6b7d;
-  border-radius: 999px 0 0 999px;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s ease;
+}
+
+.auth-field:focus-within .auth-field-icon {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .auth-field-icon svg {
   width: 20px;
   height: 20px;
-  opacity: 1;
 }
 
 .auth-field-select {
@@ -152,16 +169,22 @@
   width: 100%;
   height: 100%;
   border: 0;
-  border-radius: 0 999px 999px 0;
+  border-radius: 999px;
   background: transparent;
-  color: #1a1a1a;
-  -webkit-text-fill-color: #1a1a1a;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
   font: inherit;
   font-size: 0.95rem;
   outline: none;
   padding: 0 2.5rem 0 0;
   appearance: none;
   cursor: pointer;
+  box-shadow: none;
+}
+
+.auth-field select:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 .auth-field select option {
@@ -172,37 +195,51 @@
   position: absolute;
   right: 1.25rem;
   font-size: 0.5rem;
-  color: #4b5563;
+  color: rgba(255, 255, 255, 0.5);
   pointer-events: none;
 }
 
 .auth-field input {
   flex: 1;
+  min-width: 0;
   width: 100%;
   height: 100%;
   border: 0;
-  border-radius: 0 999px 999px 0;
+  border-radius: 999px;
   background: transparent !important;
-  color: #1a1a1a;
-  -webkit-text-fill-color: #1a1a1a;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  line-height: 1.4;
   outline: none;
-  padding: 0 1.25rem 0 0;
+  padding: 0 1.25rem 0 0.5rem;
+  letter-spacing: 0.02em;
+  caret-color: #ffffff;
+  box-shadow: none;
+}
+
+.auth-field input:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 .auth-field input::placeholder {
-  color: #9ca3af;
-  opacity: 1;
+  color: rgba(255, 255, 255, 0.58);
+  transition: color 0.2s ease;
 }
 
-/* ตอน browser autofill ให้ตัวอักษรดำบนพื้นขาว */
+.auth-field:focus-within input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ตอน browser autofill ให้เหมือน forgot-password (ตัวอักษรขาว) */
 .auth-field input:-webkit-autofill,
 .auth-field input:-webkit-autofill:hover,
 .auth-field input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #1a1a1a;
-  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
-  box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset;
+  box-shadow: 0 0 0 1000px transparent inset;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -295,6 +332,112 @@
 
 .auth-link-right {
   margin-left: auto;
+  cursor: pointer;
+}
+
+/* ========== ป๊อปอัพลืมรหัสผ่าน – โทนเดียวกับแผงล็อกอิน ========== */
+.auth-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.40);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.auth-modal-box {
+  width: 100%;
+  max-width: 520px;
+  padding: 2.75rem 2.25rem;
+}
+
+.auth-modal-title {
+  margin: 0 0 0.35rem;
+  font-size: 2.5rem !important;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #ffffff;
+  text-align: center;
+}
+
+.auth-modal-sub {
+  margin: 0 0 1.5rem;
+  font-size: 1.1rem !important;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.95);
+  text-align: center;
+}
+
+.auth-modal-success {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.auth-modal-confirm-text {
+  margin: 0 0 1.25rem;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.auth-modal-email {
+  display: inline-block;
+  margin: 0.35em 0;
+  font-size: 1.05rem;
+  color: #ffffff;
+  word-break: break-all;
+}
+
+.auth-modal-confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.auth-submit-secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: none;
+}
+
+.auth-submit-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  transform: none;
+  box-shadow: none;
+}
+
+.auth-modal-footer {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.auth-modal-signin {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.auth-modal-signin:hover {
+  opacity: 0.9;
 }
 
 @media (max-width: 600px) {
@@ -308,7 +451,6 @@
 
   .auth-field {
     height: 54px;
-    background: linear-gradient(to right, #5a6b7d 0, #5a6b7d 54px, #ffffff 54px);
   }
 
   .auth-field-icon {

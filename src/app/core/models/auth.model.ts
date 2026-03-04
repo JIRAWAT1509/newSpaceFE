@@ -12,5 +12,8 @@ export interface AuthResponse {
 }
 
 export interface ForgotPasswordPayload {
-  email: string;
+  /** อีเมล หรือใช้ username + companyId แทน */
+  email?: string;
+  username?: string;
+  companyId?: string;
 }

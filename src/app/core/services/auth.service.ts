@@ -45,10 +45,10 @@ export class AuthService {
   }
 
   /**
-   * Request password reset – mock: ส่งอีเมลอะไรก็ถือว่าสำเร็จ
+   * Request password reset – mock: รับ username + companyId หรือ email
    * เมื่อมี API จริง: เปลี่ยนเป็น this.http.post<void>(`${AUTH_BASE}/forgot-password`, payload).pipe(...)
    */
-  requestPasswordReset(_payload: ForgotPasswordPayload): Observable<void> {
+  requestPasswordReset(payload: ForgotPasswordPayload): Observable<void> {
     return of(undefined).pipe(delay(MOCK_DELAY_MS));
   }
 

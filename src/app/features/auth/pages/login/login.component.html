@@ -4,8 +4,8 @@
     <div class="auth-content">
       <section class="auth-panel" aria-labelledby="login-title">
         <div class="auth-welcome">
-          <h1 class="auth-welcome-title" id="login-title">Welcome to Space</h1>
-          <p class="auth-welcome-sub">Sign in to continue</p>
+          <h1 class="auth-welcome-title" id="login-title">Welcome</h1>
+          <p class="auth-welcome-sub" id="login-subtitle">Sign in to continue</p>
         </div>
 
         <form (ngSubmit)="onSubmit()" class="auth-form">
@@ -80,9 +80,75 @@
         </form>
 
         <div class="auth-actions">
-          <a routerLink="/forgot-password" class="auth-link-right">Forgot password?</a>
+          <a (click)="openForgotModal()" href="javascript:void(0)" class="auth-link-right">Forgot password?</a>
         </div>
       </section>
     </div>
   </div>
-</div>
+
+  <!-- ป๊อปอัพลืมรหัสผ่าน (Username + Company ตามรูป) -->
+  @if (showForgotModal) {
+    <div class="auth-modal-backdrop" (click)="closeForgotModal()" role="button" tabindex="0" aria-label="ปิด" (keydown.escape)="closeForgotModal()"></div>
+    <div class="auth-modal" role="dialog" aria-labelledby="forgot-modal-title" aria-modal="true">
+      <div class="auth-modal-box" (click)="$event.stopPropagation()">
+        <h2 id="forgot-modal-title" class="auth-modal-title">ลืมรหัสผ่าน</h2>
+        <p id="forgot-modal-subtitle" class="auth-modal-sub">ระบุ Username และ Company</p>
+
+        @if (!forgotSent) {
+          <form (ngSubmit)="onSubmitForgot()" class="auth-form">
+            @if (forgotError) {
+              <p class="auth-error" role="alert">{{ forgotError }}</p>
+            }
+            <div class="auth-field-wrap">
+              <label class="auth-field">
+                <span class="auth-field-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                    <circle cx="12" cy="8" r="3.5"/>
+                    <path d="M5 20.5c0-3.5 3.5-6 7-6s7 2.5 7 6"/>
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  [(ngModel)]="forgotUsername"
+                  name="forgotUsername"
+                  placeholder="Username"
+                  autocomplete="username"
+                  aria-label="Username"
+                />
+              </label>
+            </div>
+            <div class="auth-field-wrap">
+              <label class="auth-field auth-field-select">
+                <span class="auth-field-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  </svg>
+                </span>
+                <select [(ngModel)]="forgotCompanyId" name="forgotCompany" aria-label="Select a Company">
+                  @for (company of companyOptions; track company.value) {
+                    <option [value]="company.value">{{ company.label }}</option>
+                  }
+                </select>
+                <span class="auth-select-chevron" aria-hidden="true">▼</span>
+              </label>
+            </div>
+            <button type="submit" class="auth-submit" [disabled]="forgotLoading">
+              @if (forgotLoading) {
+                <span class="auth-spinner" aria-hidden="true"></span>
+                <span class="auth-submit-text">กำลังส่ง...</span>
+              } @else {
+                <span class="auth-submit-text">รีเซตรหัสผ่าน</span>
+              }
+            </button>
+          </form>
+        } @else {
+          <p class="auth-modal-success">ส่งคำขอรีเซตรหัสผ่านเรียบร้อยแล้ว กรุณาตรวจสอบอีเมลหรือติดต่อผู้ดูแลระบบ</p>
+          <button type="button" class="auth-submit" (click)="closeForgotModal()">ปิด</button>
+        }
+
+        <div class="auth-modal-footer">
+          <a (click)="closeForgotModal()" href="javascript:void(0)" class="auth-modal-signin">Sign in</a>
+        </div>
+      </div>
+    </div>
+  }
