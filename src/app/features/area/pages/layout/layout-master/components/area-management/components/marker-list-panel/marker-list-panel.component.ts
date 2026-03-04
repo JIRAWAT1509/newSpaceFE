@@ -1,3 +1,5 @@
+/* marker-list-panel.component.ts */
+
 import {
   Component,
   input,

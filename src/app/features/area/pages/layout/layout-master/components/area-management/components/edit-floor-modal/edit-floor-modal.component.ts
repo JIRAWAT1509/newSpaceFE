@@ -221,14 +221,18 @@ export class EditFloorModalComponent {
   private applyChangesToService(): void {
     this.editableAreas().forEach((editedArea) => {
       const original = this.originalAreas.find((a) => a.id === editedArea.id);
+
+      // ✅ Area ใหม่ที่ไม่มีใน original → addArea แทน updateArea
       if (!original) {
-        this.areaDataService.updateArea({ ...editedArea });
+        this.areaDataService.addArea({ ...editedArea });
         return;
       }
+
       const positionChanged =
         editedArea.position.x !== original.position.x ||
         editedArea.position.y !== original.position.y;
       const activeChanged = editedArea.isActive !== original.isActive;
+
       if (positionChanged || activeChanged) {
         this.areaDataService.updateArea({ ...editedArea });
       }

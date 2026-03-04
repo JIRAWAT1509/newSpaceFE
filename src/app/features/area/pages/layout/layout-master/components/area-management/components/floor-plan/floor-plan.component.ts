@@ -69,12 +69,8 @@ export class FloorPlanComponent implements OnInit {
 
   currentFloorImage = computed<string>(() => {
     const draft = this.draftFloorPlanImage();
-    if (draft) return draft; // ✅ ถ้ามี draft ใช้เลย
-
-    const floor = this.currentFloor();
-    if (!floor) return '';
-    const version = this.areaDataService.getLatestVersion(floor);
-    return version?.planImage || '';
+    if (draft && draft.startsWith('data:')) return draft;
+    return 'assets/floorPlan1.png';
   });
   editFloorModal = viewChild<EditFloorModalComponent>('editFloorModal');
   visibleAreas = computed<Area[]>(() => {
@@ -314,18 +310,22 @@ export class FloorPlanComponent implements OnInit {
 
   onEditModalClose(): void {}
 
-  // แก้ onEditModalSave → ไม่ loadFloorData() ทั้งหมด reload เฉพาะ areas
-onEditModalSave(changes: any): void {
-  if (changes.floorPlanImage) {
-    this.draftFloorPlanImage.set(changes.floorPlanImage);
+  onEditModalSave(changes: any): void {
+    if (changes.floorPlanImage) {
+      this.draftFloorPlanImage.set(changes.floorPlanImage);
+    }
+
+    // ✅ ดึง floor ใหม่จาก service หลัง updateArea เพื่อให้ได้ข้อมูลล่าสุด
+    const currentFloorId = this.selectedFloorId();
+    const building = this.areaDataService.building();
+    const freshFloor = building.floors.find((f) => f.id === currentFloorId);
+
+    if (freshFloor) {
+      this.currentFloor.set(freshFloor);
+      const areas = this.areaDataService.getAreasForCurrentContext(freshFloor);
+      this.areas.set(areas);
+    }
   }
-  // ✅ reload เฉพาะ areas ไม่ reset floor ทั้งหมด
-  const floor = this.currentFloor();
-  if (floor) {
-    const areas = this.areaDataService.getAreasForCurrentContext(floor);
-    this.areas.set(areas);
-  }
-}
 
   getFloors(): FloorWithAreas[] {
     return this.areaDataService.getFloors();
