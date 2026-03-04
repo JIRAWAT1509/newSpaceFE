@@ -68,20 +68,21 @@
 
 .auth-welcome-title {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: #e8f4ff;
+  color: #ffffff;
   line-height: 1.2;
-  text-shadow: 0 0 24px rgba(100, 180, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .auth-welcome-sub {
   margin: 0.5rem 0 0;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   font-weight: 400;
-  color: rgba(200, 230, 255, 0.9);
+  color: #ffffff;
   letter-spacing: 0.02em;
+  opacity: 0.95;
 }
 
 .auth-form {
@@ -100,7 +101,7 @@
   margin-bottom: 0;
 }
 
-/* Glass pill inputs – translucent, match ref */
+/* Pill ช่องกรอก – ซ้ายน้ำเงินเทา+ไอคอนขาว ขวาพื้นขาวแบบรูป */
 .auth-field {
   position: relative;
   display: flex;
@@ -108,20 +109,21 @@
   width: 100%;
   height: 56px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  background: linear-gradient(to right, #5a6b7d 0, #5a6b7d 56px, #ffffff 56px);
+  border: none;
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease;
 }
 
 .auth-field:focus-within {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.26);
+  outline: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 0 3px rgba(255, 255, 255, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .auth-field-icon {
@@ -130,12 +132,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.65);
+  background: #5a6b7d;
+  border-radius: 999px 0 0 999px;
+  color: #ffffff;
 }
 
 .auth-field-icon svg {
   width: 20px;
   height: 20px;
+  opacity: 1;
 }
 
 .auth-field-select {
@@ -147,8 +152,10 @@
   width: 100%;
   height: 100%;
   border: 0;
+  border-radius: 0 999px 999px 0;
   background: transparent;
-  color: #fff;
+  color: #1a1a1a;
+  -webkit-text-fill-color: #1a1a1a;
   font: inherit;
   font-size: 0.95rem;
   outline: none;
@@ -165,7 +172,7 @@
   position: absolute;
   right: 1.25rem;
   font-size: 0.5rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: #4b5563;
   pointer-events: none;
 }
 
@@ -174,8 +181,10 @@
   width: 100%;
   height: 100%;
   border: 0;
-  background: transparent;
-  color: #fff;
+  border-radius: 0 999px 999px 0;
+  background: transparent !important;
+  color: #1a1a1a;
+  -webkit-text-fill-color: #1a1a1a;
   font: inherit;
   font-size: 0.95rem;
   outline: none;
@@ -183,7 +192,18 @@
 }
 
 .auth-field input::placeholder {
-  color: rgba(255, 255, 255, 0.55);
+  color: #9ca3af;
+  opacity: 1;
+}
+
+/* ตอน browser autofill ให้ตัวอักษรดำบนพื้นขาว */
+.auth-field input:-webkit-autofill,
+.auth-field input:-webkit-autofill:hover,
+.auth-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1a1a1a;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .auth-error {
@@ -256,16 +276,16 @@
 
 .auth-actions a,
 .auth-link-left {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 500;
   letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .auth-actions a:hover {
-  color: #ffffff;
+  opacity: 0.9;
 }
 
 .auth-link-left {
@@ -288,6 +308,7 @@
 
   .auth-field {
     height: 54px;
+    background: linear-gradient(to right, #5a6b7d 0, #5a6b7d 54px, #ffffff 54px);
   }
 
   .auth-field-icon {
