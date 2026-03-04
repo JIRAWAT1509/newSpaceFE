@@ -2,10 +2,6 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { Select } from 'primeng/select';
-import { ButtonModule } from 'primeng/button';
 import { AuthService } from '@core/services/auth.service';
 
 @Component({
@@ -15,14 +11,14 @@ import { AuthService } from '@core/services/auth.service';
     CommonModule,
     RouterModule,
     FormsModule,
-    PasswordModule,
-    Select,
-    ButtonModule,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
+  /** Background image – set in template so angular-css-resource does not resolve at build */
+  readonly bgImage = 'url("assets/images/auth/building-bg.jpg")';
+
   username = '';
   password = '';
   companyId = '001';
@@ -52,7 +48,7 @@ export class LoginComponent {
     }
     this.loading = true;
     setTimeout(() => {
-      this.auth.login(this.username.trim(), this.password, this.companyId);
+      this.auth.loginLegacy(this.username.trim(), this.password, this.companyId);
       this.loading = false;
       this.router.navigate(['/dashboard/overview']);
     }, 600);
