@@ -1,4 +1,4 @@
-// contract-table.component.ts - WITH EDIT MODE & DRAFT SUPPORT
+// contract-table.component.ts
 import {
   Component,
   input,
@@ -51,18 +51,18 @@ import {
   styleUrl: './contract-table.component.css',
 })
 export class ContractTableComponent {
-  // Inputs
+  // ---- Inputs ----
   contractType = input.required<'quotation' | 'booking' | 'lease'>();
   data = input.required<Contract[]>();
 
-  // Shared state from parent (synchronized across tabs)
+  // Shared search state (sync'd across tabs) — เก่า
   sharedSearchText = input<string>('');
   sharedFilters = input<SearchFilter[]>([]);
 
-  // ✅ รับ prefill data จาก parent ผ่าน @Input binding
+  // ✅ [ใหม่] รับ prefill data จาก parent เพื่อ auto-open modal + pre-fill form
   prefillData = input<Record<string, any> | null>(null);
 
-  // Outputs to sync state back to parent
+  // ---- Outputs ----
   searchTextChange = output<string>();
   filtersChange = output<SearchFilter[]>();
   contractSaved = output<any>();
@@ -72,17 +72,17 @@ export class ContractTableComponent {
     cancelType: CancelType;
   }>();
 
-  // Local search (syncs with shared)
+  // ---- Local search (sync'd with shared) — เก่า ----
   simpleSearchText = signal<string>('');
   activeFilters = signal<SearchFilter[]>([]);
 
   savedSearches = signal<SavedSearch[]>([]);
   private readonly bookmarkKey = 'contract_advance_search_bookmarks';
 
-  // Selection
+  // ---- Selection — เก่า ----
   selectedIds = signal<string[]>([]);
 
-  // UI State
+  // ---- UI State — เก่า ----
   showAdvanceSearchModal = signal<boolean>(false);
   showAddModal = signal<boolean>(false);
   modalMode = signal<'add' | 'edit'>('add');
@@ -113,7 +113,7 @@ export class ContractTableComponent {
   currentBulkAction = signal<BulkActionType>('terminate');
   selectedContractsForBulk = signal<Contract[]>([]);
 
-  // Filtered data
+  // ---- Filtered data — เก่า ----
   filteredData = computed<Contract[]>(() => {
     let contracts = [...this.data()];
 
@@ -248,6 +248,7 @@ export class ContractTableComponent {
   constructor(public draftService: DraftContractService) {
     this.loadSavedSearches();
 
+    // Sync shared state → local — เก่า
     effect(() => {
       this.simpleSearchText.set(this.sharedSearchText());
     });
@@ -256,11 +257,11 @@ export class ContractTableComponent {
       this.activeFilters.set(this.sharedFilters());
     });
 
-    // ✅ watch prefillData input — เปิด modal อัตโนมัติเมื่อมี prefill จาก parent
+    // ✅ [ใหม่] Watch prefillData → เปิด modal อัตโนมัติเมื่อมี prefill จาก parent
     effect(() => {
       const prefill = this.prefillData();
       if (prefill && Object.keys(prefill).length > 0) {
-        // ใช้ setTimeout เพื่อให้ component render เสร็จก่อนเปิด modal
+        // setTimeout ให้ component render เสร็จก่อนเปิด modal
         setTimeout(() => {
           this.modalMode.set('add');
           this.selectedContract.set(null);
@@ -270,6 +271,7 @@ export class ContractTableComponent {
       }
     });
 
+    // Close row menu on outside click — เก่า
     effect(() => {
       if (this.activeRowMenu()) {
         const handler = () => this.activeRowMenu.set(null);
@@ -280,6 +282,7 @@ export class ContractTableComponent {
       }
     });
 
+    // Close bulk actions on outside click — เก่า
     effect(() => {
       if (this.showBulkActions()) {
         const handler = () => this.showBulkActions.set(false);
@@ -291,7 +294,7 @@ export class ContractTableComponent {
     });
   }
 
-  // ==================== SEARCH ====================
+  // ==================== SEARCH (เก่า) ====================
 
   onSimpleSearch(): void {
     this.searchTextChange.emit(this.simpleSearchText());
@@ -387,7 +390,7 @@ export class ContractTableComponent {
     return filter.value;
   }
 
-  // ==================== SELECTION ====================
+  // ==================== SELECTION (เก่า) ====================
 
   toggleSelectAll(): void {
     if (this.isAllSelected()) {
@@ -411,7 +414,7 @@ export class ContractTableComponent {
     return this.selectedIds().includes(id);
   }
 
-  // ==================== ACTIONS ====================
+  // ==================== BULK ACTIONS (เก่า) ====================
 
   onBulkAction(action: string): void {
     console.log('Bulk action:', action, 'on', this.selectedIds());
@@ -548,6 +551,8 @@ export class ContractTableComponent {
       this.openEditModal(contract);
     }
   }
+
+  // ==================== ROW ACTIONS (เก่า) ====================
 
   showRowActions(id: string): void {
     this.activeRowMenu.set(this.activeRowMenu() === id ? null : id);
@@ -782,7 +787,7 @@ export class ContractTableComponent {
     );
   }
 
-  // ==================== CANCEL CONFIRMATION MODAL ====================
+  // ==================== CANCEL CONFIRMATION (เก่า) ====================
 
   showCancelConfirm = signal<boolean>(false);
   cancelConfirmTitle = signal<string>('');
@@ -832,12 +837,12 @@ export class ContractTableComponent {
     this.pendingCancelType.set(null);
   }
 
-  // ==================== MODAL OPEN/CLOSE ====================
+  // ==================== MODAL OPEN/CLOSE (เก่า + patch ใหม่) ====================
 
   openAddModal(): void {
     this.modalMode.set('add');
     this.selectedContract.set(null);
-    this.selectedDraft.set(null);
+    this.selectedDraft.set(null); // ✅ [ใหม่] reset draft ด้วย
     this.showAddModal.set(true);
   }
 
@@ -855,7 +860,7 @@ export class ContractTableComponent {
     this.selectedDraft.set(null);
   }
 
-  // ==================== DRAFT MANAGEMENT ====================
+  // ==================== DRAFT MANAGEMENT (เก่า) ====================
 
   toggleDraftsPanel(): void {
     this.showDraftsPanel.update((v) => !v);
@@ -915,6 +920,8 @@ export class ContractTableComponent {
     }
   }
 
+  // ==================== MESSAGE MODAL (เก่า) ====================
+
   openMessageModal(title: string, message: string, onClose?: () => void): void {
     this.messageModalTitle.set(title);
     this.messageModalMessage.set(message);
@@ -930,7 +937,7 @@ export class ContractTableComponent {
     }
   }
 
-  // ==================== CONFIRMATION MODAL ====================
+  // ==================== CONFIRMATION MODAL (เก่า) ====================
 
   openConfirmModal(options: {
     type?: ConfirmationType;
@@ -964,7 +971,7 @@ export class ContractTableComponent {
     this.confirmModalOnConfirm = undefined;
   }
 
-  // ==================== HELPERS ====================
+  // ==================== HELPERS (เก่า) ====================
 
   formatDate(dateValue: unknown): string {
     return formatDateForDisplay(dateValue, 'th-TH');

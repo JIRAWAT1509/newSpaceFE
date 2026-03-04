@@ -29,9 +29,8 @@
       </p-tablist>
 
       <p-tabpanels>
+
         <!-- Tab 1: Quotation -->
-        <!-- ✅ ส่ง prefillData binding โดยตรง — ไม่ต้องใช้ ViewChild -->
-        <!-- ✅ ส่ง autoOpenModal เพื่อให้ contract-table เปิด modal อัตโนมัติเมื่อมี prefill -->
         <p-tabpanel value="quotation">
           <app-contract-table
             [contractType]="'quotation'"
@@ -76,6 +75,7 @@
             (contractCancelRequest)="onContractCancelRequest($event)"
           />
         </p-tabpanel>
+
       </p-tabpanels>
     </p-tabs>
   </div>

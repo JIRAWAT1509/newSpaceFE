@@ -1,4 +1,4 @@
-// add-contract-modal.component.ts - WITH EDIT MODE, DRAFT SUPPORT & PREFILL
+// add-contract-modal.component.ts
 import {
   Component,
   output,
@@ -48,21 +48,21 @@ interface Tab {
   styleUrl: './add-contract-modal.component.css',
 })
 export class AddContractModalComponent implements OnInit {
-  // Inputs
+  // ---- Inputs ----
   mode = input<'add' | 'edit'>('add');
   contractData = input<Contract | null>(null);
   draftData = input<DraftContract | null>(null);
-  // ✅ เพิ่ม: รับ prefill data จาก area-list (ผ่าน contract-table)
+  // ✅ [ใหม่] รับ prefill data จากหน้า area ผ่าน contract-table
   prefillData = input<Record<string, any> | null>(null);
 
-  // Outputs
+  // ---- Outputs ----
   close = output<void>();
   save = output<any>();
   draftSaved = output<DraftContract>();
 
   currentDraftId = signal<string | null>(null);
 
-  // Forms
+  // ---- Forms ----
   generalDetailForm!: FormGroup;
   conditionsForm!: FormGroup;
   documentForm!: FormGroup;
@@ -70,7 +70,7 @@ export class AddContractModalComponent implements OnInit {
   @ViewChild(ContractDetailTabComponent)
   contractDetailTab?: ContractDetailTabComponent;
 
-  // Tab state
+  // ---- Tab state ----
   activeTabIndex = signal<number>(0);
   lastContractDetailValue = signal<Record<string, unknown>>({});
   visitedTabs = signal<Set<number>>(new Set([0]));
@@ -94,6 +94,7 @@ export class AddContractModalComponent implements OnInit {
     private fb: FormBuilder,
     private draftService: DraftContractService,
   ) {
+    // สร้างฟอร์มก่อน ก่อน effect ใดๆ จะ patch ค่า
     this.initForms();
 
     effect(() => {
@@ -112,11 +113,12 @@ export class AddContractModalComponent implements OnInit {
     this.tabs.forEach((t) => (t.completed = false));
     this.activeTabIndex.set(0);
 
-    // โหลดข้อมูลตาม priority: edit > draft > prefill
+    // ---- Priority: edit > draft > prefill ----
+
     const contract = this.contractData();
     if (contract && this.mode() === 'edit') {
       this.loadContractData(contract);
-      return; // edit mode ไม่ต้องสนใจ prefill
+      return; // edit mode — ไม่ต้องสนใจ prefill หรือ draft
     }
 
     const draft = this.draftData();
@@ -125,14 +127,14 @@ export class AddContractModalComponent implements OnInit {
       return; // draft มี priority เหนือ prefill
     }
 
-    // ✅ ถ้าไม่มี contract/draft → ตรวจ prefill จาก area
+    // ✅ [ใหม่] ถ้าไม่มี contract/draft → ตรวจ prefill จาก area
     const prefill = this.prefillData();
     if (prefill && this.mode() === 'add') {
       this.applyPrefillData(prefill);
     }
   }
 
-  // ==================== PREFILL FROM AREA ====================
+  // ==================== PREFILL FROM AREA [ใหม่] ====================
 
   /**
    * Apply pre-fill data จากหน้าอื่น (area-list → ทำใบเสนอราคา)
@@ -183,7 +185,7 @@ export class AddContractModalComponent implements OnInit {
     }
   }
 
-  // ==================== LOAD CONTRACT DATA (EDIT MODE) ====================
+  // ==================== LOAD CONTRACT DATA (EDIT MODE) [เก่า] ====================
 
   loadContractData(contract: Contract): void {
     console.log(
@@ -235,6 +237,7 @@ export class AddContractModalComponent implements OnInit {
           STATUS?: string;
         }[]
       | undefined;
+
     if (areas && areas.length > 0) {
       generalPatch['areaBuilding'] = areas[0].BUILDING ?? '';
       generalPatch['areaFloor'] = areas[0].FLOOR ?? '';
@@ -273,7 +276,7 @@ export class AddContractModalComponent implements OnInit {
     });
   }
 
-  // ==================== DRAFT MANAGEMENT ====================
+  // ==================== DRAFT MANAGEMENT [เก่า] ====================
 
   loadDraftData(draft: DraftContract): void {
     console.log('Loading draft data:', draft);
@@ -344,7 +347,7 @@ export class AddContractModalComponent implements OnInit {
     });
   }
 
-  // ==================== FORM INIT ====================
+  // ==================== FORM INIT [เก่า] ====================
 
   initForms(): void {
     this.generalDetailForm = this.fb.group({
@@ -405,7 +408,7 @@ export class AddContractModalComponent implements OnInit {
     this.documentForm = this.fb.group({});
   }
 
-  // ==================== TAB NAVIGATION ====================
+  // ==================== TAB NAVIGATION [เก่า] ====================
 
   goToTab(index: number): void {
     if (this.canNavigateToTab(index)) {
@@ -550,7 +553,7 @@ export class AddContractModalComponent implements OnInit {
     return this.isTabVisited(index) && !this.isTabCompleted(index);
   }
 
-  // ==================== ACTIONS ====================
+  // ==================== ACTIONS [เก่า] ====================
 
   onSaveQuotationOnly(): void {
     if (!this.isAllFormsValid()) {
@@ -691,7 +694,7 @@ export class AddContractModalComponent implements OnInit {
     }
   }
 
-  // ==================== SUMMARY HELPERS ====================
+  // ==================== SUMMARY HELPERS [เก่า] ====================
 
   getFormValue(fieldName: string): any {
     return this.generalDetailForm.get(fieldName)?.value ?? null;

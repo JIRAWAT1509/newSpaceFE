@@ -1,9 +1,8 @@
-<!-- contract-table.component.html - WITH EDIT MODE INTEGRATED -->
+<!-- contract-table.component.html  -->
 
 <div class="contract-table-container">
   <!-- Search Section -->
   <div class="search-section">
-    <!-- Simple Search Bar -->
     <div class="search-bar">
       <div class="search-input-wrapper">
         <i class="pi pi-search"></i>
@@ -28,7 +27,6 @@
       </button>
     </div>
 
-    <!-- Saved Bookmarks -->
     @if (savedSearches().length > 0) {
       <div class="bookmarks">
         @for (bookmark of savedSearches(); track bookmark.id) {
@@ -45,7 +43,6 @@
       </div>
     }
 
-    <!-- Active Filters (Tags) -->
     @if (activeFilters().length > 0) {
       <div class="active-filters">
         @for (filter of activeFilters(); track filter.id) {
@@ -73,7 +70,6 @@
     </div>
 
     <div class="actions-right">
-      <!-- Bulk Actions -->
       <div class="manage-dropdown-wrapper">
         <button
           class="action-btn manage-btn"
@@ -137,29 +133,16 @@
               <div class="draft-info">
                 <div class="draft-name">{{ draft.name }}</div>
                 <div class="draft-meta">
-                  <span
-                    >แก้ไขล่าสุด:
-                    {{ draftService.formatDate(draft.updatedAt) }}</span
-                  >
-                  <span class="draft-progress"
-                    >Tab {{ draft.currentTab + 1 }}/5</span
-                  >
+                  <span>แก้ไขล่าสุด: {{ draftService.formatDate(draft.updatedAt) }}</span>
+                  <span class="draft-progress">Tab {{ draft.currentTab + 1 }}/5</span>
                 </div>
               </div>
               <div class="draft-actions">
-                <button
-                  class="draft-btn continue"
-                  (click)="continueDraft(draft)"
-                  title="กรอกต่อ"
-                >
+                <button class="draft-btn continue" (click)="continueDraft(draft)" title="กรอกต่อ">
                   <i class="pi pi-pencil"></i>
                   <span>กรอกต่อ</span>
                 </button>
-                <button
-                  class="draft-btn delete"
-                  (click)="deleteDraft(draft)"
-                  title="ลบ"
-                >
+                <button class="draft-btn delete" (click)="deleteDraft(draft)" title="ลบ">
                   <i class="pi pi-trash"></i>
                 </button>
               </div>
@@ -206,16 +189,12 @@
               <div class="contract-number-cell">
                 <div
                   class="status-dot"
-                  [class.status-dot--transferred]="
-                    !!item.TRANSFER_TO_BOOKING || !!item.TRANSFER_TO_LEASE
-                  "
+                  [class.status-dot--transferred]="!!item.TRANSFER_TO_BOOKING || !!item.TRANSFER_TO_LEASE"
                   [style.background-color]="getStatusDotColor(item)"
                 ></div>
                 <div class="contract-info">
                   <div class="contract-number">{{ item.CONTRACT_NUMBER }}</div>
-                  <div class="company-name">
-                    {{ item.TENANT_NAME_TH || "N/A" }}
-                  </div>
+                  <div class="company-name">{{ item.TENANT_NAME_TH || 'N/A' }}</div>
                   @if (item.TRANSFER_TO_BOOKING) {
                     <div class="transferred-badge">
                       <i class="pi pi-check-circle"></i>
@@ -228,7 +207,7 @@
                       โอนเป็นสัญญาเช่าแล้ว
                     </div>
                   }
-                  @if (item.STATUS === "TERMINATED") {
+                  @if (item.STATUS === 'TERMINATED') {
                     <div class="terminated-badge">
                       <i class="pi pi-times-circle"></i>
                       ยกเลิกแล้ว
@@ -240,49 +219,34 @@
             <td>{{ getContractTypeLabel(item.CONTRACT_TYPE) }}</td>
             <td>{{ formatDate(item.START_DATE) }}</td>
             <td>{{ formatDate(item.END_DATE) }}</td>
-            <td>{{ item.BOOKING_NUMBER || item.QUOTATION_NUMBER || "-" }}</td>
-            <td>{{ item.CUSTOMER_ID || "-" }}</td>
+            <td>{{ item.BOOKING_NUMBER || item.QUOTATION_NUMBER || '-' }}</td>
+            <td>{{ item.CUSTOMER_ID || '-' }}</td>
             <td class="actions-col">
-              <button
-                class="row-actions-btn"
-                (click)="showRowActions(item.CONTRACT_ID)"
-              >
+              <button class="row-actions-btn" (click)="showRowActions(item.CONTRACT_ID)">
                 <i class="pi pi-ellipsis-v"></i>
               </button>
 
               @if (activeRowMenu() === item.CONTRACT_ID) {
                 <div class="row-actions-menu">
                   @if (!isContractLocked(item)) {
-                    <button
-                      class="menu-item"
-                      (click)="onRowAction('edit', item)"
-                    >
+                    <button class="menu-item" (click)="onRowAction('edit', item)">
                       <i class="pi pi-pencil"></i>
                       <span>แก้ไขข้อมูล</span>
                     </button>
                   }
-                  <button
-                    class="menu-item"
-                    (click)="onRowAction('copy-contract', item)"
-                  >
+                  <button class="menu-item" (click)="onRowAction('copy-contract', item)">
                     <i class="pi pi-copy"></i>
                     <span>{{ getCopyContractLabel() }}</span>
                   </button>
 
                   <!-- Quotation -->
-                  @if (contractType() === "quotation") {
+                  @if (contractType() === 'quotation') {
                     @if (!isContractLocked(item)) {
-                      <button
-                        class="menu-item"
-                        (click)="onRowAction('transfer-to-booking', item)"
-                      >
+                      <button class="menu-item" (click)="onRowAction('transfer-to-booking', item)">
                         <i class="pi pi-arrow-right-arrow-left"></i>
                         <span>โอนเป็นสัญญาจอง</span>
                       </button>
-                      <button
-                        class="menu-item menu-item--danger"
-                        (click)="onRowAction('cancel-quotation', item)"
-                      >
+                      <button class="menu-item menu-item--danger" (click)="onRowAction('cancel-quotation', item)">
                         <i class="pi pi-times-circle"></i>
                         <span>ยกเลิกใบเสนอราคา</span>
                       </button>
@@ -296,26 +260,17 @@
                   }
 
                   <!-- Booking -->
-                  @if (contractType() === "booking") {
-                    <button
-                      class="menu-item"
-                      (click)="onRowAction('copy-booking-to-quotation', item)"
-                    >
+                  @if (contractType() === 'booking') {
+                    <button class="menu-item" (click)="onRowAction('copy-booking-to-quotation', item)">
                       <i class="pi pi-copy"></i>
                       <span>คัดลอกสัญญาจองไปเป็นใบเสนอราคา</span>
                     </button>
                     @if (!isContractLocked(item)) {
-                      <button
-                        class="menu-item"
-                        (click)="onRowAction('transfer-to-lease', item)"
-                      >
+                      <button class="menu-item" (click)="onRowAction('transfer-to-lease', item)">
                         <i class="pi pi-arrow-right-arrow-left"></i>
                         <span>โอนเป็นสัญญาเช่า</span>
                       </button>
-                      <button
-                        class="menu-item menu-item--danger"
-                        (click)="onRowAction('cancel-booking', item)"
-                      >
+                      <button class="menu-item menu-item--danger" (click)="onRowAction('cancel-booking', item)">
                         <i class="pi pi-times-circle"></i>
                         <span>ยกเลิกสัญญาจอง</span>
                       </button>
@@ -329,26 +284,17 @@
                   }
 
                   <!-- Lease -->
-                  @if (contractType() === "lease") {
-                    <button
-                      class="menu-item"
-                      (click)="onRowAction('copy-to-booking', item)"
-                    >
+                  @if (contractType() === 'lease') {
+                    <button class="menu-item" (click)="onRowAction('copy-to-booking', item)">
                       <i class="pi pi-copy"></i>
                       <span>คัดลอกสัญญาเช่าไปเป็นสัญญาจอง</span>
                     </button>
-                    <button
-                      class="menu-item"
-                      (click)="onRowAction('copy-to-quotation', item)"
-                    >
+                    <button class="menu-item" (click)="onRowAction('copy-to-quotation', item)">
                       <i class="pi pi-copy"></i>
                       <span>คัดลอกสัญญาเช่าไปเป็นใบเสนอราคา</span>
                     </button>
                     @if (!isContractLocked(item)) {
-                      <button
-                        class="menu-item menu-item--danger"
-                        (click)="onRowAction('cancel-lease', item)"
-                      >
+                      <button class="menu-item menu-item--danger" (click)="onRowAction('cancel-lease', item)">
                         <i class="pi pi-times-circle"></i>
                         <span>ยกเลิกสัญญาเช่า</span>
                       </button>
@@ -382,7 +328,7 @@
 }
 
 <!-- Add/Edit Contract Modal -->
-<!-- ✅ เพิ่ม [prefillData]="prefillData()" เพื่อส่งข้อมูล pre-fill จาก area-list -->
+<!-- ✅ [ใหม่] ส่ง [prefillData] เพื่อให้ modal pre-fill ข้อมูลจากหน้า area -->
 @if (showAddModal()) {
   <app-add-contract-modal
     [mode]="modalMode()"

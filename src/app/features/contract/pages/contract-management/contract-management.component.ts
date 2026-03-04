@@ -1,7 +1,7 @@
 // contract-management.component.ts
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router'; // ✅ เพิ่ม Router (ใหม่)
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { ContractTableComponent } from './components/contract-table/contract-table.component';
 import { Contract } from '@core/models/contract.model';
@@ -28,11 +28,12 @@ export class ContractManagementComponent implements OnInit {
   sharedSearchText = signal<string>('');
   sharedFilters = signal<SearchFilter[]>([]);
 
-  // ✅ ส่ง prefill ผ่าน signal binding ใน template — ไม่ต้องใช้ ViewChild
+  // ✅ [ใหม่] prefill data สำหรับเปิด modal ใบเสนอราคาอัตโนมัติเมื่อมาจากหน้า area
   quotationPrefill = signal<Record<string, any> | null>(null);
 
   private contractsList = signal<Contract[]>([]);
 
+  // ---- computed filters ตามประเภทสัญญา (เก่า) ----
   quotationData = computed<Contract[]>(() =>
     this.contractsList().filter(
       (c) => c.CONTRACT_TYPE === 'QUOTATION_AGREEMENT',
@@ -52,11 +53,11 @@ export class ContractManagementComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
+    private router: Router, // ✅ inject Router (ใหม่)
     private contractService: ContractService,
   ) {
-    // ✅ อ่านจาก history.state (Web API) — Angular router เขียนค่าไว้ที่นี่
-    // getCurrentNavigation() ใช้ไม่ได้ใน constructor ของ routed component
+    // ✅ [ใหม่] อ่าน history.state สำหรับ navigation จากหน้า area → auto-open quotation modal
+    // getCurrentNavigation() ใช้ไม่ได้ใน constructor ของ routed component จึงใช้ Web API แทน
     const state = typeof history !== 'undefined' ? history.state : null;
     console.log('[ContractManagement] history.state:', state);
 
@@ -69,8 +70,11 @@ export class ContractManagementComponent implements OnInit {
   ngOnInit(): void {
     this.contractsList.set(this.contractService.getContracts());
 
+    // ---- [เก่า] อ่าน query params จากหน้า area (areaId / roomNumber) ----
     this.route.queryParams.subscribe((params) => {
       const areaId = params['areaId'];
+      const roomNumber = params['roomNumber']; // เก็บไว้เผื่อใช้งานในอนาคต
+
       if (areaId) {
         const areaFilter: SearchFilter = {
           id: `auto-area-${Date.now()}`,
@@ -87,15 +91,18 @@ export class ContractManagementComponent implements OnInit {
   onSearchUpdate(searchText: string): void {
     this.sharedSearchText.set(searchText);
   }
+
   onFiltersUpdate(filters: SearchFilter[]): void {
     this.sharedFilters.set(filters);
   }
+
   onTabChange(value: string | number | undefined): void {
     this.activeTab.set(String(value ?? 'quotation'));
   }
 
   onContractSaved(formData: any): void {
     const newContract: Contract = this.mapFormDataToContract(formData);
+
     if (formData.mode === 'edit') {
       this.contractsList.update((list) =>
         list.map((c) =>
@@ -105,16 +112,20 @@ export class ContractManagementComponent implements OnInit {
       this.contractService.saveContracts(this.contractsList());
       return;
     }
+
     this.contractsList.update((list) => [newContract, ...list]);
     this.contractService.saveContracts(this.contractsList());
+
     if (formData.saveAsBooking) this.activeTab.set('booking');
-    // ✅ clear prefill หลัง save
+
+    // ✅ [ใหม่] เคลียร์ prefill หลัง save เพื่อไม่ให้ modal เปิดซ้ำ
     this.quotationPrefill.set(null);
   }
 
   onContractCopied(contract: Contract): void {
     this.contractsList.update((list) => [contract, ...list]);
     this.contractService.saveContracts(this.contractsList());
+
     if (contract.CONTRACT_TYPE === 'DEPOSIT_AGREEMENT')
       this.activeTab.set('booking');
     else if (
@@ -141,16 +152,20 @@ export class ContractManagementComponent implements OnInit {
     this.contractService.saveContracts(this.contractsList());
   }
 
+  // ---- helpers (เก่า) ----
+
   private mapFormDataToContract(formData: any): Contract {
     const general = formData?.generalDetails || {};
     const conditions = formData?.conditions || {};
     const contractDetails = formData?.contractDetails || {};
+
     const toDateStr = (val: unknown): string => {
       if (!val) return '';
       if (val instanceof Date) return val.toISOString().split('T')[0];
       if (typeof val === 'string') return val.split('T')[0];
       return '';
     };
+
     const contractType = formData.saveAsQuotationOnly
       ? 'QUOTATION_AGREEMENT'
       : formData.saveAsBooking
@@ -158,11 +173,14 @@ export class ContractManagementComponent implements OnInit {
         : formData.mode === 'edit'
           ? this.mapContractTypeCode(general.contractType)
           : 'QUOTATION_AGREEMENT';
+
     const displayName =
       general.contactName ||
       general.businessName ||
       contractDetails.legalEntityName ||
+      general.companyName ||
       'N/A';
+
     return {
       CONTRACT_ID: formData.contractId || `CNT-${Date.now()}`,
       OU_CODE: 'OU001',
