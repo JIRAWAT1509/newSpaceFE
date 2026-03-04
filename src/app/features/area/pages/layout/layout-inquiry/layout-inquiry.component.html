@@ -1,1 +1,366 @@
-<p>layout-inquiry works!</p>
+<!-- layout-inquiry.component.html -->
+<div class="inquiry-container">
+  <!-- Header -->
+  <div class="inquiry-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="pi pi-home"></i>
+      </div>
+      <div>
+        <h1 class="header-title">Area Maintenance</h1>
+        <p class="header-subtitle">จัดการอาคารและชั้น</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <button
+      class="tab-btn"
+      [class.active]="selectedTab() === 'buildings'"
+      (click)="setTab('buildings')"
+    >
+      <i class="pi pi-building"></i>
+      <span>Buildings</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="selectedTab() === 'floors'"
+      (click)="setTab('floors')"
+    >
+      <i class="pi pi-layer-group"></i>
+      <span>Floors</span>
+    </button>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Buildings Tab -->
+    @if (selectedTab() === "buildings") {
+      <div class="tab-panel">
+        <!-- Filter Section -->
+        <div class="filter-section">
+          <div class="filter-group">
+            <label class="filter-label">Branch:</label>
+            <p-select
+              [options]="branches()"
+              [ngModel]="selectedBranchId()"
+              (ngModelChange)="onBranchChange($event)"
+              optionLabel="nameTh"
+              optionValue="id"
+              placeholder="Select Branch"
+              styleClass="branch-dropdown"
+            />
+          </div>
+          <button
+            type="button"
+            class="btn-add-building"
+            (click)="onAddBuilding()"
+          >
+            <i class="pi pi-plus"></i>
+            Add New Building
+          </button>
+        </div>
+
+        <!-- Buildings Table -->
+        <div class="table-container">
+          <table class="buildings-table">
+            <thead>
+              <tr>
+                <th (click)="sortBuildingsBy('code')">
+                  Code
+                  <i
+                    class="pi sort-icon"
+                    [ngClass]="getBuildingSortIcon('code')"
+                  ></i>
+                </th>
+                <th (click)="sortBuildingsBy('nameTh')">
+                  Name (Thai)
+                  <i
+                    class="pi sort-icon"
+                    [ngClass]="getBuildingSortIcon('nameTh')"
+                  ></i>
+                </th>
+                <th (click)="sortBuildingsBy('nameEn')">
+                  Name (English)
+                  <i
+                    class="pi sort-icon"
+                    [ngClass]="getBuildingSortIcon('nameEn')"
+                  ></i>
+                </th>
+                <th>ข้อมูลที่จำเป็น</th>
+                <th (click)="sortBuildingsBy('isActive')">
+                  Status
+                  <i
+                    class="pi sort-icon"
+                    [ngClass]="getBuildingSortIcon('isActive')"
+                  ></i>
+                </th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (building of sortedBuildings(); track building.id) {
+                <tr [class.row-inactive]="!building.isActive">
+                  <td>{{ building.code }}</td>
+                  <td>{{ building.nameTh }}</td>
+                  <td>{{ building.nameEn }}</td>
+                  <td>
+                    <div class="essential-info">
+                      <div class="info-line">
+                        {{ building.contactPerson || "-" }}
+                      </div>
+                      <div class="info-line">
+                        {{ building.contactPhone || "-" }}
+                      </div>
+                      <div class="info-line">
+                        {{ building.optionalInfo || "-" }}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      class="status-badge"
+                      [class.status-active]="building.isActive"
+                      [class.status-inactive]="!building.isActive"
+                    >
+                      <i
+                        class="pi"
+                        [ngClass]="
+                          building.isActive
+                            ? 'pi-check-circle'
+                            : 'pi-times-circle'
+                        "
+                      ></i>
+                      {{ building.isActive ? "Active" : "Inactive" }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      class="btn-action"
+                      title="Edit"
+                      (click)="onEditBuilding(building)"
+                    >
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button
+                      class="btn-action"
+                      title="Toggle Active"
+                      (click)="toggleBuildingActive(building.id)"
+                    >
+                      <i
+                        class="pi"
+                        [ngClass]="
+                          building.isActive ? 'pi-eye' : 'pi-eye-slash'
+                        "
+                      ></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+              @if (sortedBuildings().length === 0) {
+                <tr class="empty-row">
+                  <td colspan="6" class="empty-message">No buildings found</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- Floors Tab -->
+    @if (selectedTab() === "floors") {
+      <div class="tab-panel">
+        <!-- Filter Section -->
+        <div class="filter-section">
+          <div class="filter-group">
+            <label class="filter-label">Branch:</label>
+            <p-select
+              [options]="branches()"
+              [ngModel]="selectedBranchId()"
+              (ngModelChange)="onBranchChange($event)"
+              optionLabel="nameTh"
+              optionValue="id"
+              placeholder="Select Branch"
+              styleClass="branch-dropdown"
+            />
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Building:</label>
+            <p-select
+              [options]="filteredBuildings()"
+              [ngModel]="selectedBuildingId()"
+              (ngModelChange)="onBuildingChange($event)"
+              optionLabel="nameTh"
+              optionValue="id"
+              placeholder="Select Building"
+              styleClass="building-dropdown"
+            />
+          </div>
+          <button type="button" class="btn-add-building" (click)="onAddFloor()">
+            <i class="pi pi-plus"></i>
+            Add New Floor
+          </button>
+        </div>
+
+        <!-- Floors Table -->
+        <div class="table-container">
+          <table class="buildings-table">
+            <thead>
+              <tr>
+                <th class="order-header">Order</th>
+                <th (click)="sortFloorsBy('floorNumber')">
+                  Floor Number
+                  <i
+                    class="pi sort-icon"
+                    [ngClass]="getFloorSortIcon('floorNumber')"
+                  ></i>
+                </th>
+                <th (click)="sortFloorsBy('buildingId')">
+                  Building
+                  <i
+                    class="pi sort-icon"
+                    [ngClass]="getFloorSortIcon('buildingId')"
+                  ></i>
+                </th>
+                <th (click)="sortFloorsBy('unitCount')">
+                  จำนวน Units
+                  <i
+                    class="pi sort-icon"
+                    [ngClass]="getFloorSortIcon('unitCount')"
+                  ></i>
+                </th>
+                <th (click)="sortFloorsBy('isActive')">
+                  Status
+                  <i
+                    class="pi sort-icon"
+                    [ngClass]="getFloorSortIcon('isActive')"
+                  ></i>
+                </th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (floor of filteredFloors(); let i = $index; track floor.id) {
+                <tr [class.row-inactive]="floor.isActive === false">
+                  <td class="order-column">
+                    <div class="order-buttons">
+                      <button
+                        class="btn-order"
+                        title="ขึ้นสุด"
+                        (click)="moveFloorToTop(i)"
+                        [disabled]="i === 0"
+                      >
+                        <i class="pi pi-angle-double-up"></i>
+                      </button>
+                      <button
+                        class="btn-order"
+                        title="ขึ้น"
+                        (click)="moveFloorUp(i)"
+                        [disabled]="i === 0"
+                      >
+                        <i class="pi pi-angle-up"></i>
+                      </button>
+                      <button
+                        class="btn-order"
+                        title="ลง"
+                        (click)="moveFloorDown(i)"
+                        [disabled]="i === filteredFloors().length - 1"
+                      >
+                        <i class="pi pi-angle-down"></i>
+                      </button>
+                      <button
+                        class="btn-order"
+                        title="ลงสุด"
+                        (click)="moveFloorToBottom(i)"
+                        [disabled]="i === filteredFloors().length - 1"
+                      >
+                        <i class="pi pi-angle-double-down"></i>
+                      </button>
+                    </div>
+                  </td>
+                  <td>{{ floor.floorNumber }}</td>
+                  <td>{{ getBuildingName(floor.buildingId) }}</td>
+                  <td>
+                    <span class="unit-count"
+                      >{{ floor.unitCount ?? 0 }} units</span
+                    >
+                  </td>
+                  <td>
+                    <span
+                      class="status-badge"
+                      [class.status-active]="floor.isActive !== false"
+                      [class.status-inactive]="floor.isActive === false"
+                    >
+                      <i
+                        class="pi"
+                        [ngClass]="
+                          floor.isActive !== false
+                            ? 'pi-check-circle'
+                            : 'pi-times-circle'
+                        "
+                      ></i>
+                      {{ floor.isActive !== false ? "Active" : "Inactive" }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      class="btn-action"
+                      title="Edit"
+                      (click)="onEditFloor(floor)"
+                    >
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button
+                      class="btn-action"
+                      title="Toggle Active"
+                      (click)="toggleFloorActive(floor.id)"
+                    >
+                      <i
+                        class="pi"
+                        [ngClass]="
+                          floor.isActive !== false ? 'pi-eye' : 'pi-eye-slash'
+                        "
+                      ></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+              @if (filteredFloors().length === 0) {
+                <tr class="empty-row">
+                  <td colspan="6" class="empty-message">No floors found</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Modals -->
+  <app-add-building-modal
+    #addBuildingModal
+    (buildingCreated)="onBuildingCreated($event)"
+    (closed)="onAddBuildingModalClosed()"
+  />
+
+  <app-add-floor-modal
+    #addFloorModal
+    (floorCreated)="onFloorCreated($event)"
+    (closed)="onAddFloorModalClosed()"
+  />
+
+  <app-edit-building-modal
+    #editBuildingModal
+    (buildingUpdated)="onBuildingUpdated($event)"
+    (closed)="onEditBuildingModalClosed()"
+  />
+
+  <app-edit-floor-modal
+    #editFloorModal
+    (floorUpdated)="onFloorUpdated($event)"
+    (closed)="onEditFloorModalClosed()"
+  />
+</div>

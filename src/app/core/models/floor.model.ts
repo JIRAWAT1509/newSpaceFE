@@ -8,6 +8,10 @@ export interface Floor {
   floorNameTh: string;       // "ชั้น 55"
   floorNameEn: string;       // "Floor 55"
 
+  // Status & metadata
+  isActive?: boolean;        // true = แสดงใน map / ใช้งานได้, false = ซ่อน/ปิดใช้
+  unitCount?: number;        // จำนวน units ในชั้นนี้
+
   // Multiple floor plan versions over time
   floorPlanVersions: FloorPlanVersion[];
 
@@ -28,7 +32,7 @@ export interface FloorPlanVersion {
   validUntil: Date | null;    // End date (null = current/latest version)
 
   // Renovation details
-  renovationReason?: string;  // "ปรับปรุงห้อง 5-6 เป็นห้องใหญ่"
+  renovationReason?: string;
   renovationReasonTh?: string;
   renovationReasonEn?: string;
   renovationNotes?: string;

@@ -7,9 +7,25 @@
   min-height: 70vh;
 }
 
-/* Top Left: Building Selector */
+/* Top Left: Branch Dropdown */
 .top-left-controls {
   @apply absolute top-2 left-2 sm:top-4 sm:left-4 z-20;
+}
+
+:host ::ng-deep .branch-dropdown {
+  min-width: 120px;
+  max-width: min(140px, 35vw);
+}
+
+:host ::ng-deep .branch-dropdown .p-inputtext {
+  @apply px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-md;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500;
+  @apply text-sm;
+}
+
+/* Top Center-Left: Building Selector */
+.top-center-left-controls {
+  @apply absolute top-2 left-1/3 transform -translate-x-1/2 z-20 sm:top-4;
 }
 
 :host ::ng-deep .building-dropdown {
@@ -29,7 +45,7 @@
 
 /* Top Center: Floor Dropdown */
 .top-center-controls {
-  @apply absolute top-2 left-1/2 transform -translate-x-1/2 z-20 sm:top-4;
+  @apply absolute top-2 left-2/3 transform -translate-x-1/2 z-20 sm:top-4;
 }
 
 :host ::ng-deep .floor-dropdown {
@@ -43,7 +59,7 @@
   @apply text-lg font-semibold;
 }
 
-/* Top Right: Zoom Controls */
+/* Zoom Controls */
 .top-right-controls {
   @apply absolute top-2 right-2 sm:top-4 sm:right-4 z-20;
 }

@@ -22,19 +22,24 @@
   @apply text-blue-600;
 }
 
-
+/* Sections */
 .list-section {
-  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  flex-shrink: 0;
+  min-height: 40px;
+}
+
+
+.list-section.section-collapsed {
+  flex: 0 0 auto;
 }
 
 .section-header {
   @apply flex items-center justify-between px-4 py-2.5 bg-gray-100;
   @apply cursor-pointer hover:bg-gray-200 transition-colors duration-200;
   flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
 
 .section-title {
@@ -53,10 +58,10 @@
   @apply px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold;
 }
 
-
 .area-list {
   @apply px-2 py-2;
   overflow-y: auto;
+  overflow-x: hidden;
   transition: max-height 0.25s ease, padding 0.25s ease;
 }
 

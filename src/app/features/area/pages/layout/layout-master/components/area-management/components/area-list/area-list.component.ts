@@ -23,28 +23,36 @@ interface SortOption {
 })
 export class AreaListComponent {
   selectedAreaId = input<string | null>(null);
-  statusFilters = input<AreaStatus[]>([]);
-  typeFilters = input<ActionType[]>([]);
-  searchQuery = input<string>('');
+  statusFilters  = input<AreaStatus[]>([]);
+  typeFilters    = input<ActionType[]>([]);
+  searchQuery    = input<string>('');
 
   areaSelected = output<string | null>();
 
   editAreaModal = viewChild<EditAreaModalComponent>('editAreaModal');
 
-  allAreas = signal<Area[]>([]);
-  selectedSort = signal<'roomNumber' | 'status' | 'tenant'>('roomNumber');
+  selectedSort   = signal<'roomNumber' | 'status' | 'tenant'>('roomNumber');
   expandedAreaId = signal<string | null>(null);
-  currentPage = signal<number>(1);
-  itemsPerPage = 10;
+  currentPage    = signal<number>(1);
+  itemsPerPage   = 10;
   showPageDropdown = false;
 
   sortOptions: SortOption[] = [
     { label: 'Room Number', value: 'roomNumber' },
-    { label: 'Status', value: 'status' },
-    { label: 'Tenant Name', value: 'tenant' }
+    { label: 'Status',      value: 'status'     },
+    { label: 'Tenant Name', value: 'tenant'     }
   ];
 
-  // ✅ Building + Floor computed
+  // ── Reactive source — computed จาก service signal โดยตรง ──────────────
+  allAreas = computed(() => {
+    const floor = this.areaDataService.currentFloor()
+      ?? this.areaDataService.floors()[0]
+      ?? null;
+    if (!floor) return [];
+    return this.areaDataService.getAreasForCurrentContext(floor);
+  });
+
+  // ── Building / Floor display ───────────────────────────────────────────
   currentBuildingName = computed(() => {
     const b = this.areaDataService.building();
     return b ? `${b.code} - ${b.nameTh}` : '-';
@@ -55,6 +63,7 @@ export class AreaListComponent {
     return floor ? (floor.floorNameTh || `ชั้น ${floor.floorNumber}`) : '-';
   });
 
+  // ── Filtered + sorted ─────────────────────────────────────────────────
   filteredAreas = computed(() => {
     let areas = this.allAreas().filter(a => a.isActive);
 
@@ -85,15 +94,15 @@ export class AreaListComponent {
     return this.sortAreas(areas, this.selectedSort());
   });
 
-  totalItems = computed(() => this.filteredAreas().length);
-  totalPages = computed(() => Math.max(1, Math.ceil(this.filteredAreas().length / this.itemsPerPage)));
+  // ── Pagination ────────────────────────────────────────────────────────
+  totalItems  = computed(() => this.filteredAreas().length);
+  totalPages  = computed(() => Math.max(1, Math.ceil(this.filteredAreas().length / this.itemsPerPage)));
 
   pageRanges = computed(() => {
     const ranges = [];
-    const total = this.totalPages();
-    for (let i = 1; i <= total; i++) {
+    for (let i = 1; i <= this.totalPages(); i++) {
       const startItem = (i - 1) * this.itemsPerPage + 1;
-      const endItem = Math.min(i * this.itemsPerPage, this.totalItems());
+      const endItem   = Math.min(i * this.itemsPerPage, this.totalItems());
       ranges.push({ label: `${startItem}-${endItem}`, page: i });
     }
     return ranges;
@@ -102,26 +111,19 @@ export class AreaListComponent {
   currentPageRange = computed(() => {
     const total = this.totalItems();
     if (total === 0) return '0-0';
-    const current = this.currentPage();
-    const startItem = (current - 1) * this.itemsPerPage + 1;
-    const endItem = Math.min(current * this.itemsPerPage, total);
-    return `${startItem}-${endItem}`;
+    const start = (this.currentPage() - 1) * this.itemsPerPage + 1;
+    const end   = Math.min(this.currentPage() * this.itemsPerPage, total);
+    return `${start}-${end}`;
   });
 
   paginatedAreas = computed(() => {
-    const current = this.currentPage();
-    const startIndex = (current - 1) * this.itemsPerPage;
-    return this.filteredAreas().slice(startIndex, startIndex + this.itemsPerPage);
+    const start = (this.currentPage() - 1) * this.itemsPerPage;
+    return this.filteredAreas().slice(start, start + this.itemsPerPage);
   });
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    this.showPageDropdown = false;
-  }
-
+  // ── Effects ───────────────────────────────────────────────────────────
   constructor(private areaDataService: AreaDataService) {
-    effect(() => { this.loadAreas(); });
-
+    // Reset page เมื่อ filter เปลี่ยน
     effect(() => {
       this.statusFilters();
       this.typeFilters();
@@ -129,45 +131,25 @@ export class AreaListComponent {
       this.currentPage.set(1);
     }, { allowSignalWrites: true });
 
+    // Guard ไม่ให้ currentPage เกิน totalPages
     effect(() => {
-      const total = this.totalPages();
+      const total   = this.totalPages();
       const current = this.currentPage();
-      if (current > total) {
-        this.currentPage.set(Math.max(1, total));
-      }
+      if (current > total) this.currentPage.set(Math.max(1, total));
     }, { allowSignalWrites: true });
 
+    // Jump ไปหน้าที่มี selectedArea
     effect(() => {
       const selectedId = this.selectedAreaId();
-      if (selectedId) {
-        const areas = this.filteredAreas();
-        const areaIndex = areas.findIndex(a => a.id === selectedId);
-        if (areaIndex !== -1) {
-          const targetPage = Math.floor(areaIndex / this.itemsPerPage) + 1;
-          if (this.currentPage() !== targetPage) {
-            this.currentPage.set(targetPage);
-          }
-        }
-      }
+      if (!selectedId) return;
+      const index = this.filteredAreas().findIndex(a => a.id === selectedId);
+      if (index === -1) return;
+      const targetPage = Math.floor(index / this.itemsPerPage) + 1;
+      if (this.currentPage() !== targetPage) this.currentPage.set(targetPage);
     }, { allowSignalWrites: true });
   }
 
-  private loadAreas(): void {
-    const floor = this.areaDataService.getCurrentFloor();
-    if (!floor) {
-      // fallback to first floor
-      const building = this.areaDataService.building();
-      if (!building?.floors?.length) return;
-      const firstFloor = building.floors[0];
-      const areas = this.areaDataService.getAreasForCurrentContext(firstFloor);
-      this.allAreas.set(areas);
-      return;
-    }
-    const areas = this.areaDataService.getAreasForCurrentContext(floor);
-    this.allAreas.set(areas);
-  }
-
-  // ✅ Edit Area
+  // ── Save ──────────────────────────────────────────────────────────────
   onEditArea(area: Area, event: Event): void {
     event.stopPropagation();
     this.editAreaModal()?.open(area);
@@ -175,20 +157,23 @@ export class AreaListComponent {
 
   onAreaSaved(updatedArea: Area): void {
     this.areaDataService.updateArea(updatedArea);
-    this.loadAreas();
+    // allAreas computed จะ re-run อัตโนมัติจาก signal ใน service
   }
 
+  // ── Sort ──────────────────────────────────────────────────────────────
   private sortAreas(areas: Area[], sortBy: 'roomNumber' | 'status' | 'tenant'): Area[] {
     const sorted = [...areas];
     switch (sortBy) {
       case 'roomNumber': return sorted.sort((a, b) => a.roomNumber.localeCompare(b.roomNumber));
-      case 'status': return sorted.sort((a, b) => a.status.localeCompare(b.status));
-      case 'tenant': return sorted.sort((a, b) => (a.currentTenant?.name || '').localeCompare(b.currentTenant?.name || ''));
-      default: return sorted;
+      case 'status':     return sorted.sort((a, b) => a.status.localeCompare(b.status));
+      case 'tenant':     return sorted.sort((a, b) => (a.currentTenant?.name || '').localeCompare(b.currentTenant?.name || ''));
+      default:           return sorted;
     }
   }
 
   onSortChange(): void { this.currentPage.set(1); }
+
+  // ── Selection / Expand ────────────────────────────────────────────────
   isSelected(areaId: string): boolean { return this.selectedAreaId() === areaId; }
   isExpanded(areaId: string): boolean { return this.expandedAreaId() === areaId; }
 
@@ -197,6 +182,7 @@ export class AreaListComponent {
     this.expandedAreaId.set(this.expandedAreaId() === areaId ? null : areaId);
   }
 
+  // ── Pagination controls ───────────────────────────────────────────────
   goToPage(page: number, event?: Event): void {
     event?.stopPropagation();
     if (page >= 1 && page <= this.totalPages()) {
@@ -206,11 +192,11 @@ export class AreaListComponent {
   }
 
   nextPage(): void {
-    if (this.currentPage() < this.totalPages()) this.currentPage.set(this.currentPage() + 1);
+    if (this.currentPage() < this.totalPages()) this.currentPage.update(p => p + 1);
   }
 
   previousPage(): void {
-    if (this.currentPage() > 1) this.currentPage.set(this.currentPage() - 1);
+    if (this.currentPage() > 1) this.currentPage.update(p => p - 1);
   }
 
   togglePageDropdown(event: Event): void {
@@ -218,31 +204,35 @@ export class AreaListComponent {
     this.showPageDropdown = !this.showPageDropdown;
   }
 
+  @HostListener('document:click')
+  onDocumentClick(): void { this.showPageDropdown = false; }
+
+  // ── Display helpers ───────────────────────────────────────────────────
   getStatusColor(status: AreaStatus): string {
     const map: Record<string, string> = {
-      'vacant': '#80E08E', 'leased': '#FFD05F',
-      'quotation': '#4CA3FF', 'unallocated': '#FF6384', 'inactive': '#9CA3AF'
+      vacant: '#80E08E', leased: '#FFD05F',
+      quotation: '#4CA3FF', unallocated: '#FF6384', inactive: '#9CA3AF'
     };
     return map[status] || '#9CA3AF';
   }
 
   getStatusLabel(status: AreaStatus): string {
     const map: Record<string, string> = {
-      'vacant': 'ว่าง', 'leased': 'เช่า',
-      'quotation': 'คำใบเสนอราคา', 'unallocated': 'ยังไม่พร้อม', 'inactive': 'ปิดชั่วคราว'
+      vacant: 'ว่าง', leased: 'เช่า',
+      quotation: 'คำใบเสนอราคา', unallocated: 'ยังไม่พร้อม', inactive: 'ปิดชั่วคราว'
     };
     return map[status] || status;
   }
 
   getActionLabel(status: AreaStatus): string {
     const map: Record<string, string> = {
-      'vacant': 'Log', 'leased': 'Log', 'quotation': 'OP', 'unallocated': 'Kiosk', 'inactive': 'View'
+      vacant: 'Log', leased: 'Log', quotation: 'OP', unallocated: 'Kiosk', inactive: 'View'
     };
     return map[status] || 'View';
   }
 
   getTypeLabel(type: string): string {
-    const map: Record<string, string> = { 'log': 'Log', 'kiosk': 'Kiosk', 'open-plan': 'Open Plan' };
+    const map: Record<string, string> = { log: 'Log', kiosk: 'Kiosk', 'open-plan': 'Open Plan' };
     return map[type] || type;
   }
 

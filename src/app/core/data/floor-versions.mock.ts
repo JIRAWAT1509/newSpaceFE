@@ -5,7 +5,7 @@ import { FloorPlanVersion } from '../models/floor.model';
 export const MOCK_FLOOR_PLAN_VERSIONS: FloorPlanVersion[] = [
   {
     id: 'fpv-001',
-    floorId: 'floor-55',
+    floorId: 'floor-1',
     versionNumber: 1,
     planImage: 'assets/temp/floorPlan1.png',
     planImageWidth: 1920,
@@ -21,7 +21,7 @@ export const MOCK_FLOOR_PLAN_VERSIONS: FloorPlanVersion[] = [
   },
   {
     id: 'fpv-002',
-    floorId: 'floor-55',
+    floorId: 'floor-1',
     versionNumber: 2,
     planImage: 'assets/temp/floorPlan1.png',
     planImageWidth: 1920,
@@ -37,7 +37,7 @@ export const MOCK_FLOOR_PLAN_VERSIONS: FloorPlanVersion[] = [
   },
   {
     id: 'fpv-003',
-    floorId: 'floor-55',
+    floorId: 'floor-1',
     versionNumber: 3,
     planImage: 'assets/temp/floorPlan1.png',
     planImageWidth: 1920,

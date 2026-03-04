@@ -1,8 +1,21 @@
 <!-- floor-plan.component.html -->
 
 <div class="floor-plan-wrapper">
-  <!-- Top Left: Building Selector -->
+  <!-- Top Left: Branch Dropdown -->
   <div class="top-left-controls">
+    <p-select
+      [options]="getBranchOptions()"
+      [ngModel]="selectedBranchId()"
+      (ngModelChange)="onBranchChanged($event)"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="branch-dropdown"
+      placeholder="สาขา"
+    />
+  </div>
+
+  <!-- Top Center-Left: Building Selector -->
+  <div class="top-center-left-controls">
     <p-select
       [options]="getBuildingOptions()"
       [ngModel]="selectedBuildingId()"
@@ -10,7 +23,7 @@
       optionLabel="label"
       optionValue="value"
       styleClass="building-dropdown"
-      placeholder="Select Building"
+      placeholder="อาคาร"
     />
   </div>
 
@@ -23,7 +36,7 @@
       optionLabel="label"
       optionValue="value"
       styleClass="floor-dropdown"
-      placeholder="Select Floor"
+      placeholder="ชั้น"
     />
   </div>
 

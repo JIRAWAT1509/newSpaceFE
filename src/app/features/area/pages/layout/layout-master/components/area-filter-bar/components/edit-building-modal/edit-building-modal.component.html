@@ -1,3 +1,5 @@
+<!-- /edit-building-modal.component.html -->
+
 <p-dialog
   [(visible)]="visible"
   [modal]="true"
@@ -5,7 +7,7 @@
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: '520px' }"
-  styleClass="add-building-modal"
+  styleClass="edit-building-modal"
   (onHide)="onModalHide()"
 >
   <!-- Header -->
@@ -13,7 +15,7 @@
     <div class="modal-header">
       <h2 class="modal-title">
         <i class="pi pi-building"></i>
-        Add New Building
+        Edit Building
       </h2>
     </div>
   </ng-template>
@@ -79,6 +81,36 @@
         />
       </div>
 
+      <!-- Address Thai -->
+      <div class="form-group">
+        <label class="form-label">Address (Thai)</label>
+        <input type="text" formControlName="addressTh" class="form-input" placeholder="ที่อยู่ (ไทย)" />
+      </div>
+
+      <!-- Address English -->
+      <div class="form-group">
+        <label class="form-label">Address (English)</label>
+        <input type="text" formControlName="addressEn" class="form-input" placeholder="Address (EN)" />
+      </div>
+
+      <!-- Contact Person -->
+      <div class="form-group">
+        <label class="form-label">Contact Person (optional)</label>
+        <input type="text" formControlName="contactPerson" class="form-input" placeholder="ชื่อผู้ติดต่อ" />
+      </div>
+
+      <!-- Contact Phone -->
+      <div class="form-group">
+        <label class="form-label">Contact Phone (optional)</label>
+        <input type="text" formControlName="contactPhone" class="form-input" placeholder="โทรศัพท์" />
+      </div>
+
+      <!-- Optional Info -->
+      <div class="form-group">
+        <label class="form-label">Optional Info</label>
+        <input type="text" formControlName="optionalInfo" class="form-input" placeholder="ข้อมูลเพิ่มเติม (ไม่บังคับ)" />
+      </div>
+
     </form>
   </div>
 
@@ -96,7 +128,7 @@
         [disabled]="!buildingForm.valid || isSaving()"
       >
         <i class="pi pi-check"></i>
-        {{ isSaving() ? 'Creating...' : 'Create Building' }}
+        {{ isSaving() ? 'Saving...' : 'Save Building' }}
       </button>
     </div>
   </ng-template>

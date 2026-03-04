@@ -77,14 +77,24 @@ export class MarkerListPanelComponent {
   });
 
   toggleActiveSection(): void {
+  // ถ้าเปิดอยู่แล้ว → ปิด (set เป็น null หรือ 'inactive')
+  // ถ้าปิดอยู่ → เปิด
+  if (this.openSection() === 'active') {
+    this.openSection.set('inactive'); // หรือ set เป็น null ถ้าต้องการปิดทั้งคู่
+  } else {
     this.openSection.set('active');
-    this.expandedAreaId.set(null);
   }
+  this.expandedAreaId.set(null);
+}
 
-  toggleInactiveSection(): void {
+toggleInactiveSection(): void {
+  if (this.openSection() === 'inactive') {
+    this.openSection.set('active');
+  } else {
     this.openSection.set('inactive');
-    this.expandedAreaId.set(null);
   }
+  this.expandedAreaId.set(null);
+}
 
   onActiveAreaClick(areaId: string): void {
     const current = this.expandedAreaId();

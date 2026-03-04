@@ -1,0 +1,106 @@
+<!-- edit-floor-modal.component.html -->
+
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '520px' }"
+  styleClass="edit-floor-modal"
+  (onHide)="onModalHide()"
+>
+  <!-- Header -->
+  <ng-template pTemplate="header">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="pi pi-layer-group"></i>
+        Edit Floor
+      </h2>
+    </div>
+  </ng-template>
+
+  <!-- Content -->
+  <div class="modal-content">
+    <form [formGroup]="floorForm" class="floor-form">
+
+      <!-- Building Display -->
+      <div class="form-group">
+        <label class="form-label">Building</label>
+        <div class="form-display">{{ buildingName() }}</div>
+      </div>
+
+      <!-- Floor Number -->
+      <div class="form-group">
+        <label class="form-label required">Floor Number</label>
+        <input
+          type="number"
+          formControlName="floorNumber"
+          class="form-input"
+          placeholder="e.g., 1, 2, 3..."
+          [class.error]="isFieldInvalid('floorNumber')"
+        />
+        @if (isFieldInvalid('floorNumber')) {
+          <span class="error-message">Floor number is required</span>
+        }
+      </div>
+
+      <!-- Floor Name -->
+      <div class="form-group">
+        <label class="form-label required">Floor Name</label>
+        <input
+          type="text"
+          formControlName="floorName"
+          class="form-input"
+          placeholder="e.g., Fl. 1"
+          [class.error]="isFieldInvalid('floorName')"
+        />
+        @if (isFieldInvalid('floorName')) {
+          <span class="error-message">Floor name is required</span>
+        }
+      </div>
+
+      <!-- Floor Name Thai -->
+      <div class="form-group">
+        <label class="form-label">Floor Name (Thai)</label>
+        <input
+          type="text"
+          formControlName="floorNameTh"
+          class="form-input"
+          placeholder="e.g., ชั้น 1"
+        />
+      </div>
+
+      <!-- Floor Name English -->
+      <div class="form-group">
+        <label class="form-label">Floor Name (English)</label>
+        <input
+          type="text"
+          formControlName="floorNameEn"
+          class="form-input"
+          placeholder="e.g., Floor 1"
+        />
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="onCancel()">
+        <i class="pi pi-times"></i>
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn-save"
+        (click)="onSave()"
+        [disabled]="!floorForm.valid || isSaving()"
+      >
+        <i class="pi pi-check"></i>
+        {{ isSaving() ? 'Saving...' : 'Save Floor' }}
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

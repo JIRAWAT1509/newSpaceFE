@@ -2,13 +2,19 @@
 
 export interface Building {
   id: string;
-  code: string;              // "ST03"
+  branchId: string;
+  code: string;
   name: string;
   nameTh: string;
   nameEn: string;
-  address: string;
-  addressTh: string;
-  addressEn: string;
+  address?: string;
+  addressTh?: string;
+  addressEn?: string;
+  // optional/extra fields
+  isActive?: boolean;
+  contactPerson?: string;
+  contactPhone?: string;
+  optionalInfo?: string;
   createdAt: Date;
   updatedAt: Date;
 }
