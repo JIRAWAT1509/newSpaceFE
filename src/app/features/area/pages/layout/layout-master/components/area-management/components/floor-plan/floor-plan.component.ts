@@ -53,6 +53,7 @@ export class FloorPlanComponent implements OnInit {
   selectedFilters = input<AreaStatus[]>([]);
   selectedTypeFilters = input<ActionType[]>([]);
   selectedAreaId = input<string | null>(null);
+  draftFloorPlanImage = signal<string | null>(null);
 
   areaSelected = output<string | null>();
 
@@ -65,7 +66,6 @@ export class FloorPlanComponent implements OnInit {
 
   selectedBuildingId = signal<string>('');
   selectedFloorId = signal<string>('');
-  draftFloorPlanImage = signal<string | null>(null);
 
   currentFloorImage = computed<string>(() => {
     const draft = this.draftFloorPlanImage();
@@ -311,20 +311,35 @@ export class FloorPlanComponent implements OnInit {
   onEditModalClose(): void {}
 
   onEditModalSave(changes: any): void {
+    const floor = this.currentFloor();
+    if (!floor) return;
+
+    // อัปเดต positions และ activeStates
+    if (
+      Object.keys(changes.positions).length > 0 ||
+      Object.keys(changes.activeStates).length > 0
+    ) {
+      const updatedAreas = this.areas().map((area) => ({
+        ...area,
+        position: changes.positions[area.id] ?? area.position,
+        isActive:
+          changes.activeStates[area.id] !== undefined
+            ? changes.activeStates[area.id]
+            : area.isActive,
+      }));
+      updatedAreas.forEach((area) => this.areaDataService.updateArea(area));
+    }
+
+    // เพิ่ม areas ใหม่
+    const newAreas: Area[] = changes.newAreas ?? [];
+    newAreas.forEach((newArea) => this.areaDataService.addArea(newArea));
+
+    // ✅ save draft floor plan image ถ้ามี
     if (changes.floorPlanImage) {
       this.draftFloorPlanImage.set(changes.floorPlanImage);
     }
 
-    // ✅ ดึง floor ใหม่จาก service หลัง updateArea เพื่อให้ได้ข้อมูลล่าสุด
-    const currentFloorId = this.selectedFloorId();
-    const building = this.areaDataService.building();
-    const freshFloor = building.floors.find((f) => f.id === currentFloorId);
-
-    if (freshFloor) {
-      this.currentFloor.set(freshFloor);
-      const areas = this.areaDataService.getAreasForCurrentContext(freshFloor);
-      this.areas.set(areas);
-    }
+    this.loadFloorData();
   }
 
   getFloors(): FloorWithAreas[] {

@@ -1,5 +1,7 @@
 /* marker-list-panel.component.ts */
 
+/* marker-list-panel.component.ts */
+
 import {
   Component,
   input,
@@ -47,7 +49,6 @@ export class MarkerListPanelComponent {
   draggedAreaId: string | null = null;
   dragSource: 'active' | 'inactive' | null = null;
 
-  // ✅ ใช้ signal เดียว ควบคุมว่า section ไหนเปิดอยู่ ('active' | 'inactive' | null)
   private openSection = signal<'active' | 'inactive'>('active');
 
   isActiveSectionCollapsed = computed(() => this.openSection() !== 'active');
@@ -75,7 +76,6 @@ export class MarkerListPanelComponent {
       : '80px';
   });
 
-  // ✅ toggle แต่ละ section — ถ้า section นั้นเปิดอยู่แล้ว ให้คง state เดิม (accordion style)
   toggleActiveSection(): void {
     this.openSection.set('active');
     this.expandedAreaId.set(null);
@@ -197,7 +197,10 @@ export class MarkerListPanelComponent {
     const areaId = event.dataTransfer?.getData('areaId');
     const source = event.dataTransfer?.getData('source');
     if (!areaId) return;
-    if (source === 'inactive') this.areaActivated.emit(areaId);
+    if (source === 'inactive') {
+      this.areaActivated.emit(areaId);
+      this.openSection.set('active'); // ✅ switch ไป active section
+    }
   }
 
   onInactiveZoneDragOver(event: DragEvent): void {
@@ -216,20 +219,24 @@ export class MarkerListPanelComponent {
     const areaId = event.dataTransfer?.getData('areaId');
     const source = event.dataTransfer?.getData('source');
     if (!areaId) return;
-    if (source === 'active' || source === 'marker')
+    if (source === 'active' || source === 'marker') {
       this.dragToInactive.emit(areaId);
+      this.openSection.set('inactive'); // ✅ switch ไป inactive section
+    }
   }
 
   onMoveToInactive(event: Event, areaId: string): void {
     event.stopPropagation();
     this.dragToInactive.emit(areaId);
     this.expandedAreaId.set(null);
+    this.openSection.set('inactive'); // ✅ switch ไป inactive section
   }
 
   onMoveToActive(event: Event, areaId: string): void {
     event.stopPropagation();
     this.areaActivated.emit(areaId);
     this.expandedAreaId.set(null);
+    this.openSection.set('active'); // ✅ switch ไป active section
   }
 
   onSeeMore(event: Event, areaId: string): void {
