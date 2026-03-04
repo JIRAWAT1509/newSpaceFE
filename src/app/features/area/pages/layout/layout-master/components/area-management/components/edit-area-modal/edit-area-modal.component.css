@@ -75,8 +75,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.25);
-  color: white;
+  background: #e5e7eb;
+  color: #6b7280;
   font-weight: 700;
   font-size: 0.875rem;
   position: relative;
@@ -84,16 +84,12 @@
   transition: all 0.2s;
 }
 
-.step-indicator.active .step-number {
-  background: white;
+.step-indicator.active .step-number,
+.step-indicator.completed .step-number {
+  background: #ffffff;
   color: #d97706;
-  box-shadow: 0 0 0 4px rgba(255,255,255,0.3);
 }
 
-.step-indicator.completed .step-number {
-  background: white;
-  color: #d97706;
-}
 
 .step-label {
   font-size: 0.7rem;

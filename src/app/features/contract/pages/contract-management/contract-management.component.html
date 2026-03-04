@@ -1,83 +1,82 @@
 <!-- contract-management.component.html -->
 
 <div class="contract-management-container">
-  <!-- Page title -->
   <div class="page-header">
     <h1 class="page-title">Contract Management</h1>
   </div>
 
-  <!-- Content card -->
   <div class="content-card">
-  <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" styleClass="contract-tabs">
-    <p-tablist>
-      <p-tab value="quotation">
-        <div class="tab-header">
-          <i class="pi pi-file-edit"></i>
-          <span>ใบเสนอราคา</span>
-        </div>
-      </p-tab>
+    <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" styleClass="contract-tabs">
+      <p-tablist>
+        <p-tab value="quotation">
+          <div class="tab-header">
+            <i class="pi pi-file-edit"></i>
+            <span>ใบเสนอราคา</span>
+          </div>
+        </p-tab>
+        <p-tab value="booking">
+          <div class="tab-header">
+            <i class="pi pi-bookmark"></i>
+            <span>สัญญาจอง</span>
+          </div>
+        </p-tab>
+        <p-tab value="lease">
+          <div class="tab-header">
+            <i class="pi pi-file"></i>
+            <span>สัญญาเช่า</span>
+          </div>
+        </p-tab>
+      </p-tablist>
 
-      <p-tab value="booking">
-        <div class="tab-header">
-          <i class="pi pi-bookmark"></i>
-          <span>สัญญาจอง</span>
-        </div>
-      </p-tab>
+      <p-tabpanels>
+        <!-- Tab 1: Quotation -->
+        <!-- ✅ ส่ง prefillData binding โดยตรง — ไม่ต้องใช้ ViewChild -->
+        <!-- ✅ ส่ง autoOpenModal เพื่อให้ contract-table เปิด modal อัตโนมัติเมื่อมี prefill -->
+        <p-tabpanel value="quotation">
+          <app-contract-table
+            [contractType]="'quotation'"
+            [data]="quotationData()"
+            [sharedSearchText]="sharedSearchText()"
+            [sharedFilters]="sharedFilters()"
+            [prefillData]="quotationPrefill()"
+            (searchTextChange)="onSearchUpdate($event)"
+            (filtersChange)="onFiltersUpdate($event)"
+            (contractSaved)="onContractSaved($event)"
+            (contractCopied)="onContractCopied($event)"
+            (contractCancelRequest)="onContractCancelRequest($event)"
+          />
+        </p-tabpanel>
 
-      <p-tab value="lease">
-        <div class="tab-header">
-          <i class="pi pi-file"></i>
-          <span>สัญญาเช่า</span>
-        </div>
-      </p-tab>
-    </p-tablist>
+        <!-- Tab 2: Booking -->
+        <p-tabpanel value="booking">
+          <app-contract-table
+            [contractType]="'booking'"
+            [data]="bookingData()"
+            [sharedSearchText]="sharedSearchText()"
+            [sharedFilters]="sharedFilters()"
+            (searchTextChange)="onSearchUpdate($event)"
+            (filtersChange)="onFiltersUpdate($event)"
+            (contractSaved)="onContractSaved($event)"
+            (contractCopied)="onContractCopied($event)"
+            (contractCancelRequest)="onContractCancelRequest($event)"
+          />
+        </p-tabpanel>
 
-    <p-tabpanels>
-      <!-- Tab 1: Quotation -->
-      <p-tabpanel value="quotation">
-        <app-contract-table
-          [contractType]="'quotation'"
-          [data]="quotationData()"
-          [sharedSearchText]="sharedSearchText()"
-          [sharedFilters]="sharedFilters()"
-          (searchTextChange)="onSearchUpdate($event)"
-          (filtersChange)="onFiltersUpdate($event)"
-          (contractSaved)="onContractSaved($event)"
-          (contractCopied)="onContractCopied($event)"
-          (contractCancelRequest)="onContractCancelRequest($event)"
-        />
-      </p-tabpanel>
-
-      <!-- Tab 2: Booking -->
-      <p-tabpanel value="booking">
-        <app-contract-table
-          [contractType]="'booking'"
-          [data]="bookingData()"
-          [sharedSearchText]="sharedSearchText()"
-          [sharedFilters]="sharedFilters()"
-          (searchTextChange)="onSearchUpdate($event)"
-          (filtersChange)="onFiltersUpdate($event)"
-          (contractSaved)="onContractSaved($event)"
-          (contractCopied)="onContractCopied($event)"
-          (contractCancelRequest)="onContractCancelRequest($event)"
-        />
-      </p-tabpanel>
-
-      <!-- Tab 3: Lease -->
-      <p-tabpanel value="lease">
-        <app-contract-table
-          [contractType]="'lease'"
-          [data]="leaseData()"
-          [sharedSearchText]="sharedSearchText()"
-          [sharedFilters]="sharedFilters()"
-          (searchTextChange)="onSearchUpdate($event)"
-          (filtersChange)="onFiltersUpdate($event)"
-          (contractSaved)="onContractSaved($event)"
-          (contractCopied)="onContractCopied($event)"
-          (contractCancelRequest)="onContractCancelRequest($event)"
-        />
-      </p-tabpanel>
-    </p-tabpanels>
-  </p-tabs>
+        <!-- Tab 3: Lease -->
+        <p-tabpanel value="lease">
+          <app-contract-table
+            [contractType]="'lease'"
+            [data]="leaseData()"
+            [sharedSearchText]="sharedSearchText()"
+            [sharedFilters]="sharedFilters()"
+            (searchTextChange)="onSearchUpdate($event)"
+            (filtersChange)="onFiltersUpdate($event)"
+            (contractSaved)="onContractSaved($event)"
+            (contractCopied)="onContractCopied($event)"
+            (contractCancelRequest)="onContractCancelRequest($event)"
+          />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
   </div>
 </div>
