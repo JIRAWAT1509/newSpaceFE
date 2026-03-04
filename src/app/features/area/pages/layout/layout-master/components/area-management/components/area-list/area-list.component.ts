@@ -16,6 +16,7 @@ import { Router } from '@angular/router'; // ← เพิ่ม
 import { SelectModule } from 'primeng/select';
 import { AreaDataService } from '@core/services/area/area-data.service';
 import { Area, AreaStatus } from '@core/models/area.model';
+import { getBranchById } from '@core/data/area-index'; // ← เพิ่ม
 import { ActionType } from '../../../area-filter-bar/area-filter-bar.component';
 import { EditAreaModalComponent } from '../edit-area-modal/edit-area-modal.component';
 
@@ -195,12 +196,16 @@ export class AreaListComponent {
   onCreateQuotation(area: Area, event: Event): void {
     event.stopPropagation();
 
-    // ดึง building/floor จาก service
+    // ดึง building/floor/branch จาก service
     const building = this.areaDataService.building();
     const floor = this.areaDataService.getCurrentFloor();
 
+    // lookup branch name จาก building.branchId → MOCK_BRANCHES
+    const branch = building ? getBranchById(building.branchId) : null;
+
     // สร้าง prefill payload ที่ตรงกับ field ใน generalDetailForm
     const areaData = {
+      branch: branch?.nameTh ?? '', // ✅ สาขา เช่น "สาขา สีลม"
       areaBuilding: building?.code ?? '',
       areaFloor: floor?.floorNumber?.toString() ?? '',
       areaUnitNumber: area.roomNumber,
