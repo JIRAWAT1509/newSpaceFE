@@ -6,8 +6,9 @@ import {
   output,
   ElementRef,
   viewChild,
-  effect,
   Input,
+  NgZone,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Area } from '@core/models/area.model';
@@ -45,9 +46,13 @@ export class AreaMarkerComponent {
 
   markerElement = viewChild<ElementRef>('markerElement');
 
+  private ngZone = inject(NgZone);
+
   private isDragging = false;
-  private dragOffsetX = 0; // ✅ offset จาก center ของ marker ถึง cursor
+  private dragOffsetX = 0;
   private dragOffsetY = 0;
+  private currentDragX = 0;
+  private currentDragY = 0;
 
   getMarkerStyle(): any {
     const area = this.area();
@@ -104,30 +109,30 @@ export class AreaMarkerComponent {
     event.preventDefault();
     event.stopPropagation();
 
-    // ✅ คำนวณ offset จาก cursor ถึง anchor point ของ marker บน image
     const floorImage = this.getFloorImage();
     if (!floorImage) return;
 
     const imageRect = floorImage.getBoundingClientRect();
     const zoom = this.zoomLevel();
 
-    // ตำแหน่ง anchor (%) × ขนาด image จริง = pixel position บน image
     const area = this.area();
     const markerPxX = (area.position.x / 100) * imageRect.width;
     const markerPxY = (area.position.y / 100) * imageRect.height;
 
-    // ตำแหน่ง cursor บน image (ยังไม่ zoom)
     const cursorX = (event.clientX - imageRect.left) / zoom;
     const cursorY = (event.clientY - imageRect.top) / zoom;
 
-    // ✅ offset = cursor - marker anchor → ใช้หักตอน drag
     this.dragOffsetX = cursorX - markerPxX;
     this.dragOffsetY = cursorY - markerPxY;
+    this.currentDragX = area.position.x;
+    this.currentDragY = area.position.y;
+    this.isDragging = false;
 
-    this.isDragging = false; // จะ set true เมื่อ move จริง
-
-    document.addEventListener('mousemove', this.onMouseMove);
-    document.addEventListener('mouseup', this.onMouseUp);
+    // ✅ runOutsideAngular เพื่อ performance แต่ emit กลับเข้า zone
+    this.ngZone.runOutsideAngular(() => {
+      document.addEventListener('mousemove', this.onMouseMove);
+      document.addEventListener('mouseup', this.onMouseUp);
+    });
   }
 
   private onMouseMove = (event: MouseEvent): void => {
@@ -140,28 +145,32 @@ export class AreaMarkerComponent {
     const imageRect = floorImage.getBoundingClientRect();
     const zoom = this.zoomLevel();
 
-    // cursor บน image space (unzoomed)
     const cursorX = (event.clientX - imageRect.left) / zoom;
     const cursorY = (event.clientY - imageRect.top) / zoom;
 
-    // ✅ หัก offset ออก ให้ marker ไม่กระโดด
     const markerX = cursorX - this.dragOffsetX;
     const markerY = cursorY - this.dragOffsetY;
 
-    // Check bounds (image space)
     const imageW = imageRect.width / zoom;
     const imageH = imageRect.height / zoom;
+
     const isOutside =
       markerX < 0 || markerX > imageW || markerY < 0 || markerY > imageH;
-
     if (isOutside) return;
 
-    // Convert to percentage
     const newX = Math.max(2, Math.min(98, (markerX / imageW) * 100));
     const newY = Math.max(2, Math.min(98, (markerY / imageH) * 100));
 
-    this.area().position.x = newX;
-    this.area().position.y = newY;
+    this.currentDragX = newX;
+    this.currentDragY = newY;
+
+    // ✅ run กลับเข้า Angular zone เพื่อให้ signal trigger change detection
+    this.ngZone.run(() => {
+      this.markerDragged.emit({
+        areaId: this.area().id,
+        position: { x: newX, y: newY },
+      });
+    });
   };
 
   private onMouseUp = (event: MouseEvent): void => {
@@ -187,25 +196,26 @@ export class AreaMarkerComponent {
 
       if (isOutside) {
         this.isDragging = false;
-        this.markerDraggedOutside.emit(this.area().id);
+        this.ngZone.run(() => {
+          this.markerDraggedOutside.emit(this.area().id);
+        });
         return;
       }
     }
 
-    this.markerDragged.emit({
-      areaId: this.area().id,
-      position: { x: this.area().position.x, y: this.area().position.y },
+    this.ngZone.run(() => {
+      this.markerDragged.emit({
+        areaId: this.area().id,
+        position: { x: this.currentDragX, y: this.currentDragY },
+      });
     });
 
     this.isDragging = false;
   };
 
   private getFloorImage(): HTMLImageElement | null {
-    // ✅ หา image จาก contentDiv ที่ส่งมา หรือ query จาก DOM
     if (this.contentDiv) {
-      return this.contentDiv.querySelector(
-        '.floor-plan-image',
-      ) as HTMLImageElement;
+      return this.contentDiv.querySelector('.floor-plan-image') as HTMLImageElement;
     }
     return document.querySelector('.floor-plan-image') as HTMLImageElement;
   }

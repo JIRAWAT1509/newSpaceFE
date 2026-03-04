@@ -3,7 +3,8 @@
 .floor-plan-wrapper {
   @apply relative w-full flex flex-col bg-gray-50 rounded-lg overflow-hidden;
   height: 100%;
-  max-height: 100%;
+  max-height: 80vh;
+  min-height: 70vh;
 }
 
 /* Top Left: Building Selector */

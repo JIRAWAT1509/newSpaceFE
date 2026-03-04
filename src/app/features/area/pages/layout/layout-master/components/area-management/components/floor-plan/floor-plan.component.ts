@@ -53,6 +53,7 @@ export class FloorPlanComponent implements OnInit {
   selectedFilters = input<AreaStatus[]>([]);
   selectedTypeFilters = input<ActionType[]>([]);
   selectedAreaId = input<string | null>(null);
+  draftFloorPlanImage = signal<string | null>(null);
 
   areaSelected = output<string | null>();
 
@@ -65,16 +66,11 @@ export class FloorPlanComponent implements OnInit {
 
   selectedBuildingId = signal<string>('');
   selectedFloorId = signal<string>('');
-  draftFloorPlanImage = signal<string | null>(null);
 
   currentFloorImage = computed<string>(() => {
     const draft = this.draftFloorPlanImage();
-    if (draft) return draft; // ✅ ถ้ามี draft ใช้เลย
-
-    const floor = this.currentFloor();
-    if (!floor) return '';
-    const version = this.areaDataService.getLatestVersion(floor);
-    return version?.planImage || '';
+    if (draft && draft.startsWith('data:')) return draft;
+    return 'assets/floorPlan1.png';
   });
   editFloorModal = viewChild<EditFloorModalComponent>('editFloorModal');
   visibleAreas = computed<Area[]>(() => {
@@ -314,18 +310,37 @@ export class FloorPlanComponent implements OnInit {
 
   onEditModalClose(): void {}
 
-  // แก้ onEditModalSave → ไม่ loadFloorData() ทั้งหมด reload เฉพาะ areas
-onEditModalSave(changes: any): void {
-  if (changes.floorPlanImage) {
-    this.draftFloorPlanImage.set(changes.floorPlanImage);
+  onEditModalSave(changes: any): void {
+    const floor = this.currentFloor();
+    if (!floor) return;
+
+    // อัปเดต positions และ activeStates
+    if (
+      Object.keys(changes.positions).length > 0 ||
+      Object.keys(changes.activeStates).length > 0
+    ) {
+      const updatedAreas = this.areas().map((area) => ({
+        ...area,
+        position: changes.positions[area.id] ?? area.position,
+        isActive:
+          changes.activeStates[area.id] !== undefined
+            ? changes.activeStates[area.id]
+            : area.isActive,
+      }));
+      updatedAreas.forEach((area) => this.areaDataService.updateArea(area));
+    }
+
+    // เพิ่ม areas ใหม่
+    const newAreas: Area[] = changes.newAreas ?? [];
+    newAreas.forEach((newArea) => this.areaDataService.addArea(newArea));
+
+    // ✅ save draft floor plan image ถ้ามี
+    if (changes.floorPlanImage) {
+      this.draftFloorPlanImage.set(changes.floorPlanImage);
+    }
+
+    this.loadFloorData();
   }
-  // ✅ reload เฉพาะ areas ไม่ reset floor ทั้งหมด
-  const floor = this.currentFloor();
-  if (floor) {
-    const areas = this.areaDataService.getAreasForCurrentContext(floor);
-    this.areas.set(areas);
-  }
-}
 
   getFloors(): FloorWithAreas[] {
     return this.areaDataService.getFloors();

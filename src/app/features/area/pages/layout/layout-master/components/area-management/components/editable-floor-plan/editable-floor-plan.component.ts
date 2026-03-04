@@ -52,20 +52,11 @@ export class EditableFloorPlanComponent {
   ghostMarkerPosition = signal<{ x: number; y: number } | null>(null);
   draggedAreaId = signal<string | null>(null);
 
-  // ✅ เช็ค draftFloorPlanImage ก่อน ถ้ามีให้ใช้เลย
   currentFloorImage = computed<string>(() => {
-    const draft = this.draftFloorPlanImage();
-    if (draft) return draft;
-
-    const floorData = this.floor();
-    if (!floorData?.floorPlanVersions?.length) return '';
-    const currentVersion = floorData.floorPlanVersions.find(
-      (v) => v.validUntil === null,
-    );
-    return (
-      currentVersion?.planImage || floorData.floorPlanVersions[0].planImage
-    );
-  });
+  const draft = this.draftFloorPlanImage();
+  if (draft && draft.startsWith('data:')) return draft;
+  return 'assets/floorPlan1.png';
+});
 
   private isPanning = false;
   private panStartX = 0;
