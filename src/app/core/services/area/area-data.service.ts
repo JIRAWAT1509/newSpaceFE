@@ -91,11 +91,36 @@ export class AreaDataService {
     this.selectedFloorId.set(null);
   }
 
+  updateBuilding(building: Building): void {
+    this.buildingsData.update((list) =>
+      list.map((b) =>
+        b.id === building.id ? { ...b, ...building } : b,
+      ),
+    );
+  }
+
+  toggleBuildingActive(buildingId: string): void {
+    this.buildingsData.update((list) =>
+      list.map((b) =>
+        b.id === buildingId ? { ...b, isActive: !b.isActive } : b,
+      ),
+    );
+
+    // ถ้า deactivate building ที่กำลัง active อยู่ ให้ fallback ไป building active แรกที่หาได้
+    const toggled = this.buildingsData().find((b) => b.id === buildingId);
+    if (toggled && !toggled.isActive && this.currentBuildingId() === buildingId) {
+      const fallback = this.buildingsData().find((b) => b.isActive);
+      if (fallback) {
+        this.setCurrentBuilding(fallback.id);
+      }
+    }
+  }
+
   setCurrentBuilding(buildingId: string): void {
     this.currentBuildingId.set(buildingId);
     const building = this.buildingsData().find((b) => b.id === buildingId);
-    const firstFloor = building?.floors?.[0];
-    this.selectedFloorId.set(firstFloor?.id ?? null);
+    const firstActiveFloor = building?.floors?.find((f) => f.isActive !== false);
+    this.selectedFloorId.set(firstActiveFloor?.id ?? null);
   }
 
   setCurrentFloor(floorId: string): void {
@@ -114,11 +139,46 @@ export class AreaDataService {
     const floorWithAreas: FloorWithAreas = { ...floor, areas: [] };
     this.buildingsData.update((list) =>
       list.map((b) =>
-        b.id === this.currentBuildingId()
+        b.id === floor.buildingId
           ? { ...b, floors: [...b.floors, floorWithAreas] }
           : b,
       ),
     );
+  }
+
+  updateFloor(floor: Floor): void {
+    this.buildingsData.update((list) =>
+      list.map((b) =>
+        b.id === floor.buildingId
+          ? {
+              ...b,
+              floors: b.floors.map((f) =>
+                f.id === floor.id ? { ...f, ...floor } : f,
+              ),
+            }
+          : b,
+      ),
+    );
+  }
+
+  toggleFloorActive(floorId: string): void {
+    this.buildingsData.update((list) =>
+      list.map((b) => ({
+        ...b,
+        floors: b.floors.map((f) =>
+          f.id === floorId ? { ...f, isActive: !f.isActive } : f,
+        ),
+      })),
+    );
+
+    // ถ้า deactivate floor ที่กำลัง selected อยู่ ให้ fallback ไป floor active แรก
+    if (this.selectedFloorId() === floorId) {
+      const toggled = this.building().floors.find((f) => f.id === floorId);
+      if (toggled && !toggled.isActive) {
+        const fallback = this.building().floors.find((f) => f.isActive !== false);
+        this.selectedFloorId.set(fallback?.id ?? null);
+      }
+    }
   }
 
   updateArea(updatedArea: Area): void {
@@ -135,6 +195,23 @@ export class AreaDataService {
                         area.id === updatedArea.id ? updatedArea : area,
                       ),
                     }
+                  : floor,
+              ),
+            }
+          : building,
+      ),
+    );
+  }
+
+  addArea(newArea: Area): void {
+    this.buildingsData.update((buildings) =>
+      buildings.map((building) =>
+        building.id === this.currentBuildingId()
+          ? {
+              ...building,
+              floors: building.floors.map((floor) =>
+                floor.id === newArea.floorId
+                  ? { ...floor, areas: [...floor.areas, newArea] }
                   : floor,
               ),
             }
@@ -419,20 +496,4 @@ export class AreaDataService {
       },
     ];
   }
-  addArea(newArea: Area): void {
-  this.buildingsData.update(buildings =>
-    buildings.map(building =>
-      building.id === this.currentBuildingId()
-        ? {
-            ...building,
-            floors: building.floors.map(floor =>
-              floor.id === newArea.floorId
-                ? { ...floor, areas: [...floor.areas, newArea] }
-                : floor
-            )
-          }
-        : building
-    )
-  );
-}
 }

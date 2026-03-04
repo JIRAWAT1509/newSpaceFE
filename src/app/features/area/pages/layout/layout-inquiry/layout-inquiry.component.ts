@@ -11,15 +11,8 @@ import { AddFloorModalComponent, AddFloorResult } from '../layout-master/compone
 import { AddBuildingModalComponent, AddBuildingResult } from '../layout-master/components/area-filter-bar/components/add-building-modal/add-building-modal.component';
 import { EditFloorModalComponent, EditFloorResult } from '../layout-master/components/area-filter-bar/components/edit-floor-modal/edit-floor-modal.component';
 import { EditBuildingModalComponent, EditBuildingResult } from '../layout-master/components/area-filter-bar/components/edit-building-modal/edit-building-modal.component';
-
-// ── Mock data — imported from shared mock files (single source of truth) ──────
-// ⚠️  ห้าม hard-code ข้อมูลใน component โดยตรง ให้แก้ไขที่ไฟล์ mock แทน:
-//    - Branches  → @core/data/branch.mock.ts
-//    - Buildings → @core/data/building.mock.ts
-//    - Floors    → @core/data/floor.mock.ts
+import { AreaDataService } from '@core/services/area/area-data.service';
 import { MOCK_BRANCHES } from '@core/data/branch.mock';
-import { MOCK_BUILDINGS } from '@core/data/building.mock';
-import { ALL_MOCK_FLOORS } from '@core/data/floor.mock';
 
 
 type BuildingSortField = 'code' | 'nameTh' | 'nameEn' | 'isActive';
@@ -38,14 +31,16 @@ export class LayoutInquiryComponent {
   selectedBranchId = signal<string>('');
   selectedBuildingId = signal<string>('');
   branches = signal<Branch[]>(MOCK_BRANCHES);
-  buildings = signal<Building[]>(MOCK_BUILDINGS);
-  floors = signal<Floor[]>([...ALL_MOCK_FLOORS]);
 
-  // Sorting signals for buildings
+  readonly buildings = this.areaDataService.buildings;
+
+  readonly allFloors = computed(() =>
+    this.areaDataService.buildings().flatMap((b) => b.floors),
+  );
+
   buildingSortField = signal<BuildingSortField | null>(null);
   buildingSortDirection = signal<SortDirection>(null);
 
-  // Sorting signals for floors
   floorSortField = signal<FloorSortField | null>(null);
   floorSortDirection = signal<SortDirection>(null);
 
@@ -54,27 +49,18 @@ export class LayoutInquiryComponent {
   editFloorModal = viewChild<EditFloorModalComponent>('editFloorModal');
   editBuildingModal = viewChild<EditBuildingModalComponent>('editBuildingModal');
 
-  /**
-   * filteredBuildings:
-   * - branchId === '' (All): แสดงทุก building (รวม inactive) แต่ inactive อยู่ท้ายสุด
-   * - branchId มีค่า: แสดงเฉพาะ active ของ branch นั้น
-   */
+
   filteredBuildings = computed(() => {
     const branchId = this.selectedBranchId();
     if (!branchId) {
-      // "All" branch: show active first, inactive last
       const active = this.buildings().filter((b) => b.isActive);
       const inactive = this.buildings().filter((b) => !b.isActive);
       return [...active, ...inactive];
     }
-    // Specific branch: show only active buildings of that branch
     return this.buildings().filter((b) => b.branchId === branchId && b.isActive);
   });
 
-  /**
-   * sortedBuildings: apply sort on top of filteredBuildings,
-   * but always keep inactive at bottom when viewing "All"
-   */
+
   sortedBuildings = computed(() => {
     const field = this.buildingSortField();
     const direction = this.buildingSortDirection();
@@ -102,7 +88,6 @@ export class LayoutInquiryComponent {
       return 0;
     });
 
-    // When "All" branch: keep inactive at bottom regardless of sort
     if (!branchId) {
       const active = sorted.filter((b) => b.isActive);
       const inactive = sorted.filter((b) => !b.isActive);
@@ -122,13 +107,12 @@ export class LayoutInquiryComponent {
       .filter((b) => !branchId || b.branchId === branchId)
       .map((b) => b.id);
 
-    let filtered = this.floors().filter((f) => buildingIds.includes(f.buildingId));
+    let filtered = this.allFloors().filter((f) => buildingIds.includes(f.buildingId));
 
     if (buildingId) {
       filtered = filtered.filter((f) => f.buildingId === buildingId);
     }
 
-    // Apply floor sort if active
     if (field && direction) {
       filtered = [...filtered].sort((a, b) => {
         let aVal: any = a[field];
@@ -141,7 +125,6 @@ export class LayoutInquiryComponent {
           aVal = aVal ? 1 : 0;
           bVal = bVal ? 1 : 0;
         } else {
-          // buildingId → sort by building name
           aVal = this.getBuildingName(aVal).toLowerCase();
           bVal = this.getBuildingName(bVal).toLowerCase();
         }
@@ -158,7 +141,7 @@ export class LayoutInquiryComponent {
     return [...active, ...inactive];
   });
 
-  constructor() {
+  constructor(private areaDataService: AreaDataService) {
     if (MOCK_BRANCHES.length > 0) {
       this.selectedBranchId.set(MOCK_BRANCHES[0].id);
     }
@@ -230,15 +213,20 @@ export class LayoutInquiryComponent {
   // ── Floor Order Controls ────────────────────────────────────
   private swapFloors(indexA: number, indexB: number): void {
     const floors = this.filteredFloors();
-    const allFloors = [...this.floors()];
+    const floorA = floors[indexA];
+    const floorB = floors[indexB];
+    if (!floorA || !floorB || floorA.buildingId !== floorB.buildingId) return;
 
-    const idxA = allFloors.findIndex((f) => f.id === floors[indexA].id);
-    const idxB = allFloors.findIndex((f) => f.id === floors[indexB].id);
+    const buildingFloors = [...(this.areaDataService.buildings()
+      .find((b) => b.id === floorA.buildingId)?.floors ?? [])];
 
-    if (idxA !== -1 && idxB !== -1) {
-      [allFloors[idxA], allFloors[idxB]] = [allFloors[idxB], allFloors[idxA]];
-      this.floors.set(allFloors);
-    }
+    const idxA = buildingFloors.findIndex((f) => f.id === floorA.id);
+    const idxB = buildingFloors.findIndex((f) => f.id === floorB.id);
+    if (idxA === -1 || idxB === -1) return;
+
+    [buildingFloors[idxA], buildingFloors[idxB]] = [buildingFloors[idxB], buildingFloors[idxA]];
+
+    buildingFloors.forEach((f) => this.areaDataService.updateFloor(f));
   }
 
   moveFloorToTop(index: number): void {
@@ -273,23 +261,13 @@ export class LayoutInquiryComponent {
   }
 
   onBuildingCreated(result: AddBuildingResult): void {
-    this.buildings.update((buildings) => [...buildings, result.building]);
+    this.areaDataService.addBuilding(result.building);
   }
 
-  onAddBuildingModalClosed(): void {
-    console.log('Add building modal closed');
-  }
+  onAddBuildingModalClosed(): void {}
 
   toggleBuildingActive(buildingId: string): void {
-    this.buildings.update((buildings) =>
-      buildings.map((b) => (b.id === buildingId ? { ...b, isActive: !b.isActive } : b))
-    );
-  }
-
-  toggleFloorActive(floorId: string): void {
-    this.floors.update((floors) =>
-      floors.map((f) => (f.id === floorId ? { ...f, isActive: !f.isActive } : f))
-    );
+    this.areaDataService.toggleBuildingActive(buildingId);
   }
 
   onEditBuilding(building: Building): void {
@@ -297,14 +275,10 @@ export class LayoutInquiryComponent {
   }
 
   onBuildingUpdated(result: EditBuildingResult): void {
-    this.buildings.update((buildings) =>
-      buildings.map((b) => (b.id === result.building.id ? result.building : b))
-    );
+    this.areaDataService.updateBuilding(result.building);
   }
 
-  onEditBuildingModalClosed(): void {
-    console.log('Edit building modal closed');
-  }
+  onEditBuildingModalClosed(): void {}
 
   // ── Floor Actions ───────────────────────────────────────────
   onAddFloor(): void {
@@ -314,7 +288,7 @@ export class LayoutInquiryComponent {
     }
 
     if (buildingId) {
-      const existingFloorNumbers = this.floors()
+      const existingFloorNumbers = this.allFloors()
         .filter((f) => f.buildingId === buildingId)
         .map((f) => f.floorNumber);
       this.addFloorModal()?.open(buildingId, existingFloorNumbers);
@@ -322,25 +296,23 @@ export class LayoutInquiryComponent {
   }
 
   onFloorCreated(result: AddFloorResult): void {
-    this.floors.update((floors) => [...floors, result.floor]);
+    this.areaDataService.addFloor(result.floor);
   }
 
-  onAddFloorModalClosed(): void {
-    console.log('Add floor modal closed');
-  }
+  onAddFloorModalClosed(): void {}
 
   onEditFloor(floor: Floor): void {
     this.editFloorModal()?.open(floor);
   }
 
   onFloorUpdated(result: EditFloorResult): void {
-    this.floors.update((floors) =>
-      floors.map((f) => (f.id === result.floor.id ? result.floor : f))
-    );
+    this.areaDataService.updateFloor(result.floor);
   }
 
-  onEditFloorModalClosed(): void {
-    console.log('Edit floor modal closed');
+  onEditFloorModalClosed(): void {}
+
+  toggleFloorActive(floorId: string): void {
+    this.areaDataService.toggleFloorActive(floorId);
   }
 
   getBuildingName(buildingId: string): string {
