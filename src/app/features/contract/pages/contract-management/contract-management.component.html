@@ -33,13 +33,16 @@
     </p-tablist>
 
     <p-tabpanels>
-      <!-- Tab 1: Quotation -->
+      <!-- Tab 1: Quotation - WITH CUSTOMER QUOTATION SUPPORT -->
       <p-tabpanel value="quotation">
         <app-contract-table
           [contractType]="'quotation'"
           [data]="quotationData()"
           [sharedSearchText]="sharedSearchText()"
           [sharedFilters]="sharedFilters()"
+          [customerDataForQuotation]="getCustomerDataForQuotation()"
+          [shouldAutoOpenModal]="getShouldOpenQuotationModal()"
+          (quotationModalOpened)="clearQuotationModalFlags()"
           (searchTextChange)="onSearchUpdate($event)"
           (filtersChange)="onFiltersUpdate($event)"
           (contractSaved)="onContractSaved($event)"

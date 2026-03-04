@@ -255,7 +255,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
   // 4. COLLECTION AND FINANCE
   // ============================================
   {
-    primary_content: 'collection_finance',
+    primary_content: 'collection',
     secondary_content: [
       // --- FINANCE SECTION ---
       {

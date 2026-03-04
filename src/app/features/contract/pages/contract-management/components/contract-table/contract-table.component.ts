@@ -12,6 +12,7 @@ import { WarningModalComponent } from '@shared/components/warning-modal/warning-
 import { BulkActionModalComponent, BulkActionType, BulkActionResult } from '../bulk-action-modal/bulk-action-modal.component';
 import { DraftContractService, DraftContract } from '@core/services/draft-contract.service';
 import { ConfirmationModalComponent, ConfirmationType } from '@shared/components/confirmation-modal/confirmation-modal.component';
+import { CustomerQuotationData } from '@core/services/customer-quotation.service';
 
 
 @Component({
@@ -30,12 +31,17 @@ export class ContractTableComponent {
   sharedSearchText = input<string>('');
   sharedFilters = input<SearchFilter[]>([]);
 
+  // Customer quotation inputs
+  customerDataForQuotation = input<CustomerQuotationData | null>(null);
+  shouldAutoOpenModal = input<boolean>(false);
+
   // Outputs to sync state back to parent
   searchTextChange = output<string>();
   filtersChange = output<SearchFilter[]>();
   contractSaved = output<any>();
   contractCopied = output<Contract>();
   contractCancelRequest = output<{ contract: Contract; cancelType: CancelType }>();
+  quotationModalOpened = output<void>();
 
   // Local search (syncs with shared)
   simpleSearchText = signal<string>('');
@@ -53,6 +59,7 @@ export class ContractTableComponent {
   modalMode = signal<'add' | 'edit'>('add');
   selectedContract = signal<Contract | null>(null);
   selectedDraft = signal<DraftContract | null>(null);
+  preFillData = signal<any>(null);
   showBulkActions = signal<boolean>(false);
   activeRowMenu = signal<string | null>(null);
   showDraftsPanel = signal<boolean>(true); // Show/hide drafts panel
@@ -99,14 +106,14 @@ export class ContractTableComponent {
     filters.forEach(filter => {
       // Check if filter is valid (has field and value)
       if (!filter.field) return;
-      
+
       // Check if value exists and is not empty
-      const hasValue = Array.isArray(filter.value) 
-        ? filter.value.length > 0 
-        : typeof filter.value === 'string' 
-          ? filter.value.trim().length > 0 
+      const hasValue = Array.isArray(filter.value)
+        ? filter.value.length > 0
+        : typeof filter.value === 'string'
+          ? filter.value.trim().length > 0
           : filter.value !== null && filter.value !== undefined;
-      
+
       if (!hasValue) return;
 
       switch (filter.field) {
@@ -209,6 +216,19 @@ export class ContractTableComponent {
         setTimeout(() => document.addEventListener('click', handler, { once: true }), 0);
       }
     });
+
+    // Auto-open modal when customer data is provided
+    effect(() => {
+      const shouldOpen = this.shouldAutoOpenModal();
+      const customerData = this.customerDataForQuotation();
+
+      if (shouldOpen && customerData && this.contractType() === 'quotation') {
+        console.log('🎯 Auto-opening quotation modal with customer data');
+        setTimeout(() => {
+          this.openModalWithCustomerData(customerData);
+        }, 300);
+      }
+    });
   }
 
 
@@ -252,22 +272,22 @@ export class ContractTableComponent {
   applyBookmark(bookmark: SavedSearch): void {
     // Deep copy filters to avoid reference issues
     const filters = JSON.parse(JSON.stringify(bookmark.filters));
-    
+
     // Ensure all filters have isComplete flag set correctly
     const restoredFilters = filters.map((filter: SearchFilter) => ({
       ...filter,
       // Ensure isComplete is true if field and value exist
-      isComplete: filter.field !== null && 
-                   filter.field !== undefined && 
-                   (Array.isArray(filter.value) ? filter.value.length > 0 : 
-                    typeof filter.value === 'string' ? filter.value.trim().length > 0 : 
+      isComplete: filter.field !== null &&
+                   filter.field !== undefined &&
+                   (Array.isArray(filter.value) ? filter.value.length > 0 :
+                    typeof filter.value === 'string' ? filter.value.trim().length > 0 :
                     filter.value !== null && filter.value !== undefined)
     }));
-    
+
     // Set active filters and trigger search
     this.activeFilters.set(restoredFilters);
     this.filtersChange.emit(restoredFilters);
-    
+
     // Clear simple search when applying bookmark
     this.simpleSearchText.set('');
     this.searchTextChange.emit('');
@@ -346,7 +366,7 @@ export class ContractTableComponent {
     this.showBulkActions.set(false);
 
     // Get selected contracts
-    const selectedContracts = this.filteredData().filter(c => 
+    const selectedContracts = this.filteredData().filter(c =>
       this.selectedIds().includes(c.CONTRACT_ID)
     );
 
@@ -439,7 +459,7 @@ export class ContractTableComponent {
       'service': 'ค่าบริการ'
     };
 
-    const discountText = data.discountType === 'percentage' 
+    const discountText = data.discountType === 'percentage'
       ? `${data.discountValue}%`
       : `${data.discountValue.toLocaleString()} บาท`;
 
@@ -487,7 +507,7 @@ export class ContractTableComponent {
     // For edit, we open the edit modal for the single selected contract
     const contractId = result.contractIds[0];
     const contract = this.filteredData().find(c => c.CONTRACT_ID === contractId);
-    
+
     if (contract) {
       this.openEditModal(contract);
     }
@@ -770,11 +790,40 @@ export class ContractTableComponent {
     this.showAddModal.set(true);
   }
 
+  /**
+   * Open add modal with pre-filled customer data
+   */
+  openModalWithCustomerData(customerData: CustomerQuotationData): void {
+    console.log('📝 Opening quotation modal with customer data:', customerData);
+
+    // Create pre-fill data object
+    const preFillData = {
+      generalDetails: {
+        contactName: customerData.customerName,
+        businessName: customerData.companyName || customerData.customerName,
+        customerId: customerData.customerId,
+      }
+    };
+
+    // Set mode and pre-fill data
+    this.modalMode.set('add');
+    this.selectedContract.set(null);
+    this.selectedDraft.set(null);
+    this.preFillData.set(preFillData);
+    this.showAddModal.set(true);
+
+    // Emit event to parent
+    this.quotationModalOpened.emit();
+
+    console.log('✅ Modal opened with pre-fill data:', preFillData);
+  }
+
   closeAddModal(): void {
     this.showAddModal.set(false);
     this.modalMode.set('add');
     this.selectedContract.set(null);
     this.selectedDraft.set(null);
+    this.preFillData.set(null);
   }
 
   // ==================== DRAFT MANAGEMENT ====================

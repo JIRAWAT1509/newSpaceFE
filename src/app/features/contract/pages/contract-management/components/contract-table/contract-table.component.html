@@ -35,8 +35,8 @@
           <button class="bookmark-chip" (click)="applyBookmark(bookmark)">
             <i class="pi pi-bookmark"></i>
             <span>{{ bookmark.name }}</span>
-            <i 
-              class="pi pi-times-circle" 
+            <i
+              class="pi pi-times-circle"
               (click)="deleteBookmark(bookmark.id, $event)"
               title="ลบการค้นหาที่บันทึกไว้"
             ></i>
@@ -334,6 +334,7 @@
   <app-add-contract-modal
     [mode]="modalMode()"
     [contractData]="selectedContract()"
+    [preFillData]="preFillData()"
     [draftData]="selectedDraft()"
     (close)="closeAddModal()"
     (save)="saveNewContract($event)"

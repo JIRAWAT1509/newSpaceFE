@@ -598,7 +598,7 @@ export const DEFAULT_UI_CONFIG: UiConfig = {
     sales: 'Sales',
     area: 'Area',
     contract: 'Contract',
-    collection_finance: 'Collection & Finance',
+    collection: 'Collection',
     facilities: 'Facilities',
     report: 'Report',
     report_dashboard: 'Report',
@@ -713,7 +713,7 @@ export const loadUiConfig = (): UiConfig => {
       ...DEFAULT_UI_CONFIG.labels,
       ...(parsed.labels || {}),
     };
-    // Fix legacy raw-key labels (e.g. 'collection_finance' → 'Collection & Finance')
+    // Fix legacy raw-key labels (e.g. 'collection' → 'Collection')
     for (const [key, value] of Object.entries(mergedLabels)) {
       if (value === key) {
         mergedLabels[key] = DEFAULT_UI_CONFIG.labels[key] || value;

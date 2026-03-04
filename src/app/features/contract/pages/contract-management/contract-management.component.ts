@@ -1,12 +1,13 @@
 // contract-management.component.ts
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { ContractTableComponent } from './components/contract-table/contract-table.component';
 import { Contract } from '@core/models/contract.model';
 import { SearchFilter } from '@core/models/contract-search.model';
 import { ContractService, CancelType } from '@core/services/contract.service';
+import { CustomerQuotationService, CustomerQuotationData } from '@core/services/customer-quotation.service';
 
 @Component({
   selector: 'app-contract-management',
@@ -33,6 +34,10 @@ export class ContractManagementComponent implements OnInit {
   // Local contract lists: โหลดจาก localStorage (ผ่าน service) เพื่อไม่หายเมื่อรีเฟรช
   private contractsList = signal<Contract[]>([]);
 
+  // Customer quotation auto-open modal state
+  private shouldOpenQuotationModal = signal<boolean>(false);
+  private customerDataForQuotation = signal<CustomerQuotationData | null>(null);
+
   // Filter contracts by type for each tab
   quotationData = computed<Contract[]>(() =>
     this.contractsList().filter(c => c.CONTRACT_TYPE === 'QUOTATION_AGREEMENT')
@@ -52,29 +57,51 @@ export class ContractManagementComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private contractService: ContractService
+    private contractService: ContractService,
+    private router: Router,
+    private quotationService: CustomerQuotationService
   ) {}
 
   ngOnInit(): void {
     this.contractsList.set(this.contractService.getContracts());
 
-    // Check for query params from area page
+    // Check for query params
     this.route.queryParams.subscribe(params => {
+      const action = params['action'];
+      const customerId = params['customerId'];
       const areaId = params['areaId'];
-      const roomNumber = params['roomNumber'];
 
-      if (areaId) {
-        // Auto-create filter for area
+      // Handle customer quotation creation
+      if (action === 'createQuotation' && customerId) {
+        console.log('📝 Creating quotation for customer:', customerId);
+        const customerData = this.quotationService.getAndClearCustomerData();
+
+        if (customerData) {
+          this.customerDataForQuotation.set(customerData);
+          this.shouldOpenQuotationModal.set(true);
+          this.activeTab.set('quotation');
+
+          console.log('✅ Customer data loaded:', customerData);
+
+          // Clear query params
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true
+          });
+        } else {
+          console.warn('⚠️ No customer data found in service');
+        }
+      }
+      // Handle area filter
+      else if (areaId) {
         const areaFilter: SearchFilter = {
           id: `auto-area-${Date.now()}`,
           field: 'AREA_ID',
           value: areaId,
           isComplete: true
         };
-
         this.sharedFilters.set([areaFilter]);
-
-        // Switch to lease tab (most likely tab for area contracts)
         this.activeTab.set('lease');
       }
     });
@@ -171,7 +198,7 @@ export class ContractManagementComponent implements OnInit {
       EXPIRY_DATE: toDateStr(conditions.contractEndDate) || '',
       MONTHLY_RENT: conditions.rentRate || 0,
       DEPOSIT_AMOUNT: conditions.depositAmount || 0,
-      
+
       // From generalDetails
       BRANCH_CODE: general.branch || '',
       CONTRACT_TYPE_CODE: general.contractType || '',
@@ -182,7 +209,7 @@ export class ContractManagementComponent implements OnInit {
       CONTRACT_DATE: toDateStr(general.quotationDate) || new Date().toISOString().split('T')[0],
       RECORD_DATE: toDateStr(general.recordDate),
       APPROVAL_DATE: toDateStr(general.approvalDate),
-      
+
       SUB_CATEGORY: general.subCategory || '',
       CATEGORY: general.category || '',
       PROFIT_CENTER: general.profitCenter || '',
@@ -197,11 +224,11 @@ export class ContractManagementComponent implements OnInit {
       AUTHORIZED_PERSON_1: general.authorizedPerson1 || '',
       PHONE_1: general.phone1 || '',
       POSITION_1: general.position1 || '',
-      
+
       // Contact info (page 1)
       CONTACT_PERSON: general.contactName || '',
       CONTACT_PHONE: general.contactPhone || '',
-      
+
       // From contractDetails (tab 2)
       BOOKING_NUMBER: contractDetails.bookingNumber || '',
       CONTRACT_MAKER: contractDetails.contractMaker || '',
@@ -211,7 +238,7 @@ export class ContractManagementComponent implements OnInit {
       PHONE_DETAIL: contractDetails.phone || '',
       EMAIL_DETAIL: contractDetails.email || '',
       CONTACT_PERSON_DETAIL: contractDetails.contactPerson || '',
-      
+
       // From conditions
       DURATION_YEARS: conditions.durationYears || 0,
       DURATION_MONTHS: conditions.durationMonths || 0,
@@ -220,7 +247,7 @@ export class ContractManagementComponent implements OnInit {
       END_DATE: toDateStr(conditions.contractEndDate) || '',
       CREDIT_TERM_RENT: conditions.creditTermRent || 0,
       CREDIT_TERM_UTILITY: conditions.creditTermUtility || 0,
-      
+
       // Area details (mapped from flat form fields → AREA_DETAILS array)
       AREA_DETAILS: general.areaBuilding ? [{
         BUILDING: general.areaBuilding || '',
@@ -262,5 +289,30 @@ export class ContractManagementComponent implements OnInit {
       )
     );
     this.contractService.saveContracts(this.contractsList());
+  }
+
+  // ==================== CUSTOMER QUOTATION HELPERS ====================
+
+  /**
+   * Get customer data for quotation (called by contract-table component)
+   */
+  getCustomerDataForQuotation(): CustomerQuotationData | null {
+    return this.customerDataForQuotation();
+  }
+
+  /**
+   * Check if should auto-open quotation modal
+   */
+  getShouldOpenQuotationModal(): boolean {
+    return this.shouldOpenQuotationModal();
+  }
+
+  /**
+   * Clear quotation modal flags after modal opens
+   */
+  clearQuotationModalFlags(): void {
+    console.log('🧹 Clearing quotation modal flags');
+    this.shouldOpenQuotationModal.set(false);
+    this.customerDataForQuotation.set(null);
   }
 }

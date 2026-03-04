@@ -37,6 +37,8 @@ export class AddContractModalComponent implements OnInit {
   contractData = input<Contract | null>(null);
   /** Draft data to continue editing */
   draftData = input<DraftContract | null>(null);
+  /** Pre-fill data from external sources (e.g., customer quotation) */
+  preFillData = input<any>(null);
 
   // Outputs
   close = output<void>();
@@ -96,6 +98,82 @@ export class AddContractModalComponent implements OnInit {
         this.modalTitle.set(this.mode() === 'edit' ? 'แก้ไขข้อมูลสัญญา' : 'สร้างใบเสนอราคา');
       }
     });
+
+    // Handle pre-fill data from customer quotation
+    effect(() => {
+      const preFill = this.preFillData();
+      if (preFill && this.mode() === 'add') {
+        console.log('🎨 [AddContractModal] Applying pre-fill data:', preFill);
+        this.applyPreFillData(preFill);
+      }
+    });
+  }
+
+  /**
+   * Apply pre-fill data to the form
+   * IMPROVED VERSION with better debugging and timing
+   */
+  private applyPreFillData(preFill: any): void {
+    console.log('🎨 [AddContractModal] === PRE-FILL DEBUG START ===');
+    console.log('📦 Pre-fill data received:', preFill);
+    console.log('📋 General form exists:', !!this.generalDetailForm);
+    console.log('📋 General form controls:', this.generalDetailForm ? Object.keys(this.generalDetailForm.controls) : 'N/A');
+
+    // Wait longer for form and child components to initialize
+    setTimeout(() => {
+      // Apply general details if present
+      if (preFill.generalDetails && this.generalDetailForm) {
+        console.log('📝 Attempting to patch general details...');
+        console.log('  - Data keys:', Object.keys(preFill.generalDetails));
+        console.log('  - Form controls:', Object.keys(this.generalDetailForm.controls));
+
+        // Check which fields will match
+        const dataKeys = Object.keys(preFill.generalDetails);
+        const formKeys = Object.keys(this.generalDetailForm.controls);
+        const matchingKeys = dataKeys.filter(k => formKeys.includes(k));
+        const unmatchedKeys = dataKeys.filter(k => !formKeys.includes(k));
+
+        console.log('  ✅ Matching fields:', matchingKeys);
+        if (unmatchedKeys.length > 0) {
+          console.warn('  ⚠️ Unmatched fields (will be ignored):', unmatchedKeys);
+        }
+
+        // Patch the form
+        this.generalDetailForm.patchValue(preFill.generalDetails, { emitEvent: false });
+
+        // Mark fields as touched to trigger validation display
+        matchingKeys.forEach(key => {
+          this.generalDetailForm.get(key)?.markAsTouched();
+        });
+
+        // Verify what was actually set
+        console.log('📊 Form values after patch:');
+        matchingKeys.forEach(key => {
+          const value = this.generalDetailForm.get(key)?.value;
+          console.log(`  - ${key}: ${value}`);
+        });
+
+        console.log('✅ [AddContractModal] Pre-filled general details');
+      } else {
+        console.error('❌ Cannot apply general details:');
+        console.log('  - preFill.generalDetails exists:', !!preFill.generalDetails);
+        console.log('  - generalDetailForm exists:', !!this.generalDetailForm);
+      }
+
+      // Apply conditions if present
+      if (preFill.conditions && this.conditionsForm) {
+        this.conditionsForm.patchValue(preFill.conditions, { emitEvent: false });
+        console.log('✅ [AddContractModal] Pre-filled conditions');
+      }
+
+      // Store contract details for later (when tab is opened)
+      if (preFill.contractDetails) {
+        this.lastContractDetailValue.set(preFill.contractDetails);
+        console.log('✅ [AddContractModal] Stored contract details for later');
+      }
+
+      console.log('🎨 [AddContractModal] === PRE-FILL DEBUG END ===');
+    }, 300); // Increased timeout to 300ms
   }
 
   ngOnInit(): void {
@@ -647,7 +725,7 @@ export class AddContractModalComponent implements OnInit {
     Object.keys(this.generalDetailForm.controls).forEach(key => {
       this.generalDetailForm.get(key)?.markAsTouched();
     });
-    
+
     // Mark contract detail form (if exists)
     const contractForm = this.contractDetailTab?.contractInfoTab?.form;
     if (contractForm) {
