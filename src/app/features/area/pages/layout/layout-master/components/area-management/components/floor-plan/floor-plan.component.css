@@ -1,7 +1,9 @@
 /* floor-plan.component.css */
 
 .floor-plan-wrapper {
-  @apply relative w-full h-full flex flex-col bg-gray-50 rounded-lg overflow-hidden;
+  @apply relative w-full flex flex-col bg-gray-50 rounded-lg overflow-hidden;
+  height: 100%;
+  max-height: 100%;
 }
 
 /* Top Left: Building Selector */
@@ -82,11 +84,12 @@
   @apply text-2xl;
 }
 
-/* Floor Plan Container */
+/* Floor Plan Container — เติม space ที่เหลือใน wrapper */
 .floor-plan-container {
-  @apply flex-1 relative overflow-hidden bg-gray-100;
+  flex: 1 1 0;
+  min-height: 0; /* ← สำคัญมาก: ป้องกัน flex child ยืดเกิน */
+  @apply relative overflow-hidden bg-gray-100;
   cursor: grab;
-  /* Use flexbox to center content */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,13 +103,14 @@
   @apply relative;
   transition: transform 0.3s ease-out;
   will-change: transform;
-  /* Content will be centered by flex parent */
 }
 
 .floor-plan-image {
   @apply block max-w-none;
   user-select: none;
   pointer-events: none;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* Bottom Left: Filter Toggle */
@@ -125,7 +129,7 @@
   @apply text-xl;
 }
 
-/* Bottom Center: Status Bar - Compact Version */
+/* Bottom Center: Status Bar */
 .bottom-center-controls {
   @apply absolute bottom-12 left-1/2 transform -translate-x-1/2 z-20;
   @apply min-w-[400px] w-auto h-4 px-3;
@@ -134,7 +138,6 @@
 :host ::ng-deep .status-segment {
   @apply text-sm;
 }
-
 
 /* Bottom Right: Edit Button */
 .bottom-right-controls {
@@ -200,8 +203,7 @@
   }
 
   .bottom-center-controls {
-    @apply max-w-[200px] left-20 transform-none;
-    @apply bottom-3;
+    @apply max-w-[200px] left-20 transform-none bottom-3;
   }
 
   :host ::ng-deep .status-segment {
