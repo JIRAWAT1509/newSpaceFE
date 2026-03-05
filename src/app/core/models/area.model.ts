@@ -1,5 +1,7 @@
 // src/app/core/models/area.model.ts
 
+import { RentalHistory } from "./rental-history.model";
+
 export interface Area {
   id: string;
   floorId: string;
@@ -27,6 +29,8 @@ export interface Area {
 
   // Current lease info
   currentTenant?: Tenant;
+
+  rentalHistory?: RentalHistory[];
 
   // Inactive period (for maintenance/renovation)
   inactivePeriod?: InactivePeriod;

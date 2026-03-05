@@ -41,7 +41,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     report_finance: 'Finance',
     report_collection: 'Collection',
     dashboard: 'Dashboard',
-
+    inquiry: 'Area Maintenance',
     // --- Sub-menu Items ---
     view_all_areas: 'View All Areas',
     add_new_area: 'Add New Area',
@@ -366,6 +366,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     display_preferences: 'การตั้งค่าการแสดงผล',
     data_sources: 'แหล่งข้อมูล',
     reset_dashboard: 'รีเซ็ตแดชบอร์ด',
+    inquiry: 'Area Maintenance',
   },
   zh: {
     // --- Main Categories ---
@@ -549,5 +550,7 @@ export const SIDEBAR_TEXTS: { [key: string]: { [key: string]: string } } = {
     display_preferences: '显示首选项',
     data_sources: '数据源',
     reset_dashboard: '重置仪表板',
+        inquiry: 'Area Maintenance',
+
   },
 };
