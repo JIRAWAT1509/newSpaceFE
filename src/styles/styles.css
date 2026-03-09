@@ -71,6 +71,11 @@
   box-sizing: border-box;
 }
 
+:root {
+  font-size: 14px;
+  --font-family: 'Roboto','Prompt','sans-serif';
+}
+
 /* Body Styles - responsive */
 html, body {
   overflow-x: hidden;
@@ -78,8 +83,8 @@ html, body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
-  font-size: 14px;
+  font-family: var(--font-family);
+  /* font-size: 14px; */
   color: rgb(var(--fg));
   background-color: #ffffff;
 }

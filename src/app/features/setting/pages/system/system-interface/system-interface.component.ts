@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -25,6 +25,19 @@ import {
   DEFAULT_AREA_AVAILABILITY_CONFIG,
   DEFAULT_FACILITIES_UTILITIES_CONFIG,
 } from '@core/services/ui-settings';
+import { LocalstorageService } from '@/app/core/services/settings/localstorage.service';
+
+const fontMap: Record<string, any> = {
+  'Roboto': { name: 'Roboto', path: 'assets/fonts/Roboto/font-family-roboto.css', lang: ['en'] },
+  'Prompt': { name: 'Prompt', path: 'assets/fonts/Prompt/font-family-prompt.css', lang: ['th','en'] },
+  'Kanit': { name: 'Kanit', path: 'assets/fonts/Kanit/font-family-kanit.css', lang: ['th','en'] },
+  'Sarabun': { name: 'Sarabun', path: 'assets/fonts/Sarabun/font-family-sarabun.css', lang: ['th','en'] },
+  'Noto Sans Thai': { name: 'Noto Sans Thai', path: 'assets/fonts/Noto_Sans_Thai/font-family-noto_sans_thai.css', lang: ['th'] },
+};
+
+const defaultThFont = "Prompt";
+const defaultEnFont = "Roboto";
+const defaultFontSize = 16;
 
 @Component({
   selector: 'app-system-interface',
@@ -35,6 +48,16 @@ import {
   providers: [MessageService, ConfirmationService],
 })
 export class SystemInterfaceComponent implements OnInit, OnDestroy {
+  private readonly lss = inject(LocalstorageService);
+
+
+  themeSettingFontsize = signal<number>(defaultFontSize);
+  themeSettingFontfamilyEn = signal<string>(defaultEnFont);
+  themeSettingFontfamilyTh = signal<string>(defaultThFont);
+  themeSettingDarkmode = signal<boolean>(false);
+
+
+
   config: UiConfig = { ...DEFAULT_UI_CONFIG };
   presets: UiPreset[] = UI_PRESETS;
   statusPresets: UiStatusPreset[] = UI_STATUS_PRESETS;
@@ -47,13 +70,13 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
 
   // Module selection (can be 'global' or module ID)
   selectedModule: ModuleId | 'global' = 'global';
-  
+
   // Area Availability config
   areaConfig: AreaAvailabilityConfig = getAreaAvailabilityConfig();
-  
+
   // Facilities Utilities config
   facilitiesConfig: FacilitiesUtilitiesConfig = getFacilitiesUtilitiesConfig();
-  
+
   // Rentable items (for Facilities)
   rentableItems = signal<Array<{
     id: string;
@@ -74,7 +97,7 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
   showIconLibrary = signal<boolean>(false);
   selectedItemForIcon: string | null = null;
   iconSearchQuery: string = '';
-  
+
   // Common PrimeIcons for selection - organized by category
   iconLibrary = [
     // Buildings & Places
@@ -125,8 +148,8 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
     if (!query) {
       return this.iconLibrary;
     }
-    return this.iconLibrary.filter(icon => 
-      icon.toLowerCase().includes(query) || 
+    return this.iconLibrary.filter(icon =>
+      icon.toLowerCase().includes(query) ||
       icon.replace('pi-', '').includes(query)
     );
   });
@@ -134,7 +157,15 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
   constructor(
     private messageService: MessageService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) {
+    effect(() => this.setDarkmode(this.themeSettingDarkmode()) );
+    effect(() => this.setFontFamily(this.themeSettingFontfamilyEn(), this.themeSettingFontfamilyTh()) );
+    effect(() => this.setFontSize(this.themeSettingFontsize()) );
+
+    // this.loadDarkmode()
+    this.loadFontfamily();
+    this.loadFontsize();
+  }
 
   ngOnInit(): void {
     this.isLoading.set(true);
@@ -143,14 +174,14 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
       this.lastSavedConfig = cloneConfig(this.config);
       this.syncPresetTokens();
       applyUiConfig(this.config);
-      
+
       // Load module configs
       this.areaConfig = getAreaAvailabilityConfig();
       this.facilitiesConfig = getFacilitiesUtilitiesConfig();
-      
+
       // Load rentable items from Facilities config
       this.loadRentableItems();
-      
+
       // Load selected module from localStorage
       const savedModule = localStorage.getItem('interface_selected_module');
       if (savedModule === 'global' || savedModule === 'areaAvailability' || savedModule === 'facilitiesUtilities') {
@@ -224,7 +255,7 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
     applyUiConfig(this.config);
     this.persistGlobalConfig();
   }
-  
+
   getCurrentStatusColor(type: 'success' | 'warning' | 'danger' | 'info'): string {
     // Get current tokens (including any unsaved changes)
     const currentConfig = { ...this.config };
@@ -307,6 +338,13 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
           applyUiConfig(this.config);
           this.lastSavedConfig = cloneConfig(this.config);
           this.globalChanges = {};
+
+          this.themeSettingFontfamilyTh.set(defaultThFont);
+          this.themeSettingFontfamilyEn.set(defaultEnFont);
+          this.saveFontfamily();
+          this.themeSettingFontsize.set(defaultFontSize);
+          this.saveFontSize();
+
           this.showSuccess('รีเซ็ตสำเร็จ', 'การตั้งค่าถูกรีเซ็ตเป็นค่าเริ่มต้นแล้ว');
         } catch (error) {
           console.error('Error resetting config:', error);
@@ -344,7 +382,7 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
       life: 3000
     });
   }
-  
+
   private showError(message: string, detail?: string): void {
     this.messageService.add({
       severity: 'error',
@@ -353,7 +391,7 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
       life: 5000
     });
   }
-  
+
   private showInfo(message: string, detail?: string): void {
     this.messageService.add({
       severity: 'info',
@@ -422,8 +460,8 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
   getAreaIconType(key: string): 'library' | 'upload' {
     // Return from changes first, then config
     // Use statusIconTypes for Area Availability status icons
-    return this.areaChanges.statusIconTypes?.[key] || 
-           this.areaConfig.statusIconTypes?.[key] || 
+    return this.areaChanges.statusIconTypes?.[key] ||
+           this.areaConfig.statusIconTypes?.[key] ||
            ((this.areaChanges.statusIcons?.[key] || this.areaConfig.statusIcons?.[key])?.startsWith('data:') ? 'upload' : 'library');
   }
 
@@ -649,7 +687,7 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
       this.showError('ไม่มีรายการ', 'ไม่มีรายการสิ่งที่จะเช่าได้ให้ลบ');
       return;
     }
-    
+
     this.confirmationService.confirm({
       message: `คุณต้องการลบรายการ "สิ่งที่จะเช่าได้" ทั้งหมด ${itemCount} รายการหรือไม่?\n\nการดำเนินการนี้ไม่สามารถย้อนกลับได้`,
       header: 'ยืนยันการลบรายการทั้งหมด',
@@ -682,11 +720,11 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
 
   selectIconFromLibrary(iconClass: string): void {
     if (!this.selectedItemForIcon) return;
-    
+
     // Handle rentable items
     if (!this.selectedItemForIcon.startsWith('area_') && !this.selectedItemForIcon.startsWith('facilities_')) {
       const items = this.rentableItems().map(item =>
-        item.id === this.selectedItemForIcon 
+        item.id === this.selectedItemForIcon
           ? { ...item, icon: iconClass, iconType: 'library' as const }
           : item
       );
@@ -897,7 +935,7 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
   hasRentableItemsChanges(): boolean {
     return JSON.stringify(this.rentableItems()) !== this.rentableItemsSnapshot;
   }
-  
+
   hasUnsavedChanges(): boolean {
     if (this.selectedModule === 'global') {
       return this.hasGlobalChanges();
@@ -921,17 +959,18 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
         try {
           // Preserve existing rentable items when resetting
           const currentRentableItems = this.facilitiesConfig.rentableItems || [];
-          
+
           // Reset to default but keep rentable items
           const resetConfig = {
             ...DEFAULT_FACILITIES_UTILITIES_CONFIG,
             rentableItems: currentRentableItems
           };
-          
+
           updateModuleConfig('facilitiesUtilities', resetConfig);
           this.facilitiesConfig = getFacilitiesUtilitiesConfig();
           this.facilitiesChanges = {};
           this.loadRentableItems();
+
           this.showSuccess('รีเซ็ตสำเร็จ', 'การตั้งค่า Facilities (Utilities) ถูกรีเซ็ตเป็นค่าเริ่มต้นแล้ว\n(รายการสิ่งที่จะเช่าได้ยังคงอยู่)');
         } catch (error) {
           console.error('Error resetting facilities config:', error);
@@ -956,6 +995,117 @@ export class SystemInterfaceComponent implements OnInit, OnDestroy {
     }
     return '';
   }
+
+
+  //#region Darkmode
+  // Load saved darkmode from local storage
+  private loadDarkmode() {
+    const _darkmode: string | null = this.lss.getItem('setting-darkmode');
+    if (_darkmode) {
+      this.themeSettingDarkmode.set(_darkmode == "Y")
+    }
+  }
+
+  // switch darkmode at runtime
+  onSwitchDarkmode(isDarkmode: boolean) {
+    this.themeSettingDarkmode.set(isDarkmode);
+    this.saveDarkmode();
+  }
+
+  private setDarkmode(isDarkmode: boolean) {
+    const element: HTMLElement | null = document.querySelector('html');
+    if (element) {
+      element.classList.toggle('app-dark', isDarkmode);
+    }
+  }
+
+  private saveDarkmode(){
+    this.lss.setItem('setting-darkmode', this.themeSettingDarkmode() ? "Y" : "N");
+  }
+  //#endregion
+
+  //#region Fontsize
+  loadFontsize() {
+    const _size = this.lss.getItem('setting-fontsize');
+    if (!isNaN(parseFloat(_size!))) {
+      this.themeSettingFontsize.set(parseFloat(_size!));
+    }
+  }
+
+  onSwitchFontSize(value: number) {
+    this.themeSettingFontsize.set(value)
+    this.saveFontSize();
+  }
+
+  private setFontSize(size:number) {
+    document.documentElement.style.setProperty('font-size', `${size}px`);
+  }
+
+  private saveFontSize(){
+    this.lss.setItem('setting-fontsize', this.themeSettingFontsize().toString());
+  }
+  //#endregion
+
+  //#region Fontfamily
+  canEnSameTh(fontName: string): boolean {
+    const langs = fontMap[fontName].lang;
+    return langs.includes('en') && langs.includes('th');
+  }
+
+  onSwitchLanguage(lang: 'th' | 'en', name: string) {
+    if(lang === 'th'){
+      // ถ้า En เลือกเหมือน Th
+      if(this.themeSettingFontfamilyEn() === this.themeSettingFontfamilyTh()){
+        if(this.canEnSameTh(name)){
+          this.themeSettingFontfamilyEn.set(name);
+        } else {
+          this.themeSettingFontfamilyEn.set(defaultEnFont);
+        }
+      }
+      this.themeSettingFontfamilyTh.set(name);
+      this.saveFontfamily()
+    }
+    else if(lang === 'en') {
+      this.themeSettingFontfamilyEn.set(name);
+      this.saveFontfamily()
+    }
+  }
+
+  private setFontFamily(enFont: string, thFont: string): void {
+    const list = [];
+    if(enFont !== thFont){
+      list.push(`'${enFont}'`)
+      this.loadFontFile(enFont);
+    }
+    list.push(`'${thFont}'`)
+    this.loadFontFile(thFont);
+    const fontStack = `${list.join(', ')}, sans-serif`;
+    document.documentElement.style.setProperty('--font-family', fontStack);
+  }
+
+  private loadFontfamily(): void {
+      this.themeSettingFontfamilyEn.set(localStorage.getItem('en-font-family') || defaultEnFont)
+      this.themeSettingFontfamilyTh.set(localStorage.getItem('th-font-family') || defaultThFont)
+  }
+
+  private saveFontfamily() {
+      this.lss.setItem('en-font-family', this.themeSettingFontfamilyEn());
+      this.lss.setItem('th-font-family', this.themeSettingFontfamilyTh());
+  }
+
+  private loadFontFile(fontName: string): void {
+    const id = `font-${fontName.replace(/\s+/g, '-')}`;
+    if (document.getElementById(id)) return;
+
+    const path = fontMap[fontName].path;
+    if (!path) return console.warn(`Unknown font: ${fontName}`);
+
+    const link = document.createElement('link');
+    Object.assign(link, { id, rel: 'stylesheet', href: path });
+
+    document.head.appendChild(link);
+  }
+  //#endregion
 }
 
 const cloneConfig = (config: UiConfig): UiConfig =>

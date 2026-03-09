@@ -2,7 +2,7 @@
   <!-- Toast and Confirm Dialog -->
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
-  
+
   <!-- Loading Overlay -->
   @if (isLoading()) {
     <div class="loading-overlay">
@@ -12,7 +12,7 @@
       </div>
     </div>
   }
-  
+
   <!-- Header -->
   <div class="page-header">
     <div>
@@ -71,7 +71,7 @@
 
     <!-- Right Content: Settings Panel -->
     <main class="settings-content">
-      <!-- Global Settings: theme and colors — single view, no scroll -->
+      <!-- Global Settings: ธีมและสีหลัก — ออกแบบให้อยู่หน้าเดียว ไม่ต้องสกอร์ล -->
       @if (selectedModule === 'global') {
         <div class="settings-panel global-theme-panel">
           <div class="panel-header panel-header--compact">
@@ -81,7 +81,89 @@
             </div>
           </div>
 
-          <!-- Row 1: Theme mode + Icon style -->
+
+          <!-- แถวที่ 1: Size -->
+          <div class="global-theme-row global-theme-row--toggles" style="grid-template-columns: unset !important">
+            <div class="settings-card settings-card--compact">
+              <div class="card-header card-header--compact">
+                <div class="card-title">
+                  <i class="pi pi-arrow-up-right"></i>
+                  <span>ขนาดตัวอักษร</span>
+                </div>
+              </div>
+              <div class="card-content card-content--compact">
+                <div class="theme-mode-selector theme-mode-selector--compact">
+                  @for(item of [12, 14, 16, 18, 20, 24]; track $index){
+                    <button
+                      class="theme-mode-btn theme-mode-btn--compact"
+                      [class.active]="themeSettingFontsize() === item"
+                      [attr.aria-pressed]="themeSettingFontsize() === item"
+                      (click)="onSwitchFontSize(item)"
+                      [title]="item"
+                    >
+                      <span [style]="{ 'font-size' : item + 'px' }">{{item}}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- แถวที่ 2: Font -->
+          <div class="global-theme-row global-theme-row--toggles">
+            <div class="settings-card settings-card--compact">
+              <div class="card-header card-header--compact">
+                <div class="card-title">
+                  <i class="pi pi-language"></i>
+                  <span>รูปแบบอักษร TH</span>
+                </div>
+              </div>
+              <div class="card-content card-content--compact">
+                <div class="theme-mode-selector theme-mode-selector--compact">
+                  @for(item of ['Prompt', 'Kanit', 'Sarabun', 'Noto Sans Thai']; track $index){
+                    <button
+                      class="theme-mode-btn theme-mode-btn--compact"
+                      [class.active]="themeSettingFontfamilyTh() === item"
+                      [attr.aria-pressed]="themeSettingFontfamilyTh() === item"
+                      (click)="onSwitchLanguage('th', item)"
+                      [title]="item"
+                    >
+                      <span class="!font-bold">{{item}}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="settings-card settings-card--compact">
+              <div class="card-header card-header--compact">
+                <div class="card-title">
+                  <i class="pi pi-language"></i>
+                  <span>รูปแบบอักษร EN</span>
+                </div>
+              </div>
+              <div class="card-content card-content--compact">
+                <div class="icon-style-selector icon-style-selector--compact">
+                  @for(item of ['Roboto', themeSettingFontfamilyTh()]; track $index){
+                    @if($index === 0 || canEnSameTh(item)){
+                      <button
+                        class="theme-mode-btn theme-mode-btn--compact"
+                        [class.active]="themeSettingFontfamilyEn() === item"
+                        [attr.aria-pressed]="themeSettingFontfamilyEn() === item"
+                        (click)="onSwitchLanguage('en', item)"
+                        [title]="item"
+                        >
+                        <span class="!font-bold">{{ $index > 0 ? 'Same as Thai' : item }}</span>
+                        @if($index > 0){ <span>({{ themeSettingFontfamilyTh() }})</span> }
+                      </button>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- แถวที่ 3: โหมดธีม + รูปแบบไอคอน (คู่กัน) -->
           <div class="global-theme-row global-theme-row--toggles">
             <div class="settings-card settings-card--compact">
               <div class="card-header card-header--compact">
@@ -153,7 +235,7 @@
             </div>
           </div>
 
-          <!-- Row 2: Primary colors | Status colors (two columns) -->
+          <!-- แถวที่ 4: ชุดสีหลัก | ชุดสีสถานะ (สองคอลัมน์) -->
           <div class="global-theme-row global-theme-row--presets">
             <div class="settings-card settings-card--compact global-theme-card-presets">
               <div class="card-header card-header--compact">
@@ -218,7 +300,7 @@
             </div>
           </div>
 
-          <!-- Row 3: Reset only (auto-save) -->
+          <!-- แถวที่ 5: รีเซ็ตเท่านั้น (การเปลี่ยนแปลงจะบันทึกอัตโนมัติ) -->
           <div class="panel-actions-footer panel-actions-footer--compact">
             <p class="panel-footer-hint"><i class="pi pi-info-circle"></i> การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
             <button
@@ -386,7 +468,7 @@
             </div>
           </div>
 
-          <!-- Panel footer: hint + reset -->
+          <!-- Panel Actions Footer: hint + รีเซ็ต -->
           <div class="panel-actions-footer">
             <p class="panel-footer-hint"><i class="pi pi-info-circle"></i> การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
             <button
@@ -665,8 +747,8 @@
                 </div>
                 @if (rentableItems().length > 0) {
                   <div class="rentable-items-actions">
-                    <button 
-                      class="btn-danger-outline" 
+                    <button
+                      class="btn-danger-outline"
                       (click)="resetRentableItemsToDefault()"
                       [disabled]="isSaving()"
                       type="button"
@@ -680,7 +762,7 @@
             </div>
           </div>
 
-          <!-- Panel footer: hint + reset -->
+          <!-- Panel Actions Footer: hint + รีเซ็ต -->
           <div class="panel-actions-footer">
             <p class="panel-footer-hint"><i class="pi pi-info-circle"></i> การเปลี่ยนแปลงจะบันทึกอัตโนมัติ</p>
             <button
@@ -725,7 +807,7 @@
                   autofocus
                 />
                 @if (iconSearchQuery) {
-                  <button 
+                  <button
                     class="clear-search-btn"
                     (click)="iconSearchQuery = ''"
                     aria-label="ล้างการค้นหา"
