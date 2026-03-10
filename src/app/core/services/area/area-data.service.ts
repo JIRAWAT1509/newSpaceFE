@@ -106,7 +106,6 @@ export class AreaDataService {
       ),
     );
 
-    // ถ้า deactivate building ที่กำลัง active อยู่ ให้ fallback ไป building active แรกที่หาได้
     const toggled = this.buildingsData().find((b) => b.id === buildingId);
     if (toggled && !toggled.isActive && this.currentBuildingId() === buildingId) {
       const fallback = this.buildingsData().find((b) => b.isActive);
@@ -161,6 +160,19 @@ export class AreaDataService {
     );
   }
 
+  reorderFloors(buildingId: string, orderedFloors: Floor[]): void {
+    this.buildingsData.update((list) =>
+      list.map((b) => {
+        if (b.id !== buildingId) return b;
+        const reordered = orderedFloors.map((f) => {
+          const existing = b.floors.find((bf) => bf.id === f.id);
+          return existing ? { ...existing, ...f } : (f as FloorWithAreas);
+        });
+        return { ...b, floors: reordered };
+      }),
+    );
+  }
+
   toggleFloorActive(floorId: string): void {
     this.buildingsData.update((list) =>
       list.map((b) => ({
@@ -171,7 +183,6 @@ export class AreaDataService {
       })),
     );
 
-    // ถ้า deactivate floor ที่กำลัง selected อยู่ ให้ fallback ไป floor active แรก
     if (this.selectedFloorId() === floorId) {
       const toggled = this.building().floors.find((f) => f.id === floorId);
       if (toggled && !toggled.isActive) {
