@@ -14,13 +14,13 @@
 
 /* ==================== METRIC CARD ==================== */
 .metric-card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition: all 0.2s;
   position: relative;
-  border: 2px solid #e5e7eb;
+  border: 1px solid rgb(var(--border));
 }
 
 .metric-card.clickable {
@@ -28,16 +28,16 @@
 }
 
 .metric-card.clickable:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
-  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: rgb(var(--border));
 }
 
 .metric-card.active {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  border: 1px solid rgb(var(--primary) / 0.3);
+  box-shadow: 0 0 0 2px rgb(var(--primary) / 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
-  border-color: #3b82f6;
-  background: #eff6ff;
+  background: #ffffff !important;
 }
 
 /* ==================== HEADER ==================== */
@@ -53,7 +53,7 @@
 }
 
 .metric-label {
-  font-size: 12px;
+  font-size: 0.875rem;
   color: #6b7280;
   font-weight: 600;
   text-transform: uppercase;
@@ -62,9 +62,9 @@
 
 /* ==================== VALUE ==================== */
 .metric-value {
-  font-size: 36px;
-  font-weight: 800;
-  color: #1f2937;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111827;
   line-height: 1;
 }
 
@@ -104,10 +104,10 @@
   }
 
   .metric-card {
-    padding: 16px;
+    padding: 1rem;
   }
 
   .metric-value {
-    font-size: 28px;
+    font-size: 1.35rem;
   }
 }

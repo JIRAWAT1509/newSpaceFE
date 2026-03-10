@@ -1,0 +1,61 @@
+<!-- expiry-tracker.component.html -->
+<div class="tracker-panel">
+
+  <!-- Contract Expiry Section -->
+  <div class="tracker-section">
+    <div class="section-header">
+      <h4 class="section-title">Contract Expiry Tracker</h4>
+      <span class="section-count">{{ expiringContracts().length }} contracts</span>
+    </div>
+
+    <div class="tracker-list">
+      @for (contract of expiringContracts(); track contract.id) {
+        <div class="tracker-item" (click)="onViewContract(contract.id)">
+          <div class="tracker-dot" [class]="getDotClass(contract)"></div>
+          <div class="tracker-info">
+            <div class="tracker-name">{{ contract.name }}</div>
+            <div class="tracker-meta">{{ contract.vendor }} · {{ contract.building }}</div>
+          </div>
+          <div class="tracker-days" [class]="getDaysLabelClass(contract)">
+            {{ getDaysLabel(contract) }}
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-tracker">
+          <p>No contracts expiring within 120 days</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="panel-divider"></div>
+
+  <!-- PM Schedule Section -->
+  <div class="tracker-section">
+    <div class="section-header">
+      <h4 class="section-title">Upcoming PM Tasks</h4>
+      <span class="section-count">{{ upcomingPM().length }} tasks</span>
+    </div>
+
+    <div class="tracker-list">
+      @for (task of upcomingPM(); track task.id) {
+        <div class="tracker-item">
+          <div class="tracker-dot" [class]="getPMDotClass(task)"></div>
+          <div class="tracker-info">
+            <div class="tracker-name">{{ task.task }}</div>
+            <div class="tracker-meta">{{ task.building }} · {{ task.tech }}</div>
+          </div>
+          <div class="tracker-days" [class]="getPMStatusClass(task.status)">
+            {{ getPMDaysLabel(task) }}
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-tracker">
+          <p>No upcoming PM tasks</p>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

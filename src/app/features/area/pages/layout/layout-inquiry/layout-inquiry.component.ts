@@ -1,6 +1,6 @@
 /* layout-inquiry.component.ts */
 
-import { Component, signal, computed, viewChild } from '@angular/core';
+import { Component, signal, computed, viewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
@@ -27,13 +27,14 @@ type SortDirection = 'asc' | 'desc' | null;
   standalone: true,
 })
 export class LayoutInquiryComponent {
+  private areaDataService = inject(AreaDataService);
+
   selectedTab = signal<'buildings' | 'floors'>('buildings');
   selectedBranchId = signal<string>('');
   selectedBuildingId = signal<string>('');
   branches = signal<Branch[]>(MOCK_BRANCHES);
 
-  // ✅ Use computed to avoid "used before initialization" error
-  readonly buildings = computed(() => this.areaDataService.buildings());
+  readonly buildings = this.areaDataService.buildings;
 
   readonly allFloors = computed(() =>
     this.areaDataService.buildings().flatMap((b) => b.floors),
@@ -142,7 +143,7 @@ export class LayoutInquiryComponent {
     return [...active, ...inactive];
   });
 
-  constructor(private areaDataService: AreaDataService) {
+  constructor() {
     if (MOCK_BRANCHES.length > 0) {
       this.selectedBranchId.set(MOCK_BRANCHES[0].id);
     }
@@ -212,47 +213,49 @@ export class LayoutInquiryComponent {
   }
 
   // ── Floor Order Controls ────────────────────────────────────
-  private swapFloors(indexA: number, indexB: number): void {
-    const floors = this.filteredFloors();
-    const floorA = floors[indexA];
-    const floorB = floors[indexB];
-    if (!floorA || !floorB || floorA.buildingId !== floorB.buildingId) return;
+  private swapFloorsByIds(idA: string, idB: string): void {
+    const buildings = this.areaDataService.buildings();
+    const building = buildings.find((b) => b.floors.some((f) => f.id === idA));
+    if (!building) return;
 
-    const buildingFloors = [...(this.areaDataService.buildings()
-      .find((b) => b.id === floorA.buildingId)?.floors ?? [])];
-
-    const idxA = buildingFloors.findIndex((f) => f.id === floorA.id);
-    const idxB = buildingFloors.findIndex((f) => f.id === floorB.id);
+    const floors = [...building.floors];
+    const idxA = floors.findIndex((f) => f.id === idA);
+    const idxB = floors.findIndex((f) => f.id === idB);
     if (idxA === -1 || idxB === -1) return;
 
-    [buildingFloors[idxA], buildingFloors[idxB]] = [buildingFloors[idxB], buildingFloors[idxA]];
+    [floors[idxA], floors[idxB]] = [floors[idxB], floors[idxA]];
 
-    buildingFloors.forEach((f) => this.areaDataService.updateFloor(f));
-  }
-
-  moveFloorToTop(index: number): void {
-    if (index === 0) return;
-    for (let i = index; i > 0; i--) {
-      this.swapFloors(i, i - 1);
-    }
+    this.areaDataService.reorderFloors(building.id, floors);
   }
 
   moveFloorUp(index: number): void {
     if (index === 0) return;
-    this.swapFloors(index, index - 1);
+    const floors = this.filteredFloors();
+    this.swapFloorsByIds(floors[index].id, floors[index - 1].id);
   }
 
   moveFloorDown(index: number): void {
-    const last = this.filteredFloors().length - 1;
-    if (index === last) return;
-    this.swapFloors(index, index + 1);
+    const floors = this.filteredFloors();
+    if (index === floors.length - 1) return;
+    this.swapFloorsByIds(floors[index].id, floors[index + 1].id);
+  }
+
+  moveFloorToTop(index: number): void {
+    if (index === 0) return;
+    const ids = this.filteredFloors().map((f) => f.id);
+    for (let i = index; i > 0; i--) {
+      this.swapFloorsByIds(ids[i], ids[i - 1]);
+      [ids[i], ids[i - 1]] = [ids[i - 1], ids[i]];
+    }
   }
 
   moveFloorToBottom(index: number): void {
-    const last = this.filteredFloors().length - 1;
+    const ids = this.filteredFloors().map((f) => f.id);
+    const last = ids.length - 1;
     if (index === last) return;
     for (let i = index; i < last; i++) {
-      this.swapFloors(i, i + 1);
+      this.swapFloorsByIds(ids[i], ids[i + 1]);
+      [ids[i], ids[i + 1]] = [ids[i + 1], ids[i]];
     }
   }
 

@@ -1,0 +1,350 @@
+<!-- vendor-drawer.component.html -->
+<div class="drawer-inner">
+
+  <!-- Drawer Header -->
+  <div class="drawer-header">
+    <div class="drawer-header-left">
+      <div class="drawer-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+        </svg>
+      </div>
+      <div>
+        <h2 class="drawer-title">
+          {{ mode() === 'create' ? 'New Contract' : 'Edit Contract' }}
+        </h2>
+        <p class="drawer-subtitle">
+          {{ mode() === 'create' ? 'Add a new vendor contract' : 'Update contract details' }}
+        </p>
+      </div>
+    </div>
+    <button class="btn-close" (click)="onCancel()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Drawer Body -->
+  <div class="drawer-body">
+
+    <!-- ── Section: Contract Info ── -->
+    <div class="form-section">
+      <div class="section-label">Contract Information</div>
+
+      <div class="form-group full-width">
+        <label class="form-label">Contract Name <span class="required">*</span></label>
+        <input
+          type="text"
+          class="form-input"
+          [value]="formData().name"
+          (input)="updateField('name', $any($event.target).value)"
+          placeholder="e.g. Microsoft 365 Enterprise License"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" [value]="formData().type" (change)="updateField('type', $any($event.target).value)">
+            @for (t of contractTypes; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Building</label>
+          <select class="form-select" [value]="formData().building" (change)="updateField('building', $any($event.target).value)">
+            <option value="">Select Building</option>
+            @for (b of buildings; track b) {
+              <option [value]="b">{{ b }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <input
+            type="text"
+            class="form-input"
+            [value]="formData().category"
+            (input)="updateField('category', $any($event.target).value)"
+            placeholder="e.g. Software License"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-select" [value]="formData().priority" (change)="updateField('priority', $any($event.target).value)">
+            @for (p of priorityOptions; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label class="form-label">Description</label>
+        <textarea
+          class="form-textarea"
+          rows="3"
+          [value]="formData().detail"
+          (input)="updateField('detail', $any($event.target).value)"
+          placeholder="Describe the contract scope and deliverables..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- ── Section: Business Owner ── -->
+    <div class="form-section">
+      <div class="section-label">Business Owner</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Owner Name</label>
+          <input
+            type="text"
+            class="form-input"
+            [value]="formData().owner"
+            (input)="updateField('owner', $any($event.target).value)"
+            placeholder="Owner full name"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <input
+            type="text"
+            class="form-input"
+            [value]="formData().dept"
+            (input)="updateField('dept', $any($event.target).value)"
+            placeholder="e.g. IT, Facilities"
+          />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label class="form-label">Owner Email</label>
+        <input
+          type="email"
+          class="form-input"
+          [value]="formData().ownerEmail"
+          (input)="updateField('ownerEmail', $any($event.target).value)"
+          placeholder="owner@company.com"
+        />
+      </div>
+    </div>
+
+    <!-- ── Section: Vendor Info ── -->
+    <div class="form-section">
+      <div class="section-label">Vendor Information</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Vendor Name <span class="required">*</span></label>
+          <input
+            type="text"
+            class="form-input"
+            [value]="formData().vendor"
+            (input)="updateField('vendor', $any($event.target).value)"
+            placeholder="Company name"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Person</label>
+          <input
+            type="text"
+            class="form-input"
+            [value]="formData().vendorContact"
+            (input)="updateField('vendorContact', $any($event.target).value)"
+            placeholder="Contact name"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Vendor Phone</label>
+          <input
+            type="tel"
+            class="form-input"
+            [value]="formData().vendorPhone"
+            (input)="updateField('vendorPhone', $any($event.target).value)"
+            placeholder="02-xxx-xxxx"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vendor Email</label>
+          <input
+            type="email"
+            class="form-input"
+            [value]="formData().vendorEmail"
+            (input)="updateField('vendorEmail', $any($event.target).value)"
+            placeholder="vendor@example.com"
+          />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label class="form-label">Vendor Address</label>
+        <input
+          type="text"
+          class="form-input"
+          [value]="formData().vendorAddress"
+          (input)="updateField('vendorAddress', $any($event.target).value)"
+          placeholder="Full vendor address"
+        />
+      </div>
+    </div>
+
+    <!-- ── Section: Financial Terms ── -->
+    <div class="form-section">
+      <div class="section-label">Financial Terms</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contract Value (฿)</label>
+          <input
+            type="number"
+            class="form-input"
+            [value]="formData().value"
+            (input)="updateField('value', +$any($event.target).value)"
+            placeholder="0"
+            min="0"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Recurring</label>
+          <select class="form-select" [value]="formData().recurring" (change)="updateField('recurring', $any($event.target).value)">
+            @for (r of recurringOptions; track r) {
+              <option [value]="r">{{ r }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Payment Terms</label>
+          <select class="form-select" [value]="formData().payment" (change)="updateField('payment', $any($event.target).value)">
+            @for (p of paymentOptions; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Auto Renew</label>
+          <input
+            type="text"
+            class="form-input"
+            [value]="formData().autoRenew"
+            (input)="updateField('autoRenew', $any($event.target).value)"
+            placeholder="Yes / No / Yes 30 days"
+          />
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label class="form-label">Penalty Clause</label>
+        <input
+          type="text"
+          class="form-input"
+          [value]="formData().penalty"
+          (input)="updateField('penalty', $any($event.target).value)"
+          placeholder="e.g. None, 10% of contract value"
+        />
+      </div>
+    </div>
+
+    <!-- ── Section: Contract Dates ── -->
+    <div class="form-section">
+      <div class="section-label">Contract Dates</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Start Date <span class="required">*</span></label>
+          <input
+            type="date"
+            class="form-input"
+            [value]="formData().start"
+            (change)="updateField('start', $any($event.target).value)"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Date <span class="required">*</span></label>
+          <input
+            type="date"
+            class="form-input"
+            [value]="formData().end"
+            (change)="updateField('end', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Notice Period (days)</label>
+          <input
+            type="number"
+            class="form-input"
+            [value]="formData().noticePeriod"
+            (input)="updateField('noticePeriod', +$any($event.target).value)"
+            placeholder="30"
+            min="0"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" [value]="formData().status" (change)="updateField('status', $any($event.target).value)">
+            @for (s of contractStatuses; track s) {
+              <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Section: Preventive Maintenance (Optional) ── -->
+    <div class="form-section">
+      <div class="section-label">Preventive Maintenance <span class="optional-tag">Optional</span></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">PM Frequency</label>
+          <select class="form-select" [value]="formData().pmFreq" (change)="updateField('pmFreq', $any($event.target).value)">
+            @for (f of pmFreqOptions; track f) {
+              <option [value]="f">{{ f }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assigned Technician</label>
+          <input
+            type="text"
+            class="form-input"
+            [value]="formData().technician"
+            (input)="updateField('technician', $any($event.target).value)"
+            placeholder="Technician or team name"
+          />
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Drawer Footer -->
+  <div class="drawer-footer">
+    <button class="btn-cancel" (click)="onCancel()">Cancel</button>
+    <button class="btn-save" (click)="onSave()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+        <polyline points="17,21 17,13 7,13 7,21"/>
+        <polyline points="7,3 7,8 15,8"/>
+      </svg>
+      {{ mode() === 'create' ? 'Create Contract' : 'Save Changes' }}
+    </button>
+  </div>
+
+</div>

@@ -1,0 +1,264 @@
+/* pm-table.component.css */
+
+.pm-table-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pm-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.pm-table-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.btn-add-pm {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-pm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.pm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.pm-table thead tr {
+  background: #f8f9fa;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.pm-table th {
+  padding: 0.75rem 0.875rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.pm-row {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.15s;
+}
+
+.pm-row:hover {
+  background: #f9fafb;
+}
+
+.pm-row.row-overdue {
+  background: #fff7f7;
+}
+
+.pm-row.row-overdue:hover {
+  background: #fee2e2;
+}
+
+.pm-table td {
+  padding: 0.75rem 0.875rem;
+  vertical-align: middle;
+}
+
+/* Task cell */
+.task-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.task-id {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* Building cell */
+.building-cell {
+  color: #374151;
+  white-space: nowrap;
+}
+
+/* Category badge */
+.category-badge {
+  display: inline-flex;
+  padding: 0.2rem 0.6rem;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.freq-cell {
+  color: #374151;
+  white-space: nowrap;
+}
+
+.date-cell {
+  white-space: nowrap;
+  color: #374151;
+  font-size: 0.8125rem;
+}
+
+.due-label {
+  font-size: 0.6875rem;
+  color: #9ca3af;
+  margin-top: 0.1rem;
+}
+
+.overdue-text {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.due-soon-text {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.tech-cell {
+  color: #374151;
+  white-space: nowrap;
+}
+
+/* Status badges */
+.pm-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-overdue {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-due-soon {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-scheduled {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-completed {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* Linked badge */
+.linked-badge {
+  display: inline-flex;
+  padding: 0.2rem 0.6rem;
+  background: #eff6ff;
+  color: #3b82f6;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.no-linked {
+  color: #d1d5db;
+}
+
+/* Actions */
+.actions-cell {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+.btn-done {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.625rem;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-done:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.btn-del {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #fef2f2;
+  color: #ef4444;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-del:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Empty state */
+.empty-row td {
+  padding: 3rem 1rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: #9ca3af;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
+}

@@ -73,7 +73,7 @@
 
 :root {
   font-size: 14px;
-  --font-family: 'Roboto','Prompt','sans-serif';
+  --font-family: 'Prompt','Roboto','sans-serif';
 }
 
 /* Body Styles - responsive */

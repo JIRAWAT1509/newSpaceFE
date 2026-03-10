@@ -122,32 +122,32 @@
 
 .compact-stat-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 0.75rem;
   padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   gap: 1rem;
   transition: all 0.3s ease;
   flex: 1;
+  border: 1px solid rgb(var(--border));
 }
 
 .compact-stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .compact-stat-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.375rem;
+  font-size: 1.25rem;
   color: white;
   flex-shrink: 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .compact-stat-card.customers .compact-stat-icon {
@@ -164,7 +164,7 @@
 }
 
 .compact-stat-label {
-  font-size: 0.6875rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #6b7280;
   text-transform: uppercase;
@@ -173,9 +173,9 @@
 }
 
 .compact-stat-value {
-  font-size: 1.875rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  color: #1f2937;
+  color: #111827;
   line-height: 1;
   margin-bottom: 0.25rem;
 }
@@ -365,7 +365,7 @@
   to { opacity: 1; }
 }
 
-.drawer-container {
+.drawer-panel {
   position: fixed;
   top: 0;
   right: -600px;
@@ -373,12 +373,11 @@
   height: 100vh;
   background: white;
   box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
-  z-index: 1001;
   transition: right 0.3s ease;
   overflow-y: auto;
 }
 
-.drawer-container.open {
+.drawer-panel.open {
   right: 0;
 }
 
@@ -447,13 +446,13 @@
   }
 
   .compact-stat-icon {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     font-size: 1.25rem;
   }
 
   .compact-stat-value {
-    font-size: 1.75rem;
+    font-size: 1.35rem;
   }
 
   .drawer-container {
@@ -482,12 +481,12 @@
   }
 
   .compact-stat-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
   }
 
   .compact-stat-value {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
 }

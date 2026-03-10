@@ -63,8 +63,7 @@
               @if (isExpanded() || isHovering) {
                 <div [@fadeInOut] class="w-full min-w-0 ml-1 flex-1 flex items-center justify-between">
                   <span
-                    class="font-medium text-sm transition-colors duration-200 drop-shadow-md break-words"
-                    style="word-break: break-word; white-space: normal;"
+                    class="font-medium text-sm duration-200 drop-shadow-md text-nowrap"
                     [ngClass]="{
                       'text-primary-foreground': isItemHighlighted(item),
                       'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)
@@ -120,8 +119,7 @@
                 @if (isExpanded() || isHovering) {
                   <div class="flex justify-between items-center w-full min-w-0 ml-1 flex-1" [@fadeInOut]>
                     <span
-                      class="font-medium text-sm transition-colors duration-200 drop-shadow-md break-words"
-                      style="word-break: break-word; white-space: normal;"
+                      class="font-medium text-sm duration-200 drop-shadow-md text-nowrap"
                       [ngClass]="{
                         'text-primary-foreground': isItemHighlighted(item),
                         'text-primary-foreground/80 group-hover:text-primary-foreground': !isItemHighlighted(item)

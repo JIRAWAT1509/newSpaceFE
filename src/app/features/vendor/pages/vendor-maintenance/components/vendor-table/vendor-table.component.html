@@ -1,0 +1,108 @@
+<!-- vendor-table.component.html -->
+<div class="table-wrapper">
+  <table class="vendor-table">
+    <thead>
+      <tr>
+        <th>Contract</th>
+        <th>Type</th>
+        <th>Vendor</th>
+        @if (showAllColumns()) {
+          <th>Owner</th>
+          <th>Start</th>
+          <th>Recurring</th>
+        }
+        <th>Value</th>
+        <th>End Date</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (contract of contracts(); track contract.id) {
+        <tr class="table-row">
+          <td class="contract-cell">
+            <div class="contract-name">{{ contract.name }}</div>
+            <div class="contract-id">{{ contract.id }} · {{ contract.building }}</div>
+          </td>
+          <td>
+            <span class="type-badge" [ngStyle]="getTypeBadgeStyle(contract.type)">
+              {{ contract.type }}
+            </span>
+          </td>
+          <td class="vendor-cell">
+            <div class="vendor-name">{{ contract.vendor }}</div>
+            <div class="vendor-contact">{{ contract.vendorContact }}</div>
+          </td>
+          @if (showAllColumns()) {
+            <td class="owner-cell">
+              <div class="owner-name">{{ contract.owner }}</div>
+              <div class="owner-dept">{{ contract.dept }}</div>
+            </td>
+            <td class="date-cell">{{ formatDate(contract.start) }}</td>
+            <td class="recurring-cell">{{ contract.recurring }}</td>
+          }
+          <td class="value-cell">{{ formatValue(contract.value) }}</td>
+          <td class="end-date-cell">
+            <div class="date-label">{{ formatDate(contract.end) }}</div>
+            <div class="days-label" [class.days-critical]="getDaysUntilEnd(contract) <= 30" [class.days-warning]="getDaysUntilEnd(contract) > 30 && getDaysUntilEnd(contract) <= 90" [class.days-expired]="getDaysUntilEnd(contract) < 0">
+              @if (getDaysUntilEnd(contract) < 0) {
+                Expired {{ -getDaysUntilEnd(contract) }}d ago
+              } @else {
+                {{ getDaysUntilEnd(contract) }}d left
+              }
+            </div>
+            <div class="progress-bar-track">
+              <div
+                class="progress-bar-fill"
+                [class]="getProgressClass(contract)"
+                [style.width.%]="getProgressPercent(contract)"
+              ></div>
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [class]="getStatusClass(contract)">
+              @if (getStatusLabel(contract) === 'Expiring') {
+                <span class="pulse-dot"></span>
+              }
+              {{ getStatusLabel(contract) }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button class="btn-action btn-view" (click)="onView(contract.id)" title="View">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+            <button class="btn-action btn-edit" (click)="onEdit(contract.id)" title="Edit">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="btn-action btn-delete" (click)="onDelete(contract.id)" title="Delete">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3,6 5,6 21,6"/>
+                <path d="M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4h6v2"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="9" class="empty-row">
+            <div class="empty-state">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+              <p>No contracts found</p>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

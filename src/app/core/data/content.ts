@@ -54,30 +54,37 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     primary_content: 'area',
     secondary_content: [
       {
-        name: 'Area Layout Management',
+        name: 'Master',
         icon: 'assets/icons/briefcase-outline.svg',
-        sub: [
-          {
-            name: 'Master',
-            route: '/area/layout/master',
-            hasDeeper: true,
-            deeperNote:
-              'Contains: Building, Floor, Zone, Layout, Price List, etc.',
-          },
-          {
-            name: 'Area Maintenance',
-            route: '/area/layout/inquiry',
-            hasDeeper: true,
-            deeperNote: 'Contains: Check status, Availability, Inspection',
-          },
-          // {
-          //   name: 'reports',
-          //   route: '/area/layout/reports',
-          //   hasDeeper: true,
-          //   deeperNote: 'Contains: Layout reports, Current area reports',
-          // },
-        ],
+                    route: '/area/layout/master',
+
+        // sub: [
+        //   {
+        //     name: 'Master',
+        //     route: '/area/layout/master',
+        //     hasDeeper: true,
+        //     deeperNote:
+        //       'Contains: Building, Floor, Zone, Layout, Price List, etc.',
+        //   },
+        //   {
+        //     name: 'Area Maintenance',
+        //     route: '/area/layout/inquiry',
+        //     hasDeeper: true,
+        //     deeperNote: 'Contains: Check status, Availability, Inspection',
+        //   },
+        //   // {
+        //   //   name: 'reports',
+        //   //   route: '/area/layout/reports',
+        //   //   hasDeeper: true,
+        //   //   deeperNote: 'Contains: Layout reports, Current area reports',
+        //   // },
+        // ],
       },
+       {
+        name: 'Area Maintenance',
+        icon: 'assets/icons/briefcase-outline.svg',
+            route: '/area/layout/inquiry',
+                  }
       // {
       //   name: 'area_maintenance_closure',
       //   icon: 'assets/icons/clipboard-outline.svg',
@@ -392,7 +399,7 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     secondary_content: [
       // --- UTILITIES SECTION ---
       {
-        name: 'Utilities Meter Management',
+        name: 'Meter Management',
         icon: 'assets/icons/business-outline.svg',
         route: '/facilities/utilities/master',
       },
@@ -455,6 +462,20 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       //     { name: 'reports', route: '/facilities/workorder/reports' },
       //   ],
       // },
+    ],
+  },
+
+    // ============================================
+  // 7. VENDOR MAINTENANCE
+  // ============================================
+  {
+    primary_content: 'vendor',
+    secondary_content: [
+      {
+        name: 'Vendor Maintenance',
+        icon: 'assets/icons/briefcase-outline.svg',
+        route: '/vendor/maintenance',
+      },
     ],
   },
 
@@ -546,8 +567,10 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
     ],
   },
 
+
+
   // ============================================
-  // 7. SETTING
+  // 8. SETTING
   // ============================================
   {
     primary_content: 'setting',
@@ -652,6 +675,8 @@ export const NAVIGATION_CONTENT: NavigationItem[] = [
       {
         name: 'interface_configuration',
         icon: 'assets/icons/business-outline.svg',
+                    route: '/setting/system/interface',
+
         sub: [
           {
             name: 'interface_settings',

@@ -1,0 +1,264 @@
+<!-- vendor-detail-modal.component.html -->
+<div class="modal-overlay" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="header-badges">
+          <span class="type-badge" [ngStyle]="getTypeBadgeStyle()">{{ contract().type }}</span>
+          <span class="status-badge" [class]="getStatusClass()">{{ getStatusLabel() }}</span>
+          <span class="category-badge">{{ contract().category }}</span>
+          <span class="building-badge">{{ contract().building }}</span>
+        </div>
+        <h2 class="modal-title">{{ contract().name }}</h2>
+        <p class="modal-id">{{ contract().id }}</p>
+      </div>
+      <div class="modal-header-actions">
+        <button class="btn-edit" (click)="onEdit()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit
+        </button>
+        <button class="btn-close" (click)="onClose()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="modal-tabs">
+      @for (tab of tabs; track tab.id) {
+        <button
+          class="tab-btn"
+          [class.active]="activeTab() === tab.id"
+          (click)="setTab(tab.id)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+
+      <!-- ── Tab: Overview ── -->
+      @if (activeTab() === 'overview') {
+        <div class="tab-content">
+
+          <!-- 3-col detail grid -->
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Start Date</div>
+              <div class="detail-value">{{ formatDate(contract().start) }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">End Date</div>
+              <div class="detail-value" [class.text-danger]="getDaysUntilEnd() < 0" [class.text-warning]="getDaysUntilEnd() >= 0 && getDaysUntilEnd() <= 90">
+                {{ formatDate(contract().end) }}
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Days Remaining</div>
+              <div class="detail-value" [class.text-danger]="getDaysUntilEnd() < 0" [class.text-warning]="getDaysUntilEnd() >= 0 && getDaysUntilEnd() <= 90">
+                @if (getDaysUntilEnd() < 0) {
+                  Expired {{ -getDaysUntilEnd() }} days ago
+                } @else {
+                  {{ getDaysUntilEnd() }} days
+                }
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Priority</div>
+              <div class="detail-value">
+                <span class="priority-badge priority-{{ contract().priority | lowercase }}">{{ contract().priority }}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">PM Frequency</div>
+              <div class="detail-value">{{ contract().pmFreq }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Notice Period</div>
+              <div class="detail-value">{{ contract().noticePeriod }} days</div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          @if (contract().detail) {
+            <div class="detail-description">
+              <div class="detail-label">Description</div>
+              <p class="description-text">{{ contract().detail }}</p>
+            </div>
+          }
+
+          <!-- Owner Info -->
+          <div class="owner-section">
+            <div class="detail-label">Business Owner</div>
+            <div class="owner-card">
+              <div class="owner-avatar">{{ contract().owner.charAt(0) }}</div>
+              <div class="owner-info">
+                <div class="owner-name">{{ contract().owner }}</div>
+                <div class="owner-dept">{{ contract().dept }}</div>
+                <div class="owner-email">{{ contract().ownerEmail }}</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      }
+
+      <!-- ── Tab: Vendor ── -->
+      @if (activeTab() === 'vendor') {
+        <div class="tab-content">
+
+          <div class="vendor-hero">
+            <div class="vendor-logo">{{ getVendorInitial() }}</div>
+            <div class="vendor-hero-info">
+              <h3 class="vendor-hero-name">{{ contract().vendor }}</h3>
+              <p class="vendor-hero-contact">Primary: {{ contract().vendorContact }}</p>
+            </div>
+          </div>
+
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Contact Person</div>
+              <div class="detail-value">{{ contract().vendorContact }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Phone</div>
+              <div class="detail-value">{{ contract().vendorPhone }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Email</div>
+              <div class="detail-value">{{ contract().vendorEmail }}</div>
+            </div>
+            <div class="detail-item full-span">
+              <div class="detail-label">Address</div>
+              <div class="detail-value">{{ contract().vendorAddress }}</div>
+            </div>
+          </div>
+
+        </div>
+      }
+
+      <!-- ── Tab: Financial ── -->
+      @if (activeTab() === 'financial') {
+        <div class="tab-content">
+
+          <div class="stat-mini-row">
+            <div class="stat-mini">
+              <div class="stat-mini-label">Contract Value</div>
+              <div class="stat-mini-value">{{ formatCurrency(contract().value) }}</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini-label">Recurring</div>
+              <div class="stat-mini-value">{{ contract().recurring }}</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini-label">Payment Terms</div>
+              <div class="stat-mini-value">{{ contract().payment }}</div>
+            </div>
+          </div>
+
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Auto Renew</div>
+              <div class="detail-value">{{ contract().autoRenew }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Penalty Clause</div>
+              <div class="detail-value">{{ contract().penalty || 'None' }}</div>
+            </div>
+          </div>
+
+        </div>
+      }
+
+      <!-- ── Tab: PM Schedule ── -->
+      @if (activeTab() === 'pm') {
+        <div class="tab-content">
+
+          @if (linkedPMTasks().length === 0) {
+            <div class="pm-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <p>No PM tasks linked to this contract</p>
+            </div>
+          } @else {
+            <div class="pm-list">
+              @for (task of linkedPMTasks(); track task.id) {
+                <div class="pm-item">
+                  <div class="pm-item-left">
+                    <div class="pm-task-name">{{ task.task }}</div>
+                    <div class="pm-task-meta">{{ task.building }} · {{ task.freq }} · {{ task.tech }}</div>
+                  </div>
+                  <div class="pm-item-right">
+                    <span class="pm-status-badge" [class]="getPMStatusClass(task.status)">{{ task.status }}</span>
+                    <div class="pm-date">Due: {{ formatDate(task.nextDue) }}</div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- ── Tab: History ── -->
+      @if (activeTab() === 'history') {
+        <div class="tab-content">
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot dot-green"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">Contract Created</div>
+                <div class="timeline-meta">{{ formatDate(contract().start) }}</div>
+                <div class="timeline-desc">Contract signed and activated.</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot dot-blue"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">Owner Assigned</div>
+                <div class="timeline-meta">{{ formatDate(contract().start) }}</div>
+                <div class="timeline-desc">{{ contract().owner }} ({{ contract().dept }}) assigned as contract owner.</div>
+              </div>
+            </div>
+            @if (getDaysUntilEnd() <= 90 && getDaysUntilEnd() >= 0) {
+              <div class="timeline-item">
+                <div class="timeline-dot dot-orange"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Expiry Alert Triggered</div>
+                  <div class="timeline-meta">Auto-generated</div>
+                  <div class="timeline-desc">Contract expiring in {{ getDaysUntilEnd() }} days. Renewal action required.</div>
+                </div>
+              </div>
+            }
+            @if (getDaysUntilEnd() < 0) {
+              <div class="timeline-item">
+                <div class="timeline-dot dot-red"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Contract Expired</div>
+                  <div class="timeline-meta">{{ formatDate(contract().end) }}</div>
+                  <div class="timeline-desc">Contract has expired. Renewal or termination required.</div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+
+  </div>
+</div>

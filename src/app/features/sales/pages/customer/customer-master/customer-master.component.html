@@ -143,28 +143,29 @@
 
   </div>
 
-  <!-- ==================== DRAWER: CREATE/EDIT ==================== -->
-  @if (isDrawerOpen()) {
-    <div class="drawer-overlay" (click)="closeDrawer()"></div>
-
-    <div class="drawer-container" [class.open]="isDrawerOpen()">
-      <app-customer-drawer
-        [mode]="drawerMode()"
-        [customer]="selectedCustomer()"
-        [availableSegments]="availableSegments()"
-        (save)="drawerMode() === 'create' ? createCustomer($event) : updateCustomer(selectedCustomerId()!, $event)"
-        (cancel)="closeDrawer()"
-      ></app-customer-drawer>
-    </div>
-  }
-
-  <!-- ==================== DETAIL MODAL ==================== -->
-  @if (isDetailModalOpen() && detailModalCustomer()) {
-    <app-customer-detail-modal
-      [customer]="detailModalCustomer()!"
-      (close)="closeDetailModal()"
-      (edit)="openEditDrawer($event); closeDetailModal()"
-    ></app-customer-detail-modal>
-  }
 
 </div>
+
+<!-- ==================== DRAWER: CREATE/EDIT ==================== -->
+@if (isDrawerOpen()) {
+  <div class="drawer-overlay" (click)="closeDrawer()"></div>
+
+  <div class="drawer-panel" [class.open]="isDrawerOpen()">
+    <app-customer-drawer
+      [mode]="drawerMode()"
+      [customer]="selectedCustomer()"
+      [availableSegments]="availableSegments()"
+      (save)="drawerMode() === 'create' ? createCustomer($event) : updateCustomer(selectedCustomerId()!, $event)"
+      (cancel)="closeDrawer()"
+    ></app-customer-drawer>
+  </div>
+}
+
+<!-- ==================== DETAIL MODAL ==================== -->
+@if (isDetailModalOpen() && detailModalCustomer()) {
+  <app-customer-detail-modal
+    [customer]="detailModalCustomer()!"
+    (close)="closeDetailModal()"
+    (edit)="openEditDrawer($event); closeDetailModal()"
+  ></app-customer-detail-modal>
+}

@@ -165,6 +165,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     collection: 'pi pi-wallet',
     facilities: 'pi pi-cog',
     report_dashboard: 'pi pi-chart-bar',
+    vendor: 'pi pi-wrench',
     setting: 'pi pi-sliders-h',
   };
 

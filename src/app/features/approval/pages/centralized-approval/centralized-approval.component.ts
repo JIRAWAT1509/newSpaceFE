@@ -520,6 +520,62 @@ export class CentralizedApprovalComponent implements OnInit {
     this.showApproveAllConfirm.set(false);
   }
 
+  allTotalCount = computed(() => this.effectiveApprovalRows().length);
+
+  resetFilters(): void {
+    this.selectedBranch.set('');
+    this.showMyDocumentsOnly.set(false);
+    this.selectedDocTypeIds.set([
+      'quotation', 'booking', 'lease', 'lease_renewal',
+      'amendment', 'discount', 'record_renewal', 'addendum',
+    ]);
+    this.searchKeyword.set('');
+  }
+
+  getApproverSteps(row: ApprovalRow): { name: string; shortName: string; status: 'done' | 'waiting' | 'pending' | 'rejected' }[] {
+    const names = [row.approver1Display, row.approver2Display, row.approver3Display];
+    if (row.approvalStatus === 'approved') {
+      return names.map((n) => ({ name: n, shortName: n.split(' ')[0], status: 'done' as const }));
+    }
+    const wl = row.waitingForApproverLevel;
+    return names.map((n, i) => {
+      const level = (i + 1) as 1 | 2 | 3;
+      let status: 'done' | 'waiting' | 'pending' | 'rejected' = 'pending';
+      if (wl != null) {
+        if (level < wl) status = 'done';
+        else if (level === wl) status = 'waiting';
+      }
+      return { name: n, shortName: n.split(' ')[0], status };
+    });
+  }
+
+  getStepDotColor(status: string): string {
+    const colors: Record<string, string> = {
+      done: '#16a34a', waiting: '#d97706', rejected: '#dc2626', pending: '#cbd5e1',
+    };
+    return colors[status] ?? '#cbd5e1';
+  }
+
+  getStepStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      done: 'อนุมัติแล้ว', waiting: 'รออนุมัติ', rejected: 'ปฏิเสธ', pending: 'รอดำเนินการ',
+    };
+    return labels[status] ?? 'รอดำเนินการ';
+  }
+
+  getTypeBadgeClass(contractType: string): string {
+    const map: Record<string, string> = {
+      QUOTATION_AGREEMENT: 'type-quotation',
+      DEPOSIT_AGREEMENT: 'type-booking',
+      LEASE_AGREEMENT: 'type-lease',
+      LEASE_RENEWAL: 'type-renewal',
+      LEASE_AMENDMENT: 'type-amendment',
+      ADDENDUM: 'type-addendum',
+      OTHER: 'type-other',
+    };
+    return map[contractType] ?? 'type-other';
+  }
+
   private hash(s: string): number {
     let h = 0;
     for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i);

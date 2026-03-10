@@ -11,10 +11,7 @@ export const routes: Routes = [
   },
   {
     path: 'forgot-password',
-    loadComponent: () =>
-      import('./features/auth/pages/forgot-password/forgot-password-redirect.component').then(
-        (m) => m.ForgotPasswordRedirectComponent
-      ),
+    loadComponent: () => import('./features/auth/pages/forgot-password/forgot-password-redirect.component').then((m) => m.ForgotPasswordRedirectComponent),
   },
   {
     path: 'reset-password',
@@ -45,7 +42,8 @@ export const routes: Routes = [
   },
   {
     path: 'sales',
-    loadChildren: () => import('./features/sales/sales.routes').then(m => m.SALES_ROUTES)
+    loadChildren: () => import('./features/sales/sales.routes').then(m => m.SALES_ROUTES),
+    data: { module: 'sales' }
   },
 
   // ============================================
@@ -58,7 +56,8 @@ export const routes: Routes = [
   },
   {
     path: 'area',
-    loadChildren: () => import('./features/area/area.routes').then(m => m.AREA_ROUTES)
+    loadChildren: () => import('./features/area/area.routes').then(m => m.AREA_ROUTES),
+    data: { module: 'area' }
   },
 
   // ============================================
@@ -71,7 +70,8 @@ export const routes: Routes = [
   },
   {
     path: 'contract',
-    loadChildren: () => import('./features/contract/contract.routes').then(m => m.CONTRACT_ROUTES)
+    loadChildren: () => import('./features/contract/contract.routes').then(m => m.CONTRACT_ROUTES),
+    data: { module: 'contract' }
   },
 
   // ============================================
@@ -79,7 +79,8 @@ export const routes: Routes = [
   // ============================================
   {
     path: 'approval',
-    loadChildren: () => import('./features/approval/approval.routes').then(m => m.APPROVAL_ROUTES)
+    loadChildren: () => import('./features/approval/approval.routes').then(m => m.APPROVAL_ROUTES),
+    data: { module: 'approval' }
   },
 
   // ============================================
@@ -87,7 +88,7 @@ export const routes: Routes = [
   // ============================================
   {
     path: 'collection',
-    loadChildren: () => import('./features/collection/collection.routes').then(m => m.COLLECTION_ROUTES)
+    loadChildren: () => import('./features/collection/collection.routes').then(m => m.COLLECTION_ROUTES),
   },
   {
     path: 'finance',
@@ -96,7 +97,8 @@ export const routes: Routes = [
   },
   {
     path: 'finance',
-    loadChildren: () => import('./features/finance/finance.routes').then(m => m.FINANCE_ROUTES)
+    loadChildren: () => import('./features/finance/finance.routes').then(m => m.FINANCE_ROUTES),
+    data: { module: 'finance' }
   },
 
   // ============================================
@@ -109,7 +111,8 @@ export const routes: Routes = [
   },
   {
     path: 'facilities',
-    loadChildren: () => import('./features/facilities/facilities.routes').then(m => m.FACILITIES_ROUTES)
+    loadChildren: () => import('./features/facilities/facilities.routes').then(m => m.FACILITIES_ROUTES),
+    data: { module: 'facilities' }
   },
 
   // ============================================
@@ -117,11 +120,13 @@ export const routes: Routes = [
   // ============================================
   {
     path: 'reports',
-    loadChildren: () => import('./features/reports/reports.routes').then(m => m.REPORTS_ROUTES)
+    loadChildren: () => import('./features/reports/reports.routes').then(m => m.REPORTS_ROUTES),
+    data: { module: 'report_dashboard' }
   },
   {
     path: 'dashboard',
-    loadChildren: () => import('./features/dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES)
+    loadChildren: () => import('./features/dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES),
+    data: { module: 'dashboard' }
   },
 
   // ============================================
@@ -134,7 +139,22 @@ export const routes: Routes = [
   },
   {
     path: 'setting',
-    loadChildren: () => import('./features/setting/setting.routes').then(m => m.SETTING_ROUTES)
+    loadChildren: () => import('./features/setting/setting.routes').then(m => m.SETTING_ROUTES),
+    data: { module: 'setting' }
+  },
+
+  // ============================================
+  // 8. VENDOR MAINTENANCE MODULE
+  // ============================================
+  {
+    path: 'vendor',
+    redirectTo: 'vendor/maintenance',
+    pathMatch: 'full'
+  },
+  {
+    path: 'vendor',
+    loadChildren: () => import('./features/vendor/vendor.routes').then(m => m.VENDOR_ROUTES),
+    data: { module: 'vendor' }
   },
 
   // ============================================

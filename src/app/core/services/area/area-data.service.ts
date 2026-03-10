@@ -161,6 +161,21 @@ export class AreaDataService {
     );
   }
 
+
+  reorderFloors(buildingId: string, orderedFloors: Floor[]): void {
+    this.buildingsData.update((list) =>
+      list.map((b) => {
+        if (b.id !== buildingId) return b;
+        const reordered = orderedFloors.map((f) => {
+          const existing = b.floors.find((bf) => bf.id === f.id);
+          return existing ? { ...existing, ...f } : (f as FloorWithAreas);
+        });
+        return { ...b, floors: reordered };
+      }),
+    );
+  }
+
+
   toggleFloorActive(floorId: string): void {
     this.buildingsData.update((list) =>
       list.map((b) => ({

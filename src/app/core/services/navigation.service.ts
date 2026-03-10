@@ -29,6 +29,14 @@ export class NavigationService {
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       this.activeSubRoute.set(event.urlAfterRedirects);
+
+        // Get data.module from route
+      let currentRoute = this.router.routerState.root;
+      while (currentRoute.firstChild) {
+        currentRoute = currentRoute.firstChild;
+      }
+      const module = currentRoute.snapshot.data['module'];
+      this.setActivePrimaryNavItem(module);
     });
   }
 

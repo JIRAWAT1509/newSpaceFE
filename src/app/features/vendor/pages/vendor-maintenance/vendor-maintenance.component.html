@@ -1,0 +1,420 @@
+<!-- vendor-maintenance.component.html -->
+<div class="vendor-maintenance-container">
+
+  <!-- ==================== PAGE HEADER ==================== -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10,9 9,9 8,9"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="header-title">Vendor Contract Management</h1>
+        <p class="header-subtitle">Manage vendor contracts, maintenance schedules and expiry tracking</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-export" (click)="exportContracts()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7,10 12,15 17,10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export
+      </button>
+      <button class="btn-add" (click)="openCreateDrawer()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Contract
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW TABS ==================== -->
+  <div class="view-tabs">
+    <button class="view-tab" [class.active]="activeView() === 'dashboard'" (click)="setView('dashboard')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/>
+        <rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      Dashboard
+    </button>
+    <button class="view-tab" [class.active]="activeView() === 'contracts'" (click)="setView('contracts')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/>
+      </svg>
+      All Contracts
+      <span class="tab-count">{{ filteredContracts().length }}</span>
+    </button>
+    <button class="view-tab" [class.active]="activeView() === 'pm'" (click)="setView('pm')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      Preventive Maintenance
+      <span class="tab-count pm-count">{{ pmStats().overdue }} overdue</span>
+    </button>
+  </div>
+
+  <!-- ==================== LOADING ==================== -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>Loading contract data...</p>
+    </div>
+  }
+
+  <!-- ==================== DASHBOARD VIEW ==================== -->
+  @if (!isLoading() && activeView() === 'dashboard') {
+    <div class="dashboard-content">
+
+      <!-- KPI Cards -->
+      <app-vendor-kpi-cards [stats]="stats()"></app-vendor-kpi-cards>
+
+      <!-- Alert Banner -->
+      @if (expiredCount() > 0 || expiring30Count() > 0) {
+        <div class="alert-banner">
+          <div class="alert-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div class="alert-text">
+            <strong>Action Required:</strong>
+            @if (expiredCount() > 0) {
+              <span> {{ expiredCount() }} contract{{ expiredCount() > 1 ? 's' : '' }} expired</span>
+            }
+            @if (expiredCount() > 0 && expiring30Count() > 0) {
+              <span>,</span>
+            }
+            @if (expiring30Count() > 0) {
+              <span> {{ expiring30Count() }} contract{{ expiring30Count() > 1 ? 's' : '' }} expiring within 30 days</span>
+            }
+            <span>. Review and renew as needed.</span>
+          </div>
+          <button class="alert-action" (click)="setView('contracts')">View All</button>
+        </div>
+      }
+
+      <!-- Two-column layout: table + side panel -->
+      <div class="dashboard-main-grid">
+
+        <!-- Left: Contract Table (8 max) -->
+        <div class="table-card">
+          <div class="card-header">
+            <h3 class="card-title">Recent Contracts <span class="count-badge">{{ dashboardContracts().length }}</span></h3>
+            <button class="btn-view-all" (click)="setView('contracts')">View all</button>
+          </div>
+          <app-vendor-table
+            [contracts]="dashboardContracts()"
+            [showAllColumns]="false"
+            (viewContract)="openDetailModal($event)"
+            (editContract)="openEditDrawer($event)"
+            (deleteContract)="deleteContract($event)"
+          ></app-vendor-table>
+        </div>
+
+        <!-- Right: Expiry Tracker -->
+        <app-expiry-tracker
+          [contracts]="contracts()"
+          [pmTasks]="pmTasks()"
+          (viewContract)="openDetailModal($event)"
+        ></app-expiry-tracker>
+
+      </div>
+
+      <!-- Bottom analytics row: 3 columns -->
+      <div class="analytics-row">
+
+        <!-- Col 1: Contract Type Mix (SVG Donut) -->
+        <div class="analytics-card">
+          <div class="analytics-card-header">
+            <h4 class="analytics-title">Contract Type Mix</h4>
+          </div>
+          <div class="donut-chart-area">
+            <div class="donut-wrap">
+              <svg width="140" height="140" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#f3f4f6" stroke-width="18"/>
+                @for (seg of donutSegments(); track seg.type) {
+                  <circle
+                    cx="70"
+                    cy="70"
+                    r="60"
+                    fill="none"
+                    [attr.stroke]="seg.color"
+                    stroke-width="18"
+                    [attr.stroke-dasharray]="seg.strokeDasharray"
+                    [attr.stroke-dashoffset]="seg.strokeDashoffset"
+                    stroke-linecap="butt"
+                    transform="rotate(-90 70 70)"
+                  />
+                }
+                <text x="70" y="65" text-anchor="middle" font-size="22" font-weight="700" fill="#1f2937">{{ contracts().length }}</text>
+                <text x="70" y="82" text-anchor="middle" font-size="10" fill="#9ca3af">contracts</text>
+              </svg>
+            </div>
+            <div class="donut-legend">
+              @for (item of typeMix(); track item.type) {
+                <div class="legend-item">
+                  <span class="legend-dot" [style.background]="item.color"></span>
+                  <span class="legend-type">{{ item.type }}</span>
+                  <span class="legend-count">{{ item.count }}</span>
+                  <span class="legend-pct">{{ item.percent }}%</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 2: Budget by Type (Bars) -->
+        <div class="analytics-card">
+          <div class="analytics-card-header">
+            <h4 class="analytics-title">Budget by Contract Type</h4>
+          </div>
+          <div class="budget-bars">
+            @for (item of budgetMix(); track item.type) {
+              <div class="budget-bar-row">
+                <div class="bar-type-label">{{ item.type }}</div>
+                <div class="bar-track">
+                  <div class="bar-fill" [style.width.%]="item.percent" [style.background]="item.color"></div>
+                </div>
+                <div class="bar-value">{{ formatCurrency(item.value) }}</div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Col 3: Upcoming PM Tasks mini -->
+        <div class="analytics-card">
+          <div class="analytics-card-header">
+            <h4 class="analytics-title">Upcoming PM Tasks</h4>
+            <span class="overdue-chip">{{ pmStats().overdue }} overdue</span>
+          </div>
+          <div class="pm-mini-list">
+            @for (task of upcomingPMMini(); track task.id) {
+              <div class="pm-mini-item">
+                <div class="pm-mini-dot" [class]="'dot-' + task.status.toLowerCase().replace(' ', '-')"></div>
+                <div class="pm-mini-info">
+                  <div class="pm-mini-name">{{ task.task }}</div>
+                  <div class="pm-mini-meta">{{ task.building }} · {{ formatDate(task.nextDue) }}</div>
+                </div>
+                <span class="pm-mini-status" [class]="getPMStatusClass(task.status)">{{ task.status }}</span>
+              </div>
+            } @empty {
+              <div class="pm-mini-empty">No upcoming tasks</div>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- ==================== ALL CONTRACTS VIEW ==================== -->
+  @if (!isLoading() && activeView() === 'contracts') {
+    <div class="contracts-content">
+
+      <!-- Table container with filters -->
+      <div class="table-container">
+        <div class="table-header-wrapper">
+          <div class="table-title-row">
+            <h3 class="table-title">
+              All Contracts
+              <span class="count-label">({{ filteredContracts().length }} of {{ contracts().length }})</span>
+            </h3>
+            <button class="btn-add-inline" (click)="openCreateDrawer()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              New
+            </button>
+          </div>
+
+          <!-- Filters row -->
+          <div class="filters-row">
+            <div class="search-wrap">
+              <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                type="text"
+                class="search-input"
+                placeholder="Search contracts..."
+                [value]="searchQuery()"
+                (input)="onSearch($event)"
+              />
+            </div>
+            <select class="filter-select" [value]="filterType()" (change)="onFilterType($event)">
+              <option value="">All Types</option>
+              @for (t of contractTypes; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+            <select class="filter-select" [value]="filterStatus()" (change)="onFilterStatus($event)">
+              <option value="">All Statuses</option>
+              @for (s of contractStatuses; track s) {
+                <option [value]="s">{{ s }}</option>
+              }
+            </select>
+            @if (searchQuery() || filterType() || filterStatus()) {
+              <button class="btn-clear" (click)="clearFilters()">Clear</button>
+            }
+          </div>
+        </div>
+
+        @if (filteredContracts().length === 0) {
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            <h3>No contracts found</h3>
+            <p>Try adjusting filters or add a new contract</p>
+            <button class="btn-add" (click)="openCreateDrawer()">Add Contract</button>
+          </div>
+        } @else {
+          <app-vendor-table
+            [contracts]="filteredContracts()"
+            [showAllColumns]="true"
+            (viewContract)="openDetailModal($event)"
+            (editContract)="openEditDrawer($event)"
+            (deleteContract)="deleteContract($event)"
+          ></app-vendor-table>
+        }
+      </div>
+
+    </div>
+  }
+
+  <!-- ==================== PM VIEW ==================== -->
+  @if (!isLoading() && activeView() === 'pm') {
+    <div class="pm-content">
+
+      <!-- PM KPI row -->
+      <div class="pm-kpi-row">
+        <div class="pm-kpi-card total">
+          <div class="pm-kpi-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <div class="pm-kpi-content">
+            <div class="pm-kpi-label">Total Tasks</div>
+            <div class="pm-kpi-value">{{ pmStats().total }}</div>
+          </div>
+        </div>
+        <div class="pm-kpi-card overdue">
+          <div class="pm-kpi-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+          </div>
+          <div class="pm-kpi-content">
+            <div class="pm-kpi-label">Overdue</div>
+            <div class="pm-kpi-value">{{ pmStats().overdue }}</div>
+          </div>
+        </div>
+        <div class="pm-kpi-card due-soon">
+          <div class="pm-kpi-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12,6 12,12 16,14"/>
+            </svg>
+          </div>
+          <div class="pm-kpi-content">
+            <div class="pm-kpi-label">Due Soon</div>
+            <div class="pm-kpi-value">{{ pmStats().dueSoon }}</div>
+          </div>
+        </div>
+        <div class="pm-kpi-card scheduled">
+          <div class="pm-kpi-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20,6 9,17 4,12"/>
+            </svg>
+          </div>
+          <div class="pm-kpi-content">
+            <div class="pm-kpi-label">Scheduled</div>
+            <div class="pm-kpi-value">{{ pmStats().scheduled }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PM Table -->
+      <app-pm-table
+        [pmTasks]="pmTasks()"
+        (markDone)="markPMDone($event)"
+        (deletePm)="deletePMTask($event)"
+        (addPm)="openCreateDrawer()"
+      ></app-pm-table>
+
+    </div>
+  }
+
+
+</div>
+
+<!-- ==================== DRAWER ==================== -->
+@if (isDrawerOpen()) {
+  <div class="drawer-overlay" (click)="closeDrawer()"></div>
+  <div class="drawer-panel" [class.open]="isDrawerOpen()">
+    <app-vendor-drawer
+      [mode]="drawerMode()"
+      [contract]="selectedContract()"
+      (save)="drawerMode() === 'create' ? createContract($event) : updateContract(selectedContractId()!, $event)"
+      (cancel)="closeDrawer()"
+    ></app-vendor-drawer>
+  </div>
+}
+
+<!-- ==================== DETAIL MODAL ==================== -->
+@if (isDetailModalOpen() && detailContract()) {
+  <app-vendor-detail-modal
+    [contract]="detailContract()!"
+    [pmTasks]="pmTasks()"
+    (close)="closeDetailModal()"
+    (edit)="openEditDrawer($event); closeDetailModal()"
+  ></app-vendor-detail-modal>
+}
+
+<!-- ==================== DELETE CONFIRM ==================== -->
+@if (deleteConfirmId()) {
+  <div class="confirm-overlay">
+    <div class="confirm-dialog">
+      <div class="confirm-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h3 class="confirm-title">Delete Contract</h3>
+      <p class="confirm-message">Are you sure you want to delete this contract? This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn-cancel-confirm" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-confirm-delete" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+}

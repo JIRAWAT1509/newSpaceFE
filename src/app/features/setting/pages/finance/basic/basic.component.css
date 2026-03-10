@@ -34,29 +34,31 @@
   margin-bottom: 1.5rem;
 }
 .summary-card {
-  background: #fff;
-  border-radius: 12px;
+  background: #ffffff !important;
+  border-radius: 0.75rem;
   padding: 1rem 1.25rem;
   display: flex;
   gap: 1rem;
   align-items: center;
-  border: 2px solid transparent;
+  border: 1px solid rgb(var(--border));
   cursor: pointer;
   transition: .2s;
   box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  min-height: 100px;
 }
 .summary-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 .summary-card.active {
-  border-color: #3b82f6;
-  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
-  box-shadow: 0 4px 12px rgba(59,130,246,.15);
+  border-color: rgb(var(--primary) / 0.3);
+  background: #ffffff !important;
+  box-shadow: 0 0 0 2px rgb(var(--primary) / 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 .card-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 0.75rem;
   display: grid;
   place-items: center;
   color: #fff;
