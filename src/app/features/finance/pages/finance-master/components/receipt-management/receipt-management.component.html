@@ -221,3 +221,10 @@
   (confirm)="onConfirmCancel()"
   (cancel)="onCancelConfirm()"
 />
+
+<app-success-toast
+  [isOpen]="showToast()"
+  [title]="toastTitle()"
+  [message]="toastMessage()"
+  (closed)="onToastClosed()"
+/>

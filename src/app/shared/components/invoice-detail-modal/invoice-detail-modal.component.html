@@ -1,72 +1,153 @@
 <!-- invoice-detail-modal.component.html -->
-
 <div class="modal-overlay" (click)="onClose()">
   <div class="modal-container" (click)="$event.stopPropagation()">
-    <!-- Header -->
+
+    <!-- ══════════ HEADER ══════════ -->
     <div class="modal-header">
       <div>
         <h2 class="modal-title">รายละเอียดใบแจ้งหนี้</h2>
-        <p class="modal-subtitle">เลขที่: {{ invoice().id }}</p>
+        <p class="modal-subtitle">เลขที่: {{ invoice().invoiceNumber || invoice().contractNumber || invoice().id }}</p>
       </div>
-      <button class="close-btn" (click)="onClose()">
-        <i class="pi pi-times"></i>
-      </button>
+      <div class="header-actions">
+        @if (!isEditing()) {
+          <button class="edit-btn" (click)="startEdit()" title="แก้ไข">
+            <i class="pi pi-pencil"></i>
+            <span>แก้ไข</span>
+          </button>
+        }
+        <button class="close-btn" (click)="onClose()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
     </div>
 
-    <!-- Body -->
+    <!-- ══════════ BODY ══════════ -->
     <div class="modal-body">
-      <!-- Customer Info Section -->
+
+      <!-- ── Edit Form (แสดงเมื่อกด แก้ไข) ── -->
+      @if (isEditing()) {
+        <form [formGroup]="editForm" class="edit-form-section">
+          <div class="edit-form-header">
+            <i class="pi pi-pencil"></i>
+            <span>โหมดแก้ไข</span>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <label class="edit-label required">เลขที่สัญญา / ใบแจ้งหนี้</label>
+              <input type="text" class="edit-input" formControlName="contractNumber" />
+            </div>
+            <div class="info-item">
+              <label class="edit-label required">ชื่อลูกค้า</label>
+              <input type="text" class="edit-input" formControlName="customerName" />
+            </div>
+            <div class="info-item">
+              <label class="edit-label">รายการเรียกเก็บ</label>
+              <input type="text" class="edit-input" formControlName="collectionItem" />
+            </div>
+            <div class="info-item">
+              <label class="edit-label required">จำนวนเงิน (บาท)</label>
+              <input type="number" class="edit-input text-right" formControlName="amount" step="0.01" />
+            </div>
+            <div class="info-item">
+              <label class="edit-label">วันที่เริ่มต้นเรียกเก็บ</label>
+              <input type="date" class="edit-input" formControlName="startDate" />
+            </div>
+            <div class="info-item">
+              <label class="edit-label">หมายเหตุ</label>
+              <input type="text" class="edit-input" formControlName="remark" />
+            </div>
+          </div>
+          <div class="edit-form-actions">
+            <button class="btn-edit-cancel" type="button" (click)="cancelEdit()">
+              <i class="pi pi-times"></i> ยกเลิกการแก้ไข
+            </button>
+            <button class="btn-edit-save" type="button" (click)="saveEdit()">
+              <i class="pi pi-check"></i> บันทึกการแก้ไข
+            </button>
+          </div>
+        </form>
+      }
+
+      <!-- ── Section 1: ข้อมูลสาขาและลูกค้า ── -->
       <div class="section">
         <h3 class="section-title">
-          <i class="pi pi-user"></i>
-          <span>ข้อมูลลูกค้า</span>
+          <i class="pi pi-building"></i>
+          <span>ข้อมูลสาขาและลูกค้า</span>
         </h3>
         <div class="info-grid">
           <div class="info-item">
-            <label>ชื่อลูกค้า</label>
-            <p>{{ invoice().customerName || invoice().description }}</p>
+            <label>สาขา</label>
+            <p class="code-text">
+              {{ invoice().branchCode || '—' }}
+              @if (invoice().branchName) {
+                <span class="muted"> — {{ invoice().branchName }}</span>
+              }
+            </p>
           </div>
           <div class="info-item">
-            <label>เลขที่สัญญา</label>
-            <p class="contract-number">{{ invoice().contractFile || invoice().contractNumber }}</p>
+            <label>ชื่อลูกค้า</label>
+            <p>{{ invoice().customerName || invoice().description || '—' }}</p>
+          </div>
+          <div class="info-item">
+            <label>ชื่อร้าน</label>
+            <p>{{ invoice().shopName || '—' }}</p>
+          </div>
+          <div class="info-item">
+            <label>ที่อยู่</label>
+            <p>{{ invoice().address || '—' }}</p>
+          </div>
+          <div class="info-item">
+            <label>หมายเหตุ</label>
+            <p>{{ invoice().remark || '—' }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Invoice Details Section -->
+      <!-- ── Section 2: ข้อมูลใบแจ้งหนี้ ── -->
       <div class="section">
         <h3 class="section-title">
           <i class="pi pi-file-check"></i>
-          <span>รายละเอียดใบแจ้งหนี้</span>
+          <span>ข้อมูลใบแจ้งหนี้</span>
         </h3>
         <div class="info-grid">
           <div class="info-item">
-            <label>รายการ</label>
-            <p>{{ invoice().collectionItem || invoice().description }}</p>
+            <label>เลขที่ใบแจ้งหนี้ / สัญญา</label>
+            <p class="invoice-number">
+              {{ invoice().invoiceNumber || invoice().contractNumber || invoice().id }}
+            </p>
           </div>
           <div class="info-item">
-            <label>จำนวนเงินทั้งหมด</label>
+            <label>รายการเรียกเก็บ</label>
+            <p>{{ invoice().collectionItem || invoice().description || '—' }}</p>
+          </div>
+          <div class="info-item">
+            <label>วันที่ใบแจ้งหนี้</label>
+            <p>{{ formatDate(invoice().invoiceDate || invoice().startDate || invoice().dueDate) }}</p>
+          </div>
+          <div class="info-item">
+            <label>วันที่บันทึกบัญชี</label>
+            <p>{{ formatDate(invoice().accountingDate) }}</p>
+          </div>
+          <div class="info-item">
+            <label>วันที่บันทึก (ระบบ)</label>
+            <p>{{ formatDate(invoice().systemDate) }}</p>
+          </div>
+          <div class="info-item">
+            <label>จำนวนเงิน (รวมภาษี)</label>
             <p class="amount-large">{{ formatCurrency(invoice().amount) }}</p>
-          </div>
-          <div class="info-item">
-            <label>วันที่เริ่มเรียกเก็บ</label>
-            <p>{{ formatDate(invoice().startDate || invoice().dueDate) }}</p>
-          </div>
-          <div class="info-item">
-            <label>เลขที่ใบแจ้งหนี้</label>
-            <p class="invoice-number">{{ invoice().contractNumber || invoice().id }}</p>
           </div>
         </div>
 
-        <!-- Financial Summary -->
         <div class="financial-summary">
           <div class="summary-row">
             <span class="summary-label">ยอดชำระแล้ว</span>
-            <span class="summary-value paid">{{ formatCurrency(0) }}</span>
+            <span class="summary-value paid">{{ formatCurrency(totalPayAmount) }}</span>
           </div>
           <div class="summary-row">
             <span class="summary-label">ยอดคงค้าง</span>
-            <span class="summary-value remaining">{{ formatCurrency(invoice().amount) }}</span>
+            <span class="summary-value remaining">
+              {{ formatCurrency((invoice().amount ?? 0) - totalPayAmount) }}
+            </span>
           </div>
           <div class="summary-divider"></div>
           <div class="summary-row total">
@@ -76,7 +157,156 @@
         </div>
       </div>
 
-      <!-- Status Section -->
+      <!-- ── Section 3: การรับเงิน ── -->
+      <div class="section">
+        <h3 class="section-title">
+          <i class="pi pi-wallet"></i>
+          <span>การรับเงิน</span>
+        </h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>ใบเสร็จชั่วคราว</label>
+            <p>
+              <span class="badge" [class.badge-yes]="invoice().isTempReceipt" [class.badge-no]="!invoice().isTempReceipt">
+                {{ invoice().isTempReceipt ? 'ใช่' : 'ไม่ใช่' }}
+              </span>
+            </p>
+          </div>
+          <div class="info-item">
+            <label>ชำระด้วยเงินสด</label>
+            <p>{{ formatCurrency(invoice().cashAmount ?? 0) }}</p>
+          </div>
+          <div class="info-item">
+            <label>สกุลเงิน</label>
+            <p class="code-text">{{ invoice().currencyCode || 'THB' }}</p>
+          </div>
+          <div class="info-item">
+            <label>อัตราแลกเปลี่ยน</label>
+            <p>{{ invoice().exchangeRate ?? 1 }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Section 4: รายละเอียดการชำระเงิน (เช็ค) ── -->
+      @if (chequeRows.length > 0 && chequeRows[0].bank) {
+        <div class="section">
+          <h3 class="section-title">
+            <i class="pi pi-credit-card"></i>
+            <span>รายละเอียดการชำระเงิน — เช็ค</span>
+          </h3>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ธนาคาร</th><th>สาขา</th><th>เลขที่เช็ค</th>
+                  <th>วันที่เช็ค</th><th class="text-right">มูลค่าเช็ค</th>
+                  <th>ที่พักชำระ</th><th>รายละเอียด</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of chequeRows; track $index) {
+                  <tr>
+                    <td>{{ row.bank || '—' }}</td>
+                    <td>{{ row.branch || '—' }}</td>
+                    <td class="font-mono">{{ row.chequeNo || '—' }}</td>
+                    <td>{{ formatDate(row.chequeDate) }}</td>
+                    <td class="text-right">{{ formatCurrency(row.amount) }}</td>
+                    <td>{{ row.holdLocation || '—' }}</td>
+                    <td>{{ row.detail || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- ── Section 5: รายการใบแจ้งหนี้สำหรับตัดจ่าย ── -->
+      @if (invoiceRows.length > 0 && invoiceRows[0].invoiceNo) {
+        <div class="section">
+          <h3 class="section-title">
+            <i class="pi pi-list"></i>
+            <span>รายการใบแจ้งหนี้สำหรับตัดจ่าย</span>
+          </h3>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>สาขา</th><th>Invoice No.</th><th>Invoice Date</th>
+                  <th class="text-right">จำนวนเงิน</th><th class="text-right">หนี้เหลือ</th>
+                  <th class="text-right">ยอดชำระ</th><th class="text-right">มูลค่าลดหนี้</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of invoiceRows; track $index) {
+                  <tr [class.row-selected]="row.selected">
+                    <td>{{ row.branch || '—' }}</td>
+                    <td class="font-mono">{{ row.invoiceNo || '—' }}</td>
+                    <td>{{ formatDate(row.invoiceDate) }}</td>
+                    <td class="text-right">{{ formatCurrency(row.totalAmount) }}</td>
+                    <td class="text-right">{{ formatCurrency(row.outstanding) }}</td>
+                    <td class="text-right cell-highlight">{{ formatCurrency(row.payAmount) }}</td>
+                    <td class="text-right">{{ formatCurrency(row.creditAmount) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- ── Section 6: สรุปทางการเงิน ── -->
+      <div class="section">
+        <h3 class="section-title">
+          <i class="pi pi-calculator"></i>
+          <span>สรุปทางการเงิน</span>
+        </h3>
+        <div class="financial-summary">
+          <div class="summary-row">
+            <span class="summary-label">มูลค่ารวมในใบแจ้งหนี้</span>
+            <span class="summary-value">{{ formatCurrency(totalInvoiceAmount) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">มูลค่ารวมรับชำระ</span>
+            <span class="summary-value paid">{{ formatCurrency(totalPayAmount) }}</span>
+          </div>
+          <div class="summary-row" [class.balanced]="difference === 0">
+            <span class="summary-label">ผลต่าง <small>(ต้องเป็น 0.00)</small></span>
+            <span class="summary-value"
+              [class.remaining]="difference !== 0"
+              [class.paid]="difference === 0">
+              {{ formatCurrency(difference) }}
+            </span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row">
+            <span class="summary-label">ยอดก่อน VAT</span>
+            <span class="summary-value">{{ formatCurrency(beforeVat) }}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">VAT (7%)</span>
+            <span class="summary-value">{{ formatCurrency(vatAmount) }}</span>
+          </div>
+          <div class="summary-row total">
+            <span class="summary-label">ยอดสุทธิ</span>
+            <span class="summary-value">{{ formatCurrency(totalPayAmount) }}</span>
+          </div>
+        </div>
+        @if (invoice().profitCenter || invoice().diffAccountNo) {
+          <div class="info-grid" style="margin-top: 16px;">
+            <div class="info-item">
+              <label>Profit Center</label>
+              <p class="code-text">{{ invoice().profitCenter || '—' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Account No (Diff Amt)</label>
+              <p class="code-text">{{ invoice().diffAccountNo || '—' }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- ── Section 7: สถานะ ── -->
       <div class="section">
         <h3 class="section-title">
           <i class="pi pi-info-circle"></i>
@@ -88,44 +318,50 @@
             <span>{{ getStatusConfig(invoice().status).label }}</span>
           </div>
           <p class="status-description">
-            {{ getStatusConfig(invoice().status)?.description || "ไม่มีข้อมูล" }}
+            {{ getStatusConfig(invoice().status)?.description || 'ไม่มีข้อมูล' }}
           </p>
         </div>
       </div>
 
-      <!-- Payment History Section -->
+      <!-- ── Section 8: ประวัติการชำระเงิน ── -->
       <div class="section">
         <h3 class="section-title">
           <i class="pi pi-history"></i>
           <span>ประวัติการชำระเงิน</span>
         </h3>
-        <div class="payment-history">
-          <div class="empty-history">
-            <i class="pi pi-inbox"></i>
-            <p>ยังไม่มีประวัติการชำระเงิน</p>
-          </div>
+        <div class="empty-history">
+          <i class="pi pi-inbox"></i>
+          <p>ยังไม่มีประวัติการชำระเงิน</p>
         </div>
       </div>
-    </div>
 
-    <!-- Footer -->
-    <div class="modal-footer">
-      <!-- ✅ FIX #3: Show different buttons based on source -->
-      @if (isFromReadyList()) {
-        <button class="btn-primary" (click)="onIssueInvoice()">
-          <i class="pi pi-file-check"></i>
-          <span>ออกใบแจ้งหนี้</span>
-        </button>
-      } @else {
-        <button class="btn-secondary" (click)="onDownloadPDF()">
-          <i class="pi pi-download"></i>
-          <span>ดาวน์โหลด PDF</span>
-        </button>
-        <button class="btn-primary" (click)="onSendEmail()">
-          <i class="pi pi-send"></i>
-          <span>ส่งอีเมล</span>
-        </button>
-      }
     </div>
+    <!-- end modal-body -->
+
+    <!-- ══════════ FOOTER ══════════ -->
+    <div class="modal-footer">
+  @if (pendingAction() !== 'view') {
+    <!-- มี action: แสดงปุ่ม confirm พร้อม label ตรงๆ -->
+    <button class="btn-secondary" (click)="onClose()">
+      <i class="pi pi-times"></i><span>ยกเลิก</span>
+    </button>
+    <button class="btn-primary" (click)="onConfirm()">
+      <i class="pi" [ngClass]="actionButtonIcon"></i>
+      <span>{{ actionButtonLabel }}</span>
+    </button>
+  } @else if (isFromReadyList()) {
+    <!-- Ready list view only: ปุ่ม ออกใบแจ้งหนี้ ปกติ -->
+    <button class="btn-secondary" (click)="onClose()">ปิด</button>
+  } @else {
+    <!-- History view only -->
+    <button class="btn-secondary" (click)="onDownloadPDF()">
+      <i class="pi pi-download"></i><span>ดาวน์โหลด PDF</span>
+    </button>
+    <button class="btn-primary" (click)="onSendEmail()">
+      <i class="pi pi-send"></i><span>ส่งอีเมล</span>
+    </button>
+  }
+</div>
+
   </div>
 </div>

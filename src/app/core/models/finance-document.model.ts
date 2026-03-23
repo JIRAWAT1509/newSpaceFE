@@ -60,4 +60,27 @@ export interface FinanceDocumentFormData {
   cnReasonCode?: string;
   cnReasonDescription?: string;
   remarks?: string;
+  rcBranchCode?: string;
+  rcBranchName?: string;
+  rcStatus?: string;
+  rcPrintStatus?: string;
+  rcCustomerCode?: string;
+  rcCustomerName?: string;
+  rcShopName?: string;
+  rcAddress?: string;
+  rcCnType?: string;
+  rcCnNumber?: string;
+  rcCnDate?: string;
+  rcPostingDate?: string;
+  rcSystemDate?: string;
+  rcReasonCode?: string;
+  rcReasonDescription?: string;
+  rcCurrency?: string;
+  rcRemarks?: string;
+  rcReceiptNo?: string;
+  rcReceiptDate?: string;
+  rcInvoiceValue?: string;
+  rcVat?: string;
+  rcTotalReceived?: string;
+  rcCnCollect?: string;
 }

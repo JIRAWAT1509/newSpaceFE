@@ -349,6 +349,177 @@
           </div>
         }
 
+        @if (hasField("rcBranchCode")) {
+          <div class="form-row-2">
+            <div class="form-field">
+              <label class="field-label required">สาขา</label>
+              <div class="input-group">
+                <input type="text" class="field-input disabled" formControlName="rcBranchCode" readonly />
+                <button type="button" class="input-group-btn" (click)="onLookupClick('rcBranch')" title="ค้นหา"><i class="pi pi-folder-open"></i></button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="field-label">&nbsp;</label>
+              <input type="text" class="field-input disabled" formControlName="rcBranchName" readonly />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-field">
+              <label class="field-label required">สถานะ</label>
+              <select class="field-input" formControlName="rcStatus">
+                @for (opt of rcStatusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="field-label">สถานะการพิมพ์</label>
+              <select class="field-input" formControlName="rcPrintStatus">
+                @for (opt of rcPrintStatusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label required">ลูกค้า</label>
+            <div class="form-row-2">
+              <div class="input-group">
+                <input type="text" class="field-input disabled" formControlName="rcCustomerCode" readonly placeholder="รหัสลูกค้า" />
+                <button type="button" class="input-group-btn" (click)="onLookupClick('rcCustomer')" title="ค้นหา"><i class="pi pi-folder-open"></i></button>
+              </div>
+              <input type="text" class="field-input disabled" formControlName="rcCustomerName" readonly placeholder="ชื่อลูกค้า" />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">ชื่อร้าน</label>
+            <input type="text" class="field-input disabled" formControlName="rcShopName" readonly />
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">ที่อยู่</label>
+            <textarea class="field-input field-textarea" formControlName="rcAddress" rows="2" placeholder="กรอกที่อยู่"></textarea>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label required">ประเภทใบลดหนี้</label>
+            <div class="radio-group">
+              @for (opt of rcCnTypeOptions; track opt.value) {
+                <label class="radio-label">
+                  <input type="radio" formControlName="rcCnType" [value]="opt.value" />
+                  <span>{{ opt.label }}</span>
+                </label>
+              }
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-field">
+              <label class="field-label required">เลขที่ใบลดหนี้</label>
+              <input type="text" class="field-input disabled" formControlName="rcCnNumber" readonly />
+            </div>
+            <div class="form-field">
+              <label class="field-label required">วันที่ใบลดหนี้</label>
+              <div class="date-picker-wrapper">
+                <input type="text" [class]="'field-input date-display' + (isInvalid('rcCnDate') ? ' error' : '')" [value]="getDisplayDate('rcCnDate')" placeholder="วว/ดด/ปปปป" readonly />
+                <input type="date" class="date-native-input" [value]="form.get('rcCnDate')?.value" (change)="onNativeDateChange('rcCnDate', $any($event.target).value)" />
+                <i class="pi pi-calendar date-icon"></i>
+              </div>
+              @if (isInvalid('rcCnDate')) {
+                <div class="error-message"><i class="pi pi-exclamation-circle"></i><span>กรุณาเลือกวันที่ใบลดหนี้</span></div>
+              }
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-field">
+              <label class="field-label required">วันที่บันทึกบัญชี</label>
+              <div class="date-picker-wrapper">
+                <input type="text" [class]="'field-input date-display' + (isInvalid('rcPostingDate') ? ' error' : '')" [value]="getDisplayDate('rcPostingDate')" placeholder="วว/ดด/ปปปป" readonly />
+                <input type="date" class="date-native-input" [value]="form.get('rcPostingDate')?.value" (change)="onNativeDateChange('rcPostingDate', $any($event.target).value)" />
+                <i class="pi pi-calendar date-icon"></i>
+              </div>
+              @if (isInvalid('rcPostingDate')) {
+                <div class="error-message"><i class="pi pi-exclamation-circle"></i><span>กรุณาเลือกวันที่บันทึกบัญชี</span></div>
+              }
+            </div>
+            <div class="form-field">
+              <label class="field-label required">วันที่บันทึก</label>
+              <div class="date-picker-wrapper">
+                <input type="text" class="field-input date-display disabled" [value]="getDisplayDate('rcSystemDate')" readonly />
+                <i class="pi pi-calendar date-icon"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">สาเหตุลดหนี้</label>
+            <div class="form-row-2">
+              <select class="field-input" formControlName="rcReasonCode" (change)="onRcReasonChange($any($event.target).value)">
+                <option value="">เลือกสาเหตุ</option>
+                @for (opt of cancelReasonOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+              <input type="text" class="field-input disabled" formControlName="rcReasonDescription" readonly placeholder="คำอธิบายสาเหตุ" />
+            </div>
+          </div>
+
+          <div class="form-field half-width">
+            <label class="field-label required">สกุลเงิน</label>
+            <input type="text" class="field-input" formControlName="rcCurrency" />
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">หมายเหตุ</label>
+            <textarea class="field-input field-textarea" formControlName="rcRemarks" rows="2" placeholder="กรอกหมายเหตุ (ถ้ามี)"></textarea>
+          </div>
+
+          <div class="receipt-ref-section">
+            <div class="receipt-ref-header">ส่วนอ้างอิงใบเสร็จ</div>
+            <div class="receipt-ref-body">
+              <div class="form-field">
+                <label class="field-label required">เลขที่ใบเสร็จ</label>
+                <div class="input-group">
+                  <input type="text" [class]="'field-input' + (isInvalid('rcReceiptNo') ? ' error' : '')" formControlName="rcReceiptNo" placeholder="กรอกเลขที่ใบเสร็จ" />
+                  <button type="button" class="input-group-btn" (click)="onLookupClick('rcReceiptNo')" title="ค้นหา"><i class="pi pi-folder-open"></i></button>
+                  <button type="button" class="input-group-btn" (click)="onRcReceiptLookup()" title="รายละเอียด"><i class="pi pi-info-circle"></i></button>
+                </div>
+                @if (isInvalid('rcReceiptNo')) {
+                  <div class="error-message"><i class="pi pi-exclamation-circle"></i><span>กรุณากรอกเลขที่ใบเสร็จ</span></div>
+                }
+              </div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label class="field-label">วันที่ใบเสร็จ</label>
+                  <input type="text" class="field-input disabled" formControlName="rcReceiptDate" readonly />
+                </div>
+                <div class="form-field">
+                  <label class="field-label">มูลค่า Invoice</label>
+                  <input type="text" class="field-input disabled" formControlName="rcInvoiceValue" readonly />
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div class="form-field">
+                  <label class="field-label">VAT</label>
+                  <input type="text" class="field-input disabled" formControlName="rcVat" readonly />
+                </div>
+                <div class="form-field">
+                  <label class="field-label">มูลค่ารวมรับชำระ</label>
+                  <input type="text" class="field-input disabled" formControlName="rcTotalReceived" readonly />
+                </div>
+              </div>
+              <div class="form-field half-width">
+                <label class="field-label">CN (Collect)</label>
+                <input type="text" class="field-input" formControlName="rcCnCollect" placeholder="0.00" />
+              </div>
+            </div>
+          </div>
+        }
+
       </form>
     </div>
 

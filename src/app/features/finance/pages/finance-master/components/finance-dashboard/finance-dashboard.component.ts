@@ -3,10 +3,16 @@ import { FinanceDocumentModalComponent } from '@shared/components/finance-docume
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
 import { DocumentType } from '@core/models/finance-document.model';
 import { DebtDetailModalComponent } from '@shared/components/debt-detail-modal/debt-detail-modal.component';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FinanceStats, Debt, DEBT_STATUS_CONFIG } from '@core/models/finance.model';
-import { MOCK_FINANCE_STATS, MOCK_DEBTS, ISSUED_DOCUMENTS } from '@core/data/finance.mock';
+import {
+  FinanceStats,
+  Debt,
+  Invoice,
+  DEBT_STATUS_CONFIG,
+} from '@core/models/finance.model';
+import { MOCK_FINANCE_STATS, ISSUED_DOCUMENTS } from '@core/data/finance.mock';
+import { FinanceStateService } from '@core/services/finance-state.service';
 
 interface StatCard {
   label: string;
@@ -20,7 +26,14 @@ interface StatCard {
   tone?: 'primary' | 'warning' | 'info' | 'success';
 }
 
-type SortField = 'description' | 'customerName' | 'contractFile' | 'amount' | 'dueDate' | 'overdueDays' | 'status';
+type SortField =
+  | 'description'
+  | 'customerName'
+  | 'contractFile'
+  | 'amount'
+  | 'dueDate'
+  | 'overdueDays'
+  | 'status';
 type SortDirection = 'asc' | 'desc' | null;
 
 @Component({
@@ -36,6 +49,8 @@ type SortDirection = 'asc' | 'desc' | null;
   styleUrl: './finance-dashboard.component.css',
 })
 export class FinanceDashboardComponent implements OnInit {
+  private readonly state = inject(FinanceStateService);
+
   stats = signal<FinanceStats>(MOCK_FINANCE_STATS);
   debts = signal<Debt[]>([]);
   statCards = signal<StatCard[]>([]);
@@ -46,7 +61,9 @@ export class FinanceDashboardComponent implements OnInit {
   showConfirmationModal = signal<boolean>(false);
   confirmationTitle = signal<string>('');
   confirmationMessage = signal<string>('');
-  pendingAction = signal<{ debt: Debt; documentType: DocumentType } | null>(null);
+  pendingAction = signal<{ debt: Debt; documentType: DocumentType } | null>(
+    null,
+  );
 
   sortField = signal<SortField | null>(null);
   sortDirection = signal<SortDirection>(null);
@@ -63,16 +80,51 @@ export class FinanceDashboardComponent implements OnInit {
   loadStats(): void {
     const statsData = this.stats();
     const cards: StatCard[] = [
-      { label: 'จำนวนรายการทั้งหมด', value: statsData.totalItems, color: '#667eea', icon: 'pi-list', tone: 'primary', change: 2.1, changeLabel: 'vs last month' },
-      { label: 'ออกใบแจ้งหนี้แล้ว', value: statsData.invoicesIssued, color: '#43e97b', icon: 'pi-check-circle', tone: 'success', change: 5.3, changeLabel: 'vs last month' },
-      { label: 'ออกใบกำกับภาษีแล้ว', value: statsData.taxInvoicesIssued, color: '#4facfe', icon: 'pi-file-check', tone: 'info', change: -1.2, changeLabel: 'vs last month' },
-      { label: 'รายการหนี้คงค้างทั้งหมด', value: statsData.totalOutstanding, color: '#fa709a', icon: 'pi-exclamation-triangle', tone: 'warning', change: 0.8, changeLabel: 'vs last month' },
+      {
+        label: 'จำนวนรายการทั้งหมด',
+        value: statsData.totalItems,
+        color: '#667eea',
+        icon: 'pi-list',
+        tone: 'primary',
+        change: 2.1,
+        changeLabel: 'vs last month',
+      },
+      {
+        label: 'ออกใบแจ้งหนี้แล้ว',
+        value: statsData.invoicesIssued,
+        color: '#43e97b',
+        icon: 'pi-check-circle',
+        tone: 'success',
+        change: 5.3,
+        changeLabel: 'vs last month',
+      },
+      {
+        label: 'ออกใบกำกับภาษีแล้ว',
+        value: statsData.taxInvoicesIssued,
+        color: '#4facfe',
+        icon: 'pi-file-check',
+        tone: 'info',
+        change: -1.2,
+        changeLabel: 'vs last month',
+      },
+      {
+        label: 'รายการหนี้คงค้างทั้งหมด',
+        value: statsData.totalOutstanding,
+        color: '#fa709a',
+        icon: 'pi-exclamation-triangle',
+        tone: 'warning',
+        change: 0.8,
+        changeLabel: 'vs last month',
+      },
     ];
     this.statCards.set(cards);
   }
 
+  // FIX: Always read fresh from state signal so debt amounts reflect latest updates
   loadDebts(): void {
-    const sorted = [...MOCK_DEBTS].sort((a, b) => b.overdueDays - a.overdueDays);
+    const sorted = [...this.state.debts()].sort(
+      (a, b) => b.overdueDays - a.overdueDays,
+    );
     this.debts.set(sorted);
   }
 
@@ -128,7 +180,9 @@ export class FinanceDashboardComponent implements OnInit {
 
   getSortIcon(field: SortField): string {
     if (this.sortField() !== field) return 'pi-sort-alt';
-    return this.sortDirection() === 'asc' ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down';
+    return this.sortDirection() === 'asc'
+      ? 'pi-sort-amount-up-alt'
+      : 'pi-sort-amount-down';
   }
 
   toggleDebtMenu(debtId: string, event: MouseEvent): void {
@@ -167,10 +221,14 @@ export class FinanceDashboardComponent implements OnInit {
     if (!issued) return true;
 
     switch (documentType) {
-      case 'receipt_credit': return issued.hasCreditNote;
-      case 'receipt_invoice': return issued.hasInvoice;
-      case 'receipt_cancel': return issued.hasCancelInvoice || false;
-      default: return true;
+      case 'receipt_credit':
+        return issued.hasCreditNote;
+      case 'receipt_invoice':
+        return issued.hasInvoice;
+      case 'receipt_cancel':
+        return issued.hasCancelInvoice || false;
+      default:
+        return true;
     }
   }
 
@@ -178,11 +236,21 @@ export class FinanceDashboardComponent implements OnInit {
     let documentType: DocumentType | null = null;
 
     switch (action) {
-      case 'ออกใบลดหนี้':       documentType = 'credit_note';    break;
-      case 'ออกใบเสร็จใบลดหนี้': documentType = 'receipt_credit'; break;
-      case 'ออกใบเสร็จใบยกเลิก': documentType = 'receipt_cancel'; break;
-      case 'ออกใบยกเลิก':       documentType = 'cancel_invoice'; break;
-      case 'ออกใบเสร็จ':        documentType = 'receipt_invoice'; break;
+      case 'ออกใบลดหนี้':
+        documentType = 'credit_note';
+        break;
+      case 'ออกใบเสร็จใบลดหนี้':
+        documentType = 'receipt_credit';
+        break;
+      case 'ออกใบเสร็จใบยกเลิก':
+        documentType = 'receipt_cancel';
+        break;
+      case 'ออกใบยกเลิก':
+        documentType = 'cancel_invoice';
+        break;
+      case 'ออกใบเสร็จ':
+        documentType = 'receipt_invoice';
+        break;
     }
 
     this.closeDebtMenu();
@@ -192,7 +260,9 @@ export class FinanceDashboardComponent implements OnInit {
     if (!this.checkDocumentRequirement(debt, documentType)) {
       const docName = this.getRequiredDocumentName(documentType);
       this.confirmationTitle.set(`ยังไม่เคยออก${docName}`);
-      this.confirmationMessage.set(`คุณยังไม่เคยออก${docName}สำหรับรายการนี้\nต้องการออก${docName}ก่อนหรือไม่?`);
+      this.confirmationMessage.set(
+        `คุณยังไม่เคยออก${docName}สำหรับรายการนี้\nต้องการออก${docName}ก่อนหรือไม่?`,
+      );
       this.pendingAction.set({ debt, documentType });
       this.showConfirmationModal.set(true);
     } else {
@@ -202,10 +272,14 @@ export class FinanceDashboardComponent implements OnInit {
 
   getRequiredDocumentName(documentType: DocumentType): string {
     switch (documentType) {
-      case 'receipt_credit':  return 'ใบลดหนี้';
-      case 'receipt_invoice': return 'ใบแจ้งหนี้';
-      case 'receipt_cancel':  return 'ใบยกเลิก';
-      default:                return 'เอกสาร';
+      case 'receipt_credit':
+        return 'ใบลดหนี้';
+      case 'receipt_invoice':
+        return 'ใบแจ้งหนี้';
+      case 'receipt_cancel':
+        return 'ใบยกเลิก';
+      default:
+        return 'เอกสาร';
     }
   }
 
@@ -220,10 +294,17 @@ export class FinanceDashboardComponent implements OnInit {
     if (pending) {
       let requiredType: DocumentType;
       switch (pending.documentType) {
-        case 'receipt_credit':  requiredType = 'credit_note';    break;
-        case 'receipt_invoice': requiredType = 'invoice';        break;
-        case 'receipt_cancel':  requiredType = 'cancel_invoice'; break;
-        default:                requiredType = 'invoice';
+        case 'receipt_credit':
+          requiredType = 'credit_note';
+          break;
+        case 'receipt_invoice':
+          requiredType = 'invoice';
+          break;
+        case 'receipt_cancel':
+          requiredType = 'cancel_invoice';
+          break;
+        default:
+          requiredType = 'invoice';
       }
       this.openDocumentModal(pending.debt, requiredType);
     }
@@ -239,12 +320,90 @@ export class FinanceDashboardComponent implements OnInit {
 
   onDocumentSubmit(formData: any): void {
     const debt = this.currentDebt();
-    if (debt && ISSUED_DOCUMENTS[debt.id]) {
-      if (formData.documentType === 'credit_note')     ISSUED_DOCUMENTS[debt.id].hasCreditNote    = true;
-      if (formData.documentType === 'invoice')         ISSUED_DOCUMENTS[debt.id].hasInvoice       = true;
-      if (formData.documentType === 'cancel_invoice')  ISSUED_DOCUMENTS[debt.id].hasCancelInvoice = true;
+    if (!debt) {
+      this.closeDocumentModal();
+      return;
     }
-    alert(`สำเร็จ: ${formData.documentType}`);
+
+    // FIX: Use debt.id as contractNumber so it matches invoice lookups correctly.
+    // debt.contractFile is a filename (e.g. "CONTRACT-2024-001.pdf"), not a contract number.
+    const mockInvoice: Invoice = {
+      id: debt.id,
+      contractNumber: debt.contractFile.replace('.pdf', ''),
+      customerName: debt.customerName,
+      collectionItem: debt.description,
+      amount: formData.amount ?? debt.amount,
+      startDate: debt.dueDate,
+      status: 'open' as const,
+      branchId: debt.branchId,
+    };
+
+    // Update ISSUED_DOCUMENTS tracking before dispatching actions
+    if (ISSUED_DOCUMENTS[debt.id]) {
+      if (formData.documentType === 'credit_note')
+        ISSUED_DOCUMENTS[debt.id].hasCreditNote = true;
+      if (formData.documentType === 'invoice')
+        ISSUED_DOCUMENTS[debt.id].hasInvoice = true;
+      if (formData.documentType === 'cancel_invoice')
+        ISSUED_DOCUMENTS[debt.id].hasCancelInvoice = true;
+    }
+
+    switch (formData.documentType as DocumentType) {
+      case 'credit_note': {
+        const reason =
+          formData.cnReasonDescription || formData.reason || 'ออกใบลดหนี้';
+        this.state.issueCreditNote(
+          mockInvoice,
+          formData.amount ?? debt.amount,
+          reason,
+          formData,
+        );
+        break;
+      }
+
+      case 'cancel_invoice': {
+        this.state.issueCancelInvoice(mockInvoice);
+        this.state.deleteDebt(debt.id);
+        break;
+      }
+
+      case 'receipt_credit': {
+        // FIX: Find only open CN for this customer — avoid picking a cancelled one
+        const cn = this.state
+          .creditNotes()
+          .find(
+            (c) => c.customerName === debt.customerName && c.status === 'open',
+          );
+        if (!cn) {
+          alert(
+            'ไม่พบใบลดหนี้ที่ยังเปิดอยู่สำหรับลูกค้านี้ กรุณาออกใบลดหนี้ก่อน',
+          );
+          return;
+        }
+        this.state.issueReceipt(cn, 'credit_note', formData);
+        alert('ออกใบเสร็จ (ใบลดหนี้) สำเร็จ — ปรากฏในประวัติใบเสร็จแล้ว');
+        break;
+      }
+
+      case 'receipt_invoice': {
+        // FIX: Pass mockInvoice explicitly with type 'invoice' — no ambiguous cn ?? mockInvoice fallback
+        this.state.issueReceipt(mockInvoice, 'invoice', formData);
+        alert('ออกใบเสร็จ (ใบแจ้งหนี้) สำเร็จ — ปรากฏในประวัติใบเสร็จแล้ว');
+        break;
+      }
+
+      case 'receipt_cancel': {
+        this.state.issueReceipt(mockInvoice, 'cancel', formData);
+        alert('ออกใบเสร็จ (ใบยกเลิก) สำเร็จ — ปรากฏในประวัติใบเสร็จแล้ว');
+        break;
+      }
+
+      default: {
+        alert(`สำเร็จ: ${formData.documentType}`);
+      }
+    }
+
+    this.loadDebts();
     this.closeDocumentModal();
   }
 

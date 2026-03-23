@@ -1,3 +1,5 @@
+/* finance-document-modal.component.css */
+
 .field-input.error {
   @apply border-red-500;
 }
@@ -205,4 +207,30 @@ select.field-input:disabled {
   .p-dropdown {
     @apply w-full border border-gray-300 rounded-lg;
   }
+}
+
+.radio-group {
+  @apply flex items-center gap-6;
+}
+
+.radio-label {
+  @apply flex items-center gap-2 cursor-pointer text-sm text-gray-700 font-medium;
+}
+
+.radio-label input[type="radio"] {
+  @apply w-4 h-4 cursor-pointer accent-blue-600;
+}
+
+.receipt-ref-section {
+  @apply rounded-lg overflow-hidden border border-blue-800 mt-2;
+}
+
+.receipt-ref-header {
+  @apply px-4 py-2.5 text-sm font-bold text-white;
+  background: #1e3a5f;
+}
+
+.receipt-ref-body {
+  @apply p-4 flex flex-col gap-4;
+  background: #f0f4ff;
 }

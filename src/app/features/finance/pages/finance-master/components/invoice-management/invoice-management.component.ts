@@ -1,15 +1,26 @@
 // invoice-management.component.ts
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Invoice, CreditNote } from '@core/models/finance.model';
-import { MOCK_INVOICES, MOCK_CREDIT_NOTES } from '@core/data/finance.mock';
+import { Invoice, CreditNote, Debt } from '@core/models/finance.model';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
-import { WarningModalComponent } from '@shared/components/warning-modal/warning-modal.component';
 import { FinanceDocumentModalComponent } from '@shared/components/finance-document-modal/finance-document-modal.component';
 import { DocumentType } from '@core/models/finance-document.model';
 import { InvoiceDetailModalComponent } from '@shared/components/invoice-detail-modal/invoice-detail-modal.component';
+import { FinanceStateService } from '@core/services/finance-state.service';
+import { SuccessToastComponent } from '@shared/components/success-toast/success-toast.component';
+import {
+  CreateInvoiceModalComponent,
+  CreateInvoiceSubmitData,
+} from '@shared/components/create-invoice-modal/create-invoice-modal.component';
+import { IssueInvoiceEvent } from '@shared/components/invoice-detail-modal/invoice-detail-modal.component';
 
-type SortField = 'contractNumber' | 'customerName' | 'collectionItem' | 'amount' | 'startDate' | 'status';
+type SortField =
+  | 'contractNumber'
+  | 'customerName'
+  | 'collectionItem'
+  | 'amount'
+  | 'startDate'
+  | 'status';
 type SortDirection = 'asc' | 'desc' | null;
 type HistoryTab = 'invoice' | 'credit';
 
@@ -19,75 +30,90 @@ type HistoryTab = 'invoice' | 'credit';
   imports: [
     CommonModule,
     ConfirmationModalComponent,
-    WarningModalComponent,
     FinanceDocumentModalComponent,
     InvoiceDetailModalComponent,
+    SuccessToastComponent,
+    CreateInvoiceModalComponent,
   ],
   templateUrl: './invoice-management.component.html',
   styleUrl: './invoice-management.component.css',
 })
 export class InvoiceManagementComponent implements OnInit {
-  // View States
+  private readonly state = inject(FinanceStateService);
+pendingDetailAction = signal<'issue' | 'issue_print' | 'issue_email' | 'view'>('view');
+  // ── View States ──
   showHistory = signal<boolean>(false);
   activeHistoryTab = signal<HistoryTab>('invoice');
-  invoices = signal<Invoice[]>([]);
-  issuedInvoices = signal<Invoice[]>([]);
-  issuedCreditNotes = signal<CreditNote[]>([]);
   selectedInvoices = signal<Set<string>>(new Set());
   showBulkActions = signal<boolean>(false);
 
-  // Search
+  invoices = computed(() => this._sortedReady() ?? this.state.readyInvoices());
+  issuedInvoices = computed(
+    () => this._sortedIssued() ?? this.state.issuedInvoices(),
+  );
+  issuedCreditNotes = computed(
+    () => this._sortedCredits() ?? this.state.creditNotes(),
+  );
+
+  private _sortedReady = signal<Invoice[] | null>(null);
+  private _sortedIssued = signal<Invoice[] | null>(null);
+  private _sortedCredits = signal<CreditNote[] | null>(null);
+
+  // ── Search ──
   searchQuery = signal<string>('');
 
-  // Sorting
+  // ── Sorting ──
   sortField = signal<SortField | null>(null);
   sortDirection = signal<SortDirection>(null);
 
-  // Modals & Drawers
+  // ── Toast ──
+  showToast = signal<boolean>(false);
+  toastTitle = signal<string>('สำเร็จ');
+  toastMessage = signal<string>('');
+
+  // ── Modals ──
   showCreateDrawer = signal<boolean>(false);
   showConfirmModal = signal<boolean>(false);
   pendingCancelInvoice = signal<Invoice | null>(null);
-  showMessageModal = signal<boolean>(false);
-  messageTitle = signal<string>('');
-  messageText = signal<string>('');
 
-  // Document Modal
   showDocumentModal = signal<boolean>(false);
   selectedDocumentType = signal<DocumentType | null>(null);
-  currentInvoice = signal<any>(null);
 
-  // Detail Modal
+  // แยก signal สำหรับแต่ละ modal — ไม่ปะปนกัน
+  currentDebtForDocument = signal<Debt | null>(null); // → finance-document-modal
+  currentInvoiceForDetail = signal<Invoice | null>(null); // → invoice-detail-modal
+  currentInvoice = signal<Invoice | null>(null); // → row menu / edit
+
   showDetailModal = signal<boolean>(false);
-
-  // Edit Modal
   showEditModal = signal<boolean>(false);
   editingInvoice = signal<Invoice | CreditNote | null>(null);
 
-  // Row Kebab Menu
+  // ── Row / Header menus ──
   showRowMenu = signal<string | null>(null);
   menuPosition = signal<{ top: number; left: number }>({ top: 0, left: 0 });
-
-  // Header Kebab Menu
   showHeaderMenu = signal<boolean>(false);
 
-  // New Invoice Data
-  newInvoiceData = signal<Partial<Invoice>>({
-    contractNumber: '',
-    customerName: '',
-    collectionItem: '',
-    amount: 0,
-    startDate: '',
-    status: 'ready',
-  });
-
+  // ══════════════════════════════════════════════
   ngOnInit(): void {
     this.loadInvoices();
   }
 
   loadInvoices(): void {
-    this.invoices.set(MOCK_INVOICES.filter((inv) => inv.status === 'ready'));
-    this.issuedInvoices.set(MOCK_INVOICES.filter((inv) => inv.status === 'open'));
-    this.issuedCreditNotes.set(MOCK_CREDIT_NOTES);
+    this._sortedReady.set(null);
+    this._sortedIssued.set(null);
+    this._sortedCredits.set(null);
+  }
+
+  // ===================== TOAST =====================
+  showSuccessToast(title: string, message: string): void {
+    this.toastTitle.set(title);
+    this.toastMessage.set(message);
+    this.showToast.set(false);
+    setTimeout(() => this.showToast.set(true), 10);
+  }
+
+  onToastClosed(): void {
+    this.showToast.set(false);
   }
 
   // ===================== VIEW TOGGLE =====================
@@ -106,45 +132,40 @@ export class InvoiceManagementComponent implements OnInit {
 
   getCurrentViewInvoices(): any[] {
     let data: any[];
-
     if (!this.showHistory()) {
       data = this.invoices();
+    } else if (this.activeHistoryTab() === 'invoice') {
+      data = this.issuedInvoices();
     } else {
-      if (this.activeHistoryTab() === 'invoice') {
-        data = this.issuedInvoices();
-      } else {
-        data = this.issuedCreditNotes().map(cn => ({
-          id: cn.id,
-          contractNumber: cn.cnNumber,
-          customerName: cn.customerName,
-          collectionItem: `อ้างอิง: ${cn.refInvoiceNumber}`,
-          amount: cn.amount,
-          startDate: cn.date,
-          status: cn.status,
-          originalData: cn
-        }));
-      }
+      data = this.issuedCreditNotes().map((cn) => ({
+        id: cn.id,
+        contractNumber: cn.cnNumber,
+        customerName: cn.customerName,
+        collectionItem: `อ้างอิง: ${cn.refInvoiceNumber}`,
+        amount: cn.amount,
+        startDate: cn.date,
+        status: cn.status,
+        originalData: cn,
+      }));
     }
 
     const query = this.searchQuery().toLowerCase();
     if (!query) return data;
-
-    return data.filter(item =>
-      (item.contractNumber || '').toLowerCase().includes(query) ||
-      (item.customerName || '').toLowerCase().includes(query) ||
-      (item.collectionItem || '').toLowerCase().includes(query)
+    return data.filter(
+      (item) =>
+        (item.contractNumber || '').toLowerCase().includes(query) ||
+        (item.customerName || '').toLowerCase().includes(query) ||
+        (item.collectionItem || '').toLowerCase().includes(query),
     );
   }
 
   // ===================== SORTING =====================
   sortBy(field: SortField): void {
-    const currentField = this.sortField();
-    const currentDirection = this.sortDirection();
-
-    if (currentField === field) {
-      if (currentDirection === null) {
+    if (this.sortField() === field) {
+      const dir = this.sortDirection();
+      if (dir === null) {
         this.sortDirection.set('asc');
-      } else if (currentDirection === 'asc') {
+      } else if (dir === 'asc') {
         this.sortDirection.set('desc');
       } else {
         this.sortDirection.set(null);
@@ -156,24 +177,25 @@ export class InvoiceManagementComponent implements OnInit {
       this.sortField.set(field);
       this.sortDirection.set('asc');
     }
-
     this.applySorting();
   }
 
   applySorting(): void {
     const field = this.sortField();
     const direction = this.sortDirection();
-    if (!field || !direction) return;
+    if (!field || !direction) {
+      this._sortedReady.set(null);
+      this._sortedIssued.set(null);
+      this._sortedCredits.set(null);
+      return;
+    }
 
-    const sortData = <T extends Invoice | CreditNote>(data: T[]): T[] => {
-      return [...data].sort((a, b) => {
-        let aVal: any;
-        let bVal: any;
-
+    const sortData = <T extends Invoice | CreditNote>(data: T[]): T[] =>
+      [...data].sort((a, b) => {
+        let aVal: any, bVal: any;
         if ('cnNumber' in a) {
-          const aCN = a as CreditNote;
-          const bCN = b as CreditNote;
-
+          const aCN = a as CreditNote,
+            bCN = b as CreditNote;
           switch (field) {
             case 'contractNumber':
               aVal = aCN.cnNumber;
@@ -207,7 +229,6 @@ export class InvoiceManagementComponent implements OnInit {
           aVal = (a as any)[field];
           bVal = (b as any)[field];
         }
-
         if (field === 'amount') {
           aVal = Number(aVal);
           bVal = Number(bVal);
@@ -215,40 +236,38 @@ export class InvoiceManagementComponent implements OnInit {
           aVal = new Date(aVal).getTime();
           bVal = new Date(bVal).getTime();
         } else if (typeof aVal === 'string') {
-          aVal = String(aVal).toLowerCase();
+          aVal = aVal.toLowerCase();
           bVal = String(bVal).toLowerCase();
         }
-
-        if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-        if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-        return 0;
+        return aVal < bVal
+          ? direction === 'asc'
+            ? -1
+            : 1
+          : aVal > bVal
+            ? direction === 'asc'
+              ? 1
+              : -1
+            : 0;
       });
-    };
 
-    if (!this.showHistory()) {
-      this.invoices.set(sortData(this.invoices()));
-    } else {
-      if (this.activeHistoryTab() === 'invoice') {
-        this.issuedInvoices.set(sortData(this.issuedInvoices()));
-      } else {
-        this.issuedCreditNotes.set(sortData(this.issuedCreditNotes()));
-      }
-    }
+    this._sortedReady.set(sortData([...this.state.readyInvoices()]));
+    this._sortedIssued.set(sortData([...this.state.issuedInvoices()]));
+    this._sortedCredits.set(sortData([...this.state.creditNotes()]));
   }
 
   getSortIcon(field: SortField): string {
     if (this.sortField() !== field) return 'pi-sort-alt';
-    return this.sortDirection() === 'asc' ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down';
+    return this.sortDirection() === 'asc'
+      ? 'pi-sort-amount-up-alt'
+      : 'pi-sort-amount-down';
   }
 
   // ===================== SELECTION =====================
   toggleSelection(invoiceId: string): void {
     const selected = new Set(this.selectedInvoices());
-    if (selected.has(invoiceId)) {
-      selected.delete(invoiceId);
-    } else {
-      selected.add(invoiceId);
-    }
+    selected.has(invoiceId)
+      ? selected.delete(invoiceId)
+      : selected.add(invoiceId);
     this.selectedInvoices.set(selected);
     this.showBulkActions.set(selected.size > 0);
   }
@@ -263,15 +282,15 @@ export class InvoiceManagementComponent implements OnInit {
     this.showBulkActions.set(selected.size > 0);
   }
 
-  isSelected(invoiceId: string): boolean {
-    return this.selectedInvoices().has(invoiceId);
+  isSelected(id: string): boolean {
+    return this.selectedInvoices().has(id);
   }
-
   isAllSelected(): boolean {
     const current = this.getCurrentViewInvoices();
-    return this.selectedInvoices().size === current.length && current.length > 0;
+    return (
+      this.selectedInvoices().size === current.length && current.length > 0
+    );
   }
-
   getSelectedCount(): number {
     return this.selectedInvoices().size;
   }
@@ -280,28 +299,27 @@ export class InvoiceManagementComponent implements OnInit {
   toggleRowMenu(invoiceId: string, event: MouseEvent): void {
     if (this.showRowMenu() === invoiceId) {
       this.closeRowMenu();
-    } else {
-      const invoice = this.getCurrentViewInvoices().find((inv) => inv.id === invoiceId);
-      if (invoice) {
-        this.currentInvoice.set(invoice);
-        this.showRowMenu.set(invoiceId);
-
-        const button = event.currentTarget as HTMLElement;
-        const rect = button.getBoundingClientRect();
-        const menuWidth = 224;
-        const menuHeight = 240;
-
-        let top = rect.bottom - 18;
-        let left = rect.right - menuWidth + 20;
-
-        const spaceBelow = window.innerHeight - rect.bottom;
-        if (spaceBelow < menuHeight) {
-          top = rect.top - menuHeight - 4;
-        }
-
-        this.menuPosition.set({ top, left });
-      }
+      return;
     }
+
+    const invoice = this.getCurrentViewInvoices().find(
+      (inv) => inv.id === invoiceId,
+    );
+    if (!invoice) return;
+
+    // currentInvoice ใช้สำหรับ row menu / edit เท่านั้น
+    this.currentInvoice.set(invoice);
+    this.showRowMenu.set(invoiceId);
+
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    const menuWidth = 224,
+      menuHeight = 240;
+    let top = rect.bottom - 18;
+    let left = rect.right - menuWidth + 20;
+    if (window.innerHeight - rect.bottom < menuHeight)
+      top = rect.top - menuHeight - 4;
+    this.menuPosition.set({ top, left });
   }
 
   closeRowMenu(): void {
@@ -309,187 +327,234 @@ export class InvoiceManagementComponent implements OnInit {
   }
 
   onMenuAction(invoice: Invoice, action: string): void {
-    console.log(`Action ${action}:`, invoice);
-    this.closeRowMenu();
-
-    switch (action) {
-      case 'ออกใบแจ้งหนี้':
-        this.issueInvoiceForSingle(invoice);
-        break;
-      case 'ออกใบแจ้งหนี้ + พิมพ์เอกสาร':
-        this.issueInvoiceForSingle(invoice, true);
-        break;
-      case 'ออกใบแจ้งหนี้ + ส่งอีเมล':
-        this.issueInvoiceForSingle(invoice, false, true);
-        break;
-      case 'ยกเลิกใบแจ้งหนี้':
-        this.onCancel(invoice);
-        break;
-      case 'ลบสัญญา':
-        this.deleteContract(invoice);
-        break;
-      case 'ออกใบลดหนี้':
-        this.issueCreditNote(invoice);
-        break;
-      case 'พิมพ์เอกสาร (PDF)':
-      case 'ส่งทางอีเมล':
-        this.showMessage('ดำเนินการ', `กำลังดำเนินการ: ${action}`);
-        break;
-    }
+  this.closeRowMenu();
+  switch (action) {
+    case 'ออกใบแจ้งหนี้':
+      this.openDetailWithAction(invoice, 'issue');
+      break;
+    case 'ออกใบแจ้งหนี้ + พิมพ์เอกสาร':
+      this.openDetailWithAction(invoice, 'issue_print');
+      break;
+    case 'ออกใบแจ้งหนี้ + ส่งอีเมล':
+      this.openDetailWithAction(invoice, 'issue_email');
+      break;
+    case 'ยกเลิกใบแจ้งหนี้':
+      this.openDocumentModal(invoice, 'cancel_invoice');
+      break;
+    case 'ลบสัญญา':
+      this.deleteContract(invoice);
+      break;
+    case 'ออกใบลดหนี้':
+      this.issueCreditNote(invoice);
+      break;
+    case 'ออกใบเสร็จใบลดหนี้':
+      this.issueReceiptCredit(invoice);
+      break;
+    case 'พิมพ์เอกสาร (PDF)':
+    case 'ส่งทางอีเมล':
+      this.showSuccessToast('ดำเนินการ', `กำลังดำเนินการ: ${action}`);
+      break;
   }
+}
+
+private openDetailWithAction(
+  invoice: Invoice,
+  action: 'issue' | 'issue_print' | 'issue_email' | 'view',
+): void {
+  this.showDocumentModal.set(false);
+  this.currentDebtForDocument.set(null);
+  this.pendingDetailAction.set(action);
+  this.currentInvoiceForDetail.set(invoice);
+  this.showDetailModal.set(true);
+}
 
   // ===================== HEADER KEBAB MENU =====================
   toggleHeaderMenu(event: MouseEvent): void {
     event.stopPropagation();
-    this.showHeaderMenu.update(v => !v);
+    this.showHeaderMenu.update((v) => !v);
   }
-
   closeHeaderMenu(): void {
     this.showHeaderMenu.set(false);
   }
-
   onHeaderMenuAction(action: string): void {
     this.closeHeaderMenu();
-    this.showMessage('ดำเนินการ', `เลือก: ${action}`);
+    this.showSuccessToast('ดำเนินการ', `เลือก: ${action}`);
+  }
+
+  // ===================== OPEN DOCUMENT MODAL (ปิด detail ก่อนเปิด) =====================
+  private openDocumentModal(
+    invoice: Invoice,
+    documentType: DocumentType,
+  ): void {
+    // ปิด detail modal ก่อนเสมอ — ไม่ให้ซ้อนกัน
+    this.showDetailModal.set(false);
+    this.currentInvoiceForDetail.set(null);
+
+    this.currentDebtForDocument.set(this.convertInvoiceToDebt(invoice));
+    this.selectedDocumentType.set(documentType);
+    this.showDocumentModal.set(true);
   }
 
   // ===================== ISSUE INVOICE =====================
   issueInvoiceForSingle(invoice: Invoice, print = false, email = false): void {
-    this.currentInvoice.set(this.convertInvoiceToDebt(invoice));
-    this.selectedDocumentType.set('invoice');
-    this.showDocumentModal.set(true);
-    (window as any).__pendingInvoiceActions = { print, email, originalInvoice: invoice };
-  }
+  const action = email ? 'issue_email' : print ? 'issue_print' : 'issue';
+  (window as any).__pendingInvoiceActions = { print, email, originalInvoice: invoice };
+  this.openDetailWithAction(invoice, action as any);
+}
 
   issueCreditNote(invoice: Invoice): void {
-    this.currentInvoice.set(this.convertInvoiceToDebt(invoice));
-    this.selectedDocumentType.set('credit_note');
-    this.showDocumentModal.set(true);
     (window as any).__pendingInvoiceActions = { originalInvoice: invoice };
+    this.openDocumentModal(invoice, 'credit_note');
+  }
+
+  issueReceiptCredit(invoice: Invoice | any): void {
+    const sourceInvoice = invoice?.originalData
+      ? invoice.originalData
+      : invoice;
+    (window as any).__pendingInvoiceActions = {
+      originalInvoice: sourceInvoice,
+    };
+    this.openDocumentModal(sourceInvoice, 'receipt_credit');
   }
 
   onDocumentSubmit(formData: any): void {
-    console.log('Document submitted:', formData);
     const actions = (window as any).__pendingInvoiceActions || {};
-    const invoice = actions.originalInvoice;
-
-    if (invoice) {
-      if (formData.documentType === 'invoice') {
-        const updatedInvoice = { ...invoice, status: 'open' as const };
-        this.invoices.update((invs) => invs.filter((inv) => inv.id !== invoice.id));
-        this.issuedInvoices.update((invs) => [...invs, updatedInvoice]);
-
-        let message = 'ออกใบแจ้งหนี้สำเร็จ';
-        if (actions.print) message += ' และกำลังพิมพ์เอกสาร';
-        if (actions.email) message += ' และกำลังส่งอีเมล';
-        this.showMessage('สำเร็จ', message);
-      } else if (formData.documentType === 'credit_note') {
-        const creditNote: CreditNote = {
-          id: `CN-${Date.now()}`,
-          cnNumber: `CN-2025-${String(this.issuedCreditNotes().length + 1).padStart(3, '0')}`,
-          refInvoiceNumber: invoice.contractNumber,
-          customerName: invoice.customerName,
-          amount: Math.abs(formData.amount || invoice.amount),
-          date: new Date().toISOString().split('T')[0],
-          reason: formData.reason || 'ออกใบลดหนี้',
-          status: 'open'
-        };
-        this.issuedCreditNotes.update((notes) => [...notes, creditNote]);
-        this.showMessage('สำเร็จ', 'ออกใบลดหนี้สำเร็จ');
-      }
-
-      delete (window as any).__pendingInvoiceActions;
+    const invoice: Invoice = actions.originalInvoice;
+    if (!invoice) {
+      this.closeDocumentModal();
+      return;
     }
 
+    switch (formData.documentType as DocumentType) {
+      case 'invoice': {
+        this.state.issueInvoice(invoice.id);
+        let msg = 'ออกใบแจ้งหนี้สำเร็จ';
+        if (actions.print) msg += ' · กำลังพิมพ์เอกสาร';
+        if (actions.email) msg += ' · กำลังส่งอีเมล';
+        this.showSuccessToast('ออกใบแจ้งหนี้สำเร็จ', msg);
+        break;
+      }
+      case 'credit_note': {
+        const reason =
+          formData.cnReasonDescription || formData.reason || 'ออกใบลดหนี้';
+        const cn = this.state.issueCreditNote(
+          invoice,
+          formData.amount || invoice.amount,
+          reason,
+          formData,
+        );
+        this.showSuccessToast(
+          'ออกใบลดหนี้สำเร็จ',
+          `${cn.cnNumber} · ยอดหนี้ถูกปรับลด ฿${cn.amount.toLocaleString()}`,
+        );
+        this.showHistory.set(true);
+        this.activeHistoryTab.set('credit');
+        break;
+      }
+      case 'receipt_credit': {
+        const cn: any = (invoice as any).originalData
+          ? (invoice as any).originalData
+          : invoice;
+        if (!cn) {
+          this.showSuccessToast('ไม่สำเร็จ', 'ไม่พบใบลดหนี้สำหรับออกใบเสร็จ');
+          break;
+        }
+        this.state.issueReceipt(cn, 'credit_note', formData);
+        this.showSuccessToast(
+          'ออกใบเสร็จใบลดหนี้สำเร็จ',
+          `ออกใบเสร็จใบลดหนี้สำหรับ ${cn.cnNumber || cn.contractNumber}`,
+        );
+        this.showHistory.set(true);
+        this.activeHistoryTab.set('credit');
+        break;
+      }
+      case 'cancel_invoice': {
+        this.state.issueCancelInvoice(invoice);
+        this.showSuccessToast(
+          'ยกเลิกใบแจ้งหนี้สำเร็จ',
+          `ใบแจ้งหนี้ ${invoice.contractNumber} ถูกยกเลิกแล้ว`,
+        );
+        this.showHistory.set(true);
+        this.activeHistoryTab.set('invoice');
+        break;
+      }
+    }
+    delete (window as any).__pendingInvoiceActions;
     this.closeDocumentModal();
   }
 
   closeDocumentModal(): void {
     this.showDocumentModal.set(false);
     this.selectedDocumentType.set(null);
-    this.currentInvoice.set(null);
+    this.currentDebtForDocument.set(null);
   }
 
   // ===================== CREATE MANUAL INVOICE =====================
   openCreateDrawer(): void {
-    this.newInvoiceData.set({
-      contractNumber: '',
-      customerName: '',
-      collectionItem: '',
-      amount: 0,
-      startDate: new Date().toISOString().split('T')[0],
-      status: 'ready',
-    });
-
-    const mockInvoice: Invoice = {
-      id: `temp-${Date.now()}`,
-      contractNumber: '',
-      customerName: '',
-      collectionItem: '',
-      amount: 0,
-      startDate: new Date().toISOString().split('T')[0],
-      status: 'ready',
-    };
-
-    this.currentInvoice.set(this.convertInvoiceToDebt(mockInvoice));
-    this.selectedDocumentType.set('invoice');
-    this.showDocumentModal.set(true);
-    (window as any).__pendingInvoiceActions = { isNewInvoice: true };
+    this.showCreateDrawer.set(true);
   }
 
   closeCreateDrawer(): void {
     this.showCreateDrawer.set(false);
   }
 
-  onCreateInvoice(): void {
-    const data = this.newInvoiceData();
+  onCreateInvoiceFromModal(data: CreateInvoiceSubmitData): void {
     const newInvoice: Invoice = {
       id: `manual-${Date.now()}`,
-      contractNumber: data.contractNumber || 'N/A',
-      customerName: data.customerName || 'N/A',
+      contractNumber: `${data.invoicePrefix}-${data.invoiceNumber}`,
+      customerName: data.customerName,
       collectionItem: data.collectionItem || 'N/A',
-      amount: data.amount || 0,
-      startDate: data.startDate || '',
-      status: 'open',
+      amount: data.amount,
+      startDate: data.invoiceDate,
+      status: 'ready',
     };
-
-    this.issuedInvoices.update((invs) => [...invs, newInvoice]);
-    this.showMessage('สำเร็จ', 'สร้างใบแจ้งหนี้สำเร็จ');
+    this.state.addReadyInvoice(newInvoice);
+    this.state.issueInvoice(newInvoice.id);
+    this.showSuccessToast(
+      'สร้างใบแจ้งหนี้สำเร็จ',
+      `${newInvoice.contractNumber} · ${newInvoice.customerName}`,
+    );
     this.closeCreateDrawer();
-  }
-
-  updateNewInvoiceField(field: string, value: any): void {
-    this.newInvoiceData.update((data) => ({ ...data, [field]: value }));
   }
 
   // ===================== ROW ACTIONS =====================
   onPreview(invoice: Invoice): void {
-    this.currentInvoice.set(invoice);
-    this.showDetailModal.set(true);
-  }
+  this.openDetailWithAction(invoice, 'view');
+}
 
   closeDetailModal(): void {
-    this.showDetailModal.set(false);
-    setTimeout(() => {
-      if (!this.showDetailModal()) {
-        this.currentInvoice.set(null);
-      }
-    }, 300);
-  }
-
-  onIssueInvoiceFromDetail(invoice: any): void {
-    const originalInvoice = this.invoices().find(inv => inv.id === invoice.id);
-    if (originalInvoice) {
-      this.issueInvoiceForSingle(originalInvoice);
+  this.showDetailModal.set(false);
+  setTimeout(() => {
+    if (!this.showDetailModal()) {
+      this.currentInvoiceForDetail.set(null);
+      this.pendingDetailAction.set('view');
     }
+  }, 300);
+}
+
+  onIssueInvoiceFromDetail(event: IssueInvoiceEvent): void {
+  const invoice = event.invoice;
+  this.state.issueInvoice(invoice.id);
+  let msg = 'ออกใบแจ้งหนี้สำเร็จ';
+  if (event.print) msg += ' · กำลังพิมพ์เอกสาร';
+  if (event.email) msg += ' · กำลังส่งอีเมล';
+  this.showSuccessToast('ออกใบแจ้งหนี้สำเร็จ', msg);
+  delete (window as any).__pendingInvoiceActions;
+}
+
+  onInvoiceUpdated(updated: any): void {
+    this.state.updateInvoice(updated as Invoice);
+    this.showSuccessToast('บันทึกสำเร็จ', 'แก้ไขใบแจ้งหนี้สำเร็จ');
+    // อัปเดต signal ให้ detail modal แสดงข้อมูลใหม่
+    this.currentInvoiceForDetail.set(updated);
   }
 
   onEdit(invoice: Invoice): void {
-    if ('originalData' in invoice && invoice.originalData) {
-      this.editingInvoice.set({ ...(invoice.originalData as CreditNote) });
-    } else {
-      this.editingInvoice.set({ ...invoice });
-    }
+    this.editingInvoice.set(
+      'originalData' in invoice && (invoice as any).originalData
+        ? { ...((invoice as any).originalData as CreditNote) }
+        : { ...invoice },
+    );
     this.showEditModal.set(true);
   }
 
@@ -501,112 +566,63 @@ export class InvoiceManagementComponent implements OnInit {
   onSaveEdit(): void {
     const edited = this.editingInvoice();
     if (!edited) return;
-
-    if (!this.showHistory()) {
-      this.invoices.update((invs) => invs.map((inv) => (inv.id === edited.id ? edited as Invoice : inv)));
-    } else if (this.activeHistoryTab() === 'invoice') {
-      this.issuedInvoices.update((invs) => invs.map((inv) => (inv.id === edited.id ? edited as Invoice : inv)));
-    } else {
-      if ('cnNumber' in edited) {
-        this.issuedCreditNotes.update((notes) =>
-          notes.map((note) => (note.id === edited.id ? edited as CreditNote : note))
-        );
-      }
-    }
-    this.showMessage('สำเร็จ', 'บันทึกการแก้ไขสำเร็จ');
+    if (!('cnNumber' in edited)) this.state.updateInvoice(edited as Invoice);
+    this.showSuccessToast('บันทึกสำเร็จ', 'บันทึกการแก้ไขสำเร็จ');
     this.closeEditModal();
   }
 
-  updateEditField(field: string, value: any): void {
-    this.editingInvoice.update((inv) => {
-      if (!inv) return null;
-      let finalValue = value;
-      if (field === 'amount') {
-        finalValue = parseFloat(value) || 0;
-      }
-      return { ...inv, [field]: finalValue };
-    });
-  }
-
   getEditContractNumber(): string {
-    const editing = this.editingInvoice();
-    if (!editing) return '';
-    if ('cnNumber' in editing) {
-      return editing.cnNumber;
-    }
-    return editing.contractNumber;
+    const e = this.editingInvoice();
+    if (!e) return '';
+    return 'cnNumber' in e ? e.cnNumber : e.contractNumber;
   }
-
   getEditCustomerName(): string {
-    const editing = this.editingInvoice();
-    return editing?.customerName || '';
+    return this.editingInvoice()?.customerName || '';
   }
-
   getEditCollectionItem(): string {
-    const editing = this.editingInvoice();
-    if (!editing) return '';
-    if ('refInvoiceNumber' in editing) {
-      return `อ้างอิง: ${editing.refInvoiceNumber}`;
-    }
-    return editing.collectionItem;
+    const e = this.editingInvoice();
+    if (!e) return '';
+    return 'refInvoiceNumber' in e
+      ? `อ้างอิง: ${e.refInvoiceNumber}`
+      : e.collectionItem;
   }
-
   getEditAmount(): number {
-    const editing = this.editingInvoice();
-    return editing?.amount || 0;
+    return this.editingInvoice()?.amount || 0;
   }
-
   getEditStartDate(): string {
-    const editing = this.editingInvoice();
-    if (!editing) return '';
-    if ('date' in editing) {
-      return editing.date;
-    }
-    return editing.startDate;
+    const e = this.editingInvoice();
+    if (!e) return '';
+    return 'date' in e ? e.date : e.startDate;
   }
 
-  setEditContractNumber(value: string): void {
-    this.editingInvoice.update((inv) => {
-      if (!inv) return null;
-      if ('cnNumber' in inv) {
-        return { ...inv, cnNumber: value };
-      }
-      return { ...inv, contractNumber: value };
-    });
+  setEditContractNumber(v: string): void {
+    this.editingInvoice.update((e) =>
+      !e
+        ? null
+        : 'cnNumber' in e
+          ? { ...e, cnNumber: v }
+          : { ...e, contractNumber: v },
+    );
   }
-
-  setEditCustomerName(value: string): void {
-    this.editingInvoice.update((inv) => {
-      if (!inv) return null;
-      return { ...inv, customerName: value };
-    });
+  setEditCustomerName(v: string): void {
+    this.editingInvoice.update((e) => (e ? { ...e, customerName: v } : null));
   }
-
-  setEditCollectionItem(value: string): void {
-    this.editingInvoice.update((inv) => {
-      if (!inv) return null;
-      if ('refInvoiceNumber' in inv) {
-        return { ...inv, refInvoiceNumber: value.replace('อ้างอิง: ', '') };
-      }
-      return { ...inv, collectionItem: value };
-    });
+  setEditCollectionItem(v: string): void {
+    this.editingInvoice.update((e) =>
+      !e
+        ? null
+        : 'refInvoiceNumber' in e
+          ? { ...e, refInvoiceNumber: v.replace('อ้างอิง: ', '') }
+          : { ...e, collectionItem: v },
+    );
   }
-
-  setEditAmount(value: number): void {
-    this.editingInvoice.update((inv) => {
-      if (!inv) return null;
-      return { ...inv, amount: value };
-    });
+  setEditAmount(v: number): void {
+    this.editingInvoice.update((e) => (e ? { ...e, amount: v } : null));
   }
-
-  setEditStartDate(value: string): void {
-    this.editingInvoice.update((inv) => {
-      if (!inv) return null;
-      if ('date' in inv) {
-        return { ...inv, date: value };
-      }
-      return { ...inv, startDate: value };
-    });
+  setEditStartDate(v: string): void {
+    this.editingInvoice.update((e) =>
+      !e ? null : 'date' in e ? { ...e, date: v } : { ...e, startDate: v },
+    );
   }
 
   onCancel(invoice: Invoice): void {
@@ -617,17 +633,13 @@ export class InvoiceManagementComponent implements OnInit {
   onConfirmCancel(): void {
     const invoice = this.pendingCancelInvoice();
     if (invoice) {
-      const canceledInvoice = { ...invoice, status: 'cancel' as const };
-
-      if (!this.showHistory()) {
-        this.invoices.update((invs) => invs.filter(inv => inv.id !== invoice.id));
-        this.issuedInvoices.update((invs) => [...invs, canceledInvoice]);
-      } else if (this.activeHistoryTab() === 'invoice') {
-        this.issuedInvoices.update((invs) =>
-          invs.map((inv) => (inv.id === invoice.id ? canceledInvoice : inv))
-        );
-      }
-      this.showMessage('ยกเลิกสำเร็จ', `ใบแจ้งหนี้ ${invoice.contractNumber} ถูกยกเลิกแล้ว`);
+      this.state.issueCancelInvoice(invoice);
+      this.showSuccessToast(
+        'ยกเลิกสำเร็จ',
+        `ใบแจ้งหนี้ ${invoice.contractNumber} ถูกยกเลิกแล้ว`,
+      );
+      this.showHistory.set(true);
+      this.activeHistoryTab.set('invoice');
     }
     this.showConfirmModal.set(false);
     this.pendingCancelInvoice.set(null);
@@ -639,41 +651,43 @@ export class InvoiceManagementComponent implements OnInit {
   }
 
   deleteContract(invoice: Invoice): void {
-    if (!this.showHistory()) {
-      this.invoices.update((invs) => invs.filter((inv) => inv.id !== invoice.id));
-    } else if (this.activeHistoryTab() === 'invoice') {
-      this.issuedInvoices.update((invs) => invs.filter((inv) => inv.id !== invoice.id));
-    }
-    this.showMessage('ลบสำเร็จ', `ลบสัญญา ${invoice.contractNumber} แล้ว`);
+    this.state.deleteInvoice(invoice.id);
+    this.showSuccessToast('ลบสำเร็จ', `ลบสัญญา ${invoice.contractNumber} แล้ว`);
   }
 
   // ===================== BULK ACTIONS =====================
   onBulkIssueInvoice(): void {
-    const count = this.getSelectedCount();
-    const selectedIds = Array.from(this.selectedInvoices());
-    const selectedInvs = this.invoices().filter((inv) => selectedIds.includes(inv.id));
-    const movedInvs = selectedInvs.map((inv) => ({ ...inv, status: 'open' as const }));
-
-    this.invoices.update((invs) => invs.filter((inv) => !selectedIds.includes(inv.id)));
-    this.issuedInvoices.update((invs) => [...invs, ...movedInvs]);
-
-    this.showMessage('ออกใบแจ้งหนี้สำเร็จ', `ออกใบแจ้งหนี้ ${count} รายการสำเร็จ`);
+    const ids = Array.from(this.selectedInvoices());
+    ids.forEach((id) => this.state.issueInvoice(id));
+    this.showSuccessToast(
+      'ออกใบแจ้งหนี้สำเร็จ',
+      `ออกใบแจ้งหนี้ ${ids.length} รายการสำเร็จ`,
+    );
     this.selectedInvoices.set(new Set());
     this.showBulkActions.set(false);
   }
 
   onBulkEmail(): void {
-    const count = this.getSelectedCount();
-    this.showMessage('ส่งอีเมล', `กำลังส่งอีเมล ${count} รายการ`);
+    this.showSuccessToast(
+      'ส่งอีเมล',
+      `กำลังส่งอีเมล ${this.getSelectedCount()} รายการ`,
+    );
   }
-
   onBulkPrint(): void {
-    const count = this.getSelectedCount();
-    this.showMessage('พิมพ์เอกสาร', `กำลังพิมพ์เอกสาร ${count} รายการ`);
+    this.showSuccessToast(
+      'พิมพ์เอกสาร',
+      `กำลังพิมพ์เอกสาร ${this.getSelectedCount()} รายการ`,
+    );
   }
 
   // ===================== HELPERS =====================
-  convertInvoiceToDebt(invoice: Invoice): any {
+  convertInvoiceToDebt(invoice: Invoice): Debt {
+    const statusMap: Record<Invoice['status'], Debt['status']> = {
+      ready: 'new',
+      open: 'warning',
+      cancel: 'warning',
+    };
+
     return {
       id: invoice.id,
       description: invoice.collectionItem,
@@ -682,25 +696,21 @@ export class InvoiceManagementComponent implements OnInit {
       amount: invoice.amount,
       dueDate: invoice.startDate,
       overdueDays: 0,
-      status: invoice.status,
+      status: statusMap[invoice.status],
+      branchId: invoice.branchId,
     };
   }
 
-  showMessage(title: string, message: string): void {
-    this.messageTitle.set(title);
-    this.messageText.set(message);
-    this.showMessageModal.set(true);
-  }
-
-  closeMessageModal(): void {
-    this.showMessageModal.set(false);
-  }
-
   onPrint(invoice: Invoice): void {
-    this.showMessage('พิมพ์เอกสาร', `กำลังพิมพ์เอกสาร ${invoice.contractNumber}`);
+    this.showSuccessToast(
+      'พิมพ์เอกสาร',
+      `กำลังพิมพ์เอกสาร ${invoice.contractNumber}`,
+    );
   }
-
   onEmail(invoice: Invoice): void {
-    this.showMessage('ส่งอีเมล', `กำลังส่งอีเมล ${invoice.contractNumber}`);
+    this.showSuccessToast(
+      'ส่งอีเมล',
+      `กำลังส่งอีเมล ${invoice.contractNumber}`,
+    );
   }
 }

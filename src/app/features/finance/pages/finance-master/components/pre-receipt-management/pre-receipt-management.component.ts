@@ -1,11 +1,11 @@
 // src/app/features/finance/components/pre-receipt-management/pre-receipt-management.component.ts
 
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Receipt } from '@core/models/finance.model';
-import { MOCK_RECEIPTS_WAITING } from '@core/data/finance.mock';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
 import { ReceiptDetailModalComponent } from '@shared/components/receipt-detail-modal/receipt-detail-modal.component';
+import { FinanceStateService } from '@core/services/finance-state.service';
 
 type ReceiptSortField = 'contractNumber' | 'customerName' | 'collectionItem' | 'amount' | 'startDate' | 'status';
 type SortDirection = 'asc' | 'desc' | null;
@@ -18,8 +18,11 @@ type SortDirection = 'asc' | 'desc' | null;
   styleUrl: './pre-receipt-management.component.css'
 })
 export class PreReceiptManagementComponent implements OnInit {
+  private readonly state = inject(FinanceStateService);
+
   // Data
-  receipts = signal<Receipt[]>([]);
+  receipts = computed(() => this._sortedReceipts() ?? this.state.waitingReceipts());
+  private _sortedReceipts = signal<Receipt[] | null>(null);
   selectedReceipts = signal<Set<string>>(new Set());
   showBulkActions = signal<boolean>(false);
 
@@ -44,7 +47,7 @@ export class PreReceiptManagementComponent implements OnInit {
   }
 
   loadData(): void {
-    this.receipts.set(MOCK_RECEIPTS_WAITING);
+    this._sortedReceipts.set(null);
   }
 
   // ===================== SORTING =====================
@@ -96,7 +99,7 @@ export class PreReceiptManagementComponent implements OnInit {
       return 0;
     });
 
-    this.receipts.set(sorted);
+    this._sortedReceipts.set(sorted);
   }
 
   getSortIcon(field: ReceiptSortField): string {
@@ -221,7 +224,7 @@ export class PreReceiptManagementComponent implements OnInit {
     const edited = this.editingReceipt();
     if (!edited) return;
 
-    this.receipts.update(recs => recs.map(rec => rec.id === edited.id ? edited : rec));
+    this.state.updateWaitingReceipt(edited);
     alert('บันทึกการแก้ไขสำเร็จ');
     this.closeEditModal();
   }
@@ -234,7 +237,7 @@ export class PreReceiptManagementComponent implements OnInit {
   onConfirmCancel(): void {
     const receipt = this.pendingCancelReceipt();
     if (receipt) {
-      this.receipts.update(recs => recs.filter(r => r.id !== receipt.id));
+      this.state.deleteWaitingReceipt(receipt.id);
       alert(`ยกเลิกรายการ ${receipt.contractNumber} สำเร็จ`);
     }
     this.showConfirmModal.set(false);
@@ -247,23 +250,26 @@ export class PreReceiptManagementComponent implements OnInit {
   }
 
   onIssueReceipt(receipt: Receipt): void {
-    this.receipts.update(recs => recs.filter(r => r.id !== receipt.id));
-    alert(`ออกใบเสร็จ ${receipt.contractNumber} สำเร็จ\nย้ายไปหน้าประวัติใบเสร็จแล้ว`);
+    const issued = this.state.issueReceipt(receipt, 'invoice', {});
+    this.state.deleteWaitingReceipt(receipt.id);
+    alert(`ออกใบเสร็จ ${issued.contractNumber} สำเร็จ\nปรากฏในประวัติใบเสร็จแล้ว`);
   }
 
   onIssueReceiptAndPrint(receipt: Receipt): void {
-    this.receipts.update(recs => recs.filter(r => r.id !== receipt.id));
-    alert(`ออกใบเสร็จ + พิมพ์เอกสาร ${receipt.contractNumber} สำเร็จ`);
+    const issued = this.state.issueReceipt(receipt, 'invoice', {});
+    this.state.deleteWaitingReceipt(receipt.id);
+    alert(`ออกใบเสร็จ + พิมพ์เอกสาร ${issued.contractNumber} สำเร็จ`);
   }
 
   onIssueReceiptAndEmail(receipt: Receipt): void {
-    this.receipts.update(recs => recs.filter(r => r.id !== receipt.id));
-    alert(`ออกใบเสร็จ + ส่งอีเมล ${receipt.contractNumber} สำเร็จ`);
+    const issued = this.state.issueReceipt(receipt, 'invoice', {});
+    this.state.deleteWaitingReceipt(receipt.id);
+    alert(`ออกใบเสร็จ + ส่งอีเมล ${issued.contractNumber} สำเร็จ`);
   }
 
   onDeleteContract(receipt: Receipt): void {
     if (confirm(`ต้องการลบสัญญา ${receipt.contractNumber} หรือไม่?`)) {
-      this.receipts.update(recs => recs.filter(r => r.id !== receipt.id));
+      this.state.deleteWaitingReceipt(receipt.id);
       alert('ลบสัญญาสำเร็จ');
     }
   }
@@ -272,10 +278,12 @@ export class PreReceiptManagementComponent implements OnInit {
   onBulkCreateReceipts(): void {
     const count = this.getSelectedCount();
     const selectedIds = Array.from(this.selectedReceipts());
-
-    this.receipts.update(recs => recs.filter(rec => !selectedIds.includes(rec.id)));
-    alert(`ออกใบเสร็จ ${count} รายการสำเร็จ\nย้ายไปหน้าประวัติใบเสร็จแล้ว`);
-
+    const toIssue = this.state.waitingReceipts().filter(r => selectedIds.includes(r.id));
+    toIssue.forEach(r => {
+      this.state.issueReceipt(r, 'invoice', {});
+      this.state.deleteWaitingReceipt(r.id);
+    });
+    alert(`ออกใบเสร็จ ${count} รายการสำเร็จ\nปรากฏในประวัติใบเสร็จแล้ว`);
     this.selectedReceipts.set(new Set());
     this.showBulkActions.set(false);
   }

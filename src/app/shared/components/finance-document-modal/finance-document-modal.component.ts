@@ -1,5 +1,4 @@
 /* finance-document-modal.component.ts */
-
 import { Component, input, output, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -149,9 +148,33 @@ export class FinanceDocumentModalComponent implements OnInit {
     this.form.get(field)?.markAsTouched();
   }
 
+  rcStatusOptions = [
+    { label: 'Open', value: 'open' },
+    { label: 'Cancel', value: 'cancel' },
+  ];
+
+  rcPrintStatusOptions = [
+    { label: 'Never Print', value: 'never_print' },
+    { label: 'Printed', value: 'printed' },
+  ];
+
+  rcCnTypeOptions = [
+    { label: 'ใบลดหนี้', value: 'cn' },
+    { label: 'ใบลดหนี้/ใบกำกับภาษี', value: 'cn_tax' },
+  ];
+
   onCnReasonDropdownChange(value: string): void {
     const desc = this.reasonDescriptionMap[value] ?? '';
     this.form.get('cnReasonDescription')?.setValue(desc);
+  }
+
+  onRcReasonChange(value: string): void {
+    const desc = this.reasonDescriptionMap[value] ?? '';
+    this.form.get('rcReasonDescription')?.setValue(desc);
+  }
+
+  onRcReceiptLookup(): void {
+    console.log('Receipt lookup clicked');
   }
 
   onLookupClick(field: string): void {
@@ -229,17 +252,36 @@ export class FinanceDocumentModalComponent implements OnInit {
         break;
       }
 
-      case 'receipt_credit':
+      case 'receipt_credit': {
+        const branch = debt.branchId ? getBranchById(debt.branchId) : null;
+        const today = this.formatDateForInput(new Date());
         this.form = this.fb.group({
-          receiptNumber:   [{ value: this.documentNumberService.generateDocumentNumber('receipt'), disabled: true }],
-          customerName:    [{ value: debt.customerName, disabled: true }],
-          creditNoteNumber:[{ value: 'CN' + Date.now().toString().slice(-6), disabled: true }],
-          dateFrom:        [{ value: this.formatDateForInput(new Date()), disabled: true }],
-          dateTo:          [{ value: this.formatDateForInput(new Date()), disabled: true }],
-          status:          ['all'],
-          printStatus:     ['all'],
+          rcBranchCode:        [{ value: branch?.code ?? '', disabled: true }],
+          rcBranchName:        [{ value: branch?.nameTh ?? '', disabled: true }],
+          rcStatus:            ['open'],
+          rcPrintStatus:       ['never_print'],
+          rcCustomerCode:      [{ value: debt.id, disabled: true }],
+          rcCustomerName:      [{ value: debt.customerName, disabled: true }],
+          rcShopName:          [{ value: '', disabled: true }],
+          rcAddress:           [''],
+          rcCnType:            ['cn'],
+          rcCnNumber:          [{ value: 'AUTO', disabled: true }],
+          rcCnDate:            ['', Validators.required],
+          rcPostingDate:       ['', Validators.required],
+          rcSystemDate:        [{ value: today, disabled: true }],
+          rcReasonCode:        [''],
+          rcReasonDescription: [{ value: '', disabled: true }],
+          rcCurrency:          ['THB', Validators.required],
+          rcRemarks:           [''],
+          rcReceiptNo:         ['', Validators.required],
+          rcReceiptDate:       [{ value: '', disabled: true }],
+          rcInvoiceValue:      [{ value: '', disabled: true }],
+          rcVat:               [{ value: '', disabled: true }],
+          rcTotalReceived:     [{ value: '', disabled: true }],
+          rcCnCollect:         [''],
         });
         break;
+      }
 
       case 'receipt_invoice':
         this.form = this.fb.group({
