@@ -1,20 +1,12 @@
 // finance-dashboard.component.ts
 import { FinanceDocumentModalComponent } from '@shared/components/finance-document-modal/finance-document-modal.component';
-import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component'; // ✅ เพิ่ม
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal/confirmation-modal.component';
 import { DocumentType } from '@core/models/finance-document.model';
 import { DebtDetailModalComponent } from '@shared/components/debt-detail-modal/debt-detail-modal.component';
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FinanceStats,
-  Debt,
-  DEBT_STATUS_CONFIG,
-} from '@core/models/finance.model';
-import {
-  MOCK_FINANCE_STATS,
-  MOCK_DEBTS,
-  ISSUED_DOCUMENTS,
-} from '@core/data/finance.mock'; // ✅ เพิ่ม ISSUED_DOCUMENTS
+import { FinanceStats, Debt, DEBT_STATUS_CONFIG } from '@core/models/finance.model';
+import { MOCK_FINANCE_STATS, MOCK_DEBTS, ISSUED_DOCUMENTS } from '@core/data/finance.mock';
 
 interface StatCard {
   label: string;
@@ -28,14 +20,7 @@ interface StatCard {
   tone?: 'primary' | 'warning' | 'info' | 'success';
 }
 
-type SortField =
-  | 'description'
-  | 'customerName'
-  | 'contractFile'
-  | 'amount'
-  | 'dueDate'
-  | 'overdueDays'
-  | 'status';
+type SortField = 'description' | 'customerName' | 'contractFile' | 'amount' | 'dueDate' | 'overdueDays' | 'status';
 type SortDirection = 'asc' | 'desc' | null;
 
 @Component({
@@ -45,7 +30,7 @@ type SortDirection = 'asc' | 'desc' | null;
     CommonModule,
     FinanceDocumentModalComponent,
     ConfirmationModalComponent,
-    DebtDetailModalComponent
+    DebtDetailModalComponent,
   ],
   templateUrl: './finance-dashboard.component.html',
   styleUrl: './finance-dashboard.component.css',
@@ -58,19 +43,14 @@ export class FinanceDashboardComponent implements OnInit {
   showDetailModal = signal<boolean>(false);
   selectedDocumentType = signal<DocumentType | null>(null);
 
-  // ✅ Confirmation Modal
   showConfirmationModal = signal<boolean>(false);
   confirmationTitle = signal<string>('');
   confirmationMessage = signal<string>('');
-  pendingAction = signal<{ debt: Debt; documentType: DocumentType } | null>(
-    null,
-  );
+  pendingAction = signal<{ debt: Debt; documentType: DocumentType } | null>(null);
 
-  // Sorting
   sortField = signal<SortField | null>(null);
   sortDirection = signal<SortDirection>(null);
 
-  // Kebab Menu
   showDebtMenu = signal<string | null>(null);
   currentDebt = signal<Debt | null>(null);
   menuPosition = signal<{ top: number; left: number }>({ top: 0, left: 0 });
@@ -82,57 +62,20 @@ export class FinanceDashboardComponent implements OnInit {
 
   loadStats(): void {
     const statsData = this.stats();
-
     const cards: StatCard[] = [
-      {
-        label: 'จำนวนรายการทั้งหมด',
-        value: statsData.totalItems,
-        color: '#667eea',
-        icon: 'pi-list',
-        tone: 'primary',
-        change: 2.1,
-        changeLabel: 'vs last month',
-      },
-      {
-        label: 'ออกใบแจ้งหนี้แล้ว',
-        value: statsData.invoicesIssued,
-        color: '#43e97b',
-        icon: 'pi-check-circle',
-        tone: 'success',
-        change: 5.3,
-        changeLabel: 'vs last month',
-      },
-      {
-        label: 'ออกใบกำกับภาษีแล้ว',
-        value: statsData.taxInvoicesIssued,
-        color: '#4facfe',
-        icon: 'pi-file-check',
-        tone: 'info',
-        change: -1.2,
-        changeLabel: 'vs last month',
-      },
-      {
-        label: 'รายการหนี้คงค้างทั้งหมด',
-        value: statsData.totalOutstanding,
-        color: '#fa709a',
-        icon: 'pi-exclamation-triangle',
-        tone: 'warning',
-        change: 0.8,
-        changeLabel: 'vs last month',
-      },
+      { label: 'จำนวนรายการทั้งหมด', value: statsData.totalItems, color: '#667eea', icon: 'pi-list', tone: 'primary', change: 2.1, changeLabel: 'vs last month' },
+      { label: 'ออกใบแจ้งหนี้แล้ว', value: statsData.invoicesIssued, color: '#43e97b', icon: 'pi-check-circle', tone: 'success', change: 5.3, changeLabel: 'vs last month' },
+      { label: 'ออกใบกำกับภาษีแล้ว', value: statsData.taxInvoicesIssued, color: '#4facfe', icon: 'pi-file-check', tone: 'info', change: -1.2, changeLabel: 'vs last month' },
+      { label: 'รายการหนี้คงค้างทั้งหมด', value: statsData.totalOutstanding, color: '#fa709a', icon: 'pi-exclamation-triangle', tone: 'warning', change: 0.8, changeLabel: 'vs last month' },
     ];
-
     this.statCards.set(cards);
   }
 
   loadDebts(): void {
-    const sorted = [...MOCK_DEBTS].sort(
-      (a, b) => b.overdueDays - a.overdueDays,
-    );
+    const sorted = [...MOCK_DEBTS].sort((a, b) => b.overdueDays - a.overdueDays);
     this.debts.set(sorted);
   }
 
-  // Sorting Functions
   sortBy(field: SortField): void {
     const currentField = this.sortField();
     const currentDirection = this.sortDirection();
@@ -152,17 +95,13 @@ export class FinanceDashboardComponent implements OnInit {
       this.sortField.set(field);
       this.sortDirection.set('asc');
     }
-
     this.applySorting();
   }
 
   applySorting(): void {
     const field = this.sortField();
     const direction = this.sortDirection();
-
-    if (!field || !direction) {
-      return;
-    }
+    if (!field || !direction) return;
 
     const sorted = [...this.debts()].sort((a, b) => {
       let aVal: any = a[field];
@@ -188,157 +127,104 @@ export class FinanceDashboardComponent implements OnInit {
   }
 
   getSortIcon(field: SortField): string {
-    if (this.sortField() !== field) {
-      return 'pi-sort-alt';
-    }
-    return this.sortDirection() === 'asc'
-      ? 'pi-sort-amount-up-alt'
-      : 'pi-sort-amount-down';
+    if (this.sortField() !== field) return 'pi-sort-alt';
+    return this.sortDirection() === 'asc' ? 'pi-sort-amount-up-alt' : 'pi-sort-amount-down';
   }
 
-  // Kebab Menu Functions
   toggleDebtMenu(debtId: string, event: MouseEvent): void {
     if (this.showDebtMenu() === debtId) {
       this.closeDebtMenu();
-    } else {
-      const debt = this.debts().find((d) => d.id === debtId);
-      if (debt) {
-        this.currentDebt.set(debt);
-        this.showDebtMenu.set(debtId);
-
-        const button = event.currentTarget as HTMLElement;
-        const rect = button.getBoundingClientRect();
-        const menuWidth = 224;
-        const menuHeight = 300;
-
-        const spaceOnRight = window.innerWidth - rect.right;
-        const spaceBelow = window.innerHeight - rect.bottom;
-
-        let top = rect.bottom - 18;
-        let left = rect.right - menuWidth + 20;
-
-        if (spaceOnRight < menuWidth) {
-          left = rect.left - menuWidth + 20;
-        }
-
-        if (spaceBelow < menuHeight) {
-          top = rect.top - menuHeight - 4;
-        }
-
-        this.menuPosition.set({ top, left });
-      }
+      return;
     }
+
+    const debt = this.debts().find((d) => d.id === debtId);
+    if (!debt) return;
+
+    this.currentDebt.set(debt);
+    this.showDebtMenu.set(debtId);
+
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+    const menuWidth = 224;
+    const menuHeight = 200;
+
+    let top = rect.bottom - 18;
+    let left = rect.right - menuWidth + 20;
+
+    if (window.innerHeight - rect.bottom < menuHeight) {
+      top = rect.top - menuHeight - 4;
+    }
+
+    this.menuPosition.set({ top, left });
   }
 
   closeDebtMenu(): void {
     this.showDebtMenu.set(null);
-    // ✅ ไม่ clear currentDebt ตรงนี้ เพราะจะใช้ใน modal
   }
 
-  // ✅ เช็คว่ามีเอกสารที่ต้องการหรือยัง
   checkDocumentRequirement(debt: Debt, documentType: DocumentType): boolean {
     const issued = ISSUED_DOCUMENTS[debt.id];
-
-    if (!issued) {
-      return true;
-    }
+    if (!issued) return true;
 
     switch (documentType) {
-      case 'receipt_credit':
-        return issued.hasCreditNote;
-      case 'receipt_invoice':
-        return issued.hasInvoice;
-      case 'receipt_cancel': // ✅ เพิ่มเช็คใบยกเลิก
-        return issued.hasCancelInvoice || false;
-      default:
-        return true;
+      case 'receipt_credit': return issued.hasCreditNote;
+      case 'receipt_invoice': return issued.hasInvoice;
+      case 'receipt_cancel': return issued.hasCancelInvoice || false;
+      default: return true;
     }
   }
 
   onDebtMenuAction(debt: Debt, action: string): void {
-    console.log(`Action ${action}:`, debt);
-
     let documentType: DocumentType | null = null;
 
     switch (action) {
-      case 'ออกใบลดหนี้':
-        documentType = 'credit_note';
-        break;
-      case 'ออกใบเสร็จใบลดหนี้':
-        documentType = 'receipt_credit';
-        break;
-      case 'ออกใบเสร็จใบยกเลิก': // ✅ ใช้ type ใหม่
-        documentType = 'receipt_cancel';
-        break;
-      case 'ออกใบยกเลิก':
-        documentType = 'cancel_invoice';
-        break;
-      case 'ออกใบเสร็จ':
-        documentType = 'receipt_invoice';
-        break;
+      case 'ออกใบลดหนี้':       documentType = 'credit_note';    break;
+      case 'ออกใบเสร็จใบลดหนี้': documentType = 'receipt_credit'; break;
+      case 'ออกใบเสร็จใบยกเลิก': documentType = 'receipt_cancel'; break;
+      case 'ออกใบยกเลิก':       documentType = 'cancel_invoice'; break;
+      case 'ออกใบเสร็จ':        documentType = 'receipt_invoice'; break;
     }
 
-    // ✅ ปิด menu ก่อน (แต่ยัง keep currentDebt)
     this.closeDebtMenu();
 
-    if (documentType) {
-      // เช็คว่ามีเอกสารที่ต้องการหรือยัง
-      if (!this.checkDocumentRequirement(debt, documentType)) {
-        const docName = this.getRequiredDocumentName(documentType);
-        this.confirmationTitle.set(`ยังไม่เคยออก${docName}`);
-        this.confirmationMessage.set(
-          `คุณยังไม่เคยออก${docName}สำหรับรายการนี้\nต้องการออก${docName}ก่อนหรือไม่?`,
-        );
-        this.pendingAction.set({ debt, documentType });
-        this.showConfirmationModal.set(true);
-      } else {
-        // มีเอกสารแล้ว เปิด modal ได้เลย
-        this.openDocumentModal(debt, documentType);
-      }
+    if (!documentType) return;
+
+    if (!this.checkDocumentRequirement(debt, documentType)) {
+      const docName = this.getRequiredDocumentName(documentType);
+      this.confirmationTitle.set(`ยังไม่เคยออก${docName}`);
+      this.confirmationMessage.set(`คุณยังไม่เคยออก${docName}สำหรับรายการนี้\nต้องการออก${docName}ก่อนหรือไม่?`);
+      this.pendingAction.set({ debt, documentType });
+      this.showConfirmationModal.set(true);
+    } else {
+      this.openDocumentModal(debt, documentType);
     }
   }
 
   getRequiredDocumentName(documentType: DocumentType): string {
     switch (documentType) {
-      case 'receipt_credit':
-        return 'ใบลดหนี้';
-      case 'receipt_invoice':
-        return 'ใบแจ้งหนี้';
-      case 'receipt_cancel':
-        return 'ใบยกเลิก';
-      default:
-        return 'เอกสาร';
+      case 'receipt_credit':  return 'ใบลดหนี้';
+      case 'receipt_invoice': return 'ใบแจ้งหนี้';
+      case 'receipt_cancel':  return 'ใบยกเลิก';
+      default:                return 'เอกสาร';
     }
   }
 
-  // ✅ เปิด Document Modal
   openDocumentModal(debt: Debt, documentType: DocumentType): void {
     this.currentDebt.set(debt);
     this.selectedDocumentType.set(documentType);
     this.showDocumentModal.set(true);
   }
 
-  // ✅ Confirmation Modal Handlers
   onConfirmationConfirm(): void {
     const pending = this.pendingAction();
     if (pending) {
-      // ออกเอกสารที่ต้องออกก่อน
       let requiredType: DocumentType;
-
       switch (pending.documentType) {
-        case 'receipt_credit':
-          requiredType = 'credit_note';
-          break;
-        case 'receipt_invoice':
-          requiredType = 'invoice';
-          break;
-        case 'receipt_cancel': // ✅ เพิ่ม
-          requiredType = 'cancel_invoice';
-          break;
-        default:
-          requiredType = 'invoice';
+        case 'receipt_credit':  requiredType = 'credit_note';    break;
+        case 'receipt_invoice': requiredType = 'invoice';        break;
+        case 'receipt_cancel':  requiredType = 'cancel_invoice'; break;
+        default:                requiredType = 'invoice';
       }
-
       this.openDocumentModal(pending.debt, requiredType);
     }
     this.showConfirmationModal.set(false);
@@ -348,25 +234,16 @@ export class FinanceDashboardComponent implements OnInit {
   onConfirmationCancel(): void {
     this.showConfirmationModal.set(false);
     this.pendingAction.set(null);
-    this.currentDebt.set(null); // ✅ clear หลังยกเลิก
+    this.currentDebt.set(null);
   }
 
   onDocumentSubmit(formData: any): void {
-    console.log('Document submitted:', formData);
-
-    // อัพเดท mock data
     const debt = this.currentDebt();
     if (debt && ISSUED_DOCUMENTS[debt.id]) {
-      if (formData.documentType === 'credit_note') {
-        ISSUED_DOCUMENTS[debt.id].hasCreditNote = true;
-      } else if (formData.documentType === 'invoice') {
-        ISSUED_DOCUMENTS[debt.id].hasInvoice = true;
-      } else if (formData.documentType === 'cancel_invoice') {
-        // ✅ เพิ่ม
-        ISSUED_DOCUMENTS[debt.id].hasCancelInvoice = true;
-      }
+      if (formData.documentType === 'credit_note')     ISSUED_DOCUMENTS[debt.id].hasCreditNote    = true;
+      if (formData.documentType === 'invoice')         ISSUED_DOCUMENTS[debt.id].hasInvoice       = true;
+      if (formData.documentType === 'cancel_invoice')  ISSUED_DOCUMENTS[debt.id].hasCancelInvoice = true;
     }
-
     alert(`สำเร็จ: ${formData.documentType}`);
     this.closeDocumentModal();
   }
@@ -374,10 +251,9 @@ export class FinanceDashboardComponent implements OnInit {
   closeDocumentModal(): void {
     this.showDocumentModal.set(false);
     this.selectedDocumentType.set(null);
-    this.currentDebt.set(null); // ✅ clear หลังปิด modal
+    this.currentDebt.set(null);
   }
 
-  // Existing functions
   getStatusConfig(status: string) {
     return DEBT_STATUS_CONFIG[status as keyof typeof DEBT_STATUS_CONFIG];
   }
@@ -387,12 +263,10 @@ export class FinanceDashboardComponent implements OnInit {
   }
 
   onViewContract(debt: Debt): void {
-    console.log('View contract:', debt);
     alert(`Mock: View ${debt.contractFile}`);
   }
 
   onSendReminder(debt: Debt): void {
-    console.log('Send reminder:', debt);
     alert(`Mock: Send reminder to ${debt.customerName}`);
   }
 
@@ -404,9 +278,7 @@ export class FinanceDashboardComponent implements OnInit {
   closeDetailModal(): void {
     this.showDetailModal.set(false);
     setTimeout(() => {
-      if (!this.showDetailModal()) {
-        this.currentDebt.set(null);
-      }
+      if (!this.showDetailModal()) this.currentDebt.set(null);
     }, 300);
   }
 

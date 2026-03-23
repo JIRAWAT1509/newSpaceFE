@@ -1,4 +1,4 @@
-// finance.model.ts - Complete finance data models
+// finance.model.ts
 
 export interface FinanceStats {
   totalItems: number;
@@ -15,7 +15,8 @@ export interface Debt {
   amount: number;
   dueDate: string;
   overdueDays: number;
-  status: 'new' | 'warning' | 'critical'; // new=<30days, warning=30-90, critical=>90
+  status: 'new' | 'warning' | 'critical';
+  branchId?: string;
 }
 
 export interface DebtStatusConfig {
@@ -34,13 +35,14 @@ export interface Invoice {
   amount: number;
   startDate: string;
   status: 'ready' | 'open' | 'cancel';
+  branchId?: string; 
 }
 
 export interface InvoiceStatusConfig {
   label: string;
   icon: string;
   color: string;
-  description: string; 
+  description: string;
 }
 
 export interface Receipt {
@@ -78,7 +80,7 @@ export const DEBT_STATUS_CONFIG = {
     description: 'หนี้ที่เกินกำหนดชำระแล้ว ควรติดตามการชำระเงิน'
   },
   critical: {
-    label: 'วิกฤต',
+    label: 'ด่วน',
     icon: 'pi-times-circle',
     color: 'text-red-600',
     description: 'หนี้ที่เกินกำหนดชำระมากแล้ว ต้องดำเนินการเร่งด่วน'

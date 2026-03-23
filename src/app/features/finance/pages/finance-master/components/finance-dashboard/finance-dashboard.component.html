@@ -1,7 +1,5 @@
 <!-- finance-dashboard.component.html -->
-
 <div class="dashboard-container">
-  <!-- Dashboard Overview (รูปแบบเดียวกับ facilities/utilities/master) -->
   <div class="section-card">
     <h2 class="section-title">Dashboard Overview</h2>
     <div class="stats-grid">
@@ -33,7 +31,6 @@
     </div>
   </div>
 
-  <!-- Debt/Receivables List -->
   <div class="debt-section">
     <div class="section-header">
       <h2 class="section-title">รายการหนี้คงค้าง</h2>
@@ -103,38 +100,20 @@
                 </div>
               </td>
               <td>
-                <div
-                  class="status-badge"
-                  [ngClass]="getStatusClass(debt.status)"
-                >
-                  <i
-                    class="pi"
-                    [ngClass]="getStatusConfig(debt.status).icon"
-                  ></i>
+                <div class="status-badge" [ngClass]="getStatusClass(debt.status)">
+                  <i class="pi" [ngClass]="getStatusConfig(debt.status).icon"></i>
                   <span>{{ getStatusConfig(debt.status).label }}</span>
                 </div>
               </td>
               <td>
                 <div class="action-buttons">
-                  <button
-                    class="action-btn"
-                    title="ส่งแจ้งเตือน"
-                    (click)="onSendReminder(debt)"
-                  >
+                  <button class="action-btn" title="ส่งแจ้งเตือน" (click)="onSendReminder(debt)">
                     <i class="pi pi-send"></i>
                   </button>
-                  <button
-                    class="action-btn"
-                    title="ดูรายละเอียด"
-                    (click)="onViewDetails(debt)"
-                  >
+                  <button class="action-btn" title="ดูรายละเอียด" (click)="onViewDetails(debt)">
                     <i class="pi pi-eye"></i>
                   </button>
-                  <button
-                    class="action-btn"
-                    title="เพิ่มเติม"
-                    (click)="toggleDebtMenu(debt.id, $event)"
-                  >
+                  <button class="action-btn" title="เพิ่มเติม" (click)="toggleDebtMenu(debt.id, $event)">
                     <i class="pi pi-ellipsis-v"></i>
                   </button>
                 </div>
@@ -152,56 +131,39 @@
       }
     </div>
   </div>
-
-  <!-- ✅ Kebab Menu Dropdown (นอก table) -->
-  @if (showDebtMenu() && currentDebt()) {
-    <div
-      class="action-menu-portal"
-      [style.top.px]="menuPosition().top"
-      [style.left.px]="menuPosition().left"
-    >
-      <div class="action-menu">
-        <button
-          class="menu-item"
-          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบลดหนี้')"
-        >
-          <i class="pi pi-minus-circle"></i>
-          <span>ออกใบลดหนี้</span>
-        </button>
-        <button
-          class="menu-item"
-          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบเสร็จใบลดหนี้')"
-        >
-          <i class="pi pi-receipt"></i>
-          <span>ออกใบเสร็จใบลดหนี้</span>
-        </button>
-        <button
-          class="menu-item danger"
-          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบยกเลิก')"
-        >
-          <i class="pi pi-ban"></i>
-          <span>ออกใบยกเลิก</span>
-        </button>
-        <button
-          class="menu-item"
-          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบเสร็จใบยกเลิก')"
-        >
-          <i class="pi pi-times-circle"></i>
-          <span>ออกใบเสร็จใบยกเลิก</span>
-        </button>
-        <!-- <button
-          class="menu-item"
-          (click)="onDebtMenuAction(currentDebt()!, 'ออกใบเสร็จ')"
-        >
-          <i class="pi pi-file-check"></i>
-          <span>ออกใบเสร็จ</span>
-        </button> -->
-
-      </div>
-    </div>
-  }
 </div>
-<!-- Finance Document Modal -->
+
+@if (showDebtMenu() && currentDebt()) {
+  <div
+    class="action-menu-portal"
+    [style.top.px]="menuPosition().top"
+    [style.left.px]="menuPosition().left"
+  >
+    <div class="action-menu">
+      <button class="menu-item" (click)="onDebtMenuAction(currentDebt()!, 'ออกใบลดหนี้')">
+        <i class="pi pi-minus-circle"></i>
+        <span>ออกใบลดหนี้</span>
+      </button>
+      <button class="menu-item" (click)="onDebtMenuAction(currentDebt()!, 'ออกใบเสร็จใบลดหนี้')">
+        <i class="pi pi-receipt"></i>
+        <span>ออกใบเสร็จใบลดหนี้</span>
+      </button>
+      <button class="menu-item danger" (click)="onDebtMenuAction(currentDebt()!, 'ออกใบยกเลิก')">
+        <i class="pi pi-ban"></i>
+        <span>ออกใบยกเลิก</span>
+      </button>
+      <button class="menu-item" (click)="onDebtMenuAction(currentDebt()!, 'ออกใบเสร็จใบยกเลิก')">
+        <i class="pi pi-times-circle"></i>
+        <span>ออกใบเสร็จใบยกเลิก</span>
+      </button>
+    </div>
+  </div>
+}
+
+@if (showDebtMenu()) {
+  <div class="menu-overlay" (click)="closeDebtMenu()"></div>
+}
+
 @if (showDocumentModal() && selectedDocumentType() && currentDebt()) {
   <app-finance-document-modal
     [documentType]="selectedDocumentType()!"
@@ -210,6 +172,7 @@
     (submit)="onDocumentSubmit($event)"
   />
 }
+
 <app-confirmation-modal
   [isOpen]="showConfirmationModal()"
   [type]="'warning'"
@@ -222,15 +185,9 @@
   (cancel)="onConfirmationCancel()"
 />
 
-<!-- Debt Detail Modal -->
 @if (showDetailModal() && currentDebt()) {
   <app-debt-detail-modal
     [debt]="currentDebt()!"
     (close)="closeDetailModal()"
   />
-}
-
-<!-- Click outside to close menu -->
-@if (showDebtMenu()) {
-  <div class="menu-overlay" (click)="closeDebtMenu()"></div>
 }

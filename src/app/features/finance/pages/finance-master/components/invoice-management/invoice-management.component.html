@@ -46,6 +46,64 @@
           <i class="pi pi-plus"></i>
           <span>สร้างใบแจ้งหนี้</span>
         </button>
+
+        <!-- Header Kebab Menu -->
+        <div class="header-kebab-wrapper">
+          <button class="btn-icon" (click)="toggleHeaderMenu($event)" title="เมนูเพิ่มเติม">
+            <i class="pi pi-ellipsis-v"></i>
+          </button>
+
+          @if (showHeaderMenu()) {
+            <div class="header-dropdown-menu">
+              <button class="menu-item" (click)="onHeaderMenuAction('สร้างใบแจ้งหนี้ (ภาษีโรงเรือนและเบี้ยประกันภัย)')">
+                <i class="pi pi-file-plus"></i>
+                <span>สร้างใบแจ้งหนี้ (ภาษีโรงเรือนและเบี้ยประกันภัย)</span>
+              </button>
+              <button class="menu-item" (click)="onHeaderMenuAction('ใบแจ้งหนี้เงินประกัน/เงินมัดจํา')">
+                <i class="pi pi-shield"></i>
+                <span>ใบแจ้งหนี้เงินประกัน/เงินมัดจํา</span>
+              </button>
+              <button class="menu-item" (click)="onHeaderMenuAction('ใบลดหนี้คืนเงินประกันตกแต่ง')">
+                <i class="pi pi-minus-circle"></i>
+                <span>ใบลดหนี้คืนเงินประกันตกแต่ง</span>
+              </button>
+              <button class="menu-item" (click)="onHeaderMenuAction('ใบแจ้งหนี้เงินประกัน/เงินมัดจํา (2)')">
+                <i class="pi pi-shield"></i>
+                <span>ใบแจ้งหนี้เงินประกัน/เงินมัดจํา</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button class="menu-item" (click)="onHeaderMenuAction('Discount Invoice List')">
+                <i class="pi pi-tags"></i>
+                <span>Discount Invoice List</span>
+              </button>
+              <button class="menu-item" (click)="onHeaderMenuAction('เปลี่ยนภาษีมูลค่าเพิ่ม')">
+                <i class="pi pi-percentage"></i>
+                <span>เปลี่ยนภาษีมูลค่าเพิ่ม</span>
+              </button>
+              <button class="menu-item" (click)="onHeaderMenuAction('รับข้อมูลใบแจ้งหนี้')">
+                <i class="pi pi-download"></i>
+                <span>รับข้อมูลใบแจ้งหนี้</span>
+              </button>
+              <button class="menu-item" (click)="onHeaderMenuAction('ประมวลผลรายได้อื่นๆ')">
+                <i class="pi pi-cog"></i>
+                <span>ประมวลผลรายได้อื่นๆ</span>
+              </button>
+              <div class="menu-divider"></div>
+              <button class="menu-item" (click)="onHeaderMenuAction('Split Invoice')">
+                <i class="pi pi-share-alt"></i>
+                <span>Split Invoice</span>
+              </button>
+              <button class="menu-item" (click)="onHeaderMenuAction('บันทึกรายได้ One Time')">
+                <i class="pi pi-bookmark"></i>
+                <span>บันทึกรายได้ One Time</span>
+              </button>
+            </div>
+          }
+        </div>
+
+        @if (showHeaderMenu()) {
+          <div class="menu-overlay" (click)="closeHeaderMenu()"></div>
+        }
       }
     </div>
   </div>
@@ -83,7 +141,6 @@
             />
           </th>
           <th (click)="sortBy('contractNumber')">
-            <!-- ✅ FIX #1: Change header based on tab -->
             @if (showHistory() && activeHistoryTab() === 'credit') {
               เลขที่ใบลดหนี้ใบแจ้งหนี้
             } @else if (showHistory()) {
@@ -207,13 +264,6 @@
                     <i class="pi pi-pencil"></i>
                   </button>
                   <button
-                    class="action-btn danger"
-                    title="Cancel"
-                    (click)="onCancel(invoice)"
-                  >
-                    <i class="pi pi-times"></i>
-                  </button>
-                  <button
                     class="action-btn"
                     title="เพิ่มเติม"
                     (click)="toggleRowMenu(invoice.id, $event)"
@@ -267,7 +317,7 @@
         } @else {
           <button class="btn btn-create" (click)="onBulkIssueInvoice()">
             <i class="pi pi-file-check"></i>
-            <span>ออกใบแจ้งหนี้</span>
+            <span>ออกใบแจ้งหนี้อัตโนมัติ</span>
           </button>
         }
       </div>
@@ -275,7 +325,7 @@
   }
 </div>
 
-<!-- Kebab Menu -->
+<!-- Row Kebab Menu -->
 @if (showRowMenu() && currentInvoice()) {
   <div
     class="action-menu-portal"
@@ -294,9 +344,7 @@
         </button>
         <button
           class="menu-item"
-          (click)="
-            onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้ + พิมพ์เอกสาร')
-          "
+          (click)="onMenuAction(currentInvoice()!, 'ออกใบแจ้งหนี้ + พิมพ์เอกสาร')"
         >
           <i class="pi pi-print"></i>
           <span>ออกใบแจ้งหนี้ + พิมพ์เอกสาร</span>
@@ -307,6 +355,13 @@
         >
           <i class="pi pi-send"></i>
           <span>ออกใบแจ้งหนี้ + ส่งอีเมล</span>
+        </button>
+        <button
+          class="menu-item danger"
+          (click)="onMenuAction(currentInvoice()!, 'ยกเลิกใบแจ้งหนี้')"
+        >
+          <i class="pi pi-ban"></i>
+          <span>ยกเลิกใบแจ้งหนี้</span>
         </button>
         <button
           class="menu-item danger"
@@ -380,7 +435,6 @@
   />
 }
 
-<!-- ✅ FIX #3: Pass source info to detail modal -->
 @if (showDetailModal() && currentInvoice()) {
   <app-invoice-detail-modal
     [invoice]="currentInvoice()!"
@@ -390,7 +444,6 @@
   />
 }
 
-<!-- ✅ FIX #4: Edit Modal as Popup (not drawer) -->
 @if (showEditModal() && editingInvoice()) {
   <div class="modal-overlay" (click)="closeEditModal()">
     <div class="edit-modal-container" (click)="$event.stopPropagation()">
@@ -470,9 +523,7 @@
         <input
           type="text"
           [value]="newInvoiceData().contractNumber"
-          (input)="
-            updateNewInvoiceField('contractNumber', $any($event.target).value)
-          "
+          (input)="updateNewInvoiceField('contractNumber', $any($event.target).value)"
           placeholder="กรอกเลขที่สัญญา"
         />
       </div>
@@ -481,9 +532,7 @@
         <input
           type="text"
           [value]="newInvoiceData().customerName"
-          (input)="
-            updateNewInvoiceField('customerName', $any($event.target).value)
-          "
+          (input)="updateNewInvoiceField('customerName', $any($event.target).value)"
           placeholder="กรอกชื่อลูกค้า"
         />
       </div>
@@ -492,9 +541,7 @@
         <input
           type="text"
           [value]="newInvoiceData().collectionItem"
-          (input)="
-            updateNewInvoiceField('collectionItem', $any($event.target).value)
-          "
+          (input)="updateNewInvoiceField('collectionItem', $any($event.target).value)"
           placeholder="กรอกรายการเรียกเก็บ"
         />
       </div>
@@ -512,9 +559,7 @@
           <input
             type="date"
             [value]="newInvoiceData().startDate"
-            (input)="
-              updateNewInvoiceField('startDate', $any($event.target).value)
-            "
+            (input)="updateNewInvoiceField('startDate', $any($event.target).value)"
           />
         </div>
       </div>

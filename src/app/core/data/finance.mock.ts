@@ -1,4 +1,4 @@
-// finance.mock.ts - Complete mock data
+// finance.mock.ts
 
 import { FinanceStats, Debt, Invoice, Receipt, CreditNote } from './../models/finance.model';
 
@@ -18,7 +18,8 @@ export const MOCK_DEBTS: Debt[] = [
     amount: 125000,
     dueDate: '2024-12-31',
     overdueDays: 5,
-    status: 'new'
+    status: 'new',
+    branchId: 'branch-001',
   },
   {
     id: 'D002',
@@ -28,7 +29,8 @@ export const MOCK_DEBTS: Debt[] = [
     amount: 85000,
     dueDate: '2024-10-15',
     overdueDays: 75,
-    status: 'warning'
+    status: 'warning',
+    branchId: 'branch-002',
   },
   {
     id: 'D003',
@@ -38,7 +40,8 @@ export const MOCK_DEBTS: Debt[] = [
     amount: 250000,
     dueDate: '2024-07-01',
     overdueDays: 180,
-    status: 'critical'
+    status: 'critical',
+    branchId: 'branch-001',
   },
   {
     id: 'D004',
@@ -48,7 +51,8 @@ export const MOCK_DEBTS: Debt[] = [
     amount: 95000,
     dueDate: '2024-11-30',
     overdueDays: 35,
-    status: 'warning'
+    status: 'warning',
+    branchId: 'branch-002',
   },
   {
     id: 'D005',
@@ -58,11 +62,11 @@ export const MOCK_DEBTS: Debt[] = [
     amount: 1000,
     dueDate: '2025-11-30',
     overdueDays: 1,
-    status: 'warning'
+    status: 'warning',
+    branchId: 'branch-001',
   }
 ];
 
-// Mock data (ใบแจ้งหนี้ที่ยังไม่ออกใบเสร็จ)
 export const MOCK_INVOICES: Invoice[] = [
   {
     id: 'INV001',
@@ -71,7 +75,8 @@ export const MOCK_INVOICES: Invoice[] = [
     collectionItem: 'ค่าเช่าพื้นที่',
     amount: 25000,
     startDate: '2025-01-12',
-    status: 'ready'
+    status: 'ready',
+    branchId: 'branch-001',
   },
   {
     id: 'INV002',
@@ -80,7 +85,8 @@ export const MOCK_INVOICES: Invoice[] = [
     collectionItem: 'ค่าเช่าพื้นที่',
     amount: 35000,
     startDate: '2025-01-15',
-    status: 'ready'
+    status: 'ready',
+    branchId: 'branch-002',
   },
   {
     id: 'INV003',
@@ -89,7 +95,8 @@ export const MOCK_INVOICES: Invoice[] = [
     collectionItem: 'ค่าเช่าพื้นที่ + ค่าบริการ',
     amount: 50000,
     startDate: '2025-01-10',
-    status: 'ready'
+    status: 'ready',
+    branchId: 'branch-001',
   },
   {
     id: 'INV004',
@@ -98,7 +105,8 @@ export const MOCK_INVOICES: Invoice[] = [
     collectionItem: 'ค่าเช่าพื้นที่',
     amount: 28000,
     startDate: '2025-01-08',
-    status: 'ready'
+    status: 'ready',
+    branchId: 'branch-002',
   },
   {
     id: 'INV005',
@@ -107,7 +115,8 @@ export const MOCK_INVOICES: Invoice[] = [
     collectionItem: 'ค่าเช่าพื้นที่',
     amount: 42000,
     startDate: '2025-01-20',
-    status: 'open'
+    status: 'open',
+    branchId: 'branch-001',
   },
   {
     id: 'INV006',
@@ -116,7 +125,8 @@ export const MOCK_INVOICES: Invoice[] = [
     collectionItem: 'ค่าเช่าพื้นที่',
     amount: 55000,
     startDate: '2025-01-18',
-    status: 'open'
+    status: 'open',
+    branchId: 'branch-002',
   },
   {
     id: 'INV007',
@@ -125,11 +135,12 @@ export const MOCK_INVOICES: Invoice[] = [
     collectionItem: 'ค่าเช่าพื้นที่ + ค่าบริการ',
     amount: 65000,
     startDate: '2025-01-22',
-    status: 'open'
+    status: 'open',
+    branchId: 'branch-001',
   }
 ];
 
-// Mock data สำหรับรายการรอออกใบเสร็จ (invoices ที่ออกแล้วและรอออกใบเสร็จ)
+// Mock data สำหรับรายการรอออกใบเสร็จ
 export const MOCK_RECEIPTS_WAITING: Receipt[] = [
   {
     id: 'RW001',
@@ -221,7 +232,7 @@ export const MOCK_CREDIT_NOTES: CreditNote[] = [
   {
     id: 'CN001',
     cnNumber: 'CN-2025-001',
-    refInvoiceNumber: 'INV-2025-001',
+    refInvoiceNumber: 'IVST0325070001',
     customerName: 'คุณสมชาย ธุรกิจ',
     amount: 5000,
     date: '2025-01-15',
@@ -231,7 +242,7 @@ export const MOCK_CREDIT_NOTES: CreditNote[] = [
   {
     id: 'CN002',
     cnNumber: 'CN-2025-002',
-    refInvoiceNumber: 'INV-2025-003',
+    refInvoiceNumber: 'IVST0325070002',
     customerName: 'บริษัท ABC จำกัด',
     amount: 12500,
     date: '2025-01-18',
@@ -241,7 +252,7 @@ export const MOCK_CREDIT_NOTES: CreditNote[] = [
   {
     id: 'CN003',
     cnNumber: 'CN-2025-003',
-    refInvoiceNumber: 'INV-2025-007',
+    refInvoiceNumber: 'IVST0325070003',
     customerName: 'ห้างหุ้นส่วน GHI',
     amount: 2000,
     date: '2025-01-20',
@@ -251,7 +262,7 @@ export const MOCK_CREDIT_NOTES: CreditNote[] = [
   {
     id: 'CN004',
     cnNumber: 'CN-2025-004',
-    refInvoiceNumber: 'INV-2025-004',
+    refInvoiceNumber: 'IVST0325070004',
     customerName: 'ร้าน XYZ',
     amount: 28000,
     date: '2025-01-22',
@@ -260,7 +271,6 @@ export const MOCK_CREDIT_NOTES: CreditNote[] = [
   }
 ];
 
-// ✅ Mock data สำหรับใบลดหนี้ใบเสร็จ (Receipt Credit Notes)
 export const MOCK_RECEIPT_CREDIT_NOTES: CreditNote[] = [
   {
     id: 'RCN001',
@@ -320,7 +330,7 @@ export const ISSUED_DOCUMENTS: Record<string, {
   hasCancelInvoice: boolean;
 }> = {
   'D001': { hasCreditNote: false, hasInvoice: false, hasCancelInvoice: false },
-  'D002': { hasCreditNote: true, hasInvoice: false, hasCancelInvoice: false },
-  'D003': { hasCreditNote: false, hasInvoice: true, hasCancelInvoice: false },
-  'D004': { hasCreditNote: true, hasInvoice: true, hasCancelInvoice: true }
+  'D002': { hasCreditNote: true,  hasInvoice: false, hasCancelInvoice: false },
+  'D003': { hasCreditNote: false, hasInvoice: true,  hasCancelInvoice: false },
+  'D004': { hasCreditNote: true,  hasInvoice: true,  hasCancelInvoice: true  }
 };

@@ -1,8 +1,6 @@
-<!-- finance-document-modal.component.html -->
-
 <div class="modal-overlay" (click)="onCancel()">
   <div class="modal-container" (click)="$event.stopPropagation()">
-    <!-- Header -->
+
     <div class="modal-header">
       <h2 class="modal-title">{{ modalTitle() }}</h2>
       <button class="close-btn" (click)="onCancel()">
@@ -10,132 +8,292 @@
       </button>
     </div>
 
-    <!-- Body -->
     <div class="modal-body">
       <form [formGroup]="form">
-        <!-- Receipt Number -->
+
+        @if (hasField("branch")) {
+          <div class="form-field">
+            <label class="field-label">สาขา</label>
+            <input type="text" class="field-input disabled" formControlName="branch" readonly />
+          </div>
+        }
+
+        @if (hasField("cnStatus")) {
+          <div class="form-row-3">
+            <div class="form-field">
+              <label class="field-label required">สถานะใบลดหนี้</label>
+              <select class="field-input" formControlName="cnStatus">
+                @for (opt of cnStatusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="field-label">สถานะการโอน</label>
+              <select class="field-input" formControlName="transferStatus">
+                @for (opt of cnTransferStatusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="field-label">สถานะการพิมพ์</label>
+              <select class="field-input" formControlName="printStatus">
+                @for (opt of cnPrintStatusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+
+        @if (hasField("creditNoteNumber") && !hasField("cnStatus")) {
+          <div class="form-field">
+            <label class="field-label">เลขที่ใบลดหนี้</label>
+            <input type="text" class="field-input disabled" formControlName="creditNoteNumber" readonly />
+          </div>
+        }
+
+        @if (hasField("creditNoteNumber") && hasField("cnStatus")) {
+          <div class="form-row-2">
+            <div class="form-field">
+              <label class="field-label">เลขที่ใบลดหนี้</label>
+              <input type="text" class="field-input disabled" formControlName="creditNoteNumber" readonly />
+            </div>
+            <div class="form-field">
+              <label class="field-label required">วันที่ใบลดหนี้</label>
+              <div class="date-picker-wrapper">
+                <input type="text" class="field-input date-display" [value]="getDisplayDate('cnDate')" placeholder="วว/ดด/ปปปป" readonly [class.error]="isInvalid('cnDate')" />
+                <input type="date" class="date-native-input" [value]="form.get('cnDate')?.value" (change)="onNativeDateChange('cnDate', $any($event.target).value)" />
+                <i class="pi pi-calendar date-icon"></i>
+              </div>
+              @if (isInvalid('cnDate')) {
+                <div class="error-message"><i class="pi pi-exclamation-circle"></i><span>กรุณาเลือกวันที่ใบลดหนี้</span></div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (hasField("postingDate")) {
+          <div class="form-row-2">
+            <div class="form-field">
+              <label class="field-label">วันที่บันทึกบัญชี</label>
+              <div class="date-picker-wrapper">
+                <input type="text" class="field-input date-display" [value]="getDisplayDate('postingDate')" placeholder="วว/ดด/ปปปป" readonly />
+                <input type="date" class="date-native-input" [value]="form.get('postingDate')?.value" (change)="onNativeDateChange('postingDate', $any($event.target).value)" />
+                <i class="pi pi-calendar date-icon"></i>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="field-label">วันที่บันทึก (ระบบ)</label>
+              <div class="date-picker-wrapper">
+                <input type="text" class="field-input date-display disabled" [value]="getDisplayDate('systemRecordDate')" readonly />
+                <i class="pi pi-calendar date-icon"></i>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (hasField("referenceNo")) {
+          <div class="form-row-2">
+            <div class="form-field">
+              <label class="field-label">เลขที่อ้างอิง</label>
+              <div class="input-group">
+                <input type="text" class="field-input" formControlName="referenceNo" placeholder="กรอกเลขที่อ้างอิง" />
+                <button type="button" class="input-group-btn" (click)="onLookupClick('referenceNo')" title="ค้นหา">
+                  <i class="pi pi-folder-open"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="field-label">เลขที่สัญญา</label>
+              <input type="text" class="field-input disabled" formControlName="contractNumber" readonly />
+            </div>
+          </div>
+        }
+
+        @if (hasField("newInvoiceNo")) {
+          <div class="form-row-2">
+            <div class="form-field">
+              <label class="field-label">ใบแจ้งหนี้ใหม่</label>
+              <div class="input-group">
+                <input type="text" class="field-input" formControlName="newInvoiceNo" placeholder="กรอกเลขที่ใบแจ้งหนี้" />
+                <button type="button" class="input-group-btn" (click)="onLookupClick('newInvoiceNo')" title="ค้นหา">
+                  <i class="pi pi-folder-open"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="field-label">สกุลเงิน</label>
+              <div class="input-group">
+                <input type="text" class="field-input" formControlName="currency" />
+                <button type="button" class="input-group-btn" (click)="onLookupClick('currency')" title="ค้นหา">
+                  <i class="pi pi-folder-open"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (hasField("exchangeRate")) {
+          <div class="form-field exchange-rate-field">
+            <label class="field-label">อัตราแลกเปลี่ยน</label>
+            <input type="number" class="field-input" formControlName="exchangeRate" step="0.0001" />
+          </div>
+        }
+
+        @if (hasField("customerCode")) {
+          <div class="form-field">
+            <label class="field-label">ลูกค้า</label>
+            <div class="form-row-3">
+              <input type="text" class="field-input disabled" formControlName="customerCode" readonly placeholder="รหัสลูกค้า" />
+              <input type="text" class="field-input disabled" formControlName="customerNameTh" readonly placeholder="ชื่อบริษัท (ไทย)" />
+              <input type="text" class="field-input disabled" formControlName="customerNameEn" readonly placeholder="ชื่อบริษัท (English)" />
+            </div>
+          </div>
+        }
+
+        @if (hasField("address")) {
+          <div class="form-field">
+            <label class="field-label">ที่อยู่</label>
+            <textarea class="field-input field-textarea" formControlName="address" rows="2" placeholder="กรอกที่อยู่"></textarea>
+          </div>
+        }
+
+        @if (hasField("category")) {
+          <div class="form-field half-width">
+            <label class="field-label">Category</label>
+            <select class="field-input" formControlName="category">
+              @for (opt of categoryOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (hasField("cnReasonCode")) {
+          <div class="form-field">
+            <label class="field-label required">สาเหตุการลดหนี้</label>
+            <select
+              formControlName="cnReasonCode"
+              [class]="'field-input' + (isInvalid('cnReasonCode') ? ' error' : '')"
+              (change)="onCnReasonDropdownChange($any($event.target).value)"
+            >
+              <option value="" disabled>เลือกสาเหตุการลดหนี้</option>
+              @for (opt of cancelReasonOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+            @if (isInvalid('cnReasonCode')) {
+              <div class="error-message"><i class="pi pi-exclamation-circle"></i><span>กรุณาเลือกสาเหตุการลดหนี้</span></div>
+            }
+          </div>
+        }
+
+        @if (hasField("remarks")) {
+          <div class="form-field">
+            <label class="field-label">หมายเหตุ</label>
+            <textarea class="field-input field-textarea" formControlName="remarks" rows="3" placeholder="กรอกหมายเหตุ (ถ้ามี)"></textarea>
+          </div>
+        }
+
         @if (hasField("receiptNumber")) {
           <div class="form-field">
             <label class="field-label">เลขที่ใบเสร็จ</label>
-            <input
-              type="text"
-              class="field-input"
-              formControlName="receiptNumber"
-              [class.disabled]="isFieldDisabled('receiptNumber')"
-            />
+            <input type="text" class="field-input disabled" formControlName="receiptNumber" readonly />
           </div>
         }
 
-        <!-- Customer Name -->
-        @if (hasField("customerName")) {
-          <div class="form-field">
-            <label class="field-label">ลูกค้า</label>
-            <input
-              type="text"
-              class="field-input"
-              formControlName="customerName"
-              [class.disabled]="isFieldDisabled('customerName')"
-            />
-          </div>
-        }
-
-        <!-- Credit Note Number -->
-        @if (hasField("creditNoteNumber")) {
-          <div class="form-field">
-            <label class="field-label">เลขที่ใบลดหนี้</label>
-            <input
-              type="text"
-              class="field-input"
-              formControlName="creditNoteNumber"
-              [class.disabled]="isFieldDisabled('creditNoteNumber')"
-            />
-          </div>
-        }
-
-        <!-- Invoice Number -->
         @if (hasField("invoiceNumber")) {
           <div class="form-field">
             <label class="field-label">เลขที่ใบแจ้งหนี้</label>
-            <input
-              type="text"
-              class="field-input"
-              formControlName="invoiceNumber"
-              [class.disabled]="isFieldDisabled('invoiceNumber')"
-            />
+            <input type="text" class="field-input disabled" formControlName="invoiceNumber" readonly />
+          </div>
+        }
+
+        @if (hasField("customerName")) {
+          <div class="form-field">
+            <label class="field-label">ลูกค้า</label>
+            <input type="text" class="field-input disabled" formControlName="customerName" readonly />
           </div>
         }
 
         @if (hasField("cancelInvoiceNumber")) {
           <div class="form-field">
             <label class="field-label">เลขที่ใบยกเลิก</label>
-            <input
-              type="text"
-              class="field-input"
-              formControlName="cancelInvoiceNumber"
-              [class.disabled]="isFieldDisabled('cancelInvoiceNumber')"
-            />
+            <input type="text" class="field-input disabled" formControlName="cancelInvoiceNumber" readonly />
           </div>
         }
 
-        <!-- Date Range -->
         @if (hasField("dateFrom")) {
-          <div class="form-field-group">
-            <div class="form-field">
-              <label class="field-label required">
-                วันที่
-                @if (documentType() === "credit_note") {
-                  ใบลดหนี้
-                } @else if (
-                  documentType() === "invoice" ||
-                  documentType() === "cancel_invoice"
-                ) {
-                  ใบแจ้งหนี้
-                }
-              </label>
-              <input
-                type="date"
-                class="field-input"
-                formControlName="dateFrom"
-                [class.disabled]="isFieldDisabled('dateFrom')"
-                [class.error]="hasDateRangeError()"
-              />
-            </div>
-            <span class="range-separator">ถึง</span>
-            <div class="form-field">
-              <label class="field-label required">&nbsp;</label>
-              <input
-                type="date"
-                class="field-input"
-                formControlName="dateTo"
-                [class.disabled]="isFieldDisabled('dateTo')"
-                [class.error]="hasDateRangeError()"
-              />
-            </div>
-          </div>
-
-          <!-- ✅ Error Message -->
-          @if (hasDateRangeError()) {
-            <div class="error-message">
-              <i class="pi pi-exclamation-circle"></i>
-              <span>วันที่สิ้นสุดต้องมากกว่าหรือเท่ากับวันที่เริ่มต้น</span>
-            </div>
-          }
-        }
-
-        <!-- Contract Number -->
-        @if (hasField("contractNumber")) {
           <div class="form-field">
-            <label class="field-label">เลขที่สัญญาเช่า</label>
-            <input
-              type="text"
-              class="field-input"
-              formControlName="contractNumber"
-              [class.disabled]="isFieldDisabled('contractNumber')"
-            />
+            <label class="field-label required">
+              @if (documentType() === "cancel_invoice" || documentType() === "invoice") { วันที่ใบแจ้งหนี้ }
+              @else { วันที่ }
+            </label>
+            <div class="form-field-group">
+              <div class="date-picker-wrapper">
+                <input
+                  type="text"
+                  [class]="'field-input date-display' + (isFieldDisabled('dateFrom') ? ' disabled' : '') + (hasDateRangeError() ? ' error' : '')"
+                  [value]="getDisplayDate('dateFrom')"
+                  placeholder="วว/ดด/ปปปป"
+                  readonly
+                />
+                @if (!isFieldDisabled('dateFrom')) {
+                  <input type="date" class="date-native-input" [value]="form.get('dateFrom')?.value" (change)="onNativeDateChange('dateFrom', $any($event.target).value)" />
+                }
+                <i class="pi pi-calendar date-icon"></i>
+              </div>
+              <span class="range-separator">ถึง</span>
+              <div class="date-picker-wrapper">
+                <input
+                  type="text"
+                  [class]="'field-input date-display' + (isFieldDisabled('dateTo') ? ' disabled' : '') + (hasDateRangeError() ? ' error' : '')"
+                  [value]="getDisplayDate('dateTo')"
+                  placeholder="วว/ดด/ปปปป"
+                  readonly
+                />
+                @if (!isFieldDisabled('dateTo')) {
+                  <input type="date" class="date-native-input" [value]="form.get('dateTo')?.value" (change)="onNativeDateChange('dateTo', $any($event.target).value)" />
+                }
+                <i class="pi pi-calendar date-icon"></i>
+              </div>
+            </div>
+            @if (hasDateRangeError()) {
+              <div class="error-message">
+                <i class="pi pi-exclamation-circle"></i>
+                <span>วันที่สิ้นสุดต้องมากกว่าหรือเท่ากับวันที่เริ่มต้น</span>
+              </div>
+            }
           </div>
         }
 
-        <!-- Invoice Status -->
+        @if (hasField("contractNumber") && !hasField("referenceNo")) {
+          <div class="form-field">
+            <label class="field-label">
+              @if (documentType() === "cancel_invoice") { เลขที่สัญญาจอง }
+              @else { เลขที่สัญญาเช่า }
+            </label>
+            <input type="text" class="field-input disabled" formControlName="contractNumber" readonly />
+          </div>
+        }
+
+        @if (hasField("cancelReason")) {
+          <div class="form-field">
+            <label class="field-label required">สาเหตุที่ต้องการยกเลิก</label>
+            <select formControlName="cancelReason" [class]="'field-input' + (isInvalid('cancelReason') ? ' error' : '')">
+              <option value="" disabled>เลือกสาเหตุ</option>
+              @for (option of cancelReasonOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+            @if (isInvalid('cancelReason')) {
+              <div class="error-message"><i class="pi pi-exclamation-circle"></i><span>กรุณาเลือกสาเหตุที่ต้องการยกเลิก</span></div>
+            }
+          </div>
+        }
+
         @if (hasField("invoiceStatus")) {
           <div class="form-field">
             <label class="field-label">สถานะใบแจ้งหนี้</label>
@@ -147,8 +305,7 @@
           </div>
         }
 
-        <!-- Print Status -->
-        @if (hasField("printStatus")) {
+        @if (hasField("printStatus") && !hasField("cnStatus")) {
           <div class="form-field">
             <label class="field-label">สถานะการพิมพ์</label>
             <select class="field-input" formControlName="printStatus">
@@ -159,8 +316,7 @@
           </div>
         }
 
-        <!-- Transfer Status -->
-        @if (hasField("transferStatus")) {
+        @if (hasField("transferStatus") && !hasField("cnStatus")) {
           <div class="form-field">
             <label class="field-label">สถานะการโอน</label>
             <select class="field-input" formControlName="transferStatus">
@@ -171,7 +327,6 @@
           </div>
         }
 
-        <!-- Debt Status -->
         @if (hasField("debtStatus")) {
           <div class="form-field">
             <label class="field-label">สถานะหนี้คงเหลือ</label>
@@ -183,7 +338,6 @@
           </div>
         }
 
-        <!-- Receipt Status -->
         @if (hasField("status")) {
           <div class="form-field">
             <label class="field-label">สถานะ</label>
@@ -194,15 +348,14 @@
             </select>
           </div>
         }
+
       </form>
     </div>
 
-    <!-- Footer -->
     <div class="modal-footer">
       <button class="btn-cancel" (click)="onCancel()">ยกเลิก</button>
-      <button class="btn-submit" (click)="onSubmit()">
-        {{ submitButtonLabel() }}
-      </button>
+      <button class="btn-submit" (click)="onSubmit()">{{ submitButtonLabel() }}</button>
     </div>
+
   </div>
 </div>

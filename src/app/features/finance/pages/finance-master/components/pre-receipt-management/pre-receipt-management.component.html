@@ -84,9 +84,6 @@
                 <button class="action-btn" title="Edit" (click)="onEdit(receipt)">
                   <i class="pi pi-pencil"></i>
                 </button>
-                <button class="action-btn danger" title="Cancel" (click)="onCancel(receipt)">
-                  <i class="pi pi-times"></i>
-                </button>
                 <button class="action-btn" title="เพิ่มเติม" (click)="toggleRowMenu(receipt.id, $event)">
                   <i class="pi pi-ellipsis-v"></i>
                 </button>
@@ -142,6 +139,10 @@
       <button class="menu-item" (click)="onMenuAction(currentReceipt()!, 'ออกใบเสร็จ + ส่งอีเมล')">
         <i class="pi pi-send"></i>
         <span>ออกใบเสร็จ + ส่งอีเมล</span>
+      </button>
+      <button class="menu-item danger" (click)="onMenuAction(currentReceipt()!, 'ยกเลิกรายการ')">
+        <i class="pi pi-ban"></i>
+        <span>ยกเลิกรายการ</span>
       </button>
       <button class="menu-item danger" (click)="onMenuAction(currentReceipt()!, 'ลบสัญญา')">
         <i class="pi pi-trash"></i>

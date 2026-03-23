@@ -63,9 +63,12 @@ export class InvoiceManagementComponent implements OnInit {
   showEditModal = signal<boolean>(false);
   editingInvoice = signal<Invoice | CreditNote | null>(null);
 
-  // Kebab Menu
+  // Row Kebab Menu
   showRowMenu = signal<string | null>(null);
   menuPosition = signal<{ top: number; left: number }>({ top: 0, left: 0 });
+
+  // Header Kebab Menu
+  showHeaderMenu = signal<boolean>(false);
 
   // New Invoice Data
   newInvoiceData = signal<Partial<Invoice>>({
@@ -273,7 +276,7 @@ export class InvoiceManagementComponent implements OnInit {
     return this.selectedInvoices().size;
   }
 
-  // ===================== KEBAB MENU =====================
+  // ===================== ROW KEBAB MENU =====================
   toggleRowMenu(invoiceId: string, event: MouseEvent): void {
     if (this.showRowMenu() === invoiceId) {
       this.closeRowMenu();
@@ -319,6 +322,9 @@ export class InvoiceManagementComponent implements OnInit {
       case 'ออกใบแจ้งหนี้ + ส่งอีเมล':
         this.issueInvoiceForSingle(invoice, false, true);
         break;
+      case 'ยกเลิกใบแจ้งหนี้':
+        this.onCancel(invoice);
+        break;
       case 'ลบสัญญา':
         this.deleteContract(invoice);
         break;
@@ -330,6 +336,21 @@ export class InvoiceManagementComponent implements OnInit {
         this.showMessage('ดำเนินการ', `กำลังดำเนินการ: ${action}`);
         break;
     }
+  }
+
+  // ===================== HEADER KEBAB MENU =====================
+  toggleHeaderMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showHeaderMenu.update(v => !v);
+  }
+
+  closeHeaderMenu(): void {
+    this.showHeaderMenu.set(false);
+  }
+
+  onHeaderMenuAction(action: string): void {
+    this.closeHeaderMenu();
+    this.showMessage('ดำเนินการ', `เลือก: ${action}`);
   }
 
   // ===================== ISSUE INVOICE =====================
@@ -347,7 +368,6 @@ export class InvoiceManagementComponent implements OnInit {
     (window as any).__pendingInvoiceActions = { originalInvoice: invoice };
   }
 
-  // ✅ FIX #3 & #4: Move to history when issuing invoice
   onDocumentSubmit(formData: any): void {
     console.log('Document submitted:', formData);
     const actions = (window as any).__pendingInvoiceActions || {};
@@ -355,7 +375,6 @@ export class InvoiceManagementComponent implements OnInit {
 
     if (invoice) {
       if (formData.documentType === 'invoice') {
-        // Move from ready to issued
         const updatedInvoice = { ...invoice, status: 'open' as const };
         this.invoices.update((invs) => invs.filter((inv) => inv.id !== invoice.id));
         this.issuedInvoices.update((invs) => [...invs, updatedInvoice]);
@@ -365,7 +384,6 @@ export class InvoiceManagementComponent implements OnInit {
         if (actions.email) message += ' และกำลังส่งอีเมล';
         this.showMessage('สำเร็จ', message);
       } else if (formData.documentType === 'credit_note') {
-        // Add to credit notes
         const creditNote: CreditNote = {
           id: `CN-${Date.now()}`,
           cnNumber: `CN-2025-${String(this.issuedCreditNotes().length + 1).padStart(3, '0')}`,
@@ -393,7 +411,6 @@ export class InvoiceManagementComponent implements OnInit {
   }
 
   // ===================== CREATE MANUAL INVOICE =====================
-  // ✅ FIX #4: Use ออกใบแจ้งหนี้ modal for create button
   openCreateDrawer(): void {
     this.newInvoiceData.set({
       contractNumber: '',
@@ -404,7 +421,6 @@ export class InvoiceManagementComponent implements OnInit {
       status: 'ready',
     });
 
-    // Instead of opening drawer, open the document modal
     const mockInvoice: Invoice = {
       id: `temp-${Date.now()}`,
       contractNumber: '',
@@ -434,7 +450,7 @@ export class InvoiceManagementComponent implements OnInit {
       collectionItem: data.collectionItem || 'N/A',
       amount: data.amount || 0,
       startDate: data.startDate || '',
-      status: 'open', // ✅ Go directly to history
+      status: 'open',
     };
 
     this.issuedInvoices.update((invs) => [...invs, newInvoice]);
@@ -461,9 +477,7 @@ export class InvoiceManagementComponent implements OnInit {
     }, 300);
   }
 
-  // ✅ FIX #3: Handle issue invoice from detail modal
   onIssueInvoiceFromDetail(invoice: any): void {
-    // Find the original invoice from ready list
     const originalInvoice = this.invoices().find(inv => inv.id === invoice.id);
     if (originalInvoice) {
       this.issueInvoiceForSingle(originalInvoice);
@@ -595,7 +609,6 @@ export class InvoiceManagementComponent implements OnInit {
     });
   }
 
-  // ✅ FIX #3: Move to history when canceling
   onCancel(invoice: Invoice): void {
     this.pendingCancelInvoice.set(invoice);
     this.showConfirmModal.set(true);
@@ -607,11 +620,9 @@ export class InvoiceManagementComponent implements OnInit {
       const canceledInvoice = { ...invoice, status: 'cancel' as const };
 
       if (!this.showHistory()) {
-        // Remove from ready list and add to issued invoices
         this.invoices.update((invs) => invs.filter(inv => inv.id !== invoice.id));
         this.issuedInvoices.update((invs) => [...invs, canceledInvoice]);
       } else if (this.activeHistoryTab() === 'invoice') {
-        // Update in issued invoices
         this.issuedInvoices.update((invs) =>
           invs.map((inv) => (inv.id === invoice.id ? canceledInvoice : inv))
         );

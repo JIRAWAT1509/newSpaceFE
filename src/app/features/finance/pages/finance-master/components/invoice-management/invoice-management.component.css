@@ -90,6 +90,31 @@
   @apply shadow-sm hover:shadow-md;
 }
 
+/* Header Kebab Menu */
+.header-kebab-wrapper {
+  position: relative;
+}
+
+.header-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 200;
+  width: 320px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  padding: 6px 0;
+  animation: slideDown 0.15s ease;
+}
+
+.menu-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 4px 0;
+}
+
 /* Table */
 .table-container {
   @apply bg-white rounded-xl border border-gray-200 overflow-hidden;
@@ -184,9 +209,31 @@
   @apply flex items-center justify-center gap-2;
 }
 
-/* Edit/delete buttons from global */
+/* Row action buttons — circular, matches pre-receipt style */
 .action-btn {
-  @apply flex items-center justify-center rounded-lg transition-all duration-200 border-none cursor-pointer;
+  @apply w-8 h-8 flex items-center justify-center;
+  background-color: transparent;
+  color: #3b82f6;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.action-btn.danger {
+  background-color: transparent;
+  color: #ef4444;
+  border-radius: 50%;
+}
+
+.action-btn.danger:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
 }
 
 /* Action Menu */
@@ -553,6 +600,10 @@
   .edit-modal-container {
     width: 95%;
     max-height: 90vh;
+  }
+
+  .header-dropdown-menu {
+    width: 280px;
   }
 }
 

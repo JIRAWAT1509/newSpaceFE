@@ -1,12 +1,12 @@
-// src/app/core/models/finance-document.model.ts
+//finance-document.model.ts
 
 export type DocumentType =
-  | 'credit_note'        // ออกใบลดหนี้
-  | 'invoice'            // ออกใบแจ้งหนี้
-  | 'cancel_invoice'     // ยกเลิกใบแจ้งหนี้
-  | 'receipt_credit'     // ใบเสร็จใบลดหนี้
-  | 'receipt_invoice'   // ใบเสร็จใบแจ้งหนี้
-  | 'receipt_cancel';    // ✅ ออกใบเสร็จใบยกเลิก (ใหม่)
+  | 'credit_note'
+  | 'invoice'
+  | 'cancel_invoice'
+  | 'receipt_credit'
+  | 'receipt_invoice'
+  | 'receipt_cancel';
 
 export interface FinanceDocumentConfig {
   type: DocumentType;
@@ -30,15 +30,34 @@ export interface FinanceDocumentFormData {
   documentType: DocumentType;
   customerName?: string;
   documentNumber?: string;
-  dateFrom?: Date;
-  dateTo?: Date;
+  dateFrom?: string;
+  dateTo?: string;
   contractNumber?: string;
   invoiceNumber?: string;
   creditNoteNumber?: string;
   receiptNumber?: string;
+  cancelInvoiceNumber?: string;
   invoiceStatus?: string;
   printStatus?: string;
   transferStatus?: string;
   debtStatus?: string;
   status?: string;
+  branch?: string;
+  cancelReason?: string;
+  cnStatus?: string;
+  cnDate?: string;
+  postingDate?: string;
+  referenceNo?: string;
+  newInvoiceNo?: string;
+  systemRecordDate?: string;
+  currency?: string;
+  exchangeRate?: number;
+  customerCode?: string;
+  customerNameTh?: string;
+  customerNameEn?: string;
+  address?: string;
+  category?: string;
+  cnReasonCode?: string;
+  cnReasonDescription?: string;
+  remarks?: string;
 }

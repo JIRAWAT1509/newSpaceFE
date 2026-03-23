@@ -151,7 +151,7 @@ export class PreReceiptManagementComponent implements OnInit {
         const button = event.currentTarget as HTMLElement;
         const rect = button.getBoundingClientRect();
         const menuWidth = 224;
-        const menuHeight = 150;
+        const menuHeight = 180;
 
         let top = rect.bottom - 20;
         let left = rect.left - menuWidth + 20;
@@ -182,6 +182,9 @@ export class PreReceiptManagementComponent implements OnInit {
         break;
       case 'ออกใบเสร็จ + ส่งอีเมล':
         this.onIssueReceiptAndEmail(receipt);
+        break;
+      case 'ยกเลิกรายการ':
+        this.onCancel(receipt);
         break;
       case 'ลบสัญญา':
         this.onDeleteContract(receipt);
@@ -231,7 +234,6 @@ export class PreReceiptManagementComponent implements OnInit {
   onConfirmCancel(): void {
     const receipt = this.pendingCancelReceipt();
     if (receipt) {
-      // Remove from list (mock behavior)
       this.receipts.update(recs => recs.filter(r => r.id !== receipt.id));
       alert(`ยกเลิกรายการ ${receipt.contractNumber} สำเร็จ`);
     }
