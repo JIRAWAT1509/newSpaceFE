@@ -1,0 +1,137 @@
+<!-- bulk-receipt-preview-modal.component.html -->
+@if (isOpen()) {
+  <div class="preview-backdrop" (click)="onBackdropClick($event)">
+    <div class="preview-modal">
+
+      <!-- Header -->
+      <div class="preview-header">
+        <div class="preview-title-group">
+          <div class="preview-icon"><i class="pi pi-file-check"></i></div>
+          <div>
+            <h2 class="preview-title">ตรวจสอบรายการก่อนสร้างใบเสร็จ</h2>
+            <p class="preview-subtitle">
+              พบ <strong>{{ receipts().length }}</strong> รายการ — ยอดรวม
+              <strong>฿{{ totalAmount() | number:'1.2-2' }}</strong>
+            </p>
+          </div>
+        </div>
+        <button class="icon-btn" (click)="cancel.emit()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Receipt Cards Stack -->
+      <div class="preview-body">
+        <p class="preview-hint">
+          <i class="pi pi-info-circle"></i>
+          ระบบจะสร้างใบเสร็จด้านล่างทั้งหมดพร้อมกัน กรุณาตรวจสอบให้ถูกต้องก่อนกดยืนยัน
+        </p>
+
+        <div class="receipt-cards">
+          @for (r of receipts(); track r.id; let i = $index) {
+            <div class="receipt-card">
+              <!-- Card Header -->
+              <div class="card-header">
+                <div class="card-badge">ใบเสร็จที่ {{ i + 1 }}</div>
+                <span class="card-status">พร้อมออก</span>
+              </div>
+
+              <!-- Receipt Paper -->
+              <div class="receipt-paper">
+                <div class="receipt-paper-header">
+                  <div class="receipt-paper-logo">
+                    <i class="pi pi-building"></i>
+                  </div>
+                  <div class="receipt-paper-title">
+                    <div class="doc-type">ใบเสร็จรับเงิน</div>
+                    <div class="doc-type-en">RECEIPT</div>
+                  </div>
+                </div>
+
+                <div class="receipt-paper-meta">
+                  <div class="meta-row">
+                    <span class="meta-key">เลขที่</span>
+                    <span class="meta-val receipt-no">RC-{{ r.contractNumber }}</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-key">วันที่</span>
+                    <span class="meta-val">{{ today }}</span>
+                  </div>
+                </div>
+
+                <div class="receipt-paper-divider"></div>
+
+                <div class="receipt-customer">
+                  <div class="customer-row">
+                    <span class="meta-key">ลูกค้า</span>
+                    <span class="meta-val bold">{{ r.customerName }}</span>
+                  </div>
+                  <div class="customer-row">
+                    <span class="meta-key">อ้างอิง</span>
+                    <span class="meta-val mono">{{ r.contractNumber }}</span>
+                  </div>
+                </div>
+
+                <div class="receipt-paper-divider"></div>
+
+                <!-- Item line -->
+                <div class="receipt-items">
+                  <div class="item-row item-header">
+                    <span>รายการ</span>
+                    <span>จำนวนเงิน</span>
+                  </div>
+                  <div class="item-row">
+                    <span class="item-desc">{{ r.collectionItem }}</span>
+                    <span class="item-amount">฿{{ r.amount.toLocaleString() }}</span>
+                  </div>
+                </div>
+
+                <div class="receipt-paper-divider"></div>
+
+                <!-- Totals -->
+                <div class="receipt-totals">
+                  <div class="total-row">
+                    <span>ยอดก่อน VAT</span>
+                    <span>฿{{ (r.amount / 1.07 | number:'1.2-2') }}</span>
+                  </div>
+                  <div class="total-row">
+                    <span>VAT 7%</span>
+                    <span>฿{{ (r.amount - r.amount / 1.07 | number:'1.2-2') }}</span>
+                  </div>
+                  <div class="total-row total-net">
+                    <span>ยอดสุทธิ</span>
+                    <span class="total-net-value">฿{{ r.amount | number:'1.2-2' }}</span>
+                  </div>
+                </div>
+
+                <div class="receipt-paper-footer">
+                  <div class="stamp-placeholder">
+                    <i class="pi pi-check-circle"></i>
+                    <span>ออกโดยระบบอัตโนมัติ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="preview-footer">
+        <div class="footer-summary">
+          รวมทั้งหมด <strong>{{ receipts().length }}</strong> ใบ —
+          ยอดรวม <strong class="total-highlight">฿{{ totalAmount() | number:'1.2-2' }}</strong>
+        </div>
+        <div class="footer-actions">
+          <button class="btn btn-ghost" (click)="cancel.emit()">
+            <i class="pi pi-times"></i> ยกเลิก
+          </button>
+          <button class="btn btn-confirm" (click)="confirm.emit()">
+            <i class="pi pi-check"></i> ยืนยันสร้างใบเสร็จ {{ receipts().length }} ใบ
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+}

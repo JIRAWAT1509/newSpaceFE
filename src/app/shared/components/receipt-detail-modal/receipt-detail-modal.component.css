@@ -324,3 +324,117 @@
 .modal-body::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* ── Preview mode: dim all inputs ── */
+.is-preview .input-base,
+.is-preview .input-code,
+.is-preview .input-running,
+.is-preview .input-prefix,
+.is-preview .textarea-base,
+.is-preview .cell-input {
+  background: #f8fafc;
+  color: #475569;
+  cursor: default;
+  border-color: #e5e7eb;
+}
+
+.is-preview .cell-input.highlight-cell {
+  background: #fefce8;
+  border-color: #fde68a;
+  cursor: default;
+}
+
+/* ── Mode toggle button ── */
+.mode-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+
+.mode-toggle-btn.edit {
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
+}
+
+.mode-toggle-btn.edit:hover {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+}
+
+.mode-toggle-btn.preview {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.mode-toggle-btn.preview:hover {
+  background: #dcfce7;
+}
+
+/* ── Status chips (detail modal adds cancel style) ── */
+.status-chip.status-cancel {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-chip.status-ready {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* ── Breakdown panel ── */
+.breakdown-row td {
+  padding: 0 !important;
+  background: #f8faff;
+}
+
+.breakdown-panel {
+  padding: 12px 16px;
+  border-top: 1px solid #e0e7ff;
+}
+
+.breakdown-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4f46e5;
+  margin-bottom: 10px;
+}
+
+.breakdown-table {
+  min-width: unset;
+}
+
+/* ── Expand btn ── */
+.expand-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 13px;
+}
+
+.expand-btn:hover,
+.expand-btn.active {
+  background: #eef2ff;
+  color: #4f46e5;
+}

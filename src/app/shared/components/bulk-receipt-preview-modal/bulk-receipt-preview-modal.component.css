@@ -1,0 +1,431 @@
+/* bulk-receipt-preview-modal.component.css */
+
+/* ═══════════════════════════════════════
+   BACKDROP & CONTAINER
+═══════════════════════════════════════ */
+.preview-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.preview-modal {
+  background: #f8fafc;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 32px 100px rgba(15, 23, 42, 0.3);
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin: auto;
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
+  color: white;
+  flex-shrink: 0;
+}
+
+.preview-title-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.preview-icon {
+  width: 46px;
+  height: 46px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.preview-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.preview-subtitle {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  margin: 3px 0 0;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.icon-btn:hover { background: rgba(255,255,255,0.25); }
+
+/* ═══════════════════════════════════════
+   BODY
+═══════════════════════════════════════ */
+.preview-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 65vh;
+}
+
+.preview-body::-webkit-scrollbar { width: 6px; }
+.preview-body::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+.preview-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+.preview-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #1d4ed8;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════
+   RECEIPT CARDS
+═══════════════════════════════════════ */
+.receipt-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.receipt-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s;
+}
+
+.receipt-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.card-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  background: rgba(34,197,94,0.12);
+  color: #16a34a;
+  border-radius: 999px;
+  border: 1px solid rgba(34,197,94,0.25);
+}
+
+/* ─── Receipt Paper ─── */
+.receipt-paper {
+  padding: 24px;
+  font-family: 'Courier New', monospace;
+  position: relative;
+}
+
+.receipt-paper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 4px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #3b82f6 0px,
+    #3b82f6 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  opacity: 0.3;
+}
+
+.receipt-paper-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.receipt-paper-logo {
+  width: 40px;
+  height: 40px;
+  background: #1e40af;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.receipt-paper-title {
+  flex: 1;
+}
+
+.doc-type {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: 1px;
+  font-family: 'Courier New', monospace;
+}
+
+.doc-type-en {
+  font-size: 11px;
+  color: #94a3b8;
+  letter-spacing: 3px;
+}
+
+.receipt-paper-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.meta-row, .customer-row {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 13px;
+}
+
+.meta-key {
+  width: 60px;
+  color: #94a3b8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.meta-val {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.meta-val.bold   { font-weight: 700; font-size: 14px; }
+.meta-val.mono   { font-family: 'Courier New', monospace; color: #4f46e5; }
+.receipt-no      { font-weight: 700; color: #1e40af; font-size: 14px; letter-spacing: 1px; }
+
+.receipt-paper-divider {
+  border: none;
+  border-top: 1px dashed #cbd5e1;
+  margin: 12px 0;
+}
+
+.receipt-customer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+/* Items */
+.receipt-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.item-header {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.item-desc   { color: #374151; }
+.item-amount { font-weight: 700; color: #1e293b; }
+
+/* Totals */
+.receipt-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 4px;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.total-net {
+  font-weight: 700;
+  font-size: 15px;
+  color: #1e293b;
+  padding-top: 6px;
+  border-top: 2px solid #1e293b;
+  margin-top: 4px;
+}
+
+.total-net-value {
+  color: #1d4ed8;
+  font-size: 16px;
+}
+
+/* Footer stamp */
+.receipt-paper-footer {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.stamp-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 2px dashed #93c5fd;
+  border-radius: 6px;
+  color: #3b82f6;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+.preview-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.footer-summary {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.total-highlight {
+  color: #1d4ed8;
+  font-size: 16px;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #d1d5db;
+}
+
+.btn-ghost:hover { background: #f1f5f9; }
+
+.btn-confirm {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: white;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+}
+
+.btn-confirm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.45);
+}
+
+@media (max-width: 640px) {
+  .preview-footer { flex-direction: column; align-items: stretch; }
+  .footer-actions { flex-direction: column; }
+  .btn { justify-content: center; }
+}

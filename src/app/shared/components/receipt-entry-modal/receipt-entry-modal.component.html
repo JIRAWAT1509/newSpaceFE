@@ -1,0 +1,1011 @@
+<!-- receipt-entry-modal.component.html -->
+@if (isOpen()) {
+  <div class="modal-backdrop" (click)="onBackdropClick($event)">
+    <div class="receipt-modal" (click)="$event.stopPropagation()">
+      <!-- ══════ TOP BAR ══════ -->
+      <div class="modal-top-bar">
+        <div class="modal-title-group">
+          <div class="modal-icon"><i class="pi pi-file-check"></i></div>
+          <div>
+            <h2 class="modal-title">บันทึกใบเสร็จรับเงิน</h2>
+            <p class="modal-subtitle">
+              Manual Input — อ้างอิงจากรายการรอออกใบเสร็จ
+            </p>
+          </div>
+        </div>
+        <div class="modal-header-actions">
+          <span class="status-chip status-open">Open</span>
+          <button class="icon-btn" (click)="close.emit()" title="ปิด">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════ BODY ══════ -->
+      <div class="modal-scroll-body">
+        <form [formGroup]="form">
+          <!-- ── SECTION 1: ข้อมูลใบเสร็จ ── -->
+          <div class="form-section">
+            <div class="section-label">ข้อมูลใบเสร็จ</div>
+
+            <div class="field-grid col-2">
+              <!-- สาขา -->
+              <div class="field-group">
+                <label class="field-label required">สาขา</label>
+                <div class="lookup-wrapper">
+                  <div class="lookup-field">
+                    <input
+                      type="text"
+                      class="input-code"
+                      [class.error]="isInvalid('branchCode')"
+                      placeholder="รหัสสาขา"
+                      formControlName="branchCode"
+                      (input)="onBranchInput($any($event.target).value)"
+                      (focus)="showBranchDropdown.set(true)"
+                      (click)="$event.stopPropagation()"
+                    />
+                    <button
+                      class="lookup-btn"
+                      type="button"
+                      (click)="onLookup('branch', $event)"
+                    >
+                      <i class="pi pi-search"></i>
+                    </button>
+                    <input
+                      type="text"
+                      class="input-display"
+                      formControlName="branchName"
+                      placeholder="ชื่อสาขา"
+                      readonly
+                    />
+                  </div>
+                  @if (showBranchDropdown() && filteredBranches().length > 0) {
+                    <div
+                      class="lookup-dropdown"
+                      (click)="$event.stopPropagation()"
+                    >
+                      <div class="lookup-dropdown-header">
+                        <i class="pi pi-building"></i> เลือกสาขา
+                      </div>
+                      @for (b of filteredBranches(); track b) {
+                        <button
+                          type="button"
+                          class="lookup-item"
+                          (click)="onSelectBranch(b)"
+                        >
+                          <span class="lookup-item-code">{{ b }}</span>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+                @if (isInvalid("branchCode")) {
+                  <div class="error-msg">
+                    <i class="pi pi-exclamation-circle"></i> กรุณาระบุสาขา
+                  </div>
+                }
+              </div>
+
+              <!-- ลูกค้า -->
+              <div class="field-group">
+                <label class="field-label required">ลูกค้า</label>
+                <div class="lookup-wrapper">
+                  <div class="lookup-field">
+                    <input
+                      type="text"
+                      class="input-code"
+                      [class.error]="isInvalid('customerName')"
+                      placeholder="ค้นหาลูกค้า"
+                      [value]="customerSearch()"
+                      (input)="onCustomerInput($any($event.target).value)"
+                      (focus)="showCustomerDropdown.set(true)"
+                      (click)="$event.stopPropagation()"
+                    />
+                    <button
+                      class="lookup-btn"
+                      type="button"
+                      (click)="onLookup('customer', $event)"
+                    >
+                      <i class="pi pi-search"></i>
+                    </button>
+                    <input
+                      type="text"
+                      class="input-display"
+                      formControlName="customerName"
+                      placeholder="ชื่อลูกค้า"
+                      readonly
+                    />
+                  </div>
+                  @if (
+                    showCustomerDropdown() && filteredCustomers().length > 0
+                  ) {
+                    <div
+                      class="lookup-dropdown lookup-dropdown-wide"
+                      (click)="$event.stopPropagation()"
+                    >
+                      <div class="lookup-dropdown-header">
+                        <i class="pi pi-users"></i> เลือกลูกค้า
+                      </div>
+                      @for (debt of filteredCustomers(); track debt.id) {
+                        <button
+                          type="button"
+                          class="lookup-item"
+                          (click)="onSelectCustomer(debt)"
+                        >
+                          <div class="lookup-item-main">
+                            {{ debt.customerName }}
+                          </div>
+                          <div class="lookup-item-sub">
+                            <span class="lookup-badge">{{
+                              debt.branchId
+                            }}</span>
+                            <span>฿{{ debt.amount.toLocaleString() }}</span>
+                          </div>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+                @if (isInvalid("customerName")) {
+                  <div class="error-msg">
+                    <i class="pi pi-exclamation-circle"></i> กรุณาระบุลูกค้า
+                  </div>
+                }
+              </div>
+
+              <!-- ชื่อร้าน -->
+              <div class="field-group">
+                <label class="field-label">ชื่อร้าน</label>
+                <input
+                  type="text"
+                  class="input-base"
+                  placeholder="ชื่อร้าน / สาขาย่อย"
+                  formControlName="shopName"
+                />
+              </div>
+
+              <!-- เลขที่ใบเสร็จ -->
+              <div class="field-group">
+                <label class="field-label required">เลขที่ใบเสร็จ</label>
+                <div class="receipt-number-field">
+                  <input
+                    type="text"
+                    class="input-prefix"
+                    placeholder="Prefix"
+                    formControlName="receiptPrefix"
+                  />
+                  <span class="separator">-</span>
+                  <input
+                    type="text"
+                    class="input-running"
+                    [class.error]="isInvalid('receiptRunning')"
+                    placeholder="Running No."
+                    formControlName="receiptRunning"
+                  />
+                </div>
+                @if (isInvalid("receiptRunning")) {
+                  <div class="error-msg">
+                    <i class="pi pi-exclamation-circle"></i> กรุณาระบุเลขที่
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- ที่อยู่ -->
+            <div class="field-group full-width">
+              <label class="field-label">ที่อยู่</label>
+              <div class="address-row">
+                <input
+                  type="text"
+                  class="input-base"
+                  placeholder="ที่อยู่บรรทัดที่ 1"
+                  formControlName="address1"
+                />
+                <input
+                  type="text"
+                  class="input-base"
+                  placeholder="ที่อยู่บรรทัดที่ 2"
+                  formControlName="address2"
+                />
+              </div>
+            </div>
+
+            <!-- หมายเหตุ -->
+            <div class="field-group full-width">
+              <label class="field-label">หมายเหตุ</label>
+              <textarea
+                class="textarea-base"
+                rows="2"
+                placeholder="หมายเหตุ..."
+                formControlName="remark"
+              ></textarea>
+            </div>
+
+            <div class="field-grid col-3">
+              <div class="field-group">
+                <label class="field-label required">วันที่ในใบเสร็จ</label>
+                <input
+                  type="date"
+                  class="input-base"
+                  [class.error]="isInvalid('receiptDate')"
+                  formControlName="receiptDate"
+                />
+              </div>
+              <div class="field-group">
+                <label class="field-label required">วันที่บันทึกบัญชี</label>
+                <input
+                  type="date"
+                  class="input-base"
+                  [class.error]="isInvalid('accountingDate')"
+                  formControlName="accountingDate"
+                />
+              </div>
+              <div class="field-group">
+                <label class="field-label">วันที่บันทึก</label>
+                <input
+                  type="text"
+                  class="input-base input-readonly"
+                  [value]="todayDisplay"
+                  readonly
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- ── SECTION 2: การชำระเงิน ── -->
+          <div class="form-section">
+            <div class="section-label">การชำระเงิน</div>
+            <div class="payment-actions-row">
+              <button
+                class="btn btn-outline-sm"
+                type="button"
+                (click)="onCashRef()"
+              >
+                <i class="pi pi-receipt"></i> เงินสดอ้างถึงใบเสร็จฯ ชั่วคราว
+              </button>
+              <button
+                class="btn btn-danger-sm"
+                type="button"
+                (click)="onClearPayment()"
+              >
+                <i class="pi pi-trash"></i> ลบ
+              </button>
+            </div>
+            <div class="field-grid col-3">
+              <div class="field-group">
+                <label class="field-label">ชำระด้วยเงินสด</label>
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    class="input-base"
+                    placeholder="Enter value"
+                    formControlName="cashAmount"
+                  />
+                  <span class="unit-label">บาท</span>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label required">รหัสสกุลเงิน</label>
+                <div class="lookup-field compact">
+                  <input
+                    type="text"
+                    class="input-base"
+                    placeholder="THB"
+                    formControlName="currencyCode"
+                  />
+                  <button class="lookup-btn" type="button">
+                    <i class="pi pi-search"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label required">อัตราแลกเปลี่ยน</label>
+                <input
+                  type="number"
+                  class="input-base"
+                  placeholder="1.00"
+                  formControlName="exchangeRate"
+                  step="0.0001"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- ── SECTION 3: Payment Tabs ── -->
+          <div class="form-section">
+            <div class="section-label">รายละเอียดการรับเงิน</div>
+            <div class="inner-tabs">
+              @for (tab of paymentTabs; track tab.key) {
+                <button
+                  type="button"
+                  class="inner-tab-btn"
+                  [class.active]="activePaymentTab() === tab.key"
+                  (click)="activePaymentTab.set(tab.key)"
+                >
+                  {{ tab.label }}
+                </button>
+              }
+            </div>
+
+            <!-- เช็ค -->
+            @if (activePaymentTab() === "check") {
+              <div class="table-section">
+                <div class="table-toolbar">
+                  <span class="table-section-title">รายละเอียดเช็ค</span>
+                  <div class="table-actions">
+                    <button
+                      type="button"
+                      class="tbl-btn add-btn"
+                      (click)="addCheckRow()"
+                    >
+                      <i class="pi pi-plus"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="tbl-btn del-btn"
+                      (click)="deleteSelectedCheckRows()"
+                    >
+                      <i class="pi pi-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="table-wrapper">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th class="col-check">
+                          <input
+                            type="checkbox"
+                            (change)="toggleAllCheckRows($event)"
+                          />
+                        </th>
+                        <th class="col-min">
+                          ธนาคาร <span class="req">*</span>
+                        </th>
+                        <th class="col-sm">สาขา</th>
+                        <th class="col-md">
+                          เลขที่เช็ค <span class="req">*</span>
+                        </th>
+                        <th class="col-md">
+                          วันที่เช็ค <span class="req">*</span>
+                        </th>
+                        <th class="col-num">
+                          มูลค่าเช็ค <span class="req">*</span>
+                        </th>
+                        <th class="col-num">
+                          ตัดชำระ <span class="req">*</span>
+                        </th>
+                        <th class="col-lg">รายละเอียด</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (row of checkRows(); track row.id) {
+                        <tr [class.selected-row]="row.selected">
+                          <td class="col-check">
+                            <input
+                              type="checkbox"
+                              [checked]="row.selected"
+                              (change)="
+                                updateCheckRow(
+                                  row.id,
+                                  'selected',
+                                  $any($event.target).checked
+                                )
+                              "
+                            />
+                          </td>
+                          <td>
+                            <div class="cell-lookup">
+                              <input
+                                type="text"
+                                class="cell-input"
+                                [value]="row.bank"
+                                (input)="
+                                  updateCheckRow(
+                                    row.id,
+                                    'bank',
+                                    $any($event.target).value
+                                  )
+                                "
+                                placeholder="รหัสธนาคาร"
+                              />
+                              <button type="button" class="cell-lookup-btn">
+                                <i class="pi pi-search"></i>
+                              </button>
+                            </div>
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              class="cell-input"
+                              [value]="row.branch"
+                              (input)="
+                                updateCheckRow(
+                                  row.id,
+                                  'branch',
+                                  $any($event.target).value
+                                )
+                              "
+                              placeholder="-"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              class="cell-input"
+                              [value]="row.checkNo"
+                              (input)="
+                                updateCheckRow(
+                                  row.id,
+                                  'checkNo',
+                                  $any($event.target).value
+                                )
+                              "
+                              placeholder="เลขที่เช็ค"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              class="cell-input"
+                              [value]="row.checkDate"
+                              (input)="
+                                updateCheckRow(
+                                  row.id,
+                                  'checkDate',
+                                  $any($event.target).value
+                                )
+                              "
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              class="cell-input text-right"
+                              [value]="row.checkAmount ?? ''"
+                              (input)="
+                                updateCheckRow(
+                                  row.id,
+                                  'checkAmount',
+                                  +$any($event.target).value
+                                )
+                              "
+                              placeholder="0.00"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              class="cell-input text-right"
+                              [value]="row.deductAmount ?? ''"
+                              (input)="
+                                updateCheckRow(
+                                  row.id,
+                                  'deductAmount',
+                                  +$any($event.target).value
+                                )
+                              "
+                              placeholder="0.00"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              class="cell-input"
+                              [value]="row.detail"
+                              (input)="
+                                updateCheckRow(
+                                  row.id,
+                                  'detail',
+                                  $any($event.target).value
+                                )
+                              "
+                              placeholder="-"
+                            />
+                          </td>
+                        </tr>
+                      }
+                      @if (checkRows().length === 0) {
+                        <tr>
+                          <td colspan="8" class="empty-row">
+                            ไม่มีข้อมูล — กด <strong>+</strong> เพื่อเพิ่มแถว
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+            @if (activePaymentTab() !== "check") {
+              <div class="empty-tab-state">
+                <i class="pi pi-inbox"></i>
+                <span>{{ paymentTabs | keyvalue }} — ยังไม่มีข้อมูล</span>
+              </div>
+            }
+          </div>
+
+          <!-- ── SECTION 4: รายการใบแจ้งหนี้ ── -->
+          <div class="form-section">
+            <div class="section-label">รายการใบแจ้งหนี้</div>
+            <div class="table-section">
+              <div class="table-toolbar">
+                <span class="table-section-title"
+                  >Invoice ที่ต้องการตัดยอด</span
+                >
+                <div class="table-actions">
+                  <button
+                    type="button"
+                    class="tbl-btn add-btn"
+                    (click)="addInvoiceRow()"
+                  >
+                    <i class="pi pi-plus"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="tbl-btn del-btn"
+                    (click)="deleteSelectedInvoiceRows()"
+                  >
+                    <i class="pi pi-minus"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th class="col-check">
+                        <input
+                          type="checkbox"
+                          (change)="toggleAllInvoiceRows($event)"
+                        />
+                      </th>
+                      <th class="col-sm">สาขา</th>
+                      <th class="col-md">Invoice No.</th>
+                      <th class="col-md">Invoice Date</th>
+                      <th class="col-num">จำนวนเงิน</th>
+                      <th class="col-num">หนี้คงเหลือ</th>
+                      <th class="col-num">มูลค่ารวมฯ / บางส่วน</th>
+                      <th class="col-num">มูลค่าลดหนี้</th>
+                      <th class="col-check">รายละเอียด</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of invoiceRows(); track row.id) {
+                      <tr [class.selected-row]="row.selected">
+                        <td class="col-check">
+                          <input
+                            type="checkbox"
+                            [checked]="row.selected"
+                            (change)="
+                              updateInvoiceRow(
+                                row.id,
+                                'selected',
+                                $any($event.target).checked
+                              )
+                            "
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            class="cell-input"
+                            [value]="row.branch"
+                            (input)="
+                              updateInvoiceRow(
+                                row.id,
+                                'branch',
+                                $any($event.target).value
+                              )
+                            "
+                            placeholder="-"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            class="cell-input"
+                            [value]="row.invoiceNo"
+                            (input)="
+                              updateInvoiceRow(
+                                row.id,
+                                'invoiceNo',
+                                $any($event.target).value
+                              )
+                            "
+                            placeholder="INV-XXXX"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="date"
+                            class="cell-input"
+                            [value]="row.invoiceDate"
+                            (input)="
+                              updateInvoiceRow(
+                                row.id,
+                                'invoiceDate',
+                                $any($event.target).value
+                              )
+                            "
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            class="cell-input text-right"
+                            [value]="row.totalAmount"
+                            (input)="
+                              updateInvoiceRow(
+                                row.id,
+                                'totalAmount',
+                                $any($event.target).value
+                              )
+                            "
+                            placeholder="0.00"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            class="cell-input text-right"
+                            [value]="row.remainingDebt"
+                            (input)="
+                              updateInvoiceRow(
+                                row.id,
+                                'remainingDebt',
+                                $any($event.target).value
+                              )
+                            "
+                            placeholder="0.00"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            class="cell-input text-right highlight-cell"
+                            [value]="row.payAmount"
+                            (input)="
+                              updateInvoiceRow(
+                                row.id,
+                                'payAmount',
+                                $any($event.target).value
+                              )
+                            "
+                            placeholder="0.00"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            class="cell-input text-right"
+                            [value]="row.creditAmount"
+                            (input)="
+                              updateInvoiceRow(
+                                row.id,
+                                'creditAmount',
+                                $any($event.target).value
+                              )
+                            "
+                            placeholder="0.00"
+                          />
+                        </td>
+                        <td class="text-center">
+                          <button
+                            type="button"
+                            class="expand-btn"
+                            [class.active]="row.expanded"
+                            (click)="toggleInvoiceExpand(row.id)"
+                            title="รายละเอียด"
+                          >
+                            <i
+                              class="pi"
+                              [class.pi-eye]="!row.expanded"
+                              [class.pi-eye-slash]="row.expanded"
+                            ></i>
+                          </button>
+                        </td>
+                      </tr>
+
+                      <!-- Expanded detail row -->
+                      @if (row.expanded) {
+                        <tr class="breakdown-row">
+                          <td colspan="9">
+                            <div class="breakdown-panel">
+                              <div class="breakdown-title">
+                                <i class="pi pi-receipt"></i>
+                                รายละเอียด: {{ row.invoiceNo || "—" }}
+                              </div>
+                              <table class="data-table breakdown-table">
+                                <thead>
+                                  <tr>
+                                    <th class="col-lg">รายการ</th>
+                                    <th class="col-num">ยอดเงิน</th>
+                                    <th class="col-num">หนี้เหลือ</th>
+                                    <th class="col-num">มูลค่าชำระ</th>
+                                    <th class="col-num">VAT</th>
+                                    <th class="col-num">มูลค่า Invoice</th>
+                                    <th class="col-num">W/T</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  @for (
+                                    item of row.items;
+                                    track $index;
+                                    let i = $index
+                                  ) {
+                                    <tr>
+                                      <td>
+                                        <input
+                                          type="text"
+                                          class="cell-input"
+                                          [value]="item.item"
+                                          (input)="
+                                            updateItemRow(
+                                              row.id,
+                                              i,
+                                              'item',
+                                              $any($event.target).value
+                                            )
+                                          "
+                                          placeholder="รายการ"
+                                        />
+                                      </td>
+                                      <td>
+                                        <input
+                                          type="number"
+                                          class="cell-input text-right"
+                                          [value]="item.amount"
+                                          (input)="
+                                            updateItemRow(
+                                              row.id,
+                                              i,
+                                              'amount',
+                                              $any($event.target).value
+                                            )
+                                          "
+                                          placeholder="0.00"
+                                        />
+                                      </td>
+                                      <td>
+                                        <input
+                                          type="number"
+                                          class="cell-input text-right"
+                                          [value]="item.debt"
+                                          (input)="
+                                            updateItemRow(
+                                              row.id,
+                                              i,
+                                              'debt',
+                                              $any($event.target).value
+                                            )
+                                          "
+                                          placeholder="0.00"
+                                        />
+                                      </td>
+                                      <td>
+                                        <input
+                                          type="number"
+                                          class="cell-input text-right"
+                                          [value]="item.payAmount"
+                                          (input)="
+                                            updateItemRow(
+                                              row.id,
+                                              i,
+                                              'payAmount',
+                                              $any($event.target).value
+                                            )
+                                          "
+                                          placeholder="0.00"
+                                        />
+                                      </td>
+                                      <td>
+                                        <input
+                                          type="number"
+                                          class="cell-input text-right"
+                                          [value]="item.vat"
+                                          (input)="
+                                            updateItemRow(
+                                              row.id,
+                                              i,
+                                              'vat',
+                                              $any($event.target).value
+                                            )
+                                          "
+                                          placeholder="0.00"
+                                        />
+                                      </td>
+                                      <td>
+                                        <input
+                                          type="number"
+                                          class="cell-input text-right"
+                                          [value]="item.invoiceValue"
+                                          (input)="
+                                            updateItemRow(
+                                              row.id,
+                                              i,
+                                              'invoiceValue',
+                                              $any($event.target).value
+                                            )
+                                          "
+                                          placeholder="0.00"
+                                        />
+                                      </td>
+                                      <td>
+                                        <input
+                                          type="number"
+                                          class="cell-input text-right"
+                                          [value]="item.wht"
+                                          (input)="
+                                            updateItemRow(
+                                              row.id,
+                                              i,
+                                              'wht',
+                                              $any($event.target).value
+                                            )
+                                          "
+                                          placeholder="0.00"
+                                        />
+                                      </td>
+                                    </tr>
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    }
+                    @if (invoiceRows().length === 0) {
+                      <tr>
+                        <td colspan="9" class="empty-row">
+                          ไม่มีข้อมูล — กด <strong>+</strong> เพื่อเพิ่ม Invoice
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── SECTION 5: สรุปมูลค่า ── -->
+          <div class="form-section">
+            <div class="section-label">สรุปมูลค่า</div>
+            <div class="summary-grid">
+              <div class="summary-left">
+                <div class="summary-row">
+                  <span class="summary-key">มูลค่ารวมใบแจ้งหนี้</span>
+                  <span class="summary-value">{{
+                    totalInvoiceAmount() | number: "1.2-2"
+                  }}</span>
+                  <span class="summary-unit">บาท</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-key">มูลค่ารวมรับชำระ</span>
+                  <span class="summary-value highlight">{{
+                    totalPaymentAmount() | number: "1.2-2"
+                  }}</span>
+                  <span class="summary-unit">บาท</span>
+                </div>
+                <div class="summary-row border-top">
+                  <span class="summary-key">ผลต่าง</span>
+                  <span
+                    class="summary-value"
+                    [class.negative]="diffAmount() < 0"
+                    >{{ diffAmount() | number: "1.2-2" }}</span
+                  >
+                  <span class="summary-unit">บาท</span>
+                </div>
+              </div>
+
+              <div class="summary-right">
+                <div class="tax-grid">
+                  <div class="tax-row">
+                    <span class="tax-label">ยอดก่อน VAT</span>
+                    <span class="tax-value">{{
+                      beforeVat() | number: "1.2-2"
+                    }}</span>
+                  </div>
+                  <div class="tax-row">
+                    <span class="tax-label">VAT (7%)</span>
+                    <span class="tax-value">{{
+                      vatAmount() | number: "1.2-2"
+                    }}</span>
+                  </div>
+                  <div class="tax-row highlight-tax">
+                    <span class="tax-label">ยอดสุทธิ</span>
+                    <span class="tax-value bold">{{
+                      totalPaymentAmount() | number: "1.2-2"
+                    }}</span>
+                  </div>
+                  <div class="tax-row">
+                    <span class="tax-label">WHT</span>
+                    <span class="tax-value">0.00</span>
+                  </div>
+                </div>
+
+                <div class="field-group mt-4">
+                  <label class="field-label">Profit Center</label>
+                  <div class="lookup-field">
+                    <input
+                      type="text"
+                      class="input-code"
+                      placeholder="รหัส"
+                      formControlName="profitCenterCode"
+                    />
+                    <button type="button" class="lookup-btn">
+                      <i class="pi pi-search"></i>
+                    </button>
+                    <input
+                      type="text"
+                      class="input-display"
+                      placeholder="ชื่อ Profit Center"
+                      formControlName="profitCenterName"
+                      readonly
+                    />
+                  </div>
+                </div>
+
+                <div class="field-group mt-2">
+                  <label class="field-label">Account No (Diff Amt)</label>
+                  <div class="lookup-field">
+                    <input
+                      type="text"
+                      class="input-code"
+                      placeholder="รหัส"
+                      formControlName="diffAccCode"
+                    />
+                    <button type="button" class="lookup-btn">
+                      <i class="pi pi-search"></i>
+                    </button>
+                    <input
+                      type="text"
+                      class="input-display"
+                      placeholder="ชื่อบัญชี"
+                      formControlName="diffAccName"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Footer Meta ── -->
+          <div class="form-footer-meta">
+            <span class="meta-item"
+              ><i class="pi pi-user"></i> แก้ไขล่าสุดโดย:
+              <strong>SPACE</strong></span
+            >
+            <span class="meta-separator">|</span>
+            <span class="meta-item"
+              ><i class="pi pi-calendar"></i> วันที่แก้ไขล่าสุด:
+              <strong>{{ todayDisplay }}</strong></span
+            >
+          </div>
+        </form>
+      </div>
+
+      <!-- ══════ FOOTER ══════ -->
+      <div class="modal-footer-bar">
+        <button class="btn btn-ghost" type="button" (click)="close.emit()">
+          <i class="pi pi-times"></i> ยกเลิก
+        </button>
+        <div class="footer-right-actions">
+          <button
+            class="btn btn-secondary"
+            type="button"
+            (click)="onSaveDraft()"
+          >
+            <i class="pi pi-save"></i> บันทึกร่าง
+          </button>
+          <button class="btn btn-primary" type="button" (click)="onSubmit()">
+            <i class="pi pi-check"></i> บันทึก
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

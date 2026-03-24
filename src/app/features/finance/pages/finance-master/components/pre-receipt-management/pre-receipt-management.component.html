@@ -15,11 +15,7 @@
       <thead>
         <tr>
           <th class="checkbox-col">
-            <input
-              type="checkbox"
-              [checked]="isAllSelected()"
-              (change)="toggleSelectAll($event)"
-            />
+            <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll($event)" />
           </th>
           <th (click)="sortBy('contractNumber')">
             เลขที่ใบแจ้งหนี้
@@ -52,30 +48,14 @@
         @for (receipt of receipts(); track receipt.id) {
           <tr [class.selected]="isSelected(receipt.id)">
             <td class="checkbox-col">
-              <input
-                type="checkbox"
-                [checked]="isSelected(receipt.id)"
-                (change)="toggleSelection(receipt.id)"
-              />
+              <input type="checkbox" [checked]="isSelected(receipt.id)" (change)="toggleSelection(receipt.id)" />
             </td>
-            <td>
-              <div class="contract-number">{{ receipt.contractNumber }}</div>
-            </td>
-            <td>
-              <div class="customer-name">{{ receipt.customerName }}</div>
-            </td>
-            <td>
-              <div class="collection-item">{{ receipt.collectionItem }}</div>
-            </td>
-            <td>
-              <div class="amount">฿{{ receipt.amount.toLocaleString() }}</div>
-            </td>
-            <td>
-              <div class="date">{{ receipt.startDate }}</div>
-            </td>
-            <td>
-              <span class="status-badge status-ready">พร้อมออกใบเสร็จ</span>
-            </td>
+            <td><div class="contract-number">{{ receipt.contractNumber }}</div></td>
+            <td><div class="customer-name">{{ receipt.customerName }}</div></td>
+            <td><div class="collection-item">{{ receipt.collectionItem }}</div></td>
+            <td><div class="amount">฿{{ receipt.amount.toLocaleString() }}</div></td>
+            <td><div class="date">{{ receipt.startDate }}</div></td>
+            <td><span class="status-badge status-ready">พร้อมออกใบเสร็จ</span></td>
             <td>
               <div class="row-actions">
                 <button class="action-btn" title="Preview" (click)="onPreview(receipt)">
@@ -129,24 +109,19 @@
   <div class="action-menu-portal" [style.top.px]="menuPosition().top" [style.left.px]="menuPosition().left">
     <div class="action-menu">
       <button class="menu-item" (click)="onMenuAction(currentReceipt()!, 'ออกใบเสร็จ')">
-        <i class="pi pi-file-check"></i>
-        <span>ออกใบเสร็จ</span>
+        <i class="pi pi-file-check"></i><span>ออกใบเสร็จ</span>
       </button>
       <button class="menu-item" (click)="onMenuAction(currentReceipt()!, 'ออกใบเสร็จ + พิมพ์')">
-        <i class="pi pi-print"></i>
-        <span>ออกใบเสร็จ + พิมพ์เอกสาร</span>
+        <i class="pi pi-print"></i><span>ออกใบเสร็จ + พิมพ์เอกสาร</span>
       </button>
       <button class="menu-item" (click)="onMenuAction(currentReceipt()!, 'ออกใบเสร็จ + ส่งอีเมล')">
-        <i class="pi pi-send"></i>
-        <span>ออกใบเสร็จ + ส่งอีเมล</span>
+        <i class="pi pi-send"></i><span>ออกใบเสร็จ + ส่งอีเมล</span>
       </button>
       <button class="menu-item danger" (click)="onMenuAction(currentReceipt()!, 'ยกเลิกรายการ')">
-        <i class="pi pi-ban"></i>
-        <span>ยกเลิกรายการ</span>
+        <i class="pi pi-ban"></i><span>ยกเลิกรายการ</span>
       </button>
       <button class="menu-item danger" (click)="onMenuAction(currentReceipt()!, 'ลบสัญญา')">
-        <i class="pi pi-trash"></i>
-        <span>ลบสัญญา</span>
+        <i class="pi pi-trash"></i><span>ลบสัญญา</span>
       </button>
     </div>
   </div>
@@ -158,10 +133,7 @@
 
 <!-- Detail Modal -->
 @if (showDetailModal() && currentReceipt()) {
-  <app-receipt-detail-modal
-    [receipt]="currentReceipt()!"
-    (close)="closeDetailModal()"
-  />
+  <app-receipt-detail-modal [receipt]="currentReceipt()!" (close)="closeDetailModal()" />
 }
 
 <!-- Edit Modal -->
@@ -170,9 +142,7 @@
     <div class="edit-modal-container" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>แก้ไขข้อมูล</h3>
-        <button class="close-btn" (click)="closeEditModal()">
-          <i class="pi pi-times"></i>
-        </button>
+        <button class="close-btn" (click)="closeEditModal()"><i class="pi pi-times"></i></button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -216,4 +186,20 @@
   confirmIcon="pi-check"
   (confirm)="onConfirmCancel()"
   (cancel)="onCancelConfirm()"
+/>
+
+<!-- Receipt Entry Modal (single / manual) — เปิดจาก kebab "ออกใบเสร็จ" -->
+<app-receipt-entry-modal
+  [isOpen]="showEntryModal()"
+  [receipt]="currentReceipt()"
+  (close)="closeEntryModal()"
+  (submit)="onEntrySubmit($event)"
+/>
+
+<!-- Bulk Receipt Preview Modal — เปิดจาก "สร้างใบเสร็จรับเงิน" (bulk) -->
+<app-bulk-receipt-preview-modal
+  [isOpen]="showBulkPreview()"
+  [receipts]="bulkPreviewReceipts()"
+  (confirm)="onBulkConfirm()"
+  (cancel)="closeBulkPreview()"
 />
